@@ -1,0 +1,6 @@
+to create a new version of the nuget package: 
+* Change version in csproj file
+* Build in release mode (generates package in bin/release folder)
+* Download Nuget with credential provider to project folder
+* Add source feed to nuget
+* Then publish to feed: nuget.exe push -Source "TeleoptiNugets" -ApiKey AzureDevOps bin/release/Hangfire.Configuration.X.X.X.X.nupkg
