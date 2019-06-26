@@ -45,11 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\ConfigurationTest.cs" />
-    <Compile Include="Domain\WorkerEstimationTest.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
     <Compile Include="Infrastructure\ConfigurationTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
-    <Compile Include="Infrastructure\WorkerEstimationTest.cs" />
+    <Compile Include="Infrastructure\WorkerDeterminerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

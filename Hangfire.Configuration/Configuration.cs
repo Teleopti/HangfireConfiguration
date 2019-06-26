@@ -7,10 +7,10 @@ namespace Hangfire.Configuration
 		public Configuration(IConfigurationRepository repository) => 
 			_repository = repository;
 		
-		public void WriteWorkers(int? workers) => 
+		public void WriteGoalWorkerCount(int? workers) => 
 			_repository.WriteGoalWorkerCount(workers);
 
-		public int? ReadWorkers() => 
+		public int? ReadGoalWorkerCount() => 
 			_repository.ReadGoalWorkerCount();
 	}
 }

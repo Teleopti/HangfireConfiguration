@@ -5,18 +5,18 @@ namespace Hangfire.Configuration
 {
 	public class WorkerDeterminer
 	{
-		private readonly IConfigurationRepository _repository;
+		private readonly Configuration _configuration;
 		private readonly IMonitoringApi _monitor;
 
-		public WorkerDeterminer(IConfigurationRepository repository, IMonitoringApi monitor)
+		public WorkerDeterminer(Configuration configuration, IMonitoringApi monitor)
 		{
-			_repository = repository;
+			_configuration = configuration;
 			_monitor = monitor;
 		}
 
 		public int DetermineStartingServerWorkerCount()
 		{
-			var goalWorkerCount = _repository.ReadGoalWorkerCount() ?? 10; 
+			var goalWorkerCount = _configuration.ReadGoalWorkerCount() ?? 10; 
 			
 			if (goalWorkerCount <= 0)
 				return 1;

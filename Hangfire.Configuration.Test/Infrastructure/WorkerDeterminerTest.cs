@@ -1,15 +1,15 @@
+using System;
 using Hangfire.Server;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class WorkerEstimationTest
+	public class WorkerDeterminerTest
 	{
 		[Fact, CleanDatabase]
 		public void ShouldGetDefaultGoalWorkerCount()
 		{
-			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		{
 			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 			repository.WriteGoalWorkerCount(8);
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			{
 				connection.AnnounceServer("restartedServer", new ServerContext());
 			}
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -54,7 +54,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 				connection.AnnounceServer("server1", new ServerContext());
 				connection.AnnounceServer("restartedServer", new ServerContext());
 			}
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 				connection.AnnounceServer("server2", new ServerContext());
 				connection.AnnounceServer("server3", new ServerContext());
 			}
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -84,7 +84,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		{
 			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 			repository.WriteGoalWorkerCount(0);
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -96,7 +96,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		{
 			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 			repository.WriteGoalWorkerCount(-1);
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 
@@ -108,7 +108,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		{
 			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 			repository.WriteGoalWorkerCount(101);
-			var target = new WorkerDeterminer(repository, JobStorage.Current.GetMonitoringApi());
+			var target = HangfireConfiguration.GetWorkerDeterminer(ConnectionUtils.GetConnectionString());
 
 			var workers = target.DetermineStartingServerWorkerCount();
 

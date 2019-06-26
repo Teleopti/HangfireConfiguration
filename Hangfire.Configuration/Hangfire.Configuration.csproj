@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>bin\Release\</PackageOutputPath>
-    <Version>0.0.0.2</Version>    
+    <Version>0.0.0.3</Version>    
     <Authors>Calabrio</Authors>
     <Description>Hangfire Extension used for scaling workers</Description>    
   </PropertyGroup>
@@ -48,6 +48,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationMiddleware.cs" />
     <Compile Include="ConfigurationRepository.cs" />
+    <Compile Include="HangfireConfiguration.cs" />
     <Compile Include="Pages\ConfigurationPage.cs" />
     <Compile Include="AppBuilderExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

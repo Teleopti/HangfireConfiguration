@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
 			repository.Has(existing);
 			var configuration = new Configuration(repository);
 			
-			Assert.Equal(existing, configuration.ReadWorkers());
+			Assert.Equal(existing, configuration.ReadGoalWorkerCount());
 		}
 		
 		[Theory]
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain
 			var repository = new FakeConfigurationRepository();
 			var configuration = new Configuration(repository);
 			
-			configuration.WriteWorkers(workers);
+			configuration.WriteGoalWorkerCount(workers);
 			
 			Assert.Equal(workers, repository.Workers);
 		}
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
 			repository.Has(1);
 			var configuration = new Configuration(repository);
 			
-			configuration.WriteWorkers(null);
+			configuration.WriteGoalWorkerCount(null);
 			
 			Assert.Null(repository.Workers);
 		}

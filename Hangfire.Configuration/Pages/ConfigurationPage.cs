@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Pages
 		}
 
 		private string getWorkers() => 
-			_configuration.ReadWorkers().ToString();
+			_configuration.ReadGoalWorkerCount().ToString();
 		
 	}
 }

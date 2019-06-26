@@ -23,7 +23,7 @@ namespace Hangfire.Configuration
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveConfig")))
 			{
 				var workers = tryParseNullable(context.Request.Query["workers"]);
-				_configuration.WriteWorkers(workers);
+				_configuration.WriteGoalWorkerCount(workers);
 				page.DisplayConfirmationMessage();
 			}
 
