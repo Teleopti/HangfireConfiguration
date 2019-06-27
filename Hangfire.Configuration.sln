@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration", "H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample\ConsoleSample.csproj", "{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

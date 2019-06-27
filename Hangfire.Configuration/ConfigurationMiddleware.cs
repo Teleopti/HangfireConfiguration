@@ -1,3 +1,5 @@
+using System;
+using System.Data.SqlClient;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
@@ -9,10 +11,14 @@ namespace Hangfire.Configuration
 	{
 		private readonly Configuration _configuration;
 
-		public ConfigurationMiddleware(OwinMiddleware next, string connectionString) : base(next)
+		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationOptions options) : base(next)
 		{
+			if (options.PrepareSchemaIfNecessary)
+				using (var c = new SqlConnection(options.ConnectionString))
+					SqlServerObjectsInstaller.Install(c);
+			
 			_configuration = new Configuration(
-				new ConfigurationRepository(connectionString)
+				new ConfigurationRepository(options.ConnectionString)
 			);
 		}
 
