@@ -70,9 +70,6 @@ BEGIN
 END
 ELSE
     PRINT 'Table [$(HangfireConfigurationSchema)].[Configuration] already exists';
-    
-    INSERT INTO [$(HangfireConfigurationSchema)].[Configuration] ([Key], [Value]) VALUES ('GoalWorkerCount', 10);
-
 
 IF @CURRENT_SCHEMA_VERSION = 1
 BEGIN
