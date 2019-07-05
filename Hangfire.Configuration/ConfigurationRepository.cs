@@ -50,5 +50,25 @@ namespace Hangfire.Configuration
                 );
             };
         }
+
+        public string ReadConnectionString()
+        {
+            using (var connection = _connectionFactory())
+            {
+                return connection.QueryFirstOrDefault<string>(
+                    $@"SELECT TOP 1 [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration"
+                );
+            };
+        }
+
+        public void SaveConnectionString(string connectionStringToBeStored)
+        {
+            using (var connection = _connectionFactory())
+            {
+                connection.Execute(
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString]) VALUES (@connectionString);", 
+                        new {connectionString = connectionStringToBeStored});
+            }
+        }
     }
 }

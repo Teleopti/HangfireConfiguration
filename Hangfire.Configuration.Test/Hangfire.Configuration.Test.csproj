@@ -47,6 +47,7 @@
     <Compile Include="Domain\ConfigurationTest.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
     <Compile Include="Infrastructure\ConfigurationTest.cs" />
+    <Compile Include="Infrastructure\ConnectionStringTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
     <Compile Include="Infrastructure\WorkerDeterminerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
