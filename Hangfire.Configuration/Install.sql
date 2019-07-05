@@ -75,9 +75,6 @@ IF @CURRENT_SCHEMA_VERSION = 1
 BEGIN
 	PRINT 'Installing schema version 2';
 
-    DECLARE @GOAL_WORKER_COUNT int;
-    SELECT @GOAL_WORKER_COUNT = CONVERT(int, [Value]) FROM [$(HangfireConfigurationSchema)].[Configuration] WHERE [Key] = 'GoalWorkerCount';
-
 	CREATE TABLE [$(HangfireConfigurationSchema)].[Configuration2] (
 		[Id] [int] IDENTITY(1,1) NOT NULL,
 		[ConnectionString] [nvarchar](max) NULL,
@@ -89,11 +86,12 @@ BEGIN
 	);
 	PRINT 'Created table [$(HangfireConfigurationSchema)].[Configuration2]';
 
-    IF @GOAL_WORKER_COUNT IS NOT NULL
-    BEGIN
-        INSERT INTO [$(HangfireConfigurationSchema)].[Configuration2] ([GoalWorkerCount]) VALUES (@GOAL_WORKER_COUNT);
-        PRINT 'Inserted goal worker count';
-    END
+	EXEC sp_executesql N'
+		INSERT INTO [$(HangfireConfigurationSchema)].[Configuration2] ([GoalWorkerCount]) 
+		SELECT CONVERT(int, [Value]) FROM [$(HangfireConfigurationSchema)].[Configuration] 
+		WHERE [Key] = ''GoalWorkerCount''
+	';
+    PRINT 'Inserted goal worker count';
 
     DROP TABLE [$(HangfireConfigurationSchema)].[Configuration];
     PRINT 'Dropped Configuration table';
