@@ -61,18 +61,18 @@ namespace Hangfire.Configuration
             };
         }
 
-        public void SaveConnectionString(string connectionStringToBeStored)
+        public void SaveConnectionString(string connectionString)
         {
             using (var connection = _connectionFactory())
             {
                 var updated = connection.Execute(
                     $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString WHERE Id = @id;",
-                    new {connectionString = connectionStringToBeStored, id = 1});
+                    new {connectionString = connectionString, id = 1});
 
                 if (updated == 0)
                     connection.Execute(
                         $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString]) VALUES (@connectionString);",
-                        new {connectionString = connectionStringToBeStored});
+                        new {connectionString = connectionString});
             }
         }
     }
