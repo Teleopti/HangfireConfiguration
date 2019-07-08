@@ -31,12 +31,12 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET GoalWorkerCount = @workers WHERE Id = @id;", 
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET GoalWorkerCount = @workers WHERE Id = @id;",
                     new {workers = workers, id = 1});
-                
-                if (updated == 0) 
+
+                if (updated == 0)
                     connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([GoalWorkerCount]) VALUES (@workers);", 
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([GoalWorkerCount]) VALUES (@workers);",
                         new {workers = workers});
             }
         }
@@ -65,8 +65,13 @@ namespace Hangfire.Configuration
         {
             using (var connection = _connectionFactory())
             {
-                connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString]) VALUES (@connectionString);", 
+                var updated = connection.Execute(
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString WHERE Id = @id;",
+                    new {connectionString = connectionStringToBeStored, id = 1});
+
+                if (updated == 0)
+                    connection.Execute(
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString]) VALUES (@connectionString);",
                         new {connectionString = connectionStringToBeStored});
             }
         }

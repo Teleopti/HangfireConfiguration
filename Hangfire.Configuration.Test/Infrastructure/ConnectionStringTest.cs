@@ -30,5 +30,17 @@ namespace Hangfire.Configuration.Test.Infrastructure
             
             Assert.Equal("anotherConnectionString", connectionString);
         }
+        
+        [Fact, CleanDatabase]
+        public void ShouldUpdateWithConnectionString()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            repository.WriteGoalWorkerCount(1);
+            
+            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "connectionString");
+			
+            var connectionString = HangfireConfiguration.ReadConnectionString(ConnectionUtils.GetConnectionString());
+            Assert.Equal("connectionString", connectionString);
+        }
     }
 }
