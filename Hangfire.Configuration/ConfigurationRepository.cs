@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using Dapper;
 using SqlSetup = Hangfire.Configuration.SqlServerObjectsInstaller;
 
@@ -66,14 +67,24 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString WHERE Id = @id;",
-                    new {connectionString = connectionString, id = 1});
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active WHERE Id = @id;",
+                    new {connectionString = connectionString, active = 1, id = 1});
 
                 if (updated == 0)
                     connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString]) VALUES (@connectionString);",
-                        new {connectionString = connectionString});
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active]) VALUES (@connectionString, @active);",
+                        new {connectionString = connectionString, active = 1});
             }
+        }
+
+        public bool? IsActive()
+        {
+            using (var connection = _connectionFactory())
+            {
+                return connection.QueryFirstOrDefault<bool?>(
+                    $@"SELECT TOP 1 [Active] FROM [{SqlSetup.SchemaName}].Configuration"
+                );
+            };
         }
     }
 }
