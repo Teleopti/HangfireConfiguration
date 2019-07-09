@@ -15,10 +15,10 @@ namespace Hangfire.Configuration
             return repository.ReadConnectionString();
         }
 
-        public static void SaveConnectionString(string connectionString, string connectionStringToBeStored)
+        public static void SaveConfigurationInfo(string connectionString, string connectionStringToBeStored, string schemaName)
         {
             var repository = new ConfigurationRepository(connectionString);
-            repository.SaveConnectionString(connectionStringToBeStored);
+            repository.SaveConfigurationInfo(connectionStringToBeStored, schemaName);
         }
     }
 }

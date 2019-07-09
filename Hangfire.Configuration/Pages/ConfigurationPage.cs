@@ -22,12 +22,11 @@ namespace Hangfire.Configuration.Pages
 
         private void buildHtml()
         {
-            WriteLiteral("<h2>Hangfire configuration</h2>");
+            var configuration = getConfiguration();
             
-            if (0 == 1)
+            WriteLiteral("<h2>Hangfire configuration</h2>");
+            if (configuration.ServerName != null)
             {
-                var configuration = getConfiguration();
-                
                 WriteLiteral($"<h2>Hangfire storage {configuration.Id} - {configuration.Active}");
                 WriteLiteral("</h2>");
                 WriteLiteral("<div style='padding: 10px;'>");

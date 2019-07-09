@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldSaveConnectionString()
         {
-            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "connectionString");
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", null);
 			
             var connectionString = HangfireConfiguration.ReadConnectionString(ConnectionUtils.GetConnectionString());
             Assert.Equal("connectionString", connectionString);
@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldRead()
         {
-            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "anotherConnectionString");
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "anotherConnectionString", null);
 			
             var connectionString = HangfireConfiguration.ReadConnectionString(ConnectionUtils.GetConnectionString());
             
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteGoalWorkerCount(1);
             
-            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "connectionString");
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", null);
 			
             var connectionString = HangfireConfiguration.ReadConnectionString(ConnectionUtils.GetConnectionString());
             Assert.Equal("connectionString", connectionString);
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldActivateOnSave()
         {
-            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "connectionString");
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", null);
 			
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             var isActive = repository.IsActive();
@@ -59,10 +59,32 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteGoalWorkerCount(1);
             
-            HangfireConfiguration.SaveConnectionString(ConnectionUtils.GetConnectionString(), "connectionString");
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", null);
 			
             var isActive = repository.IsActive();
             Assert.True(isActive);
+        }
+        
+        [Fact, CleanDatabase]
+        public void ShouldSaveSchemaName()
+        {
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", "schemaName");
+			
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var schemaName = repository.ReadConfiguration().SchemaName;
+            Assert.Equal("schemaName", schemaName);
+        }
+        
+        [Fact, CleanDatabase]
+        public void ShouldSaveSchemaNameOnUpdate()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            repository.WriteGoalWorkerCount(1);
+            
+            HangfireConfiguration.SaveConfigurationInfo(ConnectionUtils.GetConnectionString(), "connectionString", "schemaName");
+            
+            var schemaName = repository.ReadConfiguration().SchemaName;
+            Assert.Equal("schemaName", schemaName);
         }
     }
 }

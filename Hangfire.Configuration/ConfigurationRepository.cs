@@ -55,7 +55,12 @@ namespace Hangfire.Configuration
 
         public StoredConfiguration ReadConfiguration()
         {
-            throw new NotImplementedException();
+            using (var connection = _connectionFactory())
+            {
+                return connection.QueryFirstOrDefault<StoredConfiguration>(
+                    $@"SELECT TOP 1 Id Id, ConnectionString ConnectionString, SchemaName SchemaName, GoalWorkerCount Workers, Active Active  FROM [{SqlSetup.SchemaName}].Configuration"
+                );
+            };
         }
 
         public string ReadConnectionString()
@@ -68,18 +73,18 @@ namespace Hangfire.Configuration
             };
         }
 
-        public void SaveConnectionString(string connectionString)
+        public void SaveConfigurationInfo(string connectionString, string schemaName)
         {
             using (var connection = _connectionFactory())
             {
                 var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active WHERE Id = @id;",
-                    new {connectionString = connectionString, active = 1, id = 1});
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active, SchemaName = @schemaName WHERE Id = @id;",
+                    new {connectionString = connectionString, active = 1, schemaName = schemaName, id = 1});
 
                 if (updated == 0)
                     connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active]) VALUES (@connectionString, @active);",
-                        new {connectionString = connectionString, active = 1});
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active], [SchemaName]) VALUES (@connectionString, @active, @schemaName);",
+                        new {connectionString = connectionString, active = 1, schemaName = schemaName});
             }
         }
 

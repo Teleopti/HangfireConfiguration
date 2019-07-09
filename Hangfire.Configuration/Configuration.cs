@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using Hangfire.Configuration.Pages;
 
 namespace Hangfire.Configuration
 {
@@ -41,14 +39,5 @@ namespace Hangfire.Configuration
 			var builder = new SqlConnectionStringBuilder(connectionString);
 			return builder.DataSource;
 		}
-	}
-	
-	public class ConfigurationViewModel
-	{
-		public int? Id { get; set; }
-		public string ServerName { get; set; }
-		public string DatabaseName { get; set; }
-		public string SchemaName { get; set; }
-		public string Active { get; set; }
 	}
 }
