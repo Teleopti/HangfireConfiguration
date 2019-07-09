@@ -22,8 +22,41 @@ namespace Hangfire.Configuration.Pages
 
         private void buildHtml()
         {
-            WriteLiteral("\r\n");
             WriteLiteral("<h2>Hangfire configuration</h2>");
+            
+            if (0 == 1)
+            {
+                var configuration = getConfiguration();
+                
+                WriteLiteral($"<h2>Hangfire storage {configuration.Id} - {configuration.Active}");
+                WriteLiteral("</h2>");
+                WriteLiteral("<div style='padding: 10px;'>");
+                WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
+                WriteLiteral("Server");
+                WriteLiteral("</span>");
+                WriteLiteral("<span>");
+                WriteLiteral($"{configuration.Server}");
+                WriteLiteral("</span>");
+                WriteLiteral("</div>");
+                WriteLiteral("<div style='padding: 10px;'>");
+                WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
+                WriteLiteral("Database");
+                WriteLiteral("</span>");
+                WriteLiteral("<span>");
+                WriteLiteral($"{configuration.Database}");
+                WriteLiteral("</span>");
+                WriteLiteral("</div>");
+                WriteLiteral("<div style='padding: 10px;'>");
+                WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
+                WriteLiteral("Schema Name");
+                WriteLiteral("</span>");
+                WriteLiteral("<span>");
+                WriteLiteral($"{configuration.SchemaName}");
+                WriteLiteral("</span>");
+                WriteLiteral("</div>");
+            }
+
+            WriteLiteral("\r\n");
             WriteLiteral("<p>");
             WriteLiteral("Use this configuration to set the goal number of workers to dynamically scale workers per server.");
             WriteLiteral("<br>");
@@ -46,6 +79,7 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral("&nbsp;&nbsp; <span>Configuration was saved !</span>");
         }
 
+        private ConfigurationViewModel getConfiguration() => _configuration.GetConfiguration();
         private string getWorkers() =>
             _configuration.ReadGoalWorkerCount().ToString();
     }
