@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral("Server");
                 WriteLiteral("</span>");
                 WriteLiteral("<span>");
-                WriteLiteral($"{configuration.Server}");
+                WriteLiteral($"{configuration.ServerName}");
                 WriteLiteral("</span>");
                 WriteLiteral("</div>");
                 WriteLiteral("<div style='padding: 10px;'>");
@@ -43,7 +43,7 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral("Database");
                 WriteLiteral("</span>");
                 WriteLiteral("<span>");
-                WriteLiteral($"{configuration.Database}");
+                WriteLiteral($"{configuration.DatabaseName}");
                 WriteLiteral("</span>");
                 WriteLiteral("</div>");
                 WriteLiteral("<div style='padding: 10px;'>");

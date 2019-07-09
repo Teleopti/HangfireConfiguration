@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using Hangfire.Configuration.Pages;
+
 namespace Hangfire.Configuration
 {
 	public class Configuration
@@ -12,5 +16,39 @@ namespace Hangfire.Configuration
 
 		public int? ReadGoalWorkerCount() => 
 			_repository.ReadGoalWorkerCount();
+
+		public ConfigurationViewModel GetConfiguration()
+		{
+			var storedConfiguration = _repository.ReadConfiguration();
+			return new ConfigurationViewModel()
+			{
+				Id = storedConfiguration.Id,
+				ServerName = getServerName(storedConfiguration.ConnectionString),
+				DatabaseName = getDatabaseName(storedConfiguration.ConnectionString),
+				SchemaName = storedConfiguration.SchemaName,
+				Active = storedConfiguration.Active == true ? "Active" : "Inactive"
+			};
+		}
+
+		private string getDatabaseName(string connectionString)
+		{
+			var builder = new SqlConnectionStringBuilder(connectionString);
+			return builder.InitialCatalog;
+		}
+
+		private string getServerName(string connectionString)
+		{
+			var builder = new SqlConnectionStringBuilder(connectionString);
+			return builder.DataSource;
+		}
+	}
+	
+	public class ConfigurationViewModel
+	{
+		public int? Id { get; set; }
+		public string ServerName { get; set; }
+		public string DatabaseName { get; set; }
+		public string SchemaName { get; set; }
+		public string Active { get; set; }
 	}
 }

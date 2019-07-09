@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\ConfigurationTest.cs" />
+    <Compile Include="Domain\FakeConfigurationRepository.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
     <Compile Include="Infrastructure\ConfigurationTest.cs" />
     <Compile Include="Infrastructure\ConnectionStringTest.cs" />

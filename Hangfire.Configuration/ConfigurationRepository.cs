@@ -11,6 +11,7 @@ namespace Hangfire.Configuration
     {
         void WriteGoalWorkerCount(int? workers);
         int? ReadGoalWorkerCount();
+        StoredConfiguration ReadConfiguration();
     }
 
     public class ConfigurationRepository : IConfigurationRepository
@@ -50,6 +51,11 @@ namespace Hangfire.Configuration
                     $@"SELECT TOP 1 [GoalWorkerCount] FROM [{SqlSetup.SchemaName}].Configuration"
                 );
             };
+        }
+
+        public StoredConfiguration ReadConfiguration()
+        {
+            throw new NotImplementedException();
         }
 
         public string ReadConnectionString()
