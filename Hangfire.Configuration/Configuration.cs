@@ -18,13 +18,14 @@ namespace Hangfire.Configuration
 		public ConfigurationViewModel GetConfiguration()
 		{
 			var storedConfiguration = _repository.ReadConfiguration();
+			
 			return new ConfigurationViewModel()
 			{
-				Id = storedConfiguration.Id,
-				ServerName = getServerName(storedConfiguration.ConnectionString),
-				DatabaseName = getDatabaseName(storedConfiguration.ConnectionString),
-				SchemaName = storedConfiguration.SchemaName,
-				Active = storedConfiguration.Active == true ? "Active" : "Inactive"
+				Id = storedConfiguration?.Id,
+				ServerName = getServerName(storedConfiguration?.ConnectionString),
+				DatabaseName = getDatabaseName(storedConfiguration?.ConnectionString),
+				SchemaName = storedConfiguration?.SchemaName,
+				Active = storedConfiguration?.Active == true ? "Active" : "Inactive"
 			};
 		}
 
