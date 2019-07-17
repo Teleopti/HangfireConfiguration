@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Pages
             WriteLiteral("<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 20px'>");
             WriteLiteral("Hangfire configuration");
             WriteLiteral("</h2>");
-            if (configuration != null && configuration.ServerName != "")
+            if (configuration.ServerName != "")
             {
                 WriteLiteral("<h3 style='font-family:\"Segoe UI\"; font-size: 26px; font-weight:500; margin:0px 20px 10px'>");
                 WriteLiteral($"Hangfire storage {configuration.Id} - {configuration.Active}");
