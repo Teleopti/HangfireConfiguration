@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class FakeConfigurationRepository: IConfigurationRepository
+    public class FakeConfigurationRepository : IConfigurationRepository
     {
         public int? Workers { get; private set; }
         private int? Id { get; set; }
@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             return Workers;
         }
-		
+
         public StoredConfiguration ReadConfiguration()
         {
             return new StoredConfiguration()
@@ -28,6 +28,12 @@ namespace Hangfire.Configuration.Test.Domain
                 Workers = Workers,
                 Active = Active
             };
+        }
+
+        public void SaveNewStorageConfiguration(string connectionString, string schemaName)
+        {
+            ConnectionString = connectionString;
+            SchemaName = schemaName;
         }
 
         public void Has(StoredConfiguration configuration)

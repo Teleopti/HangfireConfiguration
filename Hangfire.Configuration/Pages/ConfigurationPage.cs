@@ -91,7 +91,7 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral($"<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 10px'>");
                 WriteLiteral("Create new Hangfire storage");
                 WriteLiteral("</h2>");
-                WriteLiteral($"<form  action='{_basePath}/createStorage'>");
+                WriteLiteral($"<form  action='{_basePath}/saveNewStorageConfiguration'>");
                 WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
                 WriteLiteral("<br>");
                 WriteLiteral("<input type='text' id='server' name='server' style='margin: 0px 10px 10px; width:200px'>");

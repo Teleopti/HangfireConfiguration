@@ -34,6 +34,21 @@ namespace Hangfire.Configuration
 				_configuration.WriteGoalWorkerCount(workers);
 				page.DisplayConfirmationMessage();
 			}
+			
+			
+			if (context.Request.Path.StartsWithSegments(new PathString("/saveNewStorageConfiguration")))
+			{
+				var newStorageConfiguration = new NewStorageConfiguration()
+				{
+					Server = context.Request.Query["server"],
+					Database = context.Request.Query["database"],
+					User = context.Request.Query["user"],
+					Password = context.Request.Query["password"],
+					SchemaName = context.Request.Query["schemaName"]
+				};
+				
+				_configuration.SaveNewStorageConfiguration(newStorageConfiguration);
+			}
 
 			var html = page.ToString();
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
