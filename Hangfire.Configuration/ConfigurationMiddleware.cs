@@ -10,21 +10,23 @@ namespace Hangfire.Configuration
 	public class ConfigurationMiddleware : OwinMiddleware
 	{
 		private readonly Configuration _configuration;
+		private readonly HangfireConfigurationOptions _options;
 
 		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationOptions options) : base(next)
 		{
-			if (options.PrepareSchemaIfNecessary)
-				using (var c = new SqlConnection(options.ConnectionString))
+			_options = options;
+			if (_options.PrepareSchemaIfNecessary)
+				using (var c = new SqlConnection(_options.ConnectionString))
 					SqlServerObjectsInstaller.Install(c);
 			
 			_configuration = new Configuration(
-				new ConfigurationRepository(options.ConnectionString)
+				new ConfigurationRepository(_options.ConnectionString)
 			);
 		}
 
 		public override async Task Invoke(IOwinContext context)
 		{
-			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value);
+			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewStorageCreation);
 
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveConfig")))
 			{

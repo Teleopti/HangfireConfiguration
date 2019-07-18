@@ -7,11 +7,13 @@ namespace Hangfire.Configuration.Pages
         private readonly Configuration _configuration;
         private readonly string _basePath;
         private bool _displayConfirmationMessage;
+        private readonly bool _allowNewStorageCreation;
 
-        public ConfigurationPage(Configuration configuration, string basePath)
+        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewStorageCreation)
         {
             _configuration = configuration;
             _basePath = basePath;
+            _allowNewStorageCreation = allowNewStorageCreation;
         }
 
         public void DisplayConfirmationMessage() =>
@@ -83,6 +85,38 @@ namespace Hangfire.Configuration.Pages
             WriteLiteral("</form>");
             if (_displayConfirmationMessage)
                 WriteLiteral("&nbsp;&nbsp; <span>Configuration was saved !</span>");
+
+            if (_allowNewStorageCreation)
+            {
+                WriteLiteral($"<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 10px'>");
+                WriteLiteral("Create new Hangfire storage");
+                WriteLiteral("</h2>");
+                WriteLiteral($"<form  action='{_basePath}/createStorage'>");
+                WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral("<input type='text' id='server' name='server' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='database' style='padding: 4px 10px; color: #888; font-weight: bold;'>Database: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral("<input type='text' id='database' name='database' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral("<input type='text' id='schemaName' name='schemaName' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='user' style='padding: 4px 10px; color: #888; font-weight: bold;'>User: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral("<input type='text' id='user' name='user' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='password' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral("<input type='text' id='password' name='password' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent; margin-left: 10px;'>");
+                WriteLiteral("Save storage configuration");
+                WriteLiteral("</button>");
+                WriteLiteral("</form>");
+            }
         }
 
         private ConfigurationViewModel getConfiguration()
