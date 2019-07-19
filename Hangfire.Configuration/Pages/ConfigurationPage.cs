@@ -7,17 +7,23 @@ namespace Hangfire.Configuration.Pages
         private readonly Configuration _configuration;
         private readonly string _basePath;
         private bool _displayConfirmationMessage;
+        private bool _displayInvalidConfigurationMessage;
         private readonly bool _allowNewStorageCreation;
+        private readonly NewStorageConfiguration _inputedStorageConfiguration;
 
-        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewStorageCreation)
+        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewStorageCreation, NewStorageConfiguration inputedStorageConfiguration)
         {
             _configuration = configuration;
             _basePath = basePath;
             _allowNewStorageCreation = allowNewStorageCreation;
+            _inputedStorageConfiguration = inputedStorageConfiguration;
         }
 
         public void DisplayConfirmationMessage() =>
             _displayConfirmationMessage = true;
+        
+        public void DisplayInvalidConfigurationMessage() =>
+            _displayInvalidConfigurationMessage = true;
 
         public override void Execute() =>
             buildHtml();
@@ -94,28 +100,34 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral($"<form  action='{_basePath}/saveNewStorageConfiguration'>");
                 WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral("<input type='text' id='server' name='server' required style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='server' name='server' value='{_inputedStorageConfiguration.Server}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='database' style='padding: 4px 10px; color: #888; font-weight: bold;'>Database: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral("<input type='text' id='database' name='database' required style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral("<input type='text' id='schemaName' name='schemaName' required style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='database' name='database' value='{_inputedStorageConfiguration.Database}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='user' style='padding: 4px 10px; color: #888; font-weight: bold;'>User: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral("<input type='text' id='user' name='user' required style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='user' name='user' value='{_inputedStorageConfiguration.User}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='password' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral("<input type='text' id='password' name='password' required style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='password' name='password' value='{_inputedStorageConfiguration.Password}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedStorageConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent; margin-left: 10px;'>");
                 WriteLiteral("Save storage configuration");
                 WriteLiteral("</button>");
                 WriteLiteral("</form>");
+                if (_displayInvalidConfigurationMessage)
+                {
+                    WriteLiteral("&nbsp;&nbsp; <span style='color: red; font-weight: 600'>");
+                    WriteLiteral("The configuration you are trying to save is invalid!");
+                    WriteLiteral("</span>");
+                }
             }
         }
 

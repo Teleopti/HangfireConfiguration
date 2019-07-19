@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
@@ -11,6 +12,7 @@ namespace Hangfire.Configuration
 	{
 		private readonly Configuration _configuration;
 		private readonly HangfireConfigurationOptions _options;
+		private NewStorageConfiguration _newStorageConfiguration;
 
 		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationOptions options) : base(next)
 		{
@@ -22,11 +24,13 @@ namespace Hangfire.Configuration
 			_configuration = new Configuration(
 				new ConfigurationRepository(_options.ConnectionString)
 			);
+			
+			_newStorageConfiguration = new NewStorageConfiguration();
 		}
 
 		public override async Task Invoke(IOwinContext context)
 		{
-			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewStorageCreation);
+			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewStorageCreation, _newStorageConfiguration);
 
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveConfig")))
 			{
@@ -38,16 +42,19 @@ namespace Hangfire.Configuration
 			
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveNewStorageConfiguration")))
 			{
-				var newStorageConfiguration = new NewStorageConfiguration()
-				{
-					Server = context.Request.Query["server"],
-					Database = context.Request.Query["database"],
-					User = context.Request.Query["user"],
-					Password = context.Request.Query["password"],
-					SchemaName = context.Request.Query["schemaName"]
-				};
+				_newStorageConfiguration.Server = context.Request.Query["server"];
+				_newStorageConfiguration.Database = context.Request.Query["database"];
+				_newStorageConfiguration.User = context.Request.Query["user"];
+				_newStorageConfiguration.Password = context.Request.Query["password"];
+				_newStorageConfiguration.SchemaName = context.Request.Query["schemaName"];
 				
-				_configuration.SaveNewStorageConfiguration(newStorageConfiguration);
+				var anyConfigurationIsNull = _newStorageConfiguration.GetType().GetProperties()
+					.Any(p => (string)p.GetValue(_newStorageConfiguration) == "");
+
+				if (anyConfigurationIsNull)
+					page.DisplayInvalidConfigurationMessage();
+				else
+					_configuration.SaveNewStorageConfiguration(_newStorageConfiguration);
 			}
 
 			var html = page.ToString();
