@@ -90,12 +90,13 @@ namespace Hangfire.Configuration
             };
         }
 
-        public string ReadConnectionString()
+        public string ReadActiveConfigurationConnectionString()
         {
             using (var connection = _connectionFactory())
             {
-                return connection.QueryFirstOrDefault<string>(
-                    $@"SELECT [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration"
+                return connection.QuerySingleOrDefault<string>(
+                    $@"SELECT [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration WHERE Active = @active",
+                    new {active = 1}
                 );
             };
         }

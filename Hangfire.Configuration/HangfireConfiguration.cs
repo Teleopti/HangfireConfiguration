@@ -11,10 +11,10 @@ namespace Hangfire.Configuration
             return new WorkerDeterminer(configuration, JobStorage.Current.GetMonitoringApi());
         }
 
-        public static string ReadConnectionString(string connectionString)
+        public static string ReadActiveConfigurationConnectionString(string connectionString)
         {
             var repository = new ConfigurationRepository(connectionString);
-            return repository.ReadConnectionString();
+            return repository.ReadActiveConfigurationConnectionString();
         }
 
         public static void SaveDefaultConfiguration(string connectionString, string connectionStringToBeStored, string schemaName)
