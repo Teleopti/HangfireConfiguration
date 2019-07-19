@@ -12,7 +12,7 @@ namespace Hangfire.Configuration
         void WriteGoalWorkerCount(int? workers);
         int? ReadGoalWorkerCount();
         StoredConfiguration ReadConfiguration();
-        void SaveNewStorageConfiguration(string connectionString, string schemaName, bool active);
+        void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active);
     }
 
     public class ConfigurationRepository : IConfigurationRepository
@@ -64,7 +64,7 @@ namespace Hangfire.Configuration
             };
         }
 
-        public void SaveNewStorageConfiguration(string connectionString, string schemaName, bool active)
+        public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)
         {
             throw new NotImplementedException();
         }
@@ -79,7 +79,7 @@ namespace Hangfire.Configuration
             };
         }
 
-        public void SaveConfigurationInfo(string connectionString, string schemaName)
+        public void SaveDefaultConfiguration(string connectionString, string schemaName)
         {
             using (var connection = _connectionFactory())
             {
@@ -92,16 +92,6 @@ namespace Hangfire.Configuration
                         $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active], [SchemaName]) VALUES (@connectionString, @active, @schemaName);",
                         new {connectionString = connectionString, active = 1, schemaName = schemaName});
             }
-        }
-
-        public bool? IsActive()
-        {
-            using (var connection = _connectionFactory())
-            {
-                return connection.QueryFirstOrDefault<bool?>(
-                    $@"SELECT TOP 1 [Active] FROM [{SqlSetup.SchemaName}].Configuration"
-                );
-            };
         }
     }
 }

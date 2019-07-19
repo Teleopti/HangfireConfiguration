@@ -40,7 +40,7 @@ namespace Hangfire.Configuration
 			var connectionString = connectionStringBuilder.ConnectionString;
 			var schemaName = newStorageConfiguration.SchemaName;
 
-			_repository.SaveNewStorageConfiguration(connectionString, schemaName, false);
+			_repository.WriteNewStorageConfiguration(connectionString, schemaName, false);
 		}
 
 		private string getDatabaseName(string connectionString)
