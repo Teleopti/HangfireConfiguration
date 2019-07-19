@@ -7,5 +7,6 @@ namespace Hangfire.Configuration
         public string DatabaseName { get; set; }
         public string SchemaName { get; set; }
         public string Active { get; set; }
+        public int? Workers { get; set; }
     }
 }

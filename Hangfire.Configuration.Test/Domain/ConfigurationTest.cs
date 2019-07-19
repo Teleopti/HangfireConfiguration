@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 		
 		[Fact]
-		public void ShouldGetConfiguration()
+		public void ShouldBuildConfiguration()
 		{
 			var repository = new FakeConfigurationRepository();
 			repository.Has(new StoredConfiguration()
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
 			});
 			var configuration = new Configuration(repository);
 
-			var result = configuration.GetAllConfigurations();
+			var result = configuration.BuildConfigurations();
 			
 			Assert.Equal(1, result.Single().Id);
 			Assert.Equal("Server", result.Single().ServerName);
@@ -73,7 +73,7 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 		
 		[Fact]
-		public void ShouldGetConfiguration2()
+		public void ShouldBuildConfiguration2()
 		{
 			var repository = new FakeConfigurationRepository();
 
@@ -86,7 +86,7 @@ namespace Hangfire.Configuration.Test.Domain
 			});
 			var configuration = new Configuration(repository);
 
-			var result = configuration.GetAllConfigurations();
+			var result = configuration.BuildConfigurations();
 			
 			Assert.Equal(2, result.Single().Id);
 			Assert.Equal("Server2", result.Single().ServerName);
@@ -96,7 +96,7 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 		
 		[Fact]
-		public void ShouldGetMultipleConfigurations()
+		public void ShouldBuildForMultipleConfigurations()
 		{
 			var repository = new FakeConfigurationRepository();
 			var storedConfigurations = new List<StoredConfiguration>();
@@ -116,9 +116,23 @@ namespace Hangfire.Configuration.Test.Domain
 			repository.Has(storedConfigurations);
 			var configuration = new Configuration(repository);
 			
-			var result = configuration.GetAllConfigurations();
+			var result = configuration.BuildConfigurations();
 			
 			Assert.Equal(2, result.Count());
+		}
+		
+		[Fact]
+		public void ShouldBuildWithWorkers()
+		{
+			var repository = new FakeConfigurationRepository();
+			repository.Has(new StoredConfiguration(){
+				Workers = 10
+			});
+			var configuration = new Configuration(repository);
+			
+			var result = configuration.BuildConfigurations();
+			
+			Assert.Equal(10, result.Single().Workers);
 		}
 	}
 }

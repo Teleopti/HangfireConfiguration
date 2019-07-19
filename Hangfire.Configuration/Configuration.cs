@@ -17,7 +17,7 @@ namespace Hangfire.Configuration
 		public int? ReadGoalWorkerCount() => 
 			_repository.ReadGoalWorkerCount();
 
-		public IEnumerable<ConfigurationViewModel> GetAllConfigurations()
+		public IEnumerable<ConfigurationViewModel> BuildConfigurations()
 		{
 			var storedConfiguration = _repository.ReadConfiguration();
 
@@ -27,7 +27,8 @@ namespace Hangfire.Configuration
 				ServerName = getServerName(x?.ConnectionString),
 				DatabaseName = getDatabaseName(x?.ConnectionString),
 				SchemaName = x?.SchemaName,
-				Active = x?.Active == true ? "Active" : "Inactive"
+				Active = x?.Active == true ? "Active" : "Inactive",
+				Workers = x?.Workers
 			});
 		}
 		
