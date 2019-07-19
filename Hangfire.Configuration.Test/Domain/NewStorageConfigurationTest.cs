@@ -25,5 +25,24 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(connectionString, storedConfiguration.ConnectionString);
             Assert.Equal(schemaName, storedConfiguration.SchemaName);
         }
+        
+        [Fact]
+        public void ShouldBeInactiveOnSave()
+        {
+            var repository = new FakeConfigurationRepository();
+            var configuration = new Configuration(repository);
+
+            configuration.SaveNewStorageConfiguration(new NewStorageConfiguration()
+            {
+                Server = "AwesomeServer",
+                Database = "TestDatabase",
+                User = "testUser",
+                Password = "awesomePassword",
+                SchemaName = "awesomeSchema"
+            });
+
+            var storedConfiguration = repository.ReadConfiguration();
+            Assert.Equal(false, storedConfiguration.Active);
+        }
     }
 }

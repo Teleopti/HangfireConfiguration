@@ -30,10 +30,11 @@ namespace Hangfire.Configuration.Test.Domain
             };
         }
 
-        public void SaveNewStorageConfiguration(string connectionString, string schemaName)
+        public void SaveNewStorageConfiguration(string connectionString, string schemaName, bool active)
         {
             ConnectionString = connectionString;
             SchemaName = schemaName;
+            Active = active;
         }
 
         public void Has(StoredConfiguration configuration)
