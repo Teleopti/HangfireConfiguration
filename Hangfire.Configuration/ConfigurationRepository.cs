@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Hangfire.Configuration
     {
         void WriteGoalWorkerCount(int? workers);
         int? ReadGoalWorkerCount();
-        StoredConfiguration ReadConfiguration();
+        IEnumerable<StoredConfiguration> ReadConfiguration();
         void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active);
     }
 
@@ -34,8 +35,8 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET GoalWorkerCount = @workers WHERE Id = @id;",
-                    new {workers = workers, id = 1});
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET GoalWorkerCount = @workers WHERE Active = @active;",
+                    new {workers = workers, active = 1});
 
                 if (updated == 0)
                     connection.Execute(
@@ -54,19 +55,39 @@ namespace Hangfire.Configuration
             };
         }
 
-        public StoredConfiguration ReadConfiguration()
+        public void WriteDefaultConfiguration(string connectionString, string schemaName)
         {
             using (var connection = _connectionFactory())
             {
-                return connection.QueryFirstOrDefault<StoredConfiguration>(
-                    $@"SELECT TOP 1 Id Id, ConnectionString ConnectionString, SchemaName SchemaName, GoalWorkerCount Workers, Active Active  FROM [{SqlSetup.SchemaName}].Configuration"
-                );
-            };
+                var updated = connection.Execute(
+                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active, SchemaName = @schemaName WHERE ConnectionString IS NULL;",
+                    new {connectionString = connectionString, active = 1, schemaName = schemaName});
+
+                if (updated == 0)
+                    connection.Execute(
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active], [SchemaName]) VALUES (@connectionString, @active, @schemaName);",
+                        new {connectionString = connectionString, active = 1, schemaName = schemaName});
+            }
         }
 
         public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)
         {
-            throw new NotImplementedException();
+            using (var connection = _connectionFactory())
+            {
+                connection.Execute(
+                    $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [SchemaName], [Active]) VALUES (@connectionString, @schemaName, @active);",
+                    new {connectionString = connectionString, schemaName = schemaName, active = 0});
+            }
+        }
+        
+        public IEnumerable<StoredConfiguration> ReadConfiguration()
+        {
+            using (var connection = _connectionFactory())
+            {
+                return connection.Query<StoredConfiguration>(
+                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount as Workers, Active  FROM [{SqlSetup.SchemaName}].Configuration"
+                ).ToArray();
+            };
         }
 
         public string ReadConnectionString()
@@ -74,24 +95,9 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 return connection.QueryFirstOrDefault<string>(
-                    $@"SELECT TOP 1 [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration"
+                    $@"SELECT [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration"
                 );
             };
-        }
-
-        public void SaveDefaultConfiguration(string connectionString, string schemaName)
-        {
-            using (var connection = _connectionFactory())
-            {
-                var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active, SchemaName = @schemaName WHERE Id = @id;",
-                    new {connectionString = connectionString, active = 1, schemaName = schemaName, id = 1});
-
-                if (updated == 0)
-                    connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active], [SchemaName]) VALUES (@connectionString, @active, @schemaName);",
-                        new {connectionString = connectionString, active = 1, schemaName = schemaName});
-            }
         }
     }
 }

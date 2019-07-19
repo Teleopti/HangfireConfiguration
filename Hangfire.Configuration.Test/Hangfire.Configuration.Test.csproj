@@ -51,6 +51,7 @@
     <Compile Include="Infrastructure\GoalWorkerCountTest.cs" />
     <Compile Include="Infrastructure\DefaultConfigurationTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
+    <Compile Include="Infrastructure\NewStorageConfigurationTest.cs" />
     <Compile Include="Infrastructure\WorkerDeterminerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -22,8 +23,8 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(connectionString, storedConfiguration.ConnectionString);
-            Assert.Equal(schemaName, storedConfiguration.SchemaName);
+            Assert.Equal(connectionString, storedConfiguration.Single().ConnectionString);
+            Assert.Equal(schemaName, storedConfiguration.Single().SchemaName);
         }
         
         [Fact]
@@ -42,7 +43,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(false, storedConfiguration.Active);
+            Assert.Equal(false, storedConfiguration.Single().Active);
         }
     }
 }

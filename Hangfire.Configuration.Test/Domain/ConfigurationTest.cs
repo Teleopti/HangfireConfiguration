@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -64,10 +65,10 @@ namespace Hangfire.Configuration.Test.Domain
 
 			var result = configuration.GetConfiguration();
 			
-			Assert.Equal(storedConfiguration.Id, result.Id);
+			Assert.Equal(storedConfiguration.Single().Id, result.Id);
 			Assert.Equal("Server", result.ServerName);
 			Assert.Equal("Test_Database", result.DatabaseName);
-			Assert.Equal(storedConfiguration.SchemaName, result.SchemaName);
+			Assert.Equal(storedConfiguration.Single().SchemaName, result.SchemaName);
 			Assert.Equal("Active", result.Active);
 		}
 		
@@ -87,10 +88,10 @@ namespace Hangfire.Configuration.Test.Domain
 
 			var result = configuration.GetConfiguration();
 			
-			Assert.Equal(storedConfiguration.Id, result.Id);
+			Assert.Equal(storedConfiguration.Single().Id, result.Id);
 			Assert.Equal("Server2", result.ServerName);
 			Assert.Equal("Test_Database_2", result.DatabaseName);
-			Assert.Equal(storedConfiguration.SchemaName, result.SchemaName);
+			Assert.Equal(storedConfiguration.Single().SchemaName, result.SchemaName);
 			Assert.Equal("Inactive", result.Active);
 		}
 	}

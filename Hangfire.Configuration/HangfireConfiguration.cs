@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
@@ -18,7 +20,7 @@ namespace Hangfire.Configuration
         public static void SaveDefaultConfiguration(string connectionString, string connectionStringToBeStored, string schemaName)
         {
             var repository = new ConfigurationRepository(connectionString);
-            repository.SaveDefaultConfiguration(connectionStringToBeStored, schemaName);
+            repository.WriteDefaultConfiguration(connectionStringToBeStored, schemaName);
         }
     }
 }

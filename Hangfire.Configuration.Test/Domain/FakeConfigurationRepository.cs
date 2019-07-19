@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Hangfire.Configuration.Test.Domain
 {
     public class FakeConfigurationRepository : IConfigurationRepository
@@ -18,16 +20,20 @@ namespace Hangfire.Configuration.Test.Domain
             return Workers;
         }
 
-        public StoredConfiguration ReadConfiguration()
+        public IEnumerable<StoredConfiguration> ReadConfiguration()
         {
-            return new StoredConfiguration()
-            {
+
+            var configurations = new List<StoredConfiguration>();
+
+            configurations.Add(new StoredConfiguration(){
                 Id = Id,
                 ConnectionString = ConnectionString,
                 SchemaName = SchemaName,
                 Workers = Workers,
                 Active = Active
-            };
+            });
+
+            return configurations;
         }
 
         public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)

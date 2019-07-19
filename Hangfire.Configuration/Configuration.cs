@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace Hangfire.Configuration
 {
@@ -21,11 +22,11 @@ namespace Hangfire.Configuration
 			
 			return new ConfigurationViewModel()
 			{
-				Id = storedConfiguration?.Id,
-				ServerName = getServerName(storedConfiguration?.ConnectionString),
-				DatabaseName = getDatabaseName(storedConfiguration?.ConnectionString),
-				SchemaName = storedConfiguration?.SchemaName,
-				Active = storedConfiguration?.Active == true ? "Active" : "Inactive"
+				Id = storedConfiguration?.First().Id,
+				ServerName = getServerName(storedConfiguration?.First().ConnectionString),
+				DatabaseName = getDatabaseName(storedConfiguration?.First().ConnectionString),
+				SchemaName = storedConfiguration?.First().SchemaName,
+				Active = storedConfiguration?.First().Active == true ? "Active" : "Inactive"
 			};
 		}
 		
