@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Hangfire.Dashboard;
 
 namespace Hangfire.Configuration.Pages
@@ -132,7 +134,7 @@ namespace Hangfire.Configuration.Pages
         }
 
         private ConfigurationViewModel getConfiguration()
-            => _configuration.GetConfiguration();
+            => _configuration.GetAllConfigurations().First();
 
         private string getWorkers() =>
             _configuration.ReadGoalWorkerCount().ToString();

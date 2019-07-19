@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -16,18 +17,18 @@ namespace Hangfire.Configuration
 		public int? ReadGoalWorkerCount() => 
 			_repository.ReadGoalWorkerCount();
 
-		public ConfigurationViewModel GetConfiguration()
+		public IEnumerable<ConfigurationViewModel> GetAllConfigurations()
 		{
 			var storedConfiguration = _repository.ReadConfiguration();
-			
-			return new ConfigurationViewModel()
+
+			return storedConfiguration.Select(x => new ConfigurationViewModel()
 			{
-				Id = storedConfiguration?.First().Id,
-				ServerName = getServerName(storedConfiguration?.First().ConnectionString),
-				DatabaseName = getDatabaseName(storedConfiguration?.First().ConnectionString),
-				SchemaName = storedConfiguration?.First().SchemaName,
-				Active = storedConfiguration?.First().Active == true ? "Active" : "Inactive"
-			};
+				Id = x?.Id,
+				ServerName = getServerName(x?.ConnectionString),
+				DatabaseName = getDatabaseName(x?.ConnectionString),
+				SchemaName = x?.SchemaName,
+				Active = x?.Active == true ? "Active" : "Inactive"
+			});
 		}
 		
 		public void SaveNewStorageConfiguration(NewStorageConfiguration newStorageConfiguration)

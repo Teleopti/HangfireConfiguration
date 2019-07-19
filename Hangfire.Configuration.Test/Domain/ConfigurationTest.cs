@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -61,21 +62,21 @@ namespace Hangfire.Configuration.Test.Domain
 				Active = true
 			});
 			var configuration = new Configuration(repository);
-			var storedConfiguration = repository.ReadConfiguration();
 
-			var result = configuration.GetConfiguration();
+			var result = configuration.GetAllConfigurations();
 			
-			Assert.Equal(storedConfiguration.Single().Id, result.Id);
-			Assert.Equal("Server", result.ServerName);
-			Assert.Equal("Test_Database", result.DatabaseName);
-			Assert.Equal(storedConfiguration.Single().SchemaName, result.SchemaName);
-			Assert.Equal("Active", result.Active);
+			Assert.Equal(1, result.Single().Id);
+			Assert.Equal("Server", result.Single().ServerName);
+			Assert.Equal("Test_Database", result.Single().DatabaseName);
+			Assert.Equal("schemaName", result.Single().SchemaName);
+			Assert.Equal("Active", result.Single().Active);
 		}
 		
 		[Fact]
 		public void ShouldGetConfiguration2()
 		{
 			var repository = new FakeConfigurationRepository();
+
 			repository.Has(new StoredConfiguration()
 			{
 				Id = 2,
@@ -84,15 +85,40 @@ namespace Hangfire.Configuration.Test.Domain
 				Active = false
 			});
 			var configuration = new Configuration(repository);
-			var storedConfiguration = repository.ReadConfiguration();
 
-			var result = configuration.GetConfiguration();
+			var result = configuration.GetAllConfigurations();
 			
-			Assert.Equal(storedConfiguration.Single().Id, result.Id);
-			Assert.Equal("Server2", result.ServerName);
-			Assert.Equal("Test_Database_2", result.DatabaseName);
-			Assert.Equal(storedConfiguration.Single().SchemaName, result.SchemaName);
-			Assert.Equal("Inactive", result.Active);
+			Assert.Equal(2, result.Single().Id);
+			Assert.Equal("Server2", result.Single().ServerName);
+			Assert.Equal("Test_Database_2", result.Single().DatabaseName);
+			Assert.Equal("schemaName2", result.Single().SchemaName);
+			Assert.Equal("Inactive", result.Single().Active);
+		}
+		
+		[Fact]
+		public void ShouldGetMultipleConfigurations()
+		{
+			var repository = new FakeConfigurationRepository();
+			var storedConfigurations = new List<StoredConfiguration>();
+			storedConfigurations.Add(new StoredConfiguration(){
+				Id = 1,
+				ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
+				SchemaName = "schemaName1",
+				Active = true
+			});
+			storedConfigurations.Add(new StoredConfiguration(){
+				Id = 2,
+				ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
+				SchemaName = "schemaName2",
+				Active = false
+			});
+		
+			repository.Has(storedConfigurations);
+			var configuration = new Configuration(repository);
+			
+			var result = configuration.GetAllConfigurations();
+			
+			Assert.Equal(2, result.Count());
 		}
 	}
 }
