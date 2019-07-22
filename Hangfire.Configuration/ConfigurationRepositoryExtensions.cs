@@ -24,5 +24,15 @@ namespace Hangfire.Configuration
         
         public static IEnumerable<StoredConfiguration> ReadConfiguration(this IConfigurationRepository repository) => 
             repository.ReadConfigurations();
+
+        public static void WriteNewStorageConfiguration(this IConfigurationRepository repository, string connectionString, string schemaName, bool active)
+        {
+            repository.WriteConfiguration(new StoredConfiguration()
+            {
+                ConnectionString = connectionString,
+                SchemaName = schemaName,
+                Active = active
+            });
+        }
     }
 }

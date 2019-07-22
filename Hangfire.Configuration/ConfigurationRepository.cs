@@ -66,16 +66,6 @@ namespace Hangfire.Configuration
             }
         }
 
-        public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)
-        {
-            using (var connection = _connectionFactory())
-            {
-                connection.Execute(
-                    $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [SchemaName], [Active]) VALUES (@connectionString, @schemaName, @active);",
-                    new {connectionString = connectionString, schemaName = schemaName, active = 0});
-            }
-        }
-
         public void ActivateStorage(int configurationId)
         {
             throw new NotImplementedException();

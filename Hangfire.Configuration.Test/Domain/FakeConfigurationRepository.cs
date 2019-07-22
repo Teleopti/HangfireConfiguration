@@ -22,16 +22,6 @@ namespace Hangfire.Configuration.Test.Domain
             Data = Data.Append(configuration).ToArray();
         }
 
-        public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)
-        {
-            Data = Data.Append(new StoredConfiguration()
-            {
-                ConnectionString = connectionString,
-                SchemaName = schemaName,
-                Active = active
-            });
-        }
-
         public void ActivateStorage(int configurationId)
         {
             foreach (var d in Data)
