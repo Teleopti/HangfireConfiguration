@@ -8,15 +8,6 @@ using SqlSetup = Hangfire.Configuration.SqlServerObjectsInstaller;
 
 namespace Hangfire.Configuration
 {
-    public interface IConfigurationRepository
-    {
-        void WriteGoalWorkerCount(int? workers);
-        int? ReadGoalWorkerCount();
-        IEnumerable<StoredConfiguration> ReadConfiguration();
-        void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active);
-        void ActivateStorage(int configurationId);
-    }
-
     public class ConfigurationRepository : IConfigurationRepository
     {
         private readonly Func<IDbConnection> _connectionFactory;
@@ -31,20 +22,37 @@ namespace Hangfire.Configuration
             };
         }
 
-        public void WriteGoalWorkerCount(int? workers)
+        public IEnumerable<StoredConfiguration> ReadConfigurations()
         {
             using (var connection = _connectionFactory())
             {
-                var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET GoalWorkerCount = @workers WHERE Active = @active;",
-                    new {workers = workers, active = 1});
+                return connection.Query<StoredConfiguration>(
+                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active FROM [{SqlSetup.SchemaName}].Configuration"
+                ).ToArray();
+            };
+        }
 
-                if (updated == 0)
+        public void WriteConfiguration(StoredConfiguration configuration)
+        {
+            using (var connection = _connectionFactory())
+            {
+                if (configuration.Id != null)
+                {
                     connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([GoalWorkerCount]) VALUES (@workers);",
-                        new {workers = workers});
+                        $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, SchemaName = @schemaName, GoalWorkerCount = @goalWorkerCount, Active = @active WHERE Id = @id;",
+                        new {id = configuration.Id, connectionString = configuration.ConnectionString, schemaName = configuration.SchemaName, goalWorkerCount = configuration.GoalWorkerCount, active = configuration.Active});
+                }
+                else
+                {
+                    connection.Execute(
+                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [SchemaName], GoalWorkerCount, Active) VALUES (@connectionString, @schemaName, @goalWorkerCount, @active);",
+                        new {connectionString = configuration.ConnectionString, schemaName = configuration.SchemaName, goalWorkerCount = configuration.GoalWorkerCount, active = configuration.Active});
+                }
             }
         }
+        
+        
+        
 
         public int? ReadGoalWorkerCount()
         {
@@ -91,7 +99,7 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 return connection.Query<StoredConfiguration>(
-                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount as Workers, Active  FROM [{SqlSetup.SchemaName}].Configuration"
+                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active  FROM [{SqlSetup.SchemaName}].Configuration"
                 ).ToArray();
             };
         }

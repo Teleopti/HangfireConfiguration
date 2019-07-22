@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             repository.WriteGoalWorkerCount(10);
 
             var configuration = repository.ReadConfiguration();
-            Assert.Null(configuration.First().Workers);
+            Assert.Null(configuration.First().GoalWorkerCount);
         }
         
         [Fact, CleanDatabase]

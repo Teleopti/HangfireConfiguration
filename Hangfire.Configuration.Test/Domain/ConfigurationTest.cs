@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Domain
 			var repository = new FakeConfigurationRepository();
 			repository.Has(new StoredConfiguration()
 			{
-				Workers = existing
+				GoalWorkerCount = existing
 			});
 			var configuration = new Configuration(repository);
 			
@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Domain
 			var repository = new FakeConfigurationRepository();
 			repository.Has(new StoredConfiguration
 			{
-				Workers = 1
+				GoalWorkerCount = 1
 			});
 			var configuration = new Configuration(repository);
 			
@@ -126,7 +126,7 @@ namespace Hangfire.Configuration.Test.Domain
 		{
 			var repository = new FakeConfigurationRepository();
 			repository.Has(new StoredConfiguration(){
-				Workers = 10
+				GoalWorkerCount = 10
 			});
 			var configuration = new Configuration(repository);
 			

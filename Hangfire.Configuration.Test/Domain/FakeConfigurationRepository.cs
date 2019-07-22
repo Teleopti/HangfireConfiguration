@@ -6,22 +6,32 @@ namespace Hangfire.Configuration.Test.Domain
 {
     public class FakeConfigurationRepository : IConfigurationRepository
     {
-        public int? Workers { get; private set; }
         private int? Id { get; set; }
         private string ConnectionString { get; set; }
         private string SchemaName { get; set; }
         private bool? Active { get; set; }
-        
         private IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
+        
+        public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 
-        public void WriteGoalWorkerCount(int? workers)
+        public IEnumerable<StoredConfiguration> ReadConfigurations()
         {
-            Workers = workers;
+            return Data.ToArray();
         }
+
+        public void WriteConfiguration(StoredConfiguration configuration)
+        {
+            if (configuration.Id != null)
+                Data = Data.Where(x => x.Id != configuration.Id).ToArray();
+            Data = Data.Append(configuration).ToArray();
+        }
+        
+        
+        
 
         public int? ReadGoalWorkerCount()
         {
-            return Data.Single().Workers;
+            return Data.Single().GoalWorkerCount;
         }
 
         public IEnumerable<StoredConfiguration> ReadConfiguration()
@@ -49,9 +59,10 @@ namespace Hangfire.Configuration.Test.Domain
 
         public void Has(StoredConfiguration configuration)
         {
-            Data = Data.Append(new StoredConfiguration(){
+            Data = Data.Append(new StoredConfiguration()
+            {
                 Id = configuration.Id,
-                Workers = configuration.Workers,
+                GoalWorkerCount = configuration.GoalWorkerCount,
                 ConnectionString = configuration.ConnectionString,
                 SchemaName = configuration.SchemaName,
                 Active = configuration.Active
@@ -62,9 +73,10 @@ namespace Hangfire.Configuration.Test.Domain
         {
             foreach (var storedConfiguration in configuration)
             {
-                Data = Data.Append(new StoredConfiguration(){
+                Data = Data.Append(new StoredConfiguration()
+                {
                     Id = storedConfiguration.Id,
-                    Workers = storedConfiguration.Workers,
+                    GoalWorkerCount = storedConfiguration.GoalWorkerCount,
                     ConnectionString = storedConfiguration.ConnectionString,
                     SchemaName = storedConfiguration.SchemaName,
                     Active = storedConfiguration.Active

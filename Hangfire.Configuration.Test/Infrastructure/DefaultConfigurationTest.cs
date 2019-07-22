@@ -64,7 +64,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal(1, result.Single().Id);
             Assert.Equal("connectionString", result.Single().ConnectionString);
             Assert.Equal("schemaName", result.Single().SchemaName);
-            Assert.Equal(1, result.Single().Workers);
+            Assert.Equal(1, result.Single().GoalWorkerCount);
             Assert.Equal(true, result.Single().Active);
         }
         
