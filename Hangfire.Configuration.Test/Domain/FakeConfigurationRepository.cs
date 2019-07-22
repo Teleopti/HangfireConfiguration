@@ -25,14 +25,6 @@ namespace Hangfire.Configuration.Test.Domain
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
             Data = Data.Append(configuration).ToArray();
         }
-        
-        
-        
-
-        public int? ReadGoalWorkerCount()
-        {
-            return Data.Single().GoalWorkerCount;
-        }
 
         public IEnumerable<StoredConfiguration> ReadConfiguration()
         {

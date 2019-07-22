@@ -17,5 +17,8 @@ namespace Hangfire.Configuration
             configuration.GoalWorkerCount = workers;
             repository.WriteConfiguration(configuration);
         }
+
+        public static int? ReadGoalWorkerCount(this IConfigurationRepository repository) => 
+            repository.ReadConfigurations().Any() ? repository.ReadConfigurations().First().GoalWorkerCount : null;
     }
 }

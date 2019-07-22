@@ -50,19 +50,6 @@ namespace Hangfire.Configuration
                 }
             }
         }
-        
-        
-        
-
-        public int? ReadGoalWorkerCount()
-        {
-            using (var connection = _connectionFactory())
-            {
-                return connection.QueryFirstOrDefault<int?>(
-                    $@"SELECT TOP 1 [GoalWorkerCount] FROM [{SqlSetup.SchemaName}].Configuration"
-                );
-            };
-        }
 
         public void WriteDefaultConfiguration(string connectionString, string schemaName)
         {

@@ -7,7 +7,6 @@ namespace Hangfire.Configuration
         IEnumerable<StoredConfiguration> ReadConfigurations();
         void WriteConfiguration(StoredConfiguration configuration);
 
-        int? ReadGoalWorkerCount();
         IEnumerable<StoredConfiguration> ReadConfiguration();
         void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active);
         void ActivateStorage(int configurationId);
