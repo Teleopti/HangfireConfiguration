@@ -34,5 +34,15 @@ namespace Hangfire.Configuration
                 Active = active
             });
         }
+
+        public static void ActivateStorage(this IConfigurationRepository repository, int id)
+        {
+            var configurations = repository.ReadConfigurations();
+            foreach (var configuration in configurations)
+            {
+                configuration.Active = configuration.Id == id;
+                repository.WriteConfiguration(configuration);
+            }
+        }
     }
 }

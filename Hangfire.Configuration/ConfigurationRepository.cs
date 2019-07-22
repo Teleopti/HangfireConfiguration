@@ -66,11 +66,6 @@ namespace Hangfire.Configuration
             }
         }
 
-        public void ActivateStorage(int configurationId)
-        {
-            throw new NotImplementedException();
-        }
-
         public string ReadActiveConfigurationConnectionString()
         {
             using (var connection = _connectionFactory())

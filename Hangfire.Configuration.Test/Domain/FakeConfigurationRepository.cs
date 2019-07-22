@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,14 +19,6 @@ namespace Hangfire.Configuration.Test.Domain
             if (configuration.Id != null)
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
             Data = Data.Append(configuration).ToArray();
-        }
-
-        public void ActivateStorage(int configurationId)
-        {
-            foreach (var d in Data)
-            {
-                d.Active = d.Id == configurationId;
-            }
         }
 
         public void Has(StoredConfiguration configuration)
