@@ -14,6 +14,7 @@ namespace Hangfire.Configuration
         int? ReadGoalWorkerCount();
         IEnumerable<StoredConfiguration> ReadConfiguration();
         void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active);
+        void ActivateStorage(int configurationId);
     }
 
     public class ConfigurationRepository : IConfigurationRepository
@@ -79,7 +80,12 @@ namespace Hangfire.Configuration
                     new {connectionString = connectionString, schemaName = schemaName, active = 0});
             }
         }
-        
+
+        public void ActivateStorage(int configurationId)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<StoredConfiguration> ReadConfiguration()
         {
             using (var connection = _connectionFactory())

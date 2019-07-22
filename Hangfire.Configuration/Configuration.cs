@@ -57,6 +57,11 @@ namespace Hangfire.Configuration
 			var builder = new SqlConnectionStringBuilder(connectionString);
 			return builder.DataSource;
 		}
+
+		public void ActivateStorage(int configurationId)
+		{
+			_repository.ActivateStorage(configurationId);
+		}
 	}
 
 	public class NewStorageConfiguration

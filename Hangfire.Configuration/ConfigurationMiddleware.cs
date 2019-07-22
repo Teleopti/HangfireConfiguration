@@ -56,6 +56,12 @@ namespace Hangfire.Configuration
 				else
 					_configuration.SaveNewStorageConfiguration(_newStorageConfiguration);
 			}
+			
+			if (context.Request.Path.StartsWithSegments(new PathString("/activateConfiguration")))
+			{
+				var id = int.Parse(context.Request.Query["id"]);
+				_configuration.ActivateStorage(id);
+			}
 
 			var html = page.ToString();
 			context.Response.StatusCode = (int) HttpStatusCode.OK;

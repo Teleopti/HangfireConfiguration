@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("\r\n");
                     if (configuration.Active == "Inactive")
                     {
-                        WriteLiteral($@"<form action='{_basePath}/activateConfiguration' '<div style='padding: 10px;'>");
+                        WriteLiteral($@"<form action='{_basePath}/activateConfiguration?id={configuration.Id}' '<div style='padding: 10px;'>");
                         WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
                         WriteLiteral("Activate configuration");
                         WriteLiteral("</button>");

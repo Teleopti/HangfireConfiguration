@@ -39,6 +39,14 @@ namespace Hangfire.Configuration.Test.Domain
             });
         }
 
+        public void ActivateStorage(int configurationId)
+        {
+            foreach (var d in Data)
+            {
+                d.Active = d.Id == configurationId;
+            }
+        }
+
         public void Has(StoredConfiguration configuration)
         {
             Data = Data.Append(new StoredConfiguration(){
