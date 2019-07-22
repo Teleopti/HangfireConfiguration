@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hangfire.Configuration
@@ -20,5 +21,8 @@ namespace Hangfire.Configuration
 
         public static int? ReadGoalWorkerCount(this IConfigurationRepository repository) => 
             repository.ReadConfigurations().Any() ? repository.ReadConfigurations().First().GoalWorkerCount : null;
+        
+        public static IEnumerable<StoredConfiguration> ReadConfiguration(this IConfigurationRepository repository) => 
+            repository.ReadConfigurations();
     }
 }

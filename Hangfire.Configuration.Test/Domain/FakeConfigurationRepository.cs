@@ -6,10 +6,6 @@ namespace Hangfire.Configuration.Test.Domain
 {
     public class FakeConfigurationRepository : IConfigurationRepository
     {
-        private int? Id { get; set; }
-        private string ConnectionString { get; set; }
-        private string SchemaName { get; set; }
-        private bool? Active { get; set; }
         private IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
@@ -24,11 +20,6 @@ namespace Hangfire.Configuration.Test.Domain
             if (configuration.Id != null)
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
             Data = Data.Append(configuration).ToArray();
-        }
-
-        public IEnumerable<StoredConfiguration> ReadConfiguration()
-        {
-            return Data.ToArray();
         }
 
         public void WriteNewStorageConfiguration(string connectionString, string schemaName, bool active)

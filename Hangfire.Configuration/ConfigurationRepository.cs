@@ -81,16 +81,6 @@ namespace Hangfire.Configuration
             throw new NotImplementedException();
         }
 
-        public IEnumerable<StoredConfiguration> ReadConfiguration()
-        {
-            using (var connection = _connectionFactory())
-            {
-                return connection.Query<StoredConfiguration>(
-                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active  FROM [{SqlSetup.SchemaName}].Configuration"
-                ).ToArray();
-            };
-        }
-
         public string ReadActiveConfigurationConnectionString()
         {
             using (var connection = _connectionFactory())
