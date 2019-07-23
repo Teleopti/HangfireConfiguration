@@ -1,46 +1,50 @@
+using System.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class GoalWorkerCountTest
-	{
-		[Fact, CleanDatabase]
-		public void ShouldReadEmptyGoalWorkerCount()
-		{
-			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			
-			Assert.Null(repository.ReadGoalWorkerCount());
-		}
-		
-		[Fact, CleanDatabase]
-		public void ShouldWriteGoalWorkerCount()
-		{
-			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			
-			repository.WriteGoalWorkerCount(1);
-			
-			Assert.Equal(1, repository.ReadGoalWorkerCount());
-		}
-		
-		[Fact, CleanDatabase]
-		public void ShouldReadGoalWorkerCount()
-		{
-			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			repository.WriteGoalWorkerCount(1);
-			
-			Assert.Equal(1, repository.ReadGoalWorkerCount());
-		}
-		
+    [Collection("Infrastructure")]
+    public class GoalWorkerCountTest
+    {
+        [Fact, CleanDatabase]
+        public void ShouldReadEmptyGoalWorkerCount()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 
-		[Fact, CleanDatabase]
-		public void ShouldWriteNullGoalWorkerCount()
-		{
-			var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			repository.WriteGoalWorkerCount(1);
-			
-			repository.WriteGoalWorkerCount(null);
-			
-			Assert.Null(repository.ReadGoalWorkerCount());
-		}
-	}
+            Assert.Null(repository.ReadGoalWorkerCount());
+        }
+
+        [Fact, CleanDatabase]
+        public void ShouldWriteGoalWorkerCount()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+
+            repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+
+            Assert.Equal(1, repository.ReadGoalWorkerCount());
+        }
+
+        [Fact, CleanDatabase]
+        public void ShouldReadGoalWorkerCount()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+
+            Assert.Equal(1, repository.ReadGoalWorkerCount());
+        }
+
+
+        [Fact, CleanDatabase]
+        public void ShouldWriteNullGoalWorkerCount()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+
+            var configuration = repository.ReadConfigurations().Single();
+            configuration.GoalWorkerCount = null;
+            repository.WriteConfiguration(configuration);
+
+            Assert.Null(repository.ReadGoalWorkerCount());
+        }
+    }
 }

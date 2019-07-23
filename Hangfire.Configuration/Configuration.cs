@@ -11,8 +11,19 @@ namespace Hangfire.Configuration
         public Configuration(IConfigurationRepository repository) =>
             _repository = repository;
 
-        public void WriteGoalWorkerCount(int? workers) =>
-            _repository.WriteGoalWorkerCount(workers);
+        public void WriteGoalWorkerCount(int? workers)
+        {
+            var configurations = _repository.ReadConfigurations();
+            var configuration = new StoredConfiguration();
+            if (configurations.Any())
+            {
+                configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
+                if (configuration == null)
+                    configuration = configurations.First();
+            }
+            configuration.GoalWorkerCount = workers;
+            _repository.WriteConfiguration(configuration);
+        }
 
         public int? ReadGoalWorkerCount() =>
             _repository.ReadGoalWorkerCount();

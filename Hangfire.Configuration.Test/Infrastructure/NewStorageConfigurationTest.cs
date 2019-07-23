@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
+    [Collection("Infrastructure")]
     public class NewStorageConfigurationTest
     {
         [Fact, CleanDatabase]
@@ -37,11 +37,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
             repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            var configuration = new Configuration(repository);
             
-            repository.WriteGoalWorkerCount(10);
+            configuration.WriteGoalWorkerCount(10);
 
-            var configuration = repository.ReadConfiguration();
-            Assert.Null(configuration.First().GoalWorkerCount);
+            var config = repository.ReadConfiguration();
+            Assert.Null(config.First().GoalWorkerCount);
         }
         
         [Fact, CleanDatabase]

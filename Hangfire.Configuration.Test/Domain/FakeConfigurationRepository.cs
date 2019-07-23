@@ -20,7 +20,9 @@ namespace Hangfire.Configuration.Test.Domain
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
             Data = Data.Append(configuration).ToArray();
         }
-
+        
+        public void HasGoalWorkerCount(int goalWorkerCount) => Has(new StoredConfiguration{GoalWorkerCount = goalWorkerCount});
+        
         public void Has(StoredConfiguration configuration)
         {
             Data = Data.Append(new StoredConfiguration()
@@ -37,15 +39,9 @@ namespace Hangfire.Configuration.Test.Domain
         {
             foreach (var storedConfiguration in configuration)
             {
-                Data = Data.Append(new StoredConfiguration()
-                {
-                    Id = storedConfiguration.Id,
-                    GoalWorkerCount = storedConfiguration.GoalWorkerCount,
-                    ConnectionString = storedConfiguration.ConnectionString,
-                    SchemaName = storedConfiguration.SchemaName,
-                    Active = storedConfiguration.Active
-                });
+                Has(storedConfiguration);
             }
         }
+    
     }
 }
