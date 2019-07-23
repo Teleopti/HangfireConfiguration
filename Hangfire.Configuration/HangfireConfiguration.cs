@@ -1,26 +1,30 @@
-using System.Linq;
-
 namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        public static WorkerDeterminer GetWorkerDeterminer(string connectionString)
+        private static Configuration BuildConfiguration(string connectionString)
         {
             var repository = new ConfigurationRepository(connectionString);
             var configuration = new Configuration(repository);
+            return configuration;
+        }
+        
+        public static WorkerDeterminer GetWorkerDeterminer(string connectionString)
+        {
+            var configuration = BuildConfiguration(connectionString);
             return new WorkerDeterminer(configuration, JobStorage.Current.GetMonitoringApi());
         }
-
+        
         public static string ReadActiveConfigurationConnectionString(string connectionString)
         {
-            var repository = new ConfigurationRepository(connectionString);
-            return repository.ReadActiveConfigurationConnectionString();
+            var configuration = BuildConfiguration(connectionString);
+            return configuration.ReadActiveConfigurationConnectionString();
         }
 
         public static void SaveDefaultConfiguration(string connectionString, string connectionStringToBeStored, string schemaName)
         {
-            var repository = new ConfigurationRepository(connectionString);
-            repository.WriteDefaultConfiguration(connectionStringToBeStored, schemaName);
+            var configuration = BuildConfiguration(connectionString);
+            configuration.WriteDefaultConfiguration(connectionStringToBeStored, schemaName);
         }
     }
 }

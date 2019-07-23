@@ -50,31 +50,5 @@ namespace Hangfire.Configuration
                 }
             }
         }
-
-        public void WriteDefaultConfiguration(string connectionString, string schemaName)
-        {
-            using (var connection = _connectionFactory())
-            {
-                var updated = connection.Execute(
-                    $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, Active = @active, SchemaName = @schemaName WHERE ConnectionString IS NULL;",
-                    new {connectionString = connectionString, active = 1, schemaName = schemaName});
-
-                if (updated == 0)
-                    connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [Active], [SchemaName]) VALUES (@connectionString, @active, @schemaName);",
-                        new {connectionString = connectionString, active = 1, schemaName = schemaName});
-            }
-        }
-
-        public string ReadActiveConfigurationConnectionString()
-        {
-            using (var connection = _connectionFactory())
-            {
-                return connection.QuerySingleOrDefault<string>(
-                    $@"SELECT [ConnectionString] FROM [{SqlSetup.SchemaName}].Configuration WHERE Active = @active",
-                    new {active = 1}
-                );
-            };
-        }
     }
 }

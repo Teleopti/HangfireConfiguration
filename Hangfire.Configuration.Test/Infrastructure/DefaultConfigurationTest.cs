@@ -57,8 +57,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldReadDefaultConfiguration()
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var configuration = new Configuration(repository);
             repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
-            repository.WriteDefaultConfiguration("connectionString", "schemaName");
+            configuration.WriteDefaultConfiguration("connectionString", "schemaName");
 
             var result = repository.ReadConfigurations();
 
@@ -115,8 +116,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldReadActiveConfigurationConnectionString()
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var configuration = new Configuration(repository);
             repository.WriteNewStorageConfiguration("newConfigurationConnectionString", "newSchemaName", false);
-            repository.WriteDefaultConfiguration("connectionString", "schemaName");
+            configuration.WriteDefaultConfiguration("connectionString", "schemaName");
 
             var result = HangfireConfiguration.ReadActiveConfigurationConnectionString(ConnectionUtils.GetConnectionString());
 

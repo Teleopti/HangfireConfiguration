@@ -29,11 +29,11 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
+            var configuration = new Configuration(repository);
             
-            repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
 
-            var configuration = repository.ReadConfigurations();
-            Assert.Equal("newConnectionString", configuration.First().ConnectionString);
+            Assert.Equal("newConnectionString", repository.ReadConfigurations().First().ConnectionString);
         }
 
         [Fact, CleanDatabase]
@@ -41,8 +41,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
-            repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
             var configuration = new Configuration(repository);
+            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
             
             configuration.WriteGoalWorkerCount(10);
 
@@ -54,7 +54,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldReadAllConfigurations()
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            var configuration = new Configuration(repository);
+            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
             repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
             
             var configurations = repository.ReadConfigurations();
