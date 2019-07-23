@@ -5,9 +5,6 @@ namespace Hangfire.Configuration
 {
     public static class ConfigurationRepositoryExtensions
     {
-        public static int? ReadGoalWorkerCount(this IConfigurationRepository repository) => 
-            repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
-        
         public static IEnumerable<StoredConfiguration> ReadConfiguration(this IConfigurationRepository repository) => 
             repository.ReadConfigurations();
 

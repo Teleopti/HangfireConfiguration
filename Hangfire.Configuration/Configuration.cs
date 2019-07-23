@@ -26,7 +26,7 @@ namespace Hangfire.Configuration
         }
 
         public int? ReadGoalWorkerCount() =>
-            _repository.ReadGoalWorkerCount();
+            _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
         public IEnumerable<ConfigurationViewModel> BuildConfigurations()
         {

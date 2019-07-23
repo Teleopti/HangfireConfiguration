@@ -11,7 +11,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 
-            Assert.Null(repository.ReadGoalWorkerCount());
+            Assert.Empty(repository.ReadConfigurations());
         }
 
         [Fact, CleanDatabase]
@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            Assert.Equal(1, repository.ReadGoalWorkerCount());
+            Assert.Equal(1, repository.ReadConfigurations().Single().GoalWorkerCount);
         }
 
         [Fact, CleanDatabase]
@@ -30,9 +30,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            Assert.Equal(1, repository.ReadGoalWorkerCount());
+            var actual = repository.ReadConfigurations();
+            
+            Assert.Equal(1, actual.Single().GoalWorkerCount);
         }
-
 
         [Fact, CleanDatabase]
         public void ShouldWriteNullGoalWorkerCount()
@@ -44,7 +45,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             configuration.GoalWorkerCount = null;
             repository.WriteConfiguration(configuration);
 
-            Assert.Null(repository.ReadGoalWorkerCount());
+            Assert.Null(repository.ReadConfigurations().Single().GoalWorkerCount);
         }
     }
 }
