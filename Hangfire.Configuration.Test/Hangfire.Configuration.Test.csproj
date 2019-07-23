@@ -44,18 +44,19 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\ConfigurationTest.cs" />
+    <Compile Include="Domain\ConfigureGoalWorkerCountTest.cs" />
     <Compile Include="Domain\ReadActiveConfigurationTest.cs" />
     <Compile Include="Domain\ConfigureDefaultStorageTest.cs" />
     <Compile Include="Domain\FakeConfigurationRepository.cs" />
     <Compile Include="Domain\FakeMonitoringApi.cs" />
+    <Compile Include="Domain\ActivateStorageConfigurationTest.cs" />
     <Compile Include="Domain\CreateStorageConfigurationTest.cs" />
-    <Compile Include="Domain\NewStorageConfigurationTest.cs" />
+    <Compile Include="Domain\ViewConfigurationsTest.cs" />
     <Compile Include="Domain\WorkerDeterminerTest.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
-    <Compile Include="Infrastructure\GoalWorkerCountTest.cs" />
+    <Compile Include="Infrastructure\ConfigurationRepositoryGoalWorkerCountTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
-    <Compile Include="Infrastructure\NewStorageConfigurationTest.cs" />
+    <Compile Include="Infrastructure\ConfigurationRepositoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

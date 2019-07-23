@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -29,56 +28,54 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldBeInactiveOnSave()
+        public void ShouldNotBeOverridenByDefaultConfiguration()
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
-
-            configuration.CreateStorageConfiguration(new NewStorageConfiguration()
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
-                Server = "AwesomeServer",
-                Database = "TestDatabase",
-                User = "testUser",
-                Password = "awesomePassword",
-                SchemaName = "awesomeSchema"
+                Server = "newStorageServer",
+                SchemaName = "newSchemaName"
             });
+            
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
 
-            var storedConfiguration = repository.Data.Single();
-            Assert.Equal(false, storedConfiguration.Active);
+            Assert.Contains("newStorageServer", repository.ReadConfigurations().First().ConnectionString);
         }
 
         [Fact]
-        public void ShouldActivate()
+        public void ShouldSetGoalWorkerCountToDefaultConfiguration()
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
-            repository.Has(new StoredConfiguration
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
-                Id = 1,
-                ConnectionString = "connectionString",
-                SchemaName = "awesomeSchema",
-                Active = false
+                Server = "newStorageServer",
+                SchemaName = "newSchemaName"
             });
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
+            
+            configuration.WriteGoalWorkerCount(10);
 
-            configuration.ActivateStorage(1);
-
-            var storedConfiguration = repository.Data.Single();
-            Assert.Equal(true, storedConfiguration.Active);
+            var config = repository.ReadConfigurations();
+            Assert.Null(config.First().GoalWorkerCount);
         }
-
+        
         [Fact]
-        public void ShouldDeactivatePreviouslyActive()
+        public void ShouldReadAllConfigurations()
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
-            repository.Has(
-                new StoredConfiguration {Id = 1, Active = true, ConnectionString = "connectionString", SchemaName = "awesomeSchema"},
-                new StoredConfiguration {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"}
-            );
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration
+            {
+                Server = "newStorageServer",
+                SchemaName = "newSchemaName"
+            });
+            
+            var configurations = repository.ReadConfigurations();
 
-            configuration.ActivateStorage(2);
-
-            Assert.Equal(false, repository.Data.Single(x => x.Id == 1).Active);
+            Assert.Equal(2, configurations.Count());
         }
     }
 }

@@ -4,14 +4,14 @@ using Xunit;
 namespace Hangfire.Configuration.Test.Infrastructure
 {
     [Collection("Infrastructure")]
-    public class NewStorageConfigurationTest
+    public class ConfigurationRepositoryTest
     {
         [Fact, CleanDatabase]
         public void ShouldReadEmptyConfiguration()
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 
-            Assert.Equal(0, repository.ReadConfigurations().Count());
+            Assert.Empty(repository.ReadConfigurations());
         }
         
         [Fact, CleanDatabase]

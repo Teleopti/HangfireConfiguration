@@ -4,7 +4,7 @@ using Xunit;
 namespace Hangfire.Configuration.Test.Infrastructure
 {
     [Collection("Infrastructure")]
-    public class GoalWorkerCountTest
+    public class ConfigurationRepositoryGoalWorkerCountTest
     {
         [Fact, CleanDatabase]
         public void ShouldReadEmptyGoalWorkerCount()

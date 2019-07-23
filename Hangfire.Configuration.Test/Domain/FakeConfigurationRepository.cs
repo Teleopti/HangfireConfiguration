@@ -8,8 +8,8 @@ namespace Hangfire.Configuration.Test.Domain
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 
-        private int _id = 0;
-        private int nextId() => _id++;
+        private int _id;
+        private int NextId() => _id++;
 
         public IEnumerable<StoredConfiguration> ReadConfigurations() => Data.ToArray();
 
@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             if (configuration.Id != null)
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
-            configuration.Id = configuration.Id ?? nextId();
+            configuration.Id = configuration.Id ?? NextId();
             Data = Data.Append(configuration).ToArray();
         }
 
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             Data = Data.Append(new StoredConfiguration()
             {
-                Id = configuration.Id ?? nextId(),
+                Id = configuration.Id ?? NextId(),
                 GoalWorkerCount = configuration.GoalWorkerCount,
                 ConnectionString = configuration.ConnectionString,
                 SchemaName = configuration.SchemaName,
