@@ -23,44 +23,5 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal("schema name", configuration.Single().SchemaName);
             Assert.Equal(false, configuration.Single().Active);
         }
-        
-        [Fact, CleanDatabase]
-        public void ShouldNotBeOverridenByDefaultConfiguration()
-        {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
-            var configuration = new Configuration(repository);
-            
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
-
-            Assert.Equal("newConnectionString", repository.ReadConfigurations().First().ConnectionString);
-        }
-
-        [Fact, CleanDatabase]
-        public void ShouldSetGoalWorkerCountToDefaultConfiguration()
-        {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
-            var configuration = new Configuration(repository);
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
-            
-            configuration.WriteGoalWorkerCount(10);
-
-            var config = repository.ReadConfigurations();
-            Assert.Null(config.First().GoalWorkerCount);
-        }
-        
-        [Fact, CleanDatabase]
-        public void ShouldReadAllConfigurations()
-        {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            var configuration = new Configuration(repository);
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
-            repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
-            
-            var configurations = repository.ReadConfigurations();
-
-            Assert.Equal(2, configurations.Count());
-        }
     }
 }

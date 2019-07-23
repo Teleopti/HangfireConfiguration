@@ -48,7 +48,6 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationMiddleware.cs" />
     <Compile Include="ConfigurationRepository.cs" />
-    <Compile Include="ConfigurationRepositoryExtensions.cs" />
     <Compile Include="ConfigurationViewModel.cs" />
     <Compile Include="HangfireConfiguration.cs" />
     <Compile Include="IConfigurationRepository.cs" />

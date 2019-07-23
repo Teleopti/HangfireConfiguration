@@ -117,7 +117,11 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             var configuration = new Configuration(repository);
-            repository.WriteNewStorageConfiguration("newConfigurationConnectionString", "newSchemaName", false);
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration
+            {
+                Database = "newDatabase",
+                SchemaName = "newSchemaName"
+            });
             configuration.WriteDefaultConfiguration("connectionString", "schemaName");
 
             var result = HangfireConfiguration.ReadActiveConfigurationConnectionString(ConnectionUtils.GetConnectionString());
