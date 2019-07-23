@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "newSchemaName"
             });
             
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
 
             Assert.Contains("newStorageServer", repository.ReadConfigurations().First().ConnectionString);
         }
@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Server = "newStorageServer",
                 SchemaName = "newSchemaName"
             });
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
             
             configuration.WriteGoalWorkerCount(10);
 
@@ -44,7 +44,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
-            configuration.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
             configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
                 Server = "newStorageServer",

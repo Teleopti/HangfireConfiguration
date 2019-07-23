@@ -21,10 +21,10 @@ namespace Hangfire.Configuration
             return configuration.ReadActiveConfigurationConnectionString();
         }
 
-        public static void SaveDefaultConfiguration(string connectionString, string connectionStringToBeStored, string schemaName)
+        public static void ConfigureDefaultStorage(string connectionString, string defaultHangfireConnectionString, string schemaName)
         {
             var configuration = BuildConfiguration(connectionString);
-            configuration.WriteDefaultConfiguration(connectionStringToBeStored, schemaName);
+            configuration.ConfigureDefaultStorage(defaultHangfireConnectionString, schemaName);
         }
     }
 }
