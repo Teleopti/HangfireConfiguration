@@ -99,23 +99,20 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildForMultipleConfigurations()
         {
             var repository = new FakeConfigurationRepository();
-            var storedConfigurations = new List<StoredConfiguration>();
-            storedConfigurations.Add(new StoredConfiguration()
-            {
-                Id = 1,
-                ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
-                SchemaName = "schemaName1",
-                Active = true
-            });
-            storedConfigurations.Add(new StoredConfiguration()
-            {
-                Id = 2,
-                ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
-                SchemaName = "schemaName2",
-                Active = false
-            });
-
-            repository.Has(storedConfigurations);
+            repository.Has(new StoredConfiguration()
+                {
+                    Id = 1,
+                    ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
+                    SchemaName = "schemaName1",
+                    Active = true
+                },
+                new StoredConfiguration()
+                {
+                    Id = 2,
+                    ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
+                    SchemaName = "schemaName2",
+                    Active = false
+                });
             var configuration = new Configuration(repository);
 
             var result = configuration.BuildConfigurations();

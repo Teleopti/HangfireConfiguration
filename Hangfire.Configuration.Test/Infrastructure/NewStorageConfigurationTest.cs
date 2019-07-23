@@ -11,9 +11,14 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 			
-            repository.WriteNewStorageConfiguration("connection string", "schema name", false);
+            repository.WriteConfiguration(new StoredConfiguration
+            {
+                ConnectionString = "connection string",
+                SchemaName = "schema name",
+                Active = false
+            });
 
-            var configuration = repository.ReadConfiguration();
+            var configuration = repository.ReadConfigurations();
             Assert.Equal("connection string", configuration.Single().ConnectionString);
             Assert.Equal("schema name", configuration.Single().SchemaName);
             Assert.Equal(false, configuration.Single().Active);
@@ -27,7 +32,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             
             repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
 
-            var configuration = repository.ReadConfiguration();
+            var configuration = repository.ReadConfigurations();
             Assert.Equal("newConnectionString", configuration.First().ConnectionString);
         }
 
@@ -41,7 +46,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             
             configuration.WriteGoalWorkerCount(10);
 
-            var config = repository.ReadConfiguration();
+            var config = repository.ReadConfigurations();
             Assert.Null(config.First().GoalWorkerCount);
         }
         
@@ -52,7 +57,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             repository.WriteDefaultConfiguration("defaultConnectionString", "defaultSchemaName");
             repository.WriteNewStorageConfiguration("newConnectionString", "newSchemaName", false);
             
-            var configurations = repository.ReadConfiguration();
+            var configurations = repository.ReadConfigurations();
 
             Assert.Equal(2, configurations.Count());
         }

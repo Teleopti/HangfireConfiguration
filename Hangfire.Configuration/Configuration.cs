@@ -30,9 +30,9 @@ namespace Hangfire.Configuration
 
         public IEnumerable<ConfigurationViewModel> BuildConfigurations()
         {
-            var storedConfiguration = _repository.ReadConfiguration();
+            var storedConfiguration = _repository.ReadConfigurations();
 
-            return storedConfiguration.Select(x => new ConfigurationViewModel()
+            return storedConfiguration.Select(x => new ConfigurationViewModel
             {
                 Id = x?.Id,
                 ServerName = getServerName(x?.ConnectionString),
@@ -43,9 +43,9 @@ namespace Hangfire.Configuration
             });
         }
 
-        public void SaveNewStorageConfiguration(NewStorageConfiguration newStorageConfiguration)
+        public void CreateStorageConfiguration(NewStorageConfiguration newStorageConfiguration)
         {
-            SqlConnectionStringBuilder connectionStringBuilder = new SqlConnectionStringBuilder();
+            var connectionStringBuilder = new SqlConnectionStringBuilder();
             connectionStringBuilder["Data Source"] = newStorageConfiguration.Server;
             connectionStringBuilder["Initial Catalog"] = newStorageConfiguration.Database;
             connectionStringBuilder["User ID"] = newStorageConfiguration.User;

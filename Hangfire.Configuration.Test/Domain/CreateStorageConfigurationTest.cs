@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class NewStorageConfigurationTest
+    public class CreateStorageConfigurationTest
     {
         [Fact]
         public void ShouldSaveNewStorageConfiguration()
@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
             var connectionString = "Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword";
             var schemaName = "awesomeSchema";
 
-            configuration.SaveNewStorageConfiguration(new NewStorageConfiguration()
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -23,9 +23,9 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = schemaName
             });
 
-            var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(connectionString, storedConfiguration.Single().ConnectionString);
-            Assert.Equal(schemaName, storedConfiguration.Single().SchemaName);
+            var storedConfiguration = repository.Data.Single();
+            Assert.Equal(connectionString, storedConfiguration.ConnectionString);
+            Assert.Equal(schemaName, storedConfiguration.SchemaName);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace Hangfire.Configuration.Test.Domain
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
 
-            configuration.SaveNewStorageConfiguration(new NewStorageConfiguration()
+            configuration.CreateStorageConfiguration(new NewStorageConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -43,8 +43,8 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "awesomeSchema"
             });
 
-            var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(false, storedConfiguration.Single().Active);
+            var storedConfiguration = repository.Data.Single();
+            Assert.Equal(false, storedConfiguration.Active);
         }
 
         [Fact]
@@ -52,17 +52,18 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
-            repository.Has(new StoredConfiguration()
+            repository.Has(new StoredConfiguration
             {
                 Id = 1,
                 ConnectionString = "connectionString",
-                SchemaName = "awesomeSchema"
+                SchemaName = "awesomeSchema",
+                Active = false
             });
 
             configuration.ActivateStorage(1);
 
-            var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(true, storedConfiguration.Single().Active);
+            var storedConfiguration = repository.Data.Single();
+            Assert.Equal(true, storedConfiguration.Active);
         }
 
         [Fact]
@@ -71,17 +72,13 @@ namespace Hangfire.Configuration.Test.Domain
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
             repository.Has(
-                new List<StoredConfiguration>()
-                {
-                    new StoredConfiguration() {Id = 1, Active = true, ConnectionString = "connectionString", SchemaName = "awesomeSchema"},
-                    new StoredConfiguration() {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"},
-                }
+                new StoredConfiguration {Id = 1, Active = true, ConnectionString = "connectionString", SchemaName = "awesomeSchema"},
+                new StoredConfiguration {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"}
             );
 
             configuration.ActivateStorage(2);
 
-            var storedConfiguration = repository.ReadConfiguration();
-            Assert.Equal(false, storedConfiguration.Single(x => x.Id == 1).Active);
+            Assert.Equal(false, repository.Data.Single(x => x.Id == 1).Active);
         }
     }
 }

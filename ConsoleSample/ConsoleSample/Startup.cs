@@ -20,6 +20,7 @@ namespace ConsoleSample
             app.UseHangfireConfiguration("/HangfireConfiguration", new HangfireConfigurationOptions
             {
                 ConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;",
+                AllowNewStorageCreation = true,
                 PrepareSchemaIfNecessary = true
             });
         }

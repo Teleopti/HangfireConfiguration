@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
 
-            Assert.Equal(0, repository.ReadConfiguration().Count());
+            Assert.Equal(0, repository.ReadConfigurations().Count());
         }
 
         [Fact, CleanDatabase]
@@ -60,7 +60,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             repository.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
             repository.WriteDefaultConfiguration("connectionString", "schemaName");
 
-            var result = repository.ReadConfiguration();
+            var result = repository.ReadConfigurations();
 
             Assert.Equal(1, result.Single().Id);
             Assert.Equal("connectionString", result.Single().ConnectionString);
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             HangfireConfiguration.SaveDefaultConfiguration(ConnectionUtils.GetConnectionString(), "connectionString", null);
 
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            Assert.True(repository.ReadConfiguration().Single().Active);
+            Assert.True(repository.ReadConfigurations().Single().Active);
         }
 
         [Fact, CleanDatabase]
@@ -86,7 +86,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             HangfireConfiguration.SaveDefaultConfiguration(ConnectionUtils.GetConnectionString(), "connectionString", null);
 
-            Assert.True(repository.ReadConfiguration().Single().Active);
+            Assert.True(repository.ReadConfigurations().Single().Active);
         }
 
         [Fact, CleanDatabase]
@@ -95,7 +95,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             HangfireConfiguration.SaveDefaultConfiguration(ConnectionUtils.GetConnectionString(), "connectionString", "schemaName");
 
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            var schemaName = repository.ReadConfiguration().Single().SchemaName;
+            var schemaName = repository.ReadConfigurations().Single().SchemaName;
             Assert.Equal("schemaName", schemaName);
         }
 
@@ -107,7 +107,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             HangfireConfiguration.SaveDefaultConfiguration(ConnectionUtils.GetConnectionString(), "connectionString", "schemaName");
 
-            var schemaName = repository.ReadConfiguration().Single().SchemaName;
+            var schemaName = repository.ReadConfigurations().Single().SchemaName;
             Assert.Equal("schemaName", schemaName);
         }
 

@@ -5,14 +5,10 @@ namespace Hangfire.Configuration.Test.Domain
 {
     public class FakeConfigurationRepository : IConfigurationRepository
     {
-        private IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
-        
+        public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations()
-        {
-            return Data.ToArray();
-        }
+        public IEnumerable<StoredConfiguration> ReadConfigurations() => Data.ToArray();
 
         public void WriteConfiguration(StoredConfiguration configuration)
         {
@@ -35,7 +31,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
         }
 
-        public void Has(IEnumerable<StoredConfiguration> configuration)
+        public void Has(params StoredConfiguration[] configuration)
         {
             foreach (var storedConfiguration in configuration)
             {

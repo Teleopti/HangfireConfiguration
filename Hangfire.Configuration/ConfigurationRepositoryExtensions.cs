@@ -1,13 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Hangfire.Configuration
 {
     public static class ConfigurationRepositoryExtensions
     {
-        public static IEnumerable<StoredConfiguration> ReadConfiguration(this IConfigurationRepository repository) => 
-            repository.ReadConfigurations();
-
         public static void WriteNewStorageConfiguration(this IConfigurationRepository repository, string connectionString, string schemaName, bool active)
         {
             repository.WriteConfiguration(new StoredConfiguration()

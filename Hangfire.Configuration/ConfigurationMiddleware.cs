@@ -54,7 +54,7 @@ namespace Hangfire.Configuration
 				if (anyConfigurationIsNull)
 					page.DisplayInvalidConfigurationMessage();
 				else
-					_configuration.SaveNewStorageConfiguration(_newStorageConfiguration);
+					_configuration.CreateStorageConfiguration(_newStorageConfiguration);
 			}
 			
 			if (context.Request.Path.StartsWithSegments(new PathString("/activateConfiguration")))
