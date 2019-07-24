@@ -11,10 +11,10 @@ namespace Hangfire.Configuration
 	public class ConfigurationMiddleware : OwinMiddleware
 	{
 		private readonly Configuration _configuration;
-		private readonly HangfireConfigurationOptions _options;
+		private readonly HangfireConfigurationInterfaceOptions _options;
 		private NewStorageConfiguration _newStorageConfiguration;
 
-		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationOptions options) : base(next)
+		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options) : base(next)
 		{
 			_options = options;
 			if (_options.PrepareSchemaIfNecessary)

@@ -9,22 +9,7 @@ namespace ConsoleSample
     {
         public static void Main()
         {
-            GlobalConfiguration.Configuration
-                .UseColouredConsoleLogProvider()
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(@"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;",
-                    new SqlServerStorageOptions
-                    {
-                        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                        QueuePollInterval = TimeSpan.Zero,
-                        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
-                        UseRecommendedIsolationLevel = true,
-                        UsePageLocksOnDequeue = true,
-                        DisableGlobalLocks = true,
-                        EnableHeavyMigrations = true
-                    });
+           
             
             using (WebApp.Start<Startup>("http://localhost:12345"))
             {

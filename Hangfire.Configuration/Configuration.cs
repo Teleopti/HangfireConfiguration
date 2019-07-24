@@ -74,6 +74,9 @@ namespace Hangfire.Configuration
                 Workers = x?.GoalWorkerCount
             });
         }
+        
+        public IEnumerable<StoredConfiguration> ReadConfigurations() => 
+            _repository.ReadConfigurations();
 
         public void CreateStorageConfiguration(NewStorageConfiguration newStorageConfiguration)
         {

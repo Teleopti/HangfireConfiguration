@@ -1,30 +1,42 @@
+using System;
+using Hangfire.Server;
+using Hangfire.SqlServer;
+using Owin;
+
 namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        private static Configuration BuildConfiguration(string connectionString)
+        private readonly IAppBuilder _builder;
+        private readonly ConfigurationOptions _options;
+
+        public HangfireConfiguration(IAppBuilder builder, ConfigurationOptions options)
         {
-            var repository = new ConfigurationRepository(connectionString);
-            var configuration = new Configuration(repository);
-            return configuration;
+            _builder = builder;
+            _options = options;
         }
-        
+
+        [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString)
         {
             var configuration = BuildConfiguration(connectionString);
             return new WorkerDeterminer(configuration, JobStorage.Current.GetMonitoringApi());
         }
         
-        public static string ReadActiveConfigurationConnectionString(string connectionString)
+        public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, params IBackgroundProcess[] additionalProcesses)
         {
-            var configuration = BuildConfiguration(connectionString);
-            return configuration.ReadActiveConfigurationConnectionString();
+            var configuration = BuildConfiguration(_options.ConnectionString);
+            new ServerStarter(_builder, configuration, new RealHangfire())
+                .StartServers(serverOptions, storageOptions, additionalProcesses);
+            return this;
         }
-
-        public static void ConfigureDefaultStorage(string connectionString, string defaultHangfireConnectionString, string schemaName)
+		
+        private static Configuration BuildConfiguration(string connectionString)
         {
-            var configuration = BuildConfiguration(connectionString);
-            configuration.ConfigureDefaultStorage(defaultHangfireConnectionString, schemaName);
+            var repository = new ConfigurationRepository(connectionString);
+            var configuration = new Configuration(repository);
+            return configuration;
         }
     }
+
 }
