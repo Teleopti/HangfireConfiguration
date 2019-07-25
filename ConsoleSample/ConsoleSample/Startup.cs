@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing.Text;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Configuration;
@@ -17,7 +16,7 @@ namespace ConsoleSample
             context.StoppingToken.Wait(TimeSpan.FromSeconds(10));
         }
     }
-    
+
     public class Startup
     {
         public void Configuration(IAppBuilder app)
@@ -28,9 +27,18 @@ namespace ConsoleSample
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
+            app.UseErrorPage();
+
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
-            var defaultHangfireSchema = "HangFire";
+            var defaultHangfireSchema = "HangFireCustomSchemaName";
+
+            app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
+            {
+                ConnectionString = configurationConnectionString,
+                AllowNewStorageCreation = true,
+                PrepareSchemaIfNecessary = true
+            });
 
             app.UseHangfireConfiguration(new ConfigurationOptions
                 {
@@ -53,35 +61,15 @@ namespace ConsoleSample
                         DisableGlobalLocks = true,
                         EnableHeavyMigrations = true,
                         PrepareSchemaIfNecessary = true,
-                        SchemaName = "DifferentSchemaName"
-                    }, new CustomBackgroundProcess());
+                        SchemaName = "NotUsedSchemaName"
+                    },
+                    new[] {new CustomBackgroundProcess()}
+                );
 
-//            HangfireConfiguration
-//                .Use(new ConfiguratoinOptions
-//                {
-//                    ConnectionString = configurationConnectionString,
-//                    DefaultHangfireConnectionString = defaultHangfireConnectionString,
-//                    DefaultSchemaName = defaultHangfireSchema
-//                })
-//                .StartClientOnActiveConfiguration();
-
-            app.UseErrorPage();
-            app.UseHangfireDashboard("/HangfireDashboard");
-
-//            app.UseHangfireServer(new BackgroundJobServerOptions
-//            {
-//                Queues = new[] { "critical", "default" },
-//                TaskScheduler = null,
-//                WorkerCount = defaultWorkerCount,
-//                
-//            });
-
-            app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
+            foreach (var server in HangfireConfiguration.RunningServers())
             {
-                ConnectionString = configurationConnectionString,
-                AllowNewStorageCreation = true,
-                PrepareSchemaIfNecessary = true
-            });
+                app.UseHangfireDashboard($"/HangfireDashboard{server.Number}", new DashboardOptions(), server.Storage);
+            }
         }
     }
 }

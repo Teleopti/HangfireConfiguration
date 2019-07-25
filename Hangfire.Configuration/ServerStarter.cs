@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
@@ -42,29 +44,46 @@ namespace Hangfire.Configuration
             _hangfire = hangfire;
         }
 
-        public void StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, params IBackgroundProcess[] additionalProcesses)
+        public IEnumerable<RunningServer> StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, params IBackgroundProcess[] additionalProcesses)
         {
-//            _configuration.BuildConfigurations().Select((item, index) =>
-//                index == 0 ? _useHangfireServer.UseHangfireServer(_builder, new FakeJobStorage(), serverOptions, additionalProcesses) : 
-//                             _useHangfireServer.UseHangfireServer(_builder, new FakeJobStorage(), serverOptions)).ToArray();
-
-            var configs = _configuration.ReadConfigurations().ToArray();
-            var firstConfig = configs.FirstOrDefault();
+            var runningServers = new List<RunningServer>();
+            var serverNumber = 1;
+            if (serverOptions != null)
+                serverOptions.ServerName = null;
             
-            var sqlStorageOptions = configs.Select(c => new SqlServerStorageOptions()
+            var storedConfigs = _configuration.ReadConfigurations().ToArray();
+
+            foreach (var storedConfig in storedConfigs)
             {
-                SchemaName = c.SchemaName,
-                PrepareSchemaIfNecessary = storageOptions?.PrepareSchemaIfNecessary ?? false
-            }).ToArray();
+                var appliedStorageOptions = new SqlServerStorageOptions
+                {
+                    SchemaName = storedConfig.SchemaName
+                };
+
+                if (storageOptions != null)
+                {
+                    appliedStorageOptions.PrepareSchemaIfNecessary = storageOptions.PrepareSchemaIfNecessary;
+                    appliedStorageOptions.QueuePollInterval = storageOptions.QueuePollInterval;
+                    appliedStorageOptions.SlidingInvisibilityTimeout = storageOptions.SlidingInvisibilityTimeout;
+                    appliedStorageOptions.InvisibilityTimeout = storageOptions.InvisibilityTimeout;
+                    appliedStorageOptions.JobExpirationCheckInterval = storageOptions.JobExpirationCheckInterval;
+                    appliedStorageOptions.CountersAggregateInterval = storageOptions.CountersAggregateInterval;
+                    appliedStorageOptions.DashboardJobListLimit = storageOptions.DashboardJobListLimit;
+                    appliedStorageOptions.TransactionTimeout = storageOptions.TransactionTimeout;
+                    appliedStorageOptions.DisableGlobalLocks = storageOptions.DisableGlobalLocks;
+                    appliedStorageOptions.UsePageLocksOnDequeue = storageOptions.UsePageLocksOnDequeue;
+                }
+
+                var sqlJobStorage = _hangfire.MakeSqlJobStorage(storedConfig.ConnectionString, appliedStorageOptions);
+                _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, additionalProcesses);
                 
-            foreach (var config in configs)
-            {
-                if (config == firstConfig)
-                    _hangfire.UseHangfireServer(_builder, _hangfire.MakeSqlJobStorage(config.ConnectionString, sqlStorageOptions.FirstOrDefault()), serverOptions, additionalProcesses);
-                else
-                    _hangfire.UseHangfireServer(_builder, _hangfire.MakeSqlJobStorage(config.ConnectionString, sqlStorageOptions.LastOrDefault()), serverOptions);
+                runningServers.Add(new RunningServer() {Number = serverNumber, Storage = sqlJobStorage});
+                serverNumber++;
+                
+                additionalProcesses = new IBackgroundProcess[] { };
             }
+
+            return runningServers;
         }
-        
     }
 }

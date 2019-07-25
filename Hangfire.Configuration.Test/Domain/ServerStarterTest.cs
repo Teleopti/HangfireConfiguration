@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
@@ -29,9 +30,22 @@ namespace Hangfire.Configuration.Test.Domain
             var useHangfireServer = new FakeHangfire();
             var target = new ServerStarter(null, new Configuration(repository), useHangfireServer);
 
+            target.StartServers(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}}, null);
+
+            Assert.Equal(new[] {"queue1", "queue2"}, useHangfireServer.StartedServers.Single().options.Queues);
+        }
+
+        [Fact]
+        public void ShouldPassNullServerNameToHangfire()
+        {
+            var repository = new FakeConfigurationRepository();
+            repository.Has(new StoredConfiguration());
+            var useHangfireServer = new FakeHangfire();
+            var target = new ServerStarter(null, new Configuration(repository), useHangfireServer);
+
             target.StartServers(new BackgroundJobServerOptions {ServerName = "server!"}, null);
 
-            Assert.Equal("server!", useHangfireServer.StartedServers.Single().options.ServerName);
+            Assert.Null(useHangfireServer.StartedServers.Single().options.ServerName);
         }
 
         [Fact]
@@ -155,7 +169,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal("SchemaName", (hangfire.StartedServers.Single().storage as FakeJobStorage).Options.SchemaName);
         }
-        
+
         [Fact]
         public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
         {
@@ -170,5 +184,98 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("SchemaName1", (hangfire.StartedServers.First().storage as FakeJobStorage).Options.SchemaName);
             Assert.Equal("SchemaName2", (hangfire.StartedServers.Last().storage as FakeJobStorage).Options.SchemaName);
         }
+
+        [Fact]
+        public void ShouldPassStorageOptionsToHangfire()
+        {
+            var repository = new FakeConfigurationRepository();
+            repository.Has(new StoredConfiguration());
+            var hangfire = new FakeHangfire();
+            var target = new ServerStarter(null, new Configuration(repository), hangfire);
+
+            var options = new SqlServerStorageOptions
+            {
+                QueuePollInterval = TimeSpan.FromSeconds(1.0),
+                SlidingInvisibilityTimeout = TimeSpan.FromSeconds(2),
+                InvisibilityTimeout = TimeSpan.FromMinutes(3),
+                JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
+                CountersAggregateInterval = TimeSpan.FromMinutes(5.0),
+                PrepareSchemaIfNecessary = !new SqlServerStorageOptions().PrepareSchemaIfNecessary,
+                DashboardJobListLimit = 6,
+                TransactionTimeout = TimeSpan.FromMinutes(7.0),
+                DisableGlobalLocks = !new SqlServerStorageOptions().DisableGlobalLocks,
+                UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
+            };
+            target.StartServers(null, options);
+
+            var storage = hangfire.StartedServers.Single().storage as FakeJobStorage;
+            Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
+            Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
+            Assert.Equal(options.InvisibilityTimeout, storage.Options.InvisibilityTimeout);
+            Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
+            Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
+            Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
+            Assert.Equal(options.DashboardJobListLimit, storage.Options.DashboardJobListLimit);
+            Assert.Equal(options.TransactionTimeout, storage.Options.TransactionTimeout);
+            Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
+            Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
+        }
+
+        [Fact]
+        public void ShouldPassDefaultStorageOptionsToHangfire()
+        {
+            var repository = new FakeConfigurationRepository();
+            repository.Has(new StoredConfiguration());
+            var hangfire = new FakeHangfire();
+            var target = new ServerStarter(null, new Configuration(repository), hangfire);
+
+            target.StartServers(null, null);
+
+            var options = new SqlServerStorageOptions();
+            var storage = hangfire.StartedServers.Single().storage as FakeJobStorage;
+            Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
+            Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
+            Assert.Equal(options.InvisibilityTimeout, storage.Options.InvisibilityTimeout);
+            Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
+            Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
+            Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
+            Assert.Equal(options.DashboardJobListLimit, storage.Options.DashboardJobListLimit);
+            Assert.Equal(options.TransactionTimeout, storage.Options.TransactionTimeout);
+            Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
+            Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
+        }
+
+        [Fact]
+        public void ShouldReturnStartedServers()
+        {
+            var repository = new FakeConfigurationRepository();
+            repository.Has(new StoredConfiguration());
+            repository.Has(new StoredConfiguration());
+            var hangfire = new FakeHangfire();
+            var target = new ServerStarter(null, new Configuration(repository), hangfire);
+
+            var result = target.StartServers(null, null);
+
+            Assert.Equal(1, result.First().Number);
+            Assert.Same(hangfire.StartedServers.First().storage, result.First().Storage);
+            Assert.Equal(2, result.Last().Number);
+            Assert.Same(hangfire.StartedServers.Last().storage, result.Last().Storage);
+        }
+//        
+//        [Fact]
+//        public void ShouldStartWithWorkerCount()
+//        {
+//            var repository = new FakeConfigurationRepository();
+//            var hangfire = new FakeHangfire();
+//            var serverOptions = new BackgroundJobServerOptions
+//            {
+//                WorkerCount = 1
+//            };
+//            var target = new ServerStarter(null, new Configuration(repository), hangfire);
+//
+//            target.StartServers(serverOptions, null);            
+//
+//            Assert.Equal(1, hangfire.StartedServers.Single().options.WorkerCount);
+//        }
     }
 }
