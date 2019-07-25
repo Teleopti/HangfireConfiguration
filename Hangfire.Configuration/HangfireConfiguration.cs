@@ -32,7 +32,7 @@ namespace Hangfire.Configuration
         {
             var configuration = BuildConfiguration(_options.ConnectionString);
             _runningServers = new ServerStarter(_builder, configuration, new RealHangfire())
-                .StartServers(serverOptions, storageOptions, additionalProcesses);
+                .StartServers(null, serverOptions, storageOptions, additionalProcesses);
             return this;
         }
 

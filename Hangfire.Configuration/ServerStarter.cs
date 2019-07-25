@@ -44,10 +44,18 @@ namespace Hangfire.Configuration
             _hangfire = hangfire;
         }
 
-        public IEnumerable<RunningServer> StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, params IBackgroundProcess[] additionalProcesses)
+        public IEnumerable<RunningServer> StartServers(
+            ConfigurationOptions options, 
+            BackgroundJobServerOptions serverOptions,
+            SqlServerStorageOptions storageOptions,
+            params IBackgroundProcess[] additionalProcesses)
         {
             var runningServers = new List<RunningServer>();
             var serverNumber = 1;
+
+            if (options?.DefaultHangfireConnectionString != null)
+                _configuration.ConfigureDefaultStorage(options.DefaultHangfireConnectionString, options.DefaultSchemaName);
+            
             if (serverOptions != null)
                 serverOptions.ServerName = null;
             

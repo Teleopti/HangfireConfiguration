@@ -9,21 +9,38 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConfigureDefaultStorage()
         {
             var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", null);
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString"
+            }, null, null);
 
             Assert.Equal("connectionString", repository.Data.Single().ConnectionString);
         }
 
         [Fact]
+        public void ShouldNotConfigureDefaultStorageIfNoneGiven()
+        {
+            var repository = new FakeConfigurationRepository();
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+
+            target.StartServers(new ConfigurationOptions(), null, null);
+
+            Assert.Empty(repository.Data);
+        }
+        
+        [Fact]
         public void ShouldUpdateLegacyConfigurationWithDefaultConnectionString()
         {
             var repository = new FakeConfigurationRepository();
             repository.Has(new StoredConfiguration {GoalWorkerCount = 54});
-            var configuration = new Configuration(repository);
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", null);
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString"
+            }, null, null);
 
             Assert.Equal("connectionString", repository.Data.Single().ConnectionString);
         }
@@ -32,10 +49,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateDefault()
         {
             var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", null);
-
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString"
+            }, null, null);
+            
             Assert.True(repository.Data.Single().Active);
         }
 
@@ -43,10 +63,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
         {
             var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
             repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", null);
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString"
+            }, null, null);
 
             Assert.True(repository.Data.Single().Active);
         }
@@ -55,9 +78,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldSaveSchemaName()
         {
             var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", "schemaName");
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString",
+                DefaultSchemaName = "schemaName"
+            }, null, null);
 
             Assert.Equal("schemaName", repository.Data.Single().SchemaName);
         }
@@ -66,10 +93,14 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
             var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
             repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
 
-            configuration.ConfigureDefaultStorage("connectionString", "schemaName");
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "connectionString",
+                DefaultSchemaName = "schemaName"
+            }, null, null);
 
             Assert.Equal("schemaName", repository.Data.Single().SchemaName);
         }

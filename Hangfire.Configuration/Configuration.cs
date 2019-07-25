@@ -118,7 +118,6 @@ namespace Hangfire.Configuration
                 _repository.WriteConfiguration(configuration);
             }
         }
-
     }
 
     public class NewStorageConfiguration
