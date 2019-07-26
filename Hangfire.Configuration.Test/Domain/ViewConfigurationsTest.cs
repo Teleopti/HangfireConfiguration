@@ -8,17 +8,16 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldBuildConfiguration()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
             {
                 Id = 1,
                 ConnectionString = "Data Source=Server;Integrated Security=SSPI;Initial Catalog=Test_Database;Application Name=Test",
                 SchemaName = "schemaName",
                 Active = true
             });
-            var configuration = new Configuration(repository);
 
-            var result = configuration.BuildConfigurations();
+            var result = system.Configuration.BuildConfigurations();
 
             Assert.Equal(1, result.Single().Id);
             Assert.Equal("Server", result.Single().ServerName);
@@ -30,18 +29,17 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldBuildConfiguration2()
         {
-            var repository = new FakeConfigurationRepository();
+            var system = new SystemUnderTest();
 
-            repository.Has(new StoredConfiguration
+            system.Repository.Has(new StoredConfiguration
             {
                 Id = 2,
                 ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
                 SchemaName = "schemaName2",
                 Active = false
             });
-            var configuration = new Configuration(repository);
 
-            var result = configuration.BuildConfigurations();
+            var result = system.Configuration.BuildConfigurations();
 
             Assert.Equal(2, result.Single().Id);
             Assert.Equal("Server2", result.Single().ServerName);
@@ -53,8 +51,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldBuildForMultipleConfigurations()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
                 {
                     Id = 1,
                     ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
@@ -68,9 +66,8 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaName = "schemaName2",
                     Active = false
                 });
-            var configuration = new Configuration(repository);
 
-            var result = configuration.BuildConfigurations();
+            var result = system.Configuration.BuildConfigurations();
 
             Assert.Equal(2, result.Count());
         }
@@ -78,11 +75,10 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldBuildWithWorkers()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration {GoalWorkerCount = 10});
-            var configuration = new Configuration(repository);
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 10});
 
-            var result = configuration.BuildConfigurations();
+            var result = system.Configuration.BuildConfigurations();
 
             Assert.Equal(10, result.Single().Workers);
         }

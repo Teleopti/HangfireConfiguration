@@ -8,9 +8,9 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldGetDefaultGoalWorkerCount()
         {
-            var target = new WorkerDeterminer(new Configuration(new FakeConfigurationRepository()), new FakeMonitoringApi());
+            var system = new SystemUnderTest();
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(10, workers);
         }
@@ -18,11 +18,10 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldGetGoalWorkerCountForFirstServer()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(8);
-            var target = new WorkerDeterminer(new Configuration(repository), new FakeMonitoringApi());
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(8, workers);
         }
@@ -30,13 +29,11 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldGetGoalWorkerCountOnRestartOfSingleServer()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(8);
-            var monitor = new FakeMonitoringApi();
-            monitor.AnnounceServer("restartedServer", new ServerContext());
-            var target = new WorkerDeterminer(new Configuration(repository), monitor);
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(8, workers);
         }
@@ -44,14 +41,12 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldDetermineHalfOfGoalForSecondServerAfterRestart()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(8);
-            var monitor = new FakeMonitoringApi();
-            monitor.AnnounceServer("server1", new ServerContext());
-            monitor.AnnounceServer("restartedServer", new ServerContext());
-            var target = new WorkerDeterminer(new Configuration(repository), monitor);
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+            system.Monitor.AnnounceServer("server1", new ServerContext());
+            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(4, workers);
         }
@@ -59,16 +54,13 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldRoundDeterminedWorkerCountUp()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(10);
-            var monitor = new FakeMonitoringApi();
-            monitor.AnnounceServer("server1", new ServerContext());
-            monitor.AnnounceServer("server2", new ServerContext());
-            monitor.AnnounceServer("server3", new ServerContext());
-
-            var target = new WorkerDeterminer(new Configuration(repository), monitor);
-
-            var workers = target.DetermineStartingServerWorkerCount();
+            var system = new SystemUnderTest(); 
+            system.Repository.HasGoalWorkerCount(10);
+            system.Monitor.AnnounceServer("server1", new ServerContext());
+            system.Monitor.AnnounceServer("server2", new ServerContext());
+            system.Monitor.AnnounceServer("server3", new ServerContext());
+            
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(4, workers);
         }
@@ -76,11 +68,10 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldDetermineToOneIfWorkerGoalCountIsZero()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(0);
-            var target = new WorkerDeterminer(new Configuration(repository), new FakeMonitoringApi());
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(0);
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(1, workers);
         }
@@ -88,11 +79,10 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldDetermineToOneIfWorkerGoalCountIsNegative()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(-1);
-            var target = new WorkerDeterminer(new Configuration(repository), new FakeMonitoringApi());
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(-1);
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(1, workers);
         }
@@ -100,11 +90,10 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldDetermineToMaxOneHundred()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.HasGoalWorkerCount(101);
-            var target = new WorkerDeterminer(new Configuration(repository), new FakeMonitoringApi());
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(101);
 
-            var workers = target.DetermineStartingServerWorkerCount();
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
             Assert.Equal(100, workers);
         }

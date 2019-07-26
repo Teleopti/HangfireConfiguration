@@ -8,9 +8,9 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldReadEmptyActiveConnectionString()
         {
-            var configuration = new Configuration(new FakeConfigurationRepository());
+            var system = new SystemUnderTest();
 
-            var connectionString = configuration.ReadActiveConfigurationConnectionString();
+            var connectionString = system.Configuration.ReadActiveConfigurationConnectionString();
 
             Assert.Null(connectionString);
         }
@@ -18,15 +18,15 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldReadActiveConnectionString()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest();
+            
+            system.Repository.Has(new StoredConfiguration
             {
                 ConnectionString = "connectionString",
                 Active = true
             });
-            var configuration = new Configuration(repository);
 
-            var connectionString = configuration.ReadActiveConfigurationConnectionString();
+            var connectionString = system.Configuration.ReadActiveConfigurationConnectionString();
 
             Assert.Equal("connectionString", connectionString);
         }

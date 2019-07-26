@@ -10,14 +10,13 @@ namespace Hangfire.Configuration.Test.Domain
         [InlineData(null)]
         public void ShouldReadGoalWorkerCount(int? workers)
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
             {
                 GoalWorkerCount = workers
             });
-            var configuration = new Configuration(repository);
 
-            Assert.Equal(workers, configuration.ReadGoalWorkerCount());
+            Assert.Equal(workers, system.Configuration.ReadGoalWorkerCount());
         }
 
         [Theory]
@@ -25,27 +24,25 @@ namespace Hangfire.Configuration.Test.Domain
         [InlineData(2)]
         public void ShouldWriteGoalWorkerCount(int workers)
         {
-            var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
+            var system = new SystemUnderTest();
+            
+            system.Configuration.WriteGoalWorkerCount(workers);
 
-            configuration.WriteGoalWorkerCount(workers);
-
-            Assert.Equal(workers, repository.Workers);
+            Assert.Equal(workers, system.Repository.Workers);
         }
 
         [Fact]
         public void ShouldWriteNullableGoalWorkerCount()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
             {
                 GoalWorkerCount = 1
             });
-            var configuration = new Configuration(repository);
 
-            configuration.WriteGoalWorkerCount(null);
+            system.Configuration.WriteGoalWorkerCount(null);
 
-            Assert.Null(repository.Workers);
+            Assert.Null(system.Repository.Workers);
         }
 
     }

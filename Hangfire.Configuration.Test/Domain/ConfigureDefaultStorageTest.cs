@@ -8,116 +8,108 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldConfigureDefaultStorage()
         {
-            var repository = new FakeConfigurationRepository();
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null, null);
 
-            Assert.Equal("connectionString", repository.Data.Single().ConnectionString);
+            Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
 
         [Fact]
         public void ShouldNotConfigureDefaultStorageIfNoneGiven()
         {
-            var repository = new FakeConfigurationRepository();
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
+            
+            system.ServerStarter.StartServers(new ConfigurationOptions(), null, null);
 
-            target.StartServers(new ConfigurationOptions(), null, null);
-
-            Assert.Empty(repository.Data);
+            Assert.Empty(system.Repository.Data);
         }
 
         [Fact]
         public void ShouldUpdateLegacyConfigurationWithDefaultConnectionString()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration {GoalWorkerCount = 54});
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 54});
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null, null);
 
-            Assert.Equal("connectionString", repository.Data.Single().ConnectionString);
+            Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
 
         [Fact]
         public void ShouldActivateDefault()
         {
-            var repository = new FakeConfigurationRepository();
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null, null);
 
-            Assert.True(repository.Data.Single().Active);
+            Assert.True(system.Repository.Data.Single().Active);
         }
 
         [Fact]
         public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null, null);
 
-            Assert.True(repository.Data.Single().Active);
+            Assert.True(system.Repository.Data.Single().Active);
         }
 
         [Fact]
         public void ShouldSaveSchemaName()
         {
-            var repository = new FakeConfigurationRepository();
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
-
-            target.StartServers(new ConfigurationOptions
+            var system = new SystemUnderTest();
+            
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
             }, null, null);
 
-            Assert.Equal("schemaName", repository.Data.Single().SchemaName);
+            Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
 
         [Fact]
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
             }, null, null);
 
-            Assert.Equal("schemaName", repository.Data.Single().SchemaName);
+            Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
 
         [Fact]
         public void ShouldNotConfigureDefaultStorageIfAlreadyExists()
         {
-            var repository = new FakeConfigurationRepository();
-            repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
-            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
 
-            target.StartServers(new ConfigurationOptions
+            system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
             }, null, null);
 
-            Assert.Equal("existingDefault", repository.Data.Single().ConnectionString);
+            Assert.Equal("existingDefault", system.Repository.Data.Single().ConnectionString);
         }
     }
 }

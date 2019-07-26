@@ -53,6 +53,7 @@
     <Compile Include="Domain\ActivateStorageConfigurationTest.cs" />
     <Compile Include="Domain\CreateStorageConfigurationTest.cs" />
     <Compile Include="Domain\ServerStarterTest.cs" />
+    <Compile Include="Domain\SystemUnderTest.cs" />
     <Compile Include="Domain\ViewConfigurationsTest.cs" />
     <Compile Include="Domain\WorkerDeterminerTest.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
