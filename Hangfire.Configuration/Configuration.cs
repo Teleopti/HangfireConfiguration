@@ -28,9 +28,6 @@ namespace Hangfire.Configuration
         public int? ReadGoalWorkerCount() =>
             _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
-        public string ReadActiveConfigurationConnectionString() =>
-            _repository.ReadConfigurations().FirstOrDefault(x => x.Active ?? false)?.ConnectionString;
-        
         public void ConfigureDefaultStorage(string connectionString, string schemaName)
         {
             var configurations = _repository.ReadConfigurations();

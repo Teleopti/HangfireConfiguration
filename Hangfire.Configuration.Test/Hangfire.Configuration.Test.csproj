@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="Domain\ConfigureGoalWorkerCountTest.cs" />
     <Compile Include="Domain\FakeUseHangfireServer.cs" />
-    <Compile Include="Domain\ReadActiveConfigurationTest.cs" />
     <Compile Include="Domain\ConfigureDefaultStorageTest.cs" />
     <Compile Include="Domain\FakeConfigurationRepository.cs" />
     <Compile Include="Domain\FakeMonitoringApi.cs" />
