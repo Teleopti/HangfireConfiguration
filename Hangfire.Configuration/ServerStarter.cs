@@ -45,20 +45,19 @@ namespace Hangfire.Configuration
         }
 
         public IEnumerable<RunningServer> StartServers(
-            ConfigurationOptions options, 
+            ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
             SqlServerStorageOptions storageOptions,
             params IBackgroundProcess[] additionalProcesses)
         {
             var runningServers = new List<RunningServer>();
             var serverNumber = 1;
-
-            if (options?.DefaultHangfireConnectionString != null)
-                configureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
             
+            configureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
+
             if (serverOptions != null)
                 serverOptions.ServerName = null;
-            
+
             var storedConfigs = _repository.ReadConfigurations().ToArray();
 
             foreach (var storedConfig in storedConfigs)
@@ -84,10 +83,10 @@ namespace Hangfire.Configuration
 
                 var sqlJobStorage = _hangfire.MakeSqlJobStorage(storedConfig.ConnectionString, appliedStorageOptions);
                 _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, additionalProcesses);
-                
+
                 runningServers.Add(new RunningServer() {Number = serverNumber, Storage = sqlJobStorage});
                 serverNumber++;
-                
+
                 additionalProcesses = new IBackgroundProcess[] { };
             }
 
@@ -96,9 +95,11 @@ namespace Hangfire.Configuration
 
         private void configureDefaultStorage(string connectionString, string schemaName)
         {
+            if (connectionString == null)
+                return; 
             var configurations = _repository.ReadConfigurations();
             var legacyConfiguration = configurations.SingleOrDefault(x => x.ConnectionString == null);
-            
+
             if (legacyConfiguration != null)
             {
                 legacyConfiguration.ConnectionString = connectionString;
@@ -106,7 +107,7 @@ namespace Hangfire.Configuration
                 legacyConfiguration.Active = true;
                 _repository.WriteConfiguration(legacyConfiguration);
             }
-            
+
             if (!configurations.Any())
             {
                 _repository.WriteConfiguration(new StoredConfiguration

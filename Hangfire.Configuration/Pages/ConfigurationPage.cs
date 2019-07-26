@@ -10,15 +10,15 @@ namespace Hangfire.Configuration.Pages
         private readonly string _basePath;
         private bool _displayConfirmationMessage;
         private bool _displayInvalidConfigurationMessage;
-        private readonly bool _allowNewStorageCreation;
-        private readonly NewStorageConfiguration _inputedStorageConfiguration;
+        private readonly bool _allowNewServerCreation;
+        private readonly CreateServerConfiguration _inputedServerConfiguration;
 
-        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewStorageCreation, NewStorageConfiguration inputedStorageConfiguration)
+        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewServerCreation, CreateServerConfiguration inputedServerConfiguration)
         {
             _configuration = configuration;
             _basePath = basePath;
-            _allowNewStorageCreation = allowNewStorageCreation;
-            _inputedStorageConfiguration = inputedStorageConfiguration;
+            _allowNewServerCreation = allowNewServerCreation;
+            _inputedServerConfiguration = inputedServerConfiguration;
         }
 
         public void DisplayConfirmationMessage() =>
@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Pages
                 if (configuration.ServerName != "")
                 {
                     WriteLiteral("<h3 style='font-family:\"Segoe UI\"; font-size: 26px; font-weight:500; margin:0px 20px 10px'>");
-                    WriteLiteral($"Hangfire storage {configuration.Id} - {configuration.Active}");
+                    WriteLiteral($"Hangfire server {configuration.Id} - {configuration.Active}");
                     WriteLiteral("</h3>");
                     WriteLiteral("<div style='padding: 10px;'>");
                     WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
@@ -107,34 +107,34 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("&nbsp;&nbsp; <span>Configuration was saved !</span>");
             }
 
-            if (_allowNewStorageCreation && configurations.Count() < 2)
+            if (_allowNewServerCreation && configurations.Count() < 2)
             {
                 WriteLiteral($"<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 10px'>");
-                WriteLiteral("Create new Hangfire storage");
+                WriteLiteral("Create new Hangfire server");
                 WriteLiteral("</h2>");
-                WriteLiteral($"<form  action='{_basePath}/saveNewStorageConfiguration'>");
+                WriteLiteral($"<form  action='{_basePath}/saveNewServerConfiguration'>");
                 WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='server' name='server' value='{_inputedStorageConfiguration.Server}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='server' name='server' value='{_inputedServerConfiguration.Server}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='database' style='padding: 4px 10px; color: #888; font-weight: bold;'>Database: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='database' name='database' value='{_inputedStorageConfiguration.Database}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='database' name='database' value='{_inputedServerConfiguration.Database}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='user' style='padding: 4px 10px; color: #888; font-weight: bold;'>User: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='user' name='user' value='{_inputedStorageConfiguration.User}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='user' name='user' value='{_inputedServerConfiguration.User}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='password' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='password' name='password' value='{_inputedStorageConfiguration.Password}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='password' name='password' value='{_inputedServerConfiguration.Password}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedStorageConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedServerConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent; margin-left: 10px;'>");
-                WriteLiteral("Save storage configuration");
+                WriteLiteral("Save server configuration");
                 WriteLiteral("</button>");
                 WriteLiteral("</form>");
                 if (_displayInvalidConfigurationMessage)
@@ -146,7 +146,7 @@ namespace Hangfire.Configuration.Pages
             }
         }
 
-        private IEnumerable<ConfigurationViewModel> getConfigurations()
-            => _configuration.BuildConfigurations().ToArray();
+        private IEnumerable<ServerConfigurationViewModel> getConfigurations()
+            => _configuration.BuildServerConfigurations().ToArray();
     }
 }

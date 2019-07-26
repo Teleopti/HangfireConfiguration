@@ -3,14 +3,14 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class ActivateStorageConfigurationTest
+    public class ActivateServerConfigurationTest
     {
         [Fact]
         public void ShouldBeInactiveWhenCreated()
         {
             var system = new SystemUnderTest();
             
-            system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration()
+            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            system.Configuration.ActivateStorage(1);
+            system.Configuration.ActivateServer(1);
 
             var storedConfiguration = system.Repository.Data.Single();
             Assert.Equal(true, storedConfiguration.Active);
@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Domain
                 new StoredConfiguration {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"}
             );
 
-            system.Configuration.ActivateStorage(2);
+            system.Configuration.ActivateServer(2);
 
             Assert.Equal(false, system.Repository.Data.Single(x => x.Id == 1).Active);
         }

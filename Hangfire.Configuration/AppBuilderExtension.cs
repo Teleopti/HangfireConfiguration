@@ -28,6 +28,6 @@ namespace Hangfire.Configuration
 	{
 		public string ConnectionString;
 		public bool PrepareSchemaIfNecessary;
-		public bool AllowNewStorageCreation;
+		public bool AllowNewServerCreation;
 	}
 }

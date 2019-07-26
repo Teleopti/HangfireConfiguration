@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration
 {
-    public class ConfigurationViewModel
+    public class ServerConfigurationViewModel
     {
         public int? Id { get; set; }
         public string ServerName { get; set; }

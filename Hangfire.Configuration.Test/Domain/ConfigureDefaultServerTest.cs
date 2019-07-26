@@ -3,10 +3,10 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class ConfigureDefaultStorageTest
+    public class ConfigureDefaultServerTest
     {
         [Fact]
-        public void ShouldConfigureDefaultStorage()
+        public void ShouldConfigureDefaultServer()
         {
             var system = new SystemUnderTest();
 
@@ -19,7 +19,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldNotConfigureDefaultStorageIfNoneGiven()
+        public void ShouldNotConfigureDefaultServerIfNoneGiven()
         {
             var system = new SystemUnderTest();
             
@@ -99,7 +99,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldNotConfigureDefaultStorageIfAlreadyExists()
+        public void ShouldNotConfigureDefaultServerIfAlreadyExists()
         {
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});

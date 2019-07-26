@@ -21,6 +21,7 @@ namespace Hangfire.Configuration
                 if (configuration == null)
                     configuration = configurations.First();
             }
+
             configuration.GoalWorkerCount = workers;
             _repository.WriteConfiguration(configuration);
         }
@@ -28,11 +29,11 @@ namespace Hangfire.Configuration
         public int? ReadGoalWorkerCount() =>
             _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
-        public IEnumerable<ConfigurationViewModel> BuildConfigurations()
+        public IEnumerable<ServerConfigurationViewModel> BuildServerConfigurations()
         {
             var storedConfiguration = _repository.ReadConfigurations();
 
-            return storedConfiguration.Select(x => new ConfigurationViewModel
+            return storedConfiguration.Select(x => new ServerConfigurationViewModel
             {
                 Id = x?.Id,
                 ServerName = getServerName(x?.ConnectionString),
@@ -43,19 +44,19 @@ namespace Hangfire.Configuration
             });
         }
         
-        public IEnumerable<StoredConfiguration> ReadConfigurations() => 
-            _repository.ReadConfigurations();
-
-        public void CreateStorageConfiguration(NewStorageConfiguration newStorageConfiguration)
+        public void CreateServerConfiguration(CreateServerConfiguration createServerConfiguration)
         {
             var connectionStringBuilder = new SqlConnectionStringBuilder();
-            connectionStringBuilder["Data Source"] = newStorageConfiguration.Server;
-            connectionStringBuilder["Initial Catalog"] = newStorageConfiguration.Database;
-            connectionStringBuilder["User ID"] = newStorageConfiguration.User;
-            connectionStringBuilder["Password"] = newStorageConfiguration.Password;
+            connectionStringBuilder.DataSource = createServerConfiguration.Server;
+            if (createServerConfiguration.Database != null)
+                connectionStringBuilder.InitialCatalog = createServerConfiguration.Database;
+            if (createServerConfiguration.User != null)
+                connectionStringBuilder.UserID = createServerConfiguration.User;
+            if (createServerConfiguration.Password != null)
+                connectionStringBuilder.Password = createServerConfiguration.Password;
 
             var connectionString = connectionStringBuilder.ConnectionString;
-            var schemaName = newStorageConfiguration.SchemaName;
+            var schemaName = createServerConfiguration.SchemaName;
 
             _repository.WriteConfiguration(new StoredConfiguration()
             {
@@ -77,7 +78,7 @@ namespace Hangfire.Configuration
             return builder.DataSource;
         }
 
-        public void ActivateStorage(int configurationId)
+        public void ActivateServer(int configurationId)
         {
             var configurations = _repository.ReadConfigurations();
             foreach (var configuration in configurations)
@@ -86,14 +87,5 @@ namespace Hangfire.Configuration
                 _repository.WriteConfiguration(configuration);
             }
         }
-    }
-
-    public class NewStorageConfiguration
-    {
-        public string Server { get; set; }
-        public string Database { get; set; }
-        public string User { get; set; }
-        public string Password { get; set; }
-        public string SchemaName { get; set; }
     }
 }

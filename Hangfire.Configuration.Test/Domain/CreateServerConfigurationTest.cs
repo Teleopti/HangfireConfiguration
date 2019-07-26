@@ -3,10 +3,10 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class CreateStorageConfigurationTest
+    public class CreateServerConfigurationTest
     {
         [Fact]
-        public void ShouldSaveNewStorageConfiguration()
+        public void ShouldSaveNewServerConfiguration()
         {
             
             var system = new SystemUnderTest(); 
@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
             var connectionString = "Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword";
             var schemaName = "awesomeSchema";
 
-            system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration()
+            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -36,9 +36,9 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
             }, null, null);
-            system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration
+            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
-                Server = "newStorageServer",
+                Server = "newServer",
                 SchemaName = "newSchemaName"
             });
             
@@ -56,9 +56,9 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
             }, null, null);
-            system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration
+            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
-                Server = "newStorageServer",
+                Server = "newServer",
                 SchemaName = "newSchemaName"
             });
             

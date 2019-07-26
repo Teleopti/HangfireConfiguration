@@ -36,7 +36,7 @@ namespace ConsoleSample
             app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
             {
                 ConnectionString = configurationConnectionString,
-                AllowNewStorageCreation = true,
+                AllowNewServerCreation = true,
                 PrepareSchemaIfNecessary = true
             });
 

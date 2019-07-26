@@ -46,11 +46,11 @@
   <ItemGroup>
     <Compile Include="Domain\ConfigureGoalWorkerCountTest.cs" />
     <Compile Include="Domain\FakeUseHangfireServer.cs" />
-    <Compile Include="Domain\ConfigureDefaultStorageTest.cs" />
+    <Compile Include="Domain\ConfigureDefaultServerTest.cs" />
     <Compile Include="Domain\FakeConfigurationRepository.cs" />
     <Compile Include="Domain\FakeMonitoringApi.cs" />
-    <Compile Include="Domain\ActivateStorageConfigurationTest.cs" />
-    <Compile Include="Domain\CreateStorageConfigurationTest.cs" />
+    <Compile Include="Domain\ActivateServerConfigurationTest.cs" />
+    <Compile Include="Domain\CreateServerConfigurationTest.cs" />
     <Compile Include="Domain\ServerStarterTest.cs" />
     <Compile Include="Domain\SystemUnderTest.cs" />
     <Compile Include="Domain\ViewConfigurationsTest.cs" />

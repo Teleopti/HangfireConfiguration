@@ -12,7 +12,7 @@ namespace Hangfire.Configuration
 	{
 		private readonly Configuration _configuration;
 		private readonly HangfireConfigurationInterfaceOptions _options;
-		private NewStorageConfiguration _newStorageConfiguration;
+		private CreateServerConfiguration _createServerConfiguration;
 
 		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options) : base(next)
 		{
@@ -25,12 +25,12 @@ namespace Hangfire.Configuration
 				new ConfigurationRepository(_options.ConnectionString)
 			);
 			
-			_newStorageConfiguration = new NewStorageConfiguration();
+			_createServerConfiguration = new CreateServerConfiguration();
 		}
 
 		public override async Task Invoke(IOwinContext context)
 		{
-			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewStorageCreation, _newStorageConfiguration);
+			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation, _createServerConfiguration);
 
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveConfig")))
 			{
@@ -40,27 +40,27 @@ namespace Hangfire.Configuration
 			}
 			
 			
-			if (context.Request.Path.StartsWithSegments(new PathString("/saveNewStorageConfiguration")))
+			if (context.Request.Path.StartsWithSegments(new PathString("/saveNewServerConfiguration")))
 			{
-				_newStorageConfiguration.Server = context.Request.Query["server"];
-				_newStorageConfiguration.Database = context.Request.Query["database"];
-				_newStorageConfiguration.User = context.Request.Query["user"];
-				_newStorageConfiguration.Password = context.Request.Query["password"];
-				_newStorageConfiguration.SchemaName = context.Request.Query["schemaName"];
+				_createServerConfiguration.Server = context.Request.Query["server"];
+				_createServerConfiguration.Database = context.Request.Query["database"];
+				_createServerConfiguration.User = context.Request.Query["user"];
+				_createServerConfiguration.Password = context.Request.Query["password"];
+				_createServerConfiguration.SchemaName = context.Request.Query["schemaName"];
 				
-				var anyConfigurationIsNull = _newStorageConfiguration.GetType().GetProperties()
-					.Any(p => (string)p.GetValue(_newStorageConfiguration) == "");
+				var anyConfigurationIsNull = _createServerConfiguration.GetType().GetProperties()
+					.Any(p => (string)p.GetValue(_createServerConfiguration) == "");
 
 				if (anyConfigurationIsNull)
 					page.DisplayInvalidConfigurationMessage();
 				else
-					_configuration.CreateStorageConfiguration(_newStorageConfiguration);
+					_configuration.CreateServerConfiguration(_createServerConfiguration);
 			}
 			
 			if (context.Request.Path.StartsWithSegments(new PathString("/activateConfiguration")))
 			{
 				var id = int.Parse(context.Request.Query["id"]);
-				_configuration.ActivateStorage(id);
+				_configuration.ActivateServer(id);
 			}
 
 			var html = page.ToString();
