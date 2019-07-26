@@ -34,14 +34,14 @@ namespace Hangfire.Configuration
     public class ServerStarter
     {
         private readonly IAppBuilder _builder;
-        private readonly Configuration _configuration;
         private readonly IHangfire _hangfire;
+        private readonly IConfigurationRepository _repository;
 
-        public ServerStarter(IAppBuilder builder, Configuration configuration, IHangfire hangfire)
+        public ServerStarter(IAppBuilder builder, IHangfire hangfire, IConfigurationRepository repository)
         {
             _builder = builder;
-            _configuration = configuration;
             _hangfire = hangfire;
+            _repository = repository;
         }
 
         public IEnumerable<RunningServer> StartServers(
@@ -54,12 +54,12 @@ namespace Hangfire.Configuration
             var serverNumber = 1;
 
             if (options?.DefaultHangfireConnectionString != null)
-                _configuration.ConfigureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
+                configureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
             
             if (serverOptions != null)
                 serverOptions.ServerName = null;
             
-            var storedConfigs = _configuration.ReadConfigurations().ToArray();
+            var storedConfigs = _repository.ReadConfigurations().ToArray();
 
             foreach (var storedConfig in storedConfigs)
             {
@@ -92,6 +92,30 @@ namespace Hangfire.Configuration
             }
 
             return runningServers;
+        }
+
+        private void configureDefaultStorage(string connectionString, string schemaName)
+        {
+            var configurations = _repository.ReadConfigurations();
+            var legacyConfiguration = configurations.SingleOrDefault(x => x.ConnectionString == null);
+            
+            if (legacyConfiguration != null)
+            {
+                legacyConfiguration.ConnectionString = connectionString;
+                legacyConfiguration.SchemaName = schemaName;
+                legacyConfiguration.Active = true;
+                _repository.WriteConfiguration(legacyConfiguration);
+            }
+            
+            if (!configurations.Any())
+            {
+                _repository.WriteConfiguration(new StoredConfiguration
+                {
+                    ConnectionString = connectionString,
+                    SchemaName = schemaName,
+                    Active = true
+                });
+            }
         }
     }
 }

@@ -30,8 +30,7 @@ namespace Hangfire.Configuration
         
         public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, IBackgroundProcess[] additionalProcesses)
         {
-            var configuration = BuildConfiguration(_options.ConnectionString);
-            _runningServers = new ServerStarter(_builder, configuration, new RealHangfire())
+            _runningServers = new ServerStarter(_builder, new RealHangfire(), new ConfigurationRepository(_options.ConnectionString))
                 .StartServers(null, serverOptions, storageOptions, additionalProcesses);
             return this;
         }

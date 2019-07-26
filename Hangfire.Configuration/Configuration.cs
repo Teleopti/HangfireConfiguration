@@ -28,30 +28,6 @@ namespace Hangfire.Configuration
         public int? ReadGoalWorkerCount() =>
             _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
-        public void ConfigureDefaultStorage(string connectionString, string schemaName)
-        {
-            var configurations = _repository.ReadConfigurations();
-            var legacyConfiguration = configurations.SingleOrDefault(x => x.ConnectionString == null);
-            
-            if (legacyConfiguration != null)
-            {
-                legacyConfiguration.ConnectionString = connectionString;
-                legacyConfiguration.SchemaName = schemaName;
-                legacyConfiguration.Active = true;
-                _repository.WriteConfiguration(legacyConfiguration);
-            }
-            
-            if (!configurations.Any())
-            {
-                _repository.WriteConfiguration(new StoredConfiguration
-                {
-                    ConnectionString = connectionString,
-                    SchemaName = schemaName,
-                    Active = true
-                });
-            }
-        }
-        
         public IEnumerable<ConfigurationViewModel> BuildConfigurations()
         {
             var storedConfiguration = _repository.ReadConfigurations();

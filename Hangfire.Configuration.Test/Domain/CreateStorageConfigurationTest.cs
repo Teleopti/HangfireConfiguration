@@ -29,25 +29,13 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldNotBeOverridenByDefaultConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration
-            {
-                Server = "newStorageServer",
-                SchemaName = "newSchemaName"
-            });
-            
-            system.Configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
-
-            Assert.Contains("newStorageServer", system.Repository.ReadConfigurations().First().ConnectionString);
-        }
-
-        [Fact]
         public void ShouldSetGoalWorkerCountToDefaultConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
+            system.ServerStarter.StartServers(new ConfigurationOptions {
+                DefaultHangfireConnectionString = "defaultConnectionString",
+                DefaultSchemaName = "defaultSchemaName"
+            }, null, null);
             system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
                 Server = "newStorageServer",
@@ -64,7 +52,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReadAllConfigurations()
         {
             var system = new SystemUnderTest();
-            system.Configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
+            system.ServerStarter.StartServers(new ConfigurationOptions {
+                DefaultHangfireConnectionString = "defaultConnectionString",
+                DefaultSchemaName = "defaultSchemaName"
+            }, null, null);
             system.Configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
                 Server = "newStorageServer",
