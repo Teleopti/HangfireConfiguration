@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Empty(repository.Data);
         }
-        
+
         [Fact]
         public void ShouldUpdateLegacyConfigurationWithDefaultConnectionString()
         {
@@ -55,7 +55,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null, null);
-            
+
             Assert.True(repository.Data.Single().Active);
         }
 
@@ -103,6 +103,21 @@ namespace Hangfire.Configuration.Test.Domain
             }, null, null);
 
             Assert.Equal("schemaName", repository.Data.Single().SchemaName);
+        }
+
+        [Fact]
+        public void ShouldNotConfigureDefaultStorageIfAlreadyExists()
+        {
+            var repository = new FakeConfigurationRepository();
+            repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
+            var target = new ServerStarter(null, new Configuration(repository), new FakeHangfire());
+
+            target.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "newDefault"
+            }, null, null);
+
+            Assert.Equal("existingDefault", repository.Data.Single().ConnectionString);
         }
     }
 }

@@ -2,6 +2,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
+    // delete?
     public class ReadActiveConfigurationTest
     {
         [Fact]
@@ -30,21 +31,5 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("connectionString", connectionString);
         }
 
-        [Fact]
-        public void ShouldReadConnectionStringFromDefaultActivatedConfiguration()
-        {
-            var repository = new FakeConfigurationRepository();
-            var configuration = new Configuration(repository);
-            configuration.CreateStorageConfiguration(new NewStorageConfiguration
-            {
-                Database = "newDatabase",
-                SchemaName = "newSchemaName",
-            });
-            configuration.ConfigureDefaultStorage("connectionString", "schemaName");
-
-            var result = configuration.ReadActiveConfigurationConnectionString();
-
-            Assert.Equal("connectionString", result);
-        }
     }
 }

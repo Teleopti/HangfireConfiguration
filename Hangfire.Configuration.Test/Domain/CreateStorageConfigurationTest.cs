@@ -48,12 +48,12 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var repository = new FakeConfigurationRepository();
             var configuration = new Configuration(repository);
+            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
             configuration.CreateStorageConfiguration(new NewStorageConfiguration
             {
                 Server = "newStorageServer",
                 SchemaName = "newSchemaName"
             });
-            configuration.ConfigureDefaultStorage("defaultConnectionString", "defaultSchemaName");
             
             configuration.WriteGoalWorkerCount(10);
 

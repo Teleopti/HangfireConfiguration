@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Hangfire.Configuration
@@ -35,21 +33,18 @@ namespace Hangfire.Configuration
         
         public void ConfigureDefaultStorage(string connectionString, string schemaName)
         {
-            var configuration = _repository.ReadConfigurations()
-                .Where(x => x.ConnectionString == null)
-                .ToArray();
+            var configurations = _repository.ReadConfigurations();
+            var legacyConfiguration = configurations.SingleOrDefault(x => x.ConnectionString == null);
             
-            if (configuration.Any())
+            if (legacyConfiguration != null)
             {
-                foreach (var c in configuration)
-                {
-                    c.ConnectionString = connectionString;
-                    c.SchemaName = schemaName;
-                    c.Active = true;
-                    _repository.WriteConfiguration(c);
-                }
+                legacyConfiguration.ConnectionString = connectionString;
+                legacyConfiguration.SchemaName = schemaName;
+                legacyConfiguration.Active = true;
+                _repository.WriteConfiguration(legacyConfiguration);
             }
-            else
+            
+            if (!configurations.Any())
             {
                 _repository.WriteConfiguration(new StoredConfiguration
                 {

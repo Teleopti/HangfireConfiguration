@@ -54,7 +54,7 @@ namespace Hangfire.Configuration
             var serverNumber = 1;
 
             if (options?.DefaultHangfireConnectionString != null)
-                _configuration.ConfigureDefaultStorage(options.DefaultHangfireConnectionString, options.DefaultSchemaName);
+                _configuration.ConfigureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
             
             if (serverOptions != null)
                 serverOptions.ServerName = null;
