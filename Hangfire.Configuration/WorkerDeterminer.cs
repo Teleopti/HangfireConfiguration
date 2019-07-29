@@ -16,13 +16,18 @@ namespace Hangfire.Configuration
 
 		public int DetermineStartingServerWorkerCount()
 		{
-			var goalWorkerCount = _configuration.ReadGoalWorkerCount() ?? 10; 
+			return  determineStartingServerWorkerCount(10, 1, 100);
+		}
+
+		private int determineStartingServerWorkerCount(int defaultWorkerCount, int minimumWorkerCount, int maximumWorkerCount)
+		{
+			var goalWorkerCount = _configuration.ReadGoalWorkerCount() ?? defaultWorkerCount; 
 			
-			if (goalWorkerCount <= 0)
-				return 1;
+			if (goalWorkerCount <= minimumWorkerCount)
+				return minimumWorkerCount;
 			
-			if (goalWorkerCount > 100)
-				return 100;
+			if (goalWorkerCount > maximumWorkerCount)
+				goalWorkerCount = maximumWorkerCount;
 			
 			var serverCount = _monitor.Servers().Count;
 			if (serverCount > 0)

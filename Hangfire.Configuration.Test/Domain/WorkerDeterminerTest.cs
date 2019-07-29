@@ -97,5 +97,18 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(100, workers);
         }
+        
+        [Fact]
+        public void ShouldDetermineBasedOnNumberOfServersWhenMaxWorkerCount()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(101);
+            system.Monitor.AnnounceServer("server1", new ServerContext());
+            system.Monitor.AnnounceServer("server2", new ServerContext());
+
+            var workers = system.Determiner.DetermineStartingServerWorkerCount();
+
+            Assert.Equal(50, workers);
+        }
     }
 }
