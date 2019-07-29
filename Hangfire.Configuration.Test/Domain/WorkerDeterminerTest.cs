@@ -6,28 +6,28 @@ namespace Hangfire.Configuration.Test.Domain
     public class WorkerDeterminerTest
     {
         [Fact]
-        public void ShouldGetDefaultGoalWorkerCount()
+        public void ShouldGetHalfOfDefaultForFirstServer()
         {
             var system = new SystemUnderTest();
 
             var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
-            Assert.Equal(10, workers);
+            Assert.Equal(5, workers);
         }
 
         [Fact]
-        public void ShouldGetGoalWorkerCountForFirstServer()
+        public void ShouldGetHalfOfGoalForFirstServer()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(8);
 
             var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
-            Assert.Equal(8, workers);
+            Assert.Equal(4, workers);
         }
 
         [Fact]
-        public void ShouldGetGoalWorkerCountOnRestartOfSingleServer()
+        public void ShouldGetHalfOfGoalOnRestartOfSingleServer()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(8);
@@ -35,11 +35,11 @@ namespace Hangfire.Configuration.Test.Domain
 
             var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
-            Assert.Equal(8, workers);
+            Assert.Equal(4, workers);
         }
 
         [Fact]
-        public void ShouldDetermineHalfOfGoalForSecondServerAfterRestart()
+        public void ShouldGetHalfOfGoalForSecondServerAfterRestart()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(8);
@@ -66,7 +66,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldDetermineToOneIfWorkerGoalCountIsZero()
+        public void ShouldGetOneIfGoalIsZero()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(0);
@@ -77,7 +77,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldDetermineToOneIfWorkerGoalCountIsNegative()
+        public void ShouldGetOneIfGoalIsNegative()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(-1);
@@ -88,18 +88,18 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldDetermineToMaxOneHundred()
+        public void ShouldGetHalfOfMaxOneHundred()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(101);
 
             var workers = system.Determiner.DetermineStartingServerWorkerCount();
 
-            Assert.Equal(100, workers);
+            Assert.Equal(50, workers);
         }
         
         [Fact]
-        public void ShouldDetermineBasedOnNumberOfServersWhenMaxWorkerCount()
+        public void ShouldGetHalfOfMaxOneHundredWhenTwoServers()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(101);
