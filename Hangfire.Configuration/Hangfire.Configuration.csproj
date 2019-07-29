@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>bin\Release\</PackageOutputPath>
-    <Version>0.0.1.6</Version>    
+    <Version>0.0.1.7</Version>    
     <Authors>Calabrio</Authors>
     <Description>Hangfire Extension used for scaling workers</Description>    
   </PropertyGroup>
