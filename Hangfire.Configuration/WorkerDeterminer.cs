@@ -28,8 +28,8 @@ namespace Hangfire.Configuration
 			
 			var goal = goalWorkerCount ?? options.DefaultGoalWorkerCount;
 
-			if (goal <= options.MinimumWorkerCount)
-				return options.MinimumWorkerCount;
+			//if (goal <= options.MinimumWorkerCount)
+			//	return options.MinimumWorkerCount;
 
 			if (goal > options.MaximumGoalWorkerCount)
 				goal = options.MaximumGoalWorkerCount;
@@ -38,7 +38,12 @@ namespace Hangfire.Configuration
 			if (serverCount < options.MinimumServers)
 				serverCount = options.MinimumServers;
 				
-			return Convert.ToInt32(Math.Ceiling(goal / ((decimal)serverCount)));
-		}
+			var workerCount =  Convert.ToInt32(Math.Ceiling(goal / ((decimal)serverCount)));
+
+            if (workerCount < options.MinimumWorkerCount)
+                workerCount = options.MinimumWorkerCount;
+
+            return workerCount;
+        }
 	}
 }

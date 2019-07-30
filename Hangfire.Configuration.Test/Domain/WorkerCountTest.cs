@@ -138,7 +138,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldUseMinimumGoalWorkerCount()
+        public void ShouldUseMinimumWorkerCount()
         {
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(0);
@@ -187,5 +187,24 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
+
+        [Fact]
+        public void ShouldUseMinimumWorkerCount2()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(7);
+            var configurationOptions = new ConfigurationOptions()
+            {
+                DefaultHangfireConnectionString = "connection",
+                DefaultSchemaName = "schema",
+                MinimumWorkerCount = 6
+            };
+
+            system.ServerStarter.StartServers(configurationOptions, null, null);
+
+            Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+
     }
 }
