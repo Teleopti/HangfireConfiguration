@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
-using Hangfire.Storage;
 using Owin;
 
 namespace Hangfire.Configuration
@@ -92,7 +90,7 @@ namespace Hangfire.Configuration
                 (
                     sqlJobStorage.GetMonitoringApi(),
                     storedConfig.GoalWorkerCount,
-                    options
+                    options ?? new ConfigurationOptions()
                 );
 
                 _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, additionalProcesses);

@@ -22,10 +22,10 @@ namespace Hangfire.Configuration
 		public string ConnectionString { get; set; }
 		public string DefaultHangfireConnectionString { get; set; }
 		public string DefaultSchemaName { get; set; }
-		public int? DefaultGoalWorkerCount { get; set; }
-		public int? MinimumWorkerCount { get; set; }
-		public int? MaximumGoalWorkerCount { get; set; }
-		public int? MinimumServers { get; set; }
+		public int DefaultGoalWorkerCount { get; set; } = 10;
+		public int MinimumWorkerCount { get; set; } = 1;
+		public int MaximumGoalWorkerCount { get; set; } = 100;
+		public int MinimumServers { get; set; } = 2;
 	}
 	
 	public class HangfireConfigurationInterfaceOptions

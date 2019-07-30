@@ -24,20 +24,19 @@ namespace Hangfire.Configuration
 		
 		internal static int DetermineWorkerCount(IMonitoringApi monitor, int? goalWorkerCount, ConfigurationOptions options = null)
 		{
-			var goal = goalWorkerCount ?? options?.DefaultGoalWorkerCount ?? 10;
+			options = options ?? new ConfigurationOptions();
+			
+			var goal = goalWorkerCount ?? options.DefaultGoalWorkerCount;
 
-			var minimumWorkerCount = options?.MinimumWorkerCount ?? 1;
-			if (goal <= minimumWorkerCount)
-				return minimumWorkerCount;
+			if (goal <= options.MinimumWorkerCount)
+				return options.MinimumWorkerCount;
 
-			var maximumGoal = options?.MaximumGoalWorkerCount ?? 100;  
-			if (goal > maximumGoal)
-				goal = maximumGoal;
+			if (goal > options.MaximumGoalWorkerCount)
+				goal = options.MaximumGoalWorkerCount;
 
-			var minimumServers = options?.MinimumServers ?? 2;
 			var serverCount = monitor.Servers().Count; 
-			if (serverCount < minimumServers)
-				serverCount = minimumServers;
+			if (serverCount < options.MinimumServers)
+				serverCount = options.MinimumServers;
 				
 			return Convert.ToInt32(Math.Ceiling(goal / ((decimal)serverCount)));
 		}
