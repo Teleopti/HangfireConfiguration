@@ -8,10 +8,12 @@ namespace Hangfire.Configuration.Test.Domain
         {
             AppBuilder = new AppBuilder();
             Repository = new FakeConfigurationRepository();
-            Hangfire = new FakeHangfire();
+            Monitor = new FakeMonitoringApi();
+            Hangfire = new FakeHangfire(Monitor);
             Configuration = new Configuration(Repository);
             ServerStarter = new ServerStarter(AppBuilder, Hangfire, Repository);
-            Monitor = new FakeMonitoringApi();
+            
+            
             Determiner = new WorkerDeterminer(Configuration, Monitor);
         }
 
