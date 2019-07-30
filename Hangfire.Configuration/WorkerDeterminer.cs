@@ -14,40 +14,32 @@ namespace Hangfire.Configuration
 			_configuration = configuration;
 			_monitor = monitor;
 		}
-
-		public int DetermineStartingServerWorkerCount() => 
-			determineStartingServerWorkerCount(new WorkerCalculationOptions
-			{ 
-				DefaultGoalWorkerCount = 10, 
-				MinimumWorkerCount = 1,
-				MaximumGoalWorkerCount = 100, 
-				MinimumServers = 2
-			});
-
-		private int determineStartingServerWorkerCount(WorkerCalculationOptions options)
-		{
-			var goalWorkerCount = _configuration.ReadGoalWorkerCount() ?? options.DefaultGoalWorkerCount; 
-			
-			if (goalWorkerCount <= options.MinimumWorkerCount)
-				return options.MinimumWorkerCount;
-			
-			if (goalWorkerCount > options.MaximumGoalWorkerCount)
-				goalWorkerCount = options.MaximumGoalWorkerCount;
-			
-			var serverCount = _monitor.Servers().Count; 
-			if (serverCount < options.MinimumServers)
-				serverCount = options.MinimumServers;
-				
-			return Convert.ToInt32(Math.Ceiling(goalWorkerCount / ((decimal)serverCount)));
-		}
 		
-		private class WorkerCalculationOptions
+		public int DetermineStartingServerWorkerCount() =>
+			DetermineWorkerCount
+			(
+				_monitor,
+				_configuration.ReadGoalWorkerCount()
+			);
+		
+		internal static int DetermineWorkerCount(IMonitoringApi monitor, int? goalWorkerCount, ConfigurationOptions options = null)
 		{
-			public int DefaultGoalWorkerCount;
-			public int MinimumWorkerCount;
-			public int MaximumGoalWorkerCount; 
-			public int MinimumServers; 
-		}
+			var goal = goalWorkerCount ?? options?.DefaultGoalWorkerCount ?? 10;
 
+			var minimumWorkerCount = options?.MinimumWorkerCount ?? 1;
+			if (goal <= minimumWorkerCount)
+				return minimumWorkerCount;
+
+			var maximumGoal = options?.MaximumGoalWorkerCount ?? 100;  
+			if (goal > maximumGoal)
+				goal = maximumGoal;
+
+			var minimumServers = options?.MinimumServers ?? 2;
+			var serverCount = monitor.Servers().Count; 
+			if (serverCount < minimumServers)
+				serverCount = minimumServers;
+				
+			return Convert.ToInt32(Math.Ceiling(goal / ((decimal)serverCount)));
+		}
 	}
 }

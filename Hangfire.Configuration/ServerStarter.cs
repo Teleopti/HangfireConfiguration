@@ -87,8 +87,13 @@ namespace Hangfire.Configuration
                 }
 
                 var sqlJobStorage = _hangfire.MakeSqlJobStorage(storedConfig.ConnectionString, appliedStorageOptions);
-                
-                serverOptions.WorkerCount = determineWorkerCount(sqlJobStorage.GetMonitoringApi(), storedConfig);
+
+                serverOptions.WorkerCount = WorkerDeterminer.DetermineWorkerCount
+                (
+                    sqlJobStorage.GetMonitoringApi(),
+                    storedConfig.GoalWorkerCount,
+                    options
+                );
 
                 _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, additionalProcesses);
 
@@ -126,40 +131,5 @@ namespace Hangfire.Configuration
                 });
             }
         }
-        
-        private int determineWorkerCount(IMonitoringApi monitor, StoredConfiguration storedConfiguration) => 
-            determineWorkerCount(monitor, storedConfiguration, new WorkerCalculationOptions
-            { 
-                DefaultGoalWorkerCount = 10, 
-                MinimumWorkerCount = 1,
-                MaximumGoalWorkerCount = 100, 
-                MinimumServers = 2
-            });
-
-        private int determineWorkerCount(IMonitoringApi monitor, StoredConfiguration storedConfiguration, WorkerCalculationOptions options)
-        {
-            var goalWorkerCount = storedConfiguration.GoalWorkerCount ?? options.DefaultGoalWorkerCount; 
-			
-            if (goalWorkerCount <= options.MinimumWorkerCount)
-                return options.MinimumWorkerCount;
-			
-            if (goalWorkerCount > options.MaximumGoalWorkerCount)
-                goalWorkerCount = options.MaximumGoalWorkerCount;
-			
-            var serverCount = monitor.Servers().Count; 
-            if (serverCount < options.MinimumServers)
-                serverCount = options.MinimumServers;
-				
-            return Convert.ToInt32(Math.Ceiling(goalWorkerCount / ((decimal)serverCount)));
-        }
-        
-        private class WorkerCalculationOptions
-        {
-            public int DefaultGoalWorkerCount;
-            public int MinimumWorkerCount;
-            public int MaximumGoalWorkerCount; 
-            public int MinimumServers; 
-        }        
-        
     }
 }
