@@ -4,7 +4,7 @@ using Hangfire.Server;
 using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.Fake
 {
     public class FakeMonitoringApi : IMonitoringApi
     {

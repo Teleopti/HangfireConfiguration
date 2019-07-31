@@ -1,3 +1,4 @@
+using Hangfire.Configuration.Test.Domain.Fake;
 using Microsoft.Owin.Builder;
 
 namespace Hangfire.Configuration.Test.Domain
