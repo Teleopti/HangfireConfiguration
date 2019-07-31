@@ -55,7 +55,6 @@
     <Compile Include="Domain\SystemUnderTest.cs" />
     <Compile Include="Domain\ViewConfigurationsTest.cs" />
     <Compile Include="Domain\WorkerCountTest.cs" />
-    <Compile Include="Domain\WorkerDeterminerTest.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
     <Compile Include="Infrastructure\ConfigurationRepositoryGoalWorkerCountTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
