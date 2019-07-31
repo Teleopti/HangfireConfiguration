@@ -204,6 +204,24 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
+        
+        [Fact]
+        public void ShouldGetGoalForFirstServerWhenMinimumServersIsZero()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+            var configurationOptions = new ConfigurationOptions()
+            {
+                DefaultHangfireConnectionString = "connection",
+                DefaultSchemaName = "schema",
+                MinimumServers = 0
+            };
+
+            system.ServerStarter.StartServers(configurationOptions, null, null);
+
+            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }        
+        
 
 
     }
