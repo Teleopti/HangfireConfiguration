@@ -60,7 +60,6 @@ namespace Hangfire.Configuration
             else
                 serverOptions = new BackgroundJobServerOptions();
 
-
             var storedConfigs = _repository.ReadConfigurations().ToArray();
 
             foreach (var storedConfig in storedConfigs)
@@ -108,17 +107,7 @@ namespace Hangfire.Configuration
         {
             if (connectionString == null)
                 return;
-            var configurations = _repository.ReadConfigurations();
-            var legacyConfiguration = configurations.SingleOrDefault(x => x.ConnectionString == null);
-
-            if (legacyConfiguration != null)
-            {
-                legacyConfiguration.ConnectionString = connectionString;
-                legacyConfiguration.SchemaName = schemaName;
-                legacyConfiguration.Active = true;
-                _repository.WriteConfiguration(legacyConfiguration);
-            }
-
+            var configurations = _repository.ReadConfigurations().ToArray();
             if (!configurations.Any())
             {
                 _repository.WriteConfiguration(new StoredConfiguration
@@ -127,6 +116,16 @@ namespace Hangfire.Configuration
                     SchemaName = schemaName,
                     Active = true
                 });
+            }
+            else
+            {
+                var legacyConfiguration = configurations.FirstOrDefault();
+                if (legacyConfiguration == null) return;
+                legacyConfiguration.ConnectionString = connectionString;
+                legacyConfiguration.SchemaName = schemaName;
+                legacyConfiguration.Active = legacyConfiguration.Active == null;
+
+                _repository.WriteConfiguration(legacyConfiguration);
             }
         }
     }

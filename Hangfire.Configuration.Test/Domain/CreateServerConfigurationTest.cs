@@ -45,7 +45,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Configuration.WriteGoalWorkerCount(10);
 
             var config = system.Repository.ReadConfigurations();
-            Assert.Null(config.First().GoalWorkerCount);
+            Assert.Equal(10, config.First().GoalWorkerCount);
         }
         
         [Fact]

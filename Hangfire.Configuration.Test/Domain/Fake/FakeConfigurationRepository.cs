@@ -17,8 +17,9 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             if (configuration.Id != null)
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
-            configuration.Id = configuration.Id ?? NextId();
-            Data = Data.Append(configuration).ToArray();
+            var existing = Data.SingleOrDefault(x => x.Id == configuration.Id);
+            configuration.Id = existing?.Id ?? configuration.Id ?? NextId();
+            Data = Data.Append(configuration).OrderBy(x => x.Id).ToArray();
         }
 
         public void HasGoalWorkerCount(int goalWorkerCount) => Has(new StoredConfiguration {GoalWorkerCount = goalWorkerCount});

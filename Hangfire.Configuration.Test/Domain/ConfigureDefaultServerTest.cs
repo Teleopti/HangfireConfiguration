@@ -99,7 +99,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldNotConfigureDefaultServerIfAlreadyExists()
+        public void ShouldUpdateConfigurationIfAlreadyExists()
         {
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
@@ -109,7 +109,23 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultHangfireConnectionString = "newDefault"
             }, null, null);
 
-            Assert.Equal("existingDefault", system.Repository.Data.Single().ConnectionString);
+            Assert.Equal("newDefault", system.Repository.Data.Single().ConnectionString);
+        }
+        
+        [Fact]
+        public void ShouldNotActivateOnUpdatingDefault()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = false});
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
+
+            system.ServerStarter.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "newDefault"
+            }, null, null);
+
+            Assert.False(system.Repository.Data.First().Active);
+            Assert.True(system.Repository.Data.Last().Active);
         }
     }
 }
