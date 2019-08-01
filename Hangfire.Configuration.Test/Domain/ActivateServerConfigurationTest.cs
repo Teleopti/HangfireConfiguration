@@ -19,7 +19,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "awesomeSchema"
             });
 
-            var storedConfiguration = system.Repository.Data.Single();
+            var storedConfiguration = system.Repository.Data.Last();
             Assert.Equal(false, storedConfiguration.Active);
         }
 

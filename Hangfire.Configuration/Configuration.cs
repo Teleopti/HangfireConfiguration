@@ -43,9 +43,12 @@ namespace Hangfire.Configuration
                 Workers = x?.GoalWorkerCount
             });
         }
-        
+
         public void CreateServerConfiguration(CreateServerConfiguration createServerConfiguration)
         {
+            if (!_repository.ReadConfigurations().Any())
+                _repository.WriteConfiguration(new StoredConfiguration());
+            
             var connectionStringBuilder = new SqlConnectionStringBuilder();
             connectionStringBuilder.DataSource = createServerConfiguration.Server;
             if (createServerConfiguration.Database != null)
@@ -57,7 +60,7 @@ namespace Hangfire.Configuration
 
             var connectionString = connectionStringBuilder.ConnectionString;
             var schemaName = createServerConfiguration.SchemaName;
-
+            
             _repository.WriteConfiguration(new StoredConfiguration()
             {
                 ConnectionString = connectionString,
