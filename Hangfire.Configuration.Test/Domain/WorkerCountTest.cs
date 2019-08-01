@@ -221,8 +221,5 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }        
-        
-
-
     }
 }

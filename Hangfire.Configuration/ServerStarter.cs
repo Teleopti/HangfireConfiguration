@@ -62,7 +62,7 @@ namespace Hangfire.Configuration
 
             var storedConfigs = _repository.ReadConfigurations().ToArray();
 
-            foreach (var storedConfig in storedConfigs)
+            storedConfigs.ForEach(storedConfig =>
             {
                 var appliedStorageOptions = new SqlServerStorageOptions
                 {
@@ -98,7 +98,7 @@ namespace Hangfire.Configuration
                 serverNumber++;
 
                 additionalProcesses = new IBackgroundProcess[] { };
-            }
+            });
 
             return runningServers;
         }
@@ -108,7 +108,7 @@ namespace Hangfire.Configuration
             if (connectionString == null)
                 return;
             var configurations = _repository.ReadConfigurations().ToArray();
-            if (!configurations.Any())
+            if (configurations.IsEmpty())
             {
                 _repository.WriteConfiguration(new StoredConfiguration
                 {
@@ -123,7 +123,8 @@ namespace Hangfire.Configuration
                 if (legacyConfiguration == null) return;
                 legacyConfiguration.ConnectionString = connectionString;
                 legacyConfiguration.SchemaName = schemaName;
-                legacyConfiguration.Active = legacyConfiguration.Active == null;
+                if (legacyConfiguration.Active == null)
+                    legacyConfiguration.Active = true;
 
                 _repository.WriteConfiguration(legacyConfiguration);
             }

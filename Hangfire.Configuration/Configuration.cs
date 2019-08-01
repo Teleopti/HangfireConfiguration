@@ -46,8 +46,8 @@ namespace Hangfire.Configuration
 
         public void CreateServerConfiguration(CreateServerConfiguration createServerConfiguration)
         {
-            if (!_repository.ReadConfigurations().Any())
-                _repository.WriteConfiguration(new StoredConfiguration());
+            if (_repository.ReadConfigurations().IsEmpty())
+                createEmptyDefault();
             
             var connectionStringBuilder = new SqlConnectionStringBuilder();
             connectionStringBuilder.DataSource = createServerConfiguration.Server;
@@ -68,6 +68,9 @@ namespace Hangfire.Configuration
                 Active = false
             });
         }
+
+        private void createEmptyDefault() => 
+            _repository.WriteConfiguration(new StoredConfiguration());
 
         private string getDatabaseName(string connectionString)
         {

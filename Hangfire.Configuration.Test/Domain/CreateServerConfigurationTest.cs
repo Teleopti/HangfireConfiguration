@@ -70,7 +70,6 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldSaveEmptyDefault()
         {
-            
             var system = new SystemUnderTest(); 
             
             var connectionString = "Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword";
