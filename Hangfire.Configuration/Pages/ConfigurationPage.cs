@@ -48,7 +48,7 @@ namespace Hangfire.Configuration.Pages
                     if (configuration.ServerName != "")
                     {
                         WriteLiteral("<h3 style='font-family:\"Segoe UI\"; font-size: 26px; font-weight:500; margin:0px 20px 10px'>");
-                        WriteLiteral($"Hangfire server {configuration.Id} - {configuration.Active}");
+                        WriteLiteral($"{configuration.Title} - {configuration.Id} - {configuration.Active}");
                         WriteLiteral("</h3>");
                         WriteLiteral("<div style='padding: 10px;'>");
                         WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");

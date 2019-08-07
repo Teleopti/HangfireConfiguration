@@ -34,18 +34,18 @@ namespace Hangfire.Configuration
         {
             var storedConfiguration = _repository.ReadConfigurations();
 
-            return storedConfiguration.Select(x => new ServerConfigurationViewModel
+            return storedConfiguration.Select((x, i) => new ServerConfigurationViewModel
             {
                 Id = x?.Id,
                 ServerName = getServerName(x?.ConnectionString),
                 DatabaseName = getDatabaseName(x?.ConnectionString),
                 SchemaName = x?.SchemaName,
                 Active = x?.Active == true ? "Active" : "Inactive",
-                Workers = x?.GoalWorkerCount
+                Workers = x?.GoalWorkerCount,
+                Title = i == 0 ? "Default Hangfire Server" : "Added Hangfire Server" 
             });
         }
         
-
         public void CreateServerConfiguration(CreateServerConfiguration createServerConfiguration)
         {
             if (_repository.ReadConfigurations().IsEmpty())

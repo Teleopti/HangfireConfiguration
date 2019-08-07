@@ -82,5 +82,28 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(10, result.Single().Workers);
         }
+
+        [Fact]
+        public void ShouldBuildWithDefaultServerTitle()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration());
+
+            var result = system.Configuration.BuildServerConfigurations();
+
+            Assert.Equal("Default Hangfire Server", result.Single().Title);
+        }
+        [Fact]
+        public void ShouldBuildWithAddedServerTitle()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration());
+            system.Repository.Has(new StoredConfiguration());
+
+            var result = system.Configuration.BuildServerConfigurations();
+
+            Assert.Equal("Added Hangfire Server", result.Last().Title);
+        }
+
     }
 }
