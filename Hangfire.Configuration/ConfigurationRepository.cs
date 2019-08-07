@@ -50,5 +50,26 @@ namespace Hangfire.Configuration
                 }
             }
         }
+
+        public void TryConnect(string connectionString)
+        {
+            var conn = new SqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        public void CreateHangfireSchema(string schemaName, string connectionString)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                Hangfire.SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
+            }
+        }
     }
 }

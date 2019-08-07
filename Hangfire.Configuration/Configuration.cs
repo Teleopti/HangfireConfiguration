@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace Hangfire.Configuration
 
         public Configuration(IConfigurationRepository repository) =>
             _repository = repository;
+        
+        public int? ReadGoalWorkerCount() =>
+            _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
         public void WriteGoalWorkerCount(int? workers)
         {
@@ -25,10 +29,7 @@ namespace Hangfire.Configuration
             configuration.GoalWorkerCount = workers;
             _repository.WriteConfiguration(configuration);
         }
-
-        public int? ReadGoalWorkerCount() =>
-            _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
-
+        
         public IEnumerable<ServerConfigurationViewModel> BuildServerConfigurations()
         {
             var storedConfiguration = _repository.ReadConfigurations();
@@ -43,30 +44,49 @@ namespace Hangfire.Configuration
                 Workers = x?.GoalWorkerCount
             });
         }
+        
 
         public void CreateServerConfiguration(CreateServerConfiguration createServerConfiguration)
         {
             if (_repository.ReadConfigurations().IsEmpty())
                 createEmptyDefault();
-            
-            var connectionStringBuilder = new SqlConnectionStringBuilder();
-            connectionStringBuilder.DataSource = createServerConfiguration.Server;
-            if (createServerConfiguration.Database != null)
-                connectionStringBuilder.InitialCatalog = createServerConfiguration.Database;
-            if (createServerConfiguration.User != null)
-                connectionStringBuilder.UserID = createServerConfiguration.User;
-            if (createServerConfiguration.Password != null)
-                connectionStringBuilder.Password = createServerConfiguration.Password;
 
-            var connectionString = connectionStringBuilder.ConnectionString;
-            var schemaName = createServerConfiguration.SchemaName;
+            var connectionString = createConnectionString(createServerConfiguration);
+            var connectionStringForCreate = createConnectionString(createServerConfiguration, true);
             
+            _repository.CreateHangfireSchema(createServerConfiguration.SchemaName, connectionStringForCreate);
+
             _repository.WriteConfiguration(new StoredConfiguration()
             {
                 ConnectionString = connectionString,
-                SchemaName = schemaName,
+                SchemaName = createServerConfiguration.SchemaName,
                 Active = false
             });
+        }
+        
+        public void ActivateServer(int configurationId)
+        {
+            var configurations = _repository.ReadConfigurations();
+            foreach (var configuration in configurations)
+            {
+                configuration.Active = configuration.Id == configurationId;
+                _repository.WriteConfiguration(configuration);
+            }
+        }        
+
+        private string createConnectionString(CreateServerConfiguration createServerConfiguration, bool forCreate = false)
+        {
+            var connectionStringBuilder = new SqlConnectionStringBuilder()
+            {
+                DataSource = createServerConfiguration.Server,
+                InitialCatalog = createServerConfiguration.Database,
+                UserID = forCreate ? createServerConfiguration.UserForCreate : createServerConfiguration.User,
+                Password = forCreate ? createServerConfiguration.PasswordForCreate: createServerConfiguration.Password
+            };
+
+            _repository.TryConnect(connectionStringBuilder.ConnectionString);
+
+            return connectionStringBuilder.ConnectionString;
         }
 
         private void createEmptyDefault() => 
@@ -84,14 +104,6 @@ namespace Hangfire.Configuration
             return builder.DataSource;
         }
 
-        public void ActivateServer(int configurationId)
-        {
-            var configurations = _repository.ReadConfigurations();
-            foreach (var configuration in configurations)
-            {
-                configuration.Active = configuration.Id == configurationId;
-                _repository.WriteConfiguration(configuration);
-            }
-        }
+
     }
 }

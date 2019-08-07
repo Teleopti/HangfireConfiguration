@@ -16,6 +16,8 @@ namespace Hangfire.Configuration.Test.Domain
                 Database = "TestDatabase",
                 User = "testUser",
                 Password = "awesomePassword",
+                UserForCreate = "createUser",
+                PasswordForCreate = "createPassword",
                 SchemaName = "awesomeSchema"
             });
 

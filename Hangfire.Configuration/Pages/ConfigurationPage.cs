@@ -9,9 +9,10 @@ namespace Hangfire.Configuration.Pages
         private readonly Configuration _configuration;
         private readonly string _basePath;
         private bool _displayConfirmationMessage;
-        private bool _displayInvalidConfigurationMessage;
+        private bool _displayErrorMessage;
         private readonly bool _allowNewServerCreation;
         private readonly CreateServerConfiguration _inputedServerConfiguration;
+        private string _errorMessage;
 
         public ConfigurationPage(Configuration configuration, string basePath, bool allowNewServerCreation, CreateServerConfiguration inputedServerConfiguration)
         {
@@ -24,8 +25,11 @@ namespace Hangfire.Configuration.Pages
         public void DisplayConfirmationMessage() =>
             _displayConfirmationMessage = true;
 
-        public void DisplayInvalidConfigurationMessage() =>
-            _displayInvalidConfigurationMessage = true;
+        public void DisplayErrorMessage(string message)
+        {
+            _errorMessage = message;
+            _displayErrorMessage = true;
+        }
 
         public override void Execute() =>
             buildHtml();
@@ -74,7 +78,7 @@ namespace Hangfire.Configuration.Pages
                         WriteLiteral("\r\n");
                         if (configuration.Active == "Inactive")
                         {
-                            WriteLiteral($@"<form action='{_basePath}/activateConfiguration?id={configuration.Id}' '<div style='padding: 10px;'>");
+                            WriteLiteral($@"<form action='{_basePath}/activateServer?id={configuration.Id}' '<div style='padding: 10px;'>");
                             WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
                             WriteLiteral("Activate configuration");
                             WriteLiteral("</button>");
@@ -144,7 +148,7 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral($"<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 10px'>");
                 WriteLiteral("Create new Hangfire server");
                 WriteLiteral("</h2>");
-                WriteLiteral($"<form  action='{_basePath}/saveNewServerConfiguration'>");
+                WriteLiteral($"<form  action='{_basePath}/createNewServerConfiguration'>");
                 WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
                 WriteLiteral("<br>");
                 WriteLiteral($"<input type='text' id='server' name='server' value='{_inputedServerConfiguration.Server}' style='margin: 0px 10px 10px; width:200px'>");
@@ -153,6 +157,10 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral("<br>");
                 WriteLiteral($"<input type='text' id='database' name='database' value='{_inputedServerConfiguration.Database}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
+                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedServerConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");                
                 WriteLiteral("<label for='user' style='padding: 4px 10px; color: #888; font-weight: bold;'>User: </label>");
                 WriteLiteral("<br>");
                 WriteLiteral($"<input type='text' id='user' name='user' value='{_inputedServerConfiguration.User}' style='margin: 0px 10px 10px; width:200px'>");
@@ -161,20 +169,24 @@ namespace Hangfire.Configuration.Pages
                 WriteLiteral("<br>");
                 WriteLiteral($"<input type='text' id='password' name='password' value='{_inputedServerConfiguration.Password}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
-                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
+                WriteLiteral("<label for='userForCreate' style='padding: 4px 10px; color: #888; font-weight: bold;'>User for creating schema: </label>");
                 WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedServerConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral($"<input type='text' id='userForCreate' name='userForCreate' value='{_inputedServerConfiguration.UserForCreate}' style='margin: 0px 10px 10px; width:200px'>");
+                WriteLiteral("<br>");
+                WriteLiteral("<label for='passwordForCreate' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password for creating schema: </label>");
+                WriteLiteral("<br>");
+                WriteLiteral($"<input type='text' id='passwordForCreate' name='passwordForCreate' value='{_inputedServerConfiguration.PasswordForCreate}' style='margin: 0px 10px 10px; width:200px'>");
                 WriteLiteral("<br>");
                 WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent; margin-left: 10px;'>");
-                WriteLiteral("Save server configuration");
+                WriteLiteral("Create");
                 WriteLiteral("</button>");
-                WriteLiteral("</form>");
-                if (_displayInvalidConfigurationMessage)
+                if (_displayErrorMessage)
                 {
                     WriteLiteral("&nbsp;&nbsp; <span style='color: red; font-weight: 600'>");
-                    WriteLiteral("The configuration you are trying to save is invalid!");
+                    WriteLiteral(_errorMessage);
                     WriteLiteral("</span>");
                 }
+                WriteLiteral("</form>");
             }
         }
 

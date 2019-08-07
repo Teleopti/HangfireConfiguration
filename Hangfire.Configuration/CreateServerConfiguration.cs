@@ -7,5 +7,7 @@ namespace Hangfire.Configuration
         public string User { get; set; }
         public string Password { get; set; }
         public string SchemaName { get; set; }
+        public string UserForCreate { get; set; }
+        public string PasswordForCreate { get; set; }
     }
 }
