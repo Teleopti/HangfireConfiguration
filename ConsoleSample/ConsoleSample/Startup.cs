@@ -27,7 +27,7 @@ namespace ConsoleSample
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
-            app.UseErrorPage();
+            app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions { ShowExceptionDetails = true });
 
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";

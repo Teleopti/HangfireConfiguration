@@ -1,6 +1,4 @@
 ﻿using System;
-using Hangfire;
-using Hangfire.SqlServer;
 using Microsoft.Owin.Hosting;
 
 namespace ConsoleSample
@@ -9,8 +7,6 @@ namespace ConsoleSample
     {
         public static void Main()
         {
-           
-            
             using (WebApp.Start<Startup>("http://localhost:12345"))
             {
                 while (true)
