@@ -1,6 +1,5 @@
 using System;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
@@ -32,12 +31,13 @@ namespace Hangfire.Configuration
 		{
 			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation, _createServerConfiguration);
 			
-			if (context.Request.Path.StartsWithSegments(new PathString("/saveConfig")))
+			if (context.Request.Path.StartsWithSegments(new PathString("/saveWorkerGoalCount")))
 			{
-				saveGoalWorkerCount(context.Request, page);
-				context.Response.StatusCode = (int) HttpStatusCode.OK;
+				saveWorkerGoalCount(context.Request, page);
+				context.Response.Redirect(context.Request.PathBase.Value);
+				return;
 			}
-			else if (context.Request.Path.StartsWithSegments(new PathString("/createNewServerConfiguration")))
+			if (context.Request.Path.StartsWithSegments(new PathString("/createNewServerConfiguration")))
 			{
 				if (createNewServerConfiguration(context.Request, page))
 				{
@@ -45,18 +45,22 @@ namespace Hangfire.Configuration
 					return;
 				}
 			}
-			else if (context.Request.Path.StartsWithSegments(new PathString("/activateServer")))
+			if (context.Request.Path.StartsWithSegments(new PathString("/activateServer")))
 			{
 				activateServer(context.Request);
+				context.Response.Redirect(context.Request.PathBase.Value);
+				return;
 			}
 			
 			await renderPage(context.Response, page);
 		}
 		
-		private void saveGoalWorkerCount(IOwinRequest request, ConfigurationPage page)
+		
+		private void saveWorkerGoalCount(IOwinRequest request, ConfigurationPage page)
 		{
 			var workers = tryParseNullable(request.Query["workers"]);
-			_configuration.WriteGoalWorkerCount(workers);
+			var configurationId = tryParseNullable(request.Query["configurationId"]);
+			_configuration.WriteGoalWorkerCount(workers, configurationId);
 			page.DisplayConfirmationMessage();
 		}
 
@@ -84,14 +88,14 @@ namespace Hangfire.Configuration
 
 		private void activateServer(IOwinRequest request)
 		{
-			var id = int.Parse(request.Query["id"]);
+			var id = int.Parse(request.Query["configurationId"]);
 			_configuration.ActivateServer(id);
 		}
 
 		private static async Task renderPage(IOwinResponse response, ConfigurationPage page)
 		{
 			var html = page.ToString();
-			//response.StatusCode = (int) HttpStatusCode.OK;
+			response.StatusCode = (int) HttpStatusCode.OK;
 			response.ContentType = "text/html";
 			await response.WriteAsync(html);
 		}

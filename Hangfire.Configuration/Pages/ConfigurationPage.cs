@@ -78,7 +78,8 @@ namespace Hangfire.Configuration.Pages
                         WriteLiteral("\r\n");
                         if (configuration.Active == "Inactive")
                         {
-                            WriteLiteral($@"<form action='{_basePath}/activateServer?id={configuration.Id}' '<div style='padding: 10px;'>");
+                            WriteLiteral($@"<form action='{_basePath}/activateServer' '<div style='padding: 10px;'>");
+                            WriteLiteral($"<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>");
                             WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
                             WriteLiteral("Activate configuration");
                             WriteLiteral("</button>");
@@ -100,10 +101,11 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("</p>");
                     WriteLiteral("\r\n");
                     WriteLiteral("\r\n");
-                    WriteLiteral($@"<form  action='{_basePath}/saveConfig' '<div style='padding: 10px;'>");
+                    WriteLiteral($@"<form  action='{_basePath}/saveWorkerGoalCount' '<div style='padding: 10px;'>");
                     WriteLiteral("<label for='workers' style='padding: 10px 0px 10px; color: #888; font-weight: bold;'>");
                     WriteLiteral("Goal Worker Count: ");
                     WriteLiteral("</label>");
+                    WriteLiteral($"<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>");
                     WriteLiteral($"<input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>");
                     WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
                     WriteLiteral("Submit");
@@ -129,7 +131,7 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("</p>");
                     WriteLiteral("\r\n");
                     WriteLiteral("\r\n");
-                    WriteLiteral($@"<form  action='{_basePath}/saveConfig' '<div style='padding: 10px;'>");
+                    WriteLiteral($@"<form  action='{_basePath}/saveWorkerGoalCount' '<div style='padding: 10px;'>");
                     WriteLiteral("<label for='workers' style='padding: 10px 0px 10px; color: #888; font-weight: bold;'>");
                     WriteLiteral("Goal Worker Count: ");
                     WriteLiteral("</label>");
