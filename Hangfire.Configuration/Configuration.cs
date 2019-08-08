@@ -18,13 +18,17 @@ namespace Hangfire.Configuration
                 _repository.ReadConfigurations().FirstOrDefault(x => x.Id == configurationId )?.GoalWorkerCount;
         }
         
-        public void WriteGoalWorkerCount(int? workers)
+        public void WriteGoalWorkerCount(int? workers, int? configurationId = null)
         {
             var configurations = _repository.ReadConfigurations();
             var configuration = new StoredConfiguration();
             if (configurations.Any())
             {
-                configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
+                if ( configurationId != null )
+                    configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
+                else        
+                    configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
+                
                 if (configuration == null)
                     configuration = configurations.First();
             }

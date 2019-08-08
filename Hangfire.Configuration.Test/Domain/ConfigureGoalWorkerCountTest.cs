@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -69,6 +70,23 @@ namespace Hangfire.Configuration.Test.Domain
             
             Assert.Null(system.Configuration.ReadGoalWorkerCount());
             Assert.Null(system.Configuration.ReadGoalWorkerCount(1));
+        }
+
+        [Fact]
+        public void ShouldWriteGoalWorkerCountForSpecificConfiguration()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 1
+            }, new StoredConfiguration
+            {
+                Id = 2
+            });
+
+            system.Configuration.WriteGoalWorkerCount(5, 2);
+
+            Assert.Equal(5, system.Repository.Data.Single(x => x.Id == 2).GoalWorkerCount);
         }
     }
 }
