@@ -44,6 +44,31 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Null(system.Repository.Workers);
         }
-
+        
+        [Fact]
+        public void ShouldReadGoalWorkerCountWithId()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 1,
+                GoalWorkerCount = 8
+            }, new StoredConfiguration
+            {
+                Id = 2,
+                GoalWorkerCount = 40
+            });
+            
+            Assert.Equal(40, system.Configuration.ReadGoalWorkerCount(2));
+        }         
+        
+        [Fact]
+        public void ShouldReadNullWhenNoConfiguration()
+        {
+            var system = new SystemUnderTest();
+            
+            Assert.Null(system.Configuration.ReadGoalWorkerCount());
+            Assert.Null(system.Configuration.ReadGoalWorkerCount(1));
+        }
     }
 }

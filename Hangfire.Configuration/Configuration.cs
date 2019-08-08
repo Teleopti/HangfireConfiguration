@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,10 +10,14 @@ namespace Hangfire.Configuration
 
         public Configuration(IConfigurationRepository repository) =>
             _repository = repository;
-        
-        public int? ReadGoalWorkerCount() =>
-            _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount;
 
+        public int? ReadGoalWorkerCount(int? configurationId = null)
+        {
+            return configurationId == null ? 
+                _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount : 
+                _repository.ReadConfigurations().FirstOrDefault(x => x.Id == configurationId )?.GoalWorkerCount;
+        }
+        
         public void WriteGoalWorkerCount(int? workers)
         {
             var configurations = _repository.ReadConfigurations();
