@@ -38,6 +38,13 @@ namespace Hangfire.Configuration.Pages
         {
             var configurations = getConfigurations().ToArray();
 
+            if (_displayConfirmationMessage)
+            {
+                WriteLiteral("<div style='color:green;background:#F1F8E9;font-family:\"Segoe UI\";font-size: 20px;font-weight:bolder; margin-left: 20px'>");
+                WriteLiteral("Saved configuration successfully!");
+                WriteLiteral("</div>");
+            }
+            
             WriteLiteral("<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 20px'>");
             WriteLiteral("Hangfire configuration");
             WriteLiteral("</h2>");
@@ -97,7 +104,7 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("<br>");
                     WriteLiteral("As the servers randomly reset, the goal will eventually be met.");
                     WriteLiteral("<br>");
-                    WriteLiteral("Default goal is 10.");
+                    WriteLiteral("Default goal is 10, if no goal is specified.");
                     WriteLiteral("</p>");
                     WriteLiteral("\r\n");
                     WriteLiteral("\r\n");
@@ -111,8 +118,6 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("Submit");
                     WriteLiteral("</button>");
                     WriteLiteral("</form>");
-                    if (_displayConfirmationMessage)
-                        WriteLiteral("&nbsp;&nbsp; <span>Configuration was saved !</span>");
                 }
             }
             else
@@ -140,8 +145,6 @@ namespace Hangfire.Configuration.Pages
                     WriteLiteral("Submit");
                     WriteLiteral("</button>");
                     WriteLiteral("</form>");
-                    if (_displayConfirmationMessage)
-                        WriteLiteral("&nbsp;&nbsp; <span>Configuration was saved !</span>");
             }
 
 

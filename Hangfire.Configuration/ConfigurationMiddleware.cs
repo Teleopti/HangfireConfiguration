@@ -34,14 +34,14 @@ namespace Hangfire.Configuration
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveWorkerGoalCount")))
 			{
 				saveWorkerGoalCount(context.Request, page);
-				context.Response.Redirect(context.Request.PathBase.Value);
+				context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
 				return;
 			}
 			if (context.Request.Path.StartsWithSegments(new PathString("/createNewServerConfiguration")))
 			{
 				if (createNewServerConfiguration(context.Request, page))
 				{
-					context.Response.Redirect(context.Request.PathBase.Value);
+					context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
 					return;
 				}
 			}
@@ -50,6 +50,10 @@ namespace Hangfire.Configuration
 				activateServer(context.Request);
 				context.Response.Redirect(context.Request.PathBase.Value);
 				return;
+			}
+			if (context.Request.Path.StartsWithSegments(new PathString("/savedConfiguration")))
+			{
+				page.DisplayConfirmationMessage();
 			}
 			
 			await renderPage(context.Response, page);
@@ -61,7 +65,6 @@ namespace Hangfire.Configuration
 			var workers = tryParseNullable(request.Query["workers"]);
 			var configurationId = tryParseNullable(request.Query["configurationId"]);
 			_configuration.WriteGoalWorkerCount(workers, configurationId);
-			page.DisplayConfirmationMessage();
 		}
 
 		private bool createNewServerConfiguration(IOwinRequest request, ConfigurationPage page)
