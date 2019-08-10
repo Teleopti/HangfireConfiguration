@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing;
 using System.Linq;
 using Hangfire.Dashboard;
 
@@ -31,171 +33,252 @@ namespace Hangfire.Configuration.Pages
             _displayErrorMessage = true;
         }
 
-        public override void Execute() =>
-            buildHtml();
-
-        private void buildHtml()
+        public override void Execute()
         {
-            var configurations = getConfigurations().ToArray();
+            var configurations = _configuration.BuildServerConfigurations().ToArray();
+            buildHtml(configurations);
+        }
+
+        private void buildHtml(ServerConfigurationViewModel[] configurations)
+        {
+            WriteLiteral("<html>");
+            WriteHead();
+            WriteLiteral("<body>");
 
             if (_displayConfirmationMessage)
             {
-                WriteLiteral("<div style='color:green;background:#F1F8E9;font-family:\"Segoe UI\";font-size: 20px;font-weight:bolder; margin-left: 20px'>");
-                WriteLiteral("Saved configuration successfully!");
-                WriteLiteral("</div>");
+                WriteLiteral(@"<div class='confirm-msg'>Saved configuration successfully!</div>");
             }
-            
-            WriteLiteral("<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 20px'>");
-            WriteLiteral("Hangfire configuration");
-            WriteLiteral("</h2>");
-            if (configurations.Any())
-            {
-                foreach (var configuration in configurations)
-                {
-                    if (configuration.ServerName != "")
-                    {
-                        WriteLiteral("<h3 style='font-family:\"Segoe UI\"; font-size: 26px; font-weight:500; margin:0px 20px 10px'>");
-                        WriteLiteral($"{configuration.Title} - {configuration.Id} - {configuration.Active}");
-                        WriteLiteral("</h3>");
-                        WriteLiteral("<div style='padding: 10px;'>");
-                        WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
-                        WriteLiteral("Server");
-                        WriteLiteral("</span>");
-                        WriteLiteral("<span>");
-                        WriteLiteral($"{configuration.ServerName}");
-                        WriteLiteral("</span>");
-                        WriteLiteral("</div>");
-                        WriteLiteral("<div style='padding: 10px;'>");
-                        WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
-                        WriteLiteral("Database");
-                        WriteLiteral("</span>");
-                        WriteLiteral("<span>");
-                        WriteLiteral($"{configuration.DatabaseName}");
-                        WriteLiteral("</span>");
-                        WriteLiteral("</div>");
-                        WriteLiteral("<div style='padding: 10px;'>");
-                        WriteLiteral("<span style='padding: 10px; color: #888; font-weight: bold;'>");
-                        WriteLiteral("Schema Name");
-                        WriteLiteral("</span>");
-                        WriteLiteral("<span>");
-                        WriteLiteral($"{configuration.SchemaName}");
-                        WriteLiteral("</span>");
-                        WriteLiteral("</div>");
-                        WriteLiteral("\r\n");
-                        WriteLiteral("\r\n");
-                        if (configuration.Active == "Inactive")
-                        {
-                            WriteLiteral($@"<form action='{_basePath}/activateServer' '<div style='padding: 10px;'>");
-                            WriteLiteral($"<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>");
-                            WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
-                            WriteLiteral("Activate configuration");
-                            WriteLiteral("</button>");
-                            WriteLiteral("</form>");
-                        }
-                    }
 
-                    WriteLiteral("\r\n");
-                    WriteLiteral("<p style='border: 1px solid #428bca; line-height: 1.5em; margin-left: 10px; padding: 10px; width: 50%'>");
-                    WriteLiteral("Use the goal worker count configuration to set the goal number of workers to dynamically scale workers per server.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("On start up of each Hangfire server, the server will be assigned a number of workers approximate for equal distribution of the goal workers count.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("This is an approximation for reasons like: the number of existing servers is not exact, rounding, minimum 1 worker assigned.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("As the servers randomly reset, the goal will eventually be met.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("Default goal is 10, if no goal is specified.");
-                    WriteLiteral("</p>");
-                    WriteLiteral("\r\n");
-                    WriteLiteral("\r\n");
-                    WriteLiteral($@"<form  action='{_basePath}/saveWorkerGoalCount' '<div style='padding: 10px;'>");
-                    WriteLiteral("<label for='workers' style='padding: 10px 0px 10px; color: #888; font-weight: bold;'>");
-                    WriteLiteral("Goal Worker Count: ");
-                    WriteLiteral("</label>");
-                    WriteLiteral($"<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>");
-                    WriteLiteral($"<input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>");
-                    WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
-                    WriteLiteral("Submit");
-                    WriteLiteral("</button>");
-                    WriteLiteral("</form>");
-                }
-            }
+            WriteLiteral("<h2>Hangfire configuration</h2>");
+
+            WriteInformationHeader();
+
+            if (_allowNewServerCreation)
+                WriteConfigurations(configurations);
             else
-            {
-                WriteLiteral("\r\n");
-                    WriteLiteral("<p style='border: 1px solid #428bca; line-height: 1.5em; margin-left: 10px; padding: 10px; width: 50%'>");
-                    WriteLiteral("Use the goal worker count configuration to set the goal number of workers to dynamically scale workers per server.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("On start up of each Hangfire server, the server will be assigned a number of workers approximate for equal distribution of the goal workers count.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("This is an approximation for reasons like: the number of existing servers is not exact, rounding, minimum 1 worker assigned.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("As the servers randomly reset, the goal will eventually be met.");
-                    WriteLiteral("<br>");
-                    WriteLiteral("Default goal is 10.");
-                    WriteLiteral("</p>");
-                    WriteLiteral("\r\n");
-                    WriteLiteral("\r\n");
-                    WriteLiteral($@"<form  action='{_basePath}/saveWorkerGoalCount' '<div style='padding: 10px;'>");
-                    WriteLiteral("<label for='workers' style='padding: 10px 0px 10px; color: #888; font-weight: bold;'>");
-                    WriteLiteral("Goal Worker Count: ");
-                    WriteLiteral("</label>");
-                    WriteLiteral($"<input type='number' value='' id='workers' name='workers' style='margin-right: 6px; width:60px'>");
-                    WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent;'>");
-                    WriteLiteral("Submit");
-                    WriteLiteral("</button>");
-                    WriteLiteral("</form>");
-            }
-
+                WriteGoalWorkerCountForm(configurations);
 
             if (_allowNewServerCreation && configurations.Count() < 2)
             {
-                WriteLiteral($"<h2 style='font-family:\"Segoe UI\"; font-size: 30px; font-weight:500; margin-left: 10px'>");
-                WriteLiteral("Create new Hangfire server");
-                WriteLiteral("</h2>");
-                WriteLiteral($"<form  action='{_basePath}/createNewServerConfiguration'>");
-                WriteLiteral("<label for='server' style='padding: 0px 10px; color: #888; font-weight: bold;'>Server: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='server' name='server' value='{_inputedServerConfiguration.Server}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='database' style='padding: 4px 10px; color: #888; font-weight: bold;'>Database: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='database' name='database' value='{_inputedServerConfiguration.Database}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='schemaName' style='padding: 4px 10px; color: #888; font-weight: bold;'>Schema name: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='schemaName' name='schemaName' value='{_inputedServerConfiguration.SchemaName}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");                
-                WriteLiteral("<label for='user' style='padding: 4px 10px; color: #888; font-weight: bold;'>User: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='user' name='user' value='{_inputedServerConfiguration.User}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='password' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='password' name='password' value='{_inputedServerConfiguration.Password}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='userForCreate' style='padding: 4px 10px; color: #888; font-weight: bold;'>User for creating schema: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='userForCreate' name='userForCreate' value='{_inputedServerConfiguration.UserForCreate}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<label for='passwordForCreate' style='padding: 4px 10px; color: #888; font-weight: bold;'>Password for creating schema: </label>");
-                WriteLiteral("<br>");
-                WriteLiteral($"<input type='text' id='passwordForCreate' name='passwordForCreate' value='{_inputedServerConfiguration.PasswordForCreate}' style='margin: 0px 10px 10px; width:200px'>");
-                WriteLiteral("<br>");
-                WriteLiteral("<button type='submit' style='padding: 1px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px; color: #fff; background-color: #337ab7; border: 1px solid transparent; margin-left: 10px;'>");
-                WriteLiteral("Create");
-                WriteLiteral("</button>");
-                if (_displayErrorMessage)
+                WriteCreateConfiguration();
+            }
+
+            WriteLiteral("</body>");
+            WriteLiteral("</html>");
+        }
+
+        private void WriteHead()
+        {
+            WriteLiteral("<head>");
+            WriteStyle();
+            WriteLiteral("</head>");
+        }
+
+        private void WriteConfigurations(ServerConfigurationViewModel[] configurations)
+        {
+            if (configurations.Any())
+            {
+                WriteLiteral("<div class='flex-grid'>");
+
+                foreach (var configuration in configurations)
                 {
-                    WriteLiteral("&nbsp;&nbsp; <span style='color: red; font-weight: 600'>");
-                    WriteLiteral(_errorMessage);
-                    WriteLiteral("</span>");
+                    WriteConfiguration(configuration);
                 }
-                WriteLiteral("</form>");
+
+                WriteLiteral("</div>");
+            }
+            else
+            {
+                WriteConfiguration(new ServerConfigurationViewModel());
             }
         }
 
-        private IEnumerable<ServerConfigurationViewModel> getConfigurations()
-            => _configuration.BuildServerConfigurations().ToArray();
+        private void WriteConfiguration(ServerConfigurationViewModel configuration)
+        {
+            var activateForm = "";
+
+            if (configuration.Active == "Inactive")
+            {
+                activateForm = $@"              
+                <div>    
+                    <form action='{_basePath}/activateServer'>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <button type='submit'>Activate configuration</button>
+                    </form>
+                </div>";
+            }
+
+            WriteLiteral($@"        
+        <div class='col'>
+            <fieldset style='height: 190px'>
+                <legend>{configuration.Title} - {configuration.Active}</legend>
+                <div><span class='configLabel'>Server:</span><span>{configuration.ServerName}</span></div>
+                <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
+                <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>
+                <div>
+                    <form action='{_basePath}/saveWorkerGoalCount'>
+                        <label for='workers'>Worker goal count: </label>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
+                        <button type='submit'>Submit</button>
+                    </form>
+                </div>
+                {activateForm}
+            </fieldset>
+        </div>");
+
+        }
+
+        private void WriteGoalWorkerCountForm(ServerConfigurationViewModel[] configurations)
+        {
+            var configuration = configurations?.FirstOrDefault() ?? new ServerConfigurationViewModel();
+
+            WriteLiteral($@"        
+            <fieldset>
+                <legend>Hangfire worker goal configuration</legend>
+                <div>
+                    <form action='{_basePath}/saveWorkerGoalCount'>
+                        <label for='workers'>Worker goal count: </label>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
+                        <button type='submit'>Submit</button>
+                    </form>
+                </div>
+            </fieldset>");
+        }
+
+        private void WriteInformationHeader()
+        {
+            WriteLiteral(@"
+    <fieldset>
+        <legend>Information</legend>
+        <p>
+            <bold>*Worker goal count:</bold> Configuration value to set the goal number of workers to dynamically scale
+            workers per server.<br>On start up of each Hangfire server, the server will be assigned a number of workers approximate
+            for equal distribution of the goal workers count.<br>This is an approximation for reasons like: the number of existing servers is
+            not exact, rounding, minimum 1 worker assigned.<br>As the servers randomly reset, the goal will eventually be
+            met.<br>Default goal is 10 if no value is specified
+        </p>
+    </fieldset>");
+        }
+
+        private void WriteCreateConfiguration()
+        {
+            var errorMsg = "";
+            if (_displayErrorMessage)
+            {
+                errorMsg = $@"&nbsp;&nbsp; <span style='color: red; font-weight: 600'>{_errorMessage}</span>";
+            }
+
+            WriteLiteral(
+$@"
+    <fieldset>
+        <legend>Create new Hangfire server</legend>
+        <form action='{_basePath}/createNewServerConfiguration'>
+            <div class='flex-grid'>
+                <div style='width: 240px'>
+                    <label for='server'>Server: </label><br>
+                    <input type='text' id='server' name='server' value='{_inputedServerConfiguration.Server}' style='width:200px'>
+                    <br><label for='database'>Database: </label><br>
+                    <input type='text' id='database' name='database' value='{_inputedServerConfiguration.Database}' style='width:200px'>
+                    <br><label for='schemaName'>Schema: </label><br>
+                    <input type='text' id='schemaName' name='schemaName' value='{_inputedServerConfiguration.SchemaName}' style='width:200px'>
+                    <br><label for='user'>User: </label><br>
+                    <input type='text' id='user' name='user' value='{_inputedServerConfiguration.User}' style='width:200px'>
+                    <br><label for='password'>Password: </label><br>
+                    <input type='text' id='password' name='password' value='{_inputedServerConfiguration.Password}' style='width:200px'>
+                </div>
+                <div class='col'>
+                    <label for='userForCreate'>Admin user: </label><br>
+                    <input type='text' id='userForCreate' name='userForCreate' value='{_inputedServerConfiguration.UserForCreate}' style='width:200px'>
+                    <br><label for='passwordForCreate'>Admin password: </label><br>
+                    <input type='text' id='passwordForCreate' name='passwordForCreate' value='{_inputedServerConfiguration.PasswordForCreate}' style='width:200px'>
+                    <br><br><button type='submit'>Create</button>{errorMsg}
+                </div>
+            </div>
+        </form>
+    </fieldset>");
+        }
+
+        private void WriteStyle() =>
+            WriteLiteral(
+@"
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-left: 20px
+        }
+
+        h2 {
+            font-size: 30px;
+            font-weight: 500
+        }
+
+        div {
+            padding-top: 3px
+        }
+
+        .configLabel {
+            padding-right: 10px;
+            padding-top: 30px;
+            color: #888;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 12px;
+            line-height: 14px;
+        }
+
+        label {
+            padding: 10px 0px 10px;
+            color: #888;
+            font-weight: bold;
+        }
+
+        form.input {
+            width: 200px
+        }
+
+        button {
+            padding: 1px 5px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 3px;
+            color: #fff;
+            background-color: #337ab7;
+            border: 1px solid transparent;
+        }
+
+        fieldset {
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            border: 1px solid #428bca;
+            line-height: 1.5em;
+        }
+
+        legend {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .flex-grid {
+            display: flex;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .confirm-msg {
+            color:green;
+            background:#F1F8E9;
+            font-size: 20px;
+            font-weight:bolder; 
+        }
+    </style>");
+
     }
 }

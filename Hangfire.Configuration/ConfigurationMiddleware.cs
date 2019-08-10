@@ -44,7 +44,8 @@ namespace Hangfire.Configuration
 					context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
 					return;
 				}
-			}
+
+            }
 			if (context.Request.Path.StartsWithSegments(new PathString("/activateServer")))
 			{
 				activateServer(context.Request);
@@ -55,9 +56,12 @@ namespace Hangfire.Configuration
 			{
 				page.DisplayConfirmationMessage();
 			}
-			
-			await renderPage(context.Response, page);
-		}
+
+            var html = page.ToString();
+            context.Response.StatusCode = (int)HttpStatusCode.OK;
+            context.Response.ContentType = "text/html";
+            context.Response.Write(html);
+        }
 		
 		
 		private void saveWorkerGoalCount(IOwinRequest request, ConfigurationPage page)
@@ -95,14 +99,7 @@ namespace Hangfire.Configuration
 			_configuration.ActivateServer(id);
 		}
 
-		private static async Task renderPage(IOwinResponse response, ConfigurationPage page)
-		{
-			var html = page.ToString();
-			response.StatusCode = (int) HttpStatusCode.OK;
-			response.ContentType = "text/html";
-			await response.WriteAsync(html);
-		}
-
+	
 		private int? tryParseNullable(string value) => 
 			int.TryParse(value, out var outValue) ? (int?) outValue : null;
 	}
