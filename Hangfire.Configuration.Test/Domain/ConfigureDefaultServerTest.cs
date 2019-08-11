@@ -127,6 +127,22 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.False(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
         }
+
+        [Fact]
+        public void ShouldNotActivateOnUpdatingDefaultWithNull()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = null});
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
+
+            system.ServerStarter.StartServers(new ConfigurationOptions
+            {
+                DefaultHangfireConnectionString = "newDefault"
+            }, null, null);
+
+            Assert.Null(system.Repository.Data.First().Active);
+            Assert.True(system.Repository.Data.Last().Active);
+        }
         
         [Fact]
         public void ShouldBeActiveOnUpdateIfActiveBefore()

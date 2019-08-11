@@ -1,5 +1,4 @@
-﻿using Hangfire.SqlServer;
-using Owin;
+﻿using Owin;
 
 namespace Hangfire.Configuration
 {

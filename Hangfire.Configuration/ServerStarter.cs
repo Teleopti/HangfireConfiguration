@@ -103,6 +103,7 @@ namespace Hangfire.Configuration
             return runningServers;
         }
 
+        //TODO: unit of work
         private void configureDefaultStorage(string connectionString, string schemaName)
         {
             if (connectionString == null)
@@ -119,11 +120,10 @@ namespace Hangfire.Configuration
             }
             else
             {
-                var legacyConfiguration = configurations.FirstOrDefault();
-                if (legacyConfiguration == null) return;
+                var legacyConfiguration = configurations.First();
                 legacyConfiguration.ConnectionString = connectionString;
                 legacyConfiguration.SchemaName = schemaName;
-                if (legacyConfiguration.Active == null)
+                if (configurations.Where(x => (x.Active != null && x.Active.Value)).IsEmpty())
                     legacyConfiguration.Active = true;
 
                 _repository.WriteConfiguration(legacyConfiguration);
