@@ -10,7 +10,6 @@ namespace Hangfire.Configuration
         public string SchemaName { get; set; }
         public string Active { get; set; }
         public int? Workers { get; set; }
-        public bool IsDefault { get; set; }
-        public string Title { get; set; } = "Default Hangfire Server";
+        public string Title { get; set; } = "Hangfire configuration";
     }
 }

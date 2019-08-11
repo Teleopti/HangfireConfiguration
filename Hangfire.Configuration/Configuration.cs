@@ -49,7 +49,7 @@ namespace Hangfire.Configuration
                 SchemaName = x?.SchemaName,
                 Active = x?.Active == true ? "Active" : "Inactive",
                 Workers = x?.GoalWorkerCount,
-                Title = i == 0 ? "Default Hangfire Server" : "Added Hangfire Server" 
+                Title = i == 0 ? "Default Hangfire configuration" : "Added Hangfire configuration" 
             });
         }
         

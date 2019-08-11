@@ -91,7 +91,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.Configuration.BuildServerConfigurations();
 
-            Assert.Equal("Default Hangfire Server", result.Single().Title);
+            Assert.Equal("Default Hangfire configuration", result.Single().Title);
         }
         [Fact]
         public void ShouldBuildWithAddedServerTitle()
@@ -102,7 +102,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.Configuration.BuildServerConfigurations();
 
-            Assert.Equal("Added Hangfire Server", result.Last().Title);
+            Assert.Equal("Added Hangfire configuration", result.Last().Title);
         }
 
     }
