@@ -49,6 +49,8 @@
     <Compile Include="ConfigurationMiddleware.cs" />
     <Compile Include="ConfigurationRepository.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="HangfireSchemaCreator.cs" />
+    <Compile Include="IHangfireSchemaCreator.cs" />
     <Compile Include="ServerConfigurationViewModel.cs" />
     <Compile Include="CreateServerConfiguration.cs" />
     <Compile Include="HangfireConfiguration.cs" />

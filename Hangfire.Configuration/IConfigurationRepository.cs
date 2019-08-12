@@ -6,7 +6,5 @@ namespace Hangfire.Configuration
     {
         IEnumerable<StoredConfiguration> ReadConfigurations();
         void WriteConfiguration(StoredConfiguration configuration);
-        void TryConnect(string connectionString);
-        void CreateHangfireSchema(string schemaName, string connectionStringForCreate);
     }
 }

@@ -21,7 +21,8 @@ namespace Hangfire.Configuration
 					SqlServerObjectsInstaller.Install(c);
 			
 			_configuration = new Configuration(
-				new ConfigurationRepository(_options.ConnectionString)
+				new ConfigurationRepository(_options.ConnectionString),
+				new HangfireSchemaCreator()
 			);
 			
 			_createServerConfiguration = new CreateServerConfiguration();
@@ -86,8 +87,8 @@ namespace Hangfire.Configuration
 			_createServerConfiguration.User = request.Query["user"];
 			_createServerConfiguration.Password = request.Query["password"];
 			_createServerConfiguration.SchemaName = request.Query["schemaName"];
-			_createServerConfiguration.UserForCreate = request.Query["userForCreate"];
-			_createServerConfiguration.PasswordForCreate = request.Query["passwordForCreate"];
+			_createServerConfiguration.SchemaCreatorUser = request.Query["userForCreate"];
+			_createServerConfiguration.SchemaCreatorPassword = request.Query["passwordForCreate"];
 
 			try
 			{

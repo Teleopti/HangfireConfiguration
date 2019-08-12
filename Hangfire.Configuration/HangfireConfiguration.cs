@@ -11,7 +11,7 @@ namespace Hangfire.Configuration
         private static IEnumerable<RunningServer> _runningServers;
 
         public static IEnumerable<RunningServer> RunningServers() => _runningServers;
-        
+
         private readonly IAppBuilder _builder;
         private readonly ConfigurationOptions _options;
 
@@ -20,14 +20,14 @@ namespace Hangfire.Configuration
             _builder = builder;
             _options = options;
         }
-        
+
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString)
         {
             var configuration = BuildConfiguration(connectionString);
             return new WorkerDeterminer(configuration, JobStorage.Current.GetMonitoringApi());
         }
-        
+
         public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, IBackgroundProcess[] additionalProcesses)
         {
             _runningServers = new ServerStarter(_builder, new RealHangfire(), new ConfigurationRepository(_options.ConnectionString))
@@ -38,7 +38,8 @@ namespace Hangfire.Configuration
         private static Configuration BuildConfiguration(string connectionString)
         {
             var repository = new ConfigurationRepository(connectionString);
-            var configuration = new Configuration(repository);
+            var creator = new HangfireSchemaCreator();
+            var configuration = new Configuration(repository, creator);
             return configuration;
         }
     }

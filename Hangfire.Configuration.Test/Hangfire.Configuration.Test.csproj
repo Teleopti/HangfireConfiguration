@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Domain\ConfigureGoalWorkerCountTest.cs" />
     <Compile Include="Domain\Fake\FakeConfigurationRepository.cs" />
+    <Compile Include="Domain\Fake\FakeHangfireSchemaCreator.cs" />
     <Compile Include="Domain\Fake\FakeMonitoringApi.cs" />
     <Compile Include="Domain\ConfigureDefaultServerTest.cs" />
     <Compile Include="Domain\ActivateServerConfigurationTest.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Infrastructure\ConfigurationRepositoryGoalWorkerCountTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />
     <Compile Include="Infrastructure\ConfigurationRepositoryTest.cs" />
+    <Compile Include="Infrastructure\SchemaCreatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

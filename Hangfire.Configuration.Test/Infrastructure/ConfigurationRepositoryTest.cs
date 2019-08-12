@@ -53,20 +53,5 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal(3, result.GoalWorkerCount);
             Assert.Equal(true, result.Active);
         }
-        
-        
-        [Fact, CleanDatabase]
-        public void ShouldConnect()
-        {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.TryConnect(ConnectionUtils.GetConnectionString());
-        }
-
-        [Fact]
-        public void ShouldThrowSqlExceptionWhenNoDatabase()
-        {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            Assert.ThrowsAny<SqlException>(() => repository.TryConnect(@"Server=.\;Database=DoesNotExist;Trusted_Connection=True;"));
-        }
     }
 }

@@ -11,23 +11,20 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            var connectionString = "Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword";
-            var schemaName = "awesomeSchema";
-
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
                 User = "testUser",
                 Password = "awesomePassword",
-                UserForCreate = "createuser",
-                PasswordForCreate = "createPassword",
-                SchemaName = schemaName
+                SchemaCreatorUser = "createuser",
+                SchemaCreatorPassword = "createPassword",
+                SchemaName = "awesomeSchema"
             });
 
             var storedConfiguration = system.Repository.Data.Last();
-            Assert.Equal(connectionString, storedConfiguration.ConnectionString);
-            Assert.Equal(schemaName, storedConfiguration.SchemaName);
+            Assert.Equal("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
+            Assert.Equal("awesomeSchema", storedConfiguration.SchemaName);
         }
 
         [Fact]
@@ -46,8 +43,8 @@ namespace Hangfire.Configuration.Test.Domain
                 Database = "database",
                 User = "user",
                 Password = "Password",
-                UserForCreate = "createUser",
-                PasswordForCreate = "createPassword",                
+                SchemaCreatorUser = "createUser",
+                SchemaCreatorPassword = "createPassword",                
             });
 
             system.Configuration.WriteGoalWorkerCount(10);
@@ -71,8 +68,8 @@ namespace Hangfire.Configuration.Test.Domain
                 Database = "database",
                 User = "user",
                 Password = "Password",
-                UserForCreate = "createUser",
-                PasswordForCreate = "createPassword",
+                SchemaCreatorUser = "createUser",
+                SchemaCreatorPassword = "createPassword",
                 SchemaName = "newSchemaName"
             });
 
@@ -80,46 +77,74 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(2, configurations.Count());
         }
-
+        
         [Fact]
-        public void ShouldSaveEmptyDefault()
+        public void ShouldThrowWhenConnectionFails()
         {
             var system = new SystemUnderTest();
-            
-            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
-            {
-                Server = "AwesomeServer",
-                Database = "TestDatabase",
-                User = "testUser",
-                Password = "awesomePassword",
-                UserForCreate = "createUser",
-                PasswordForCreate = "createPassword",
-                SchemaName = "awesomeSchema"
-            });
-
-            var storedConfigurations = system.Repository.Data.ToArray();
-            Assert.Equal(2, storedConfigurations.Count());
-            Assert.Null(storedConfigurations.First().ConnectionString);
-            Assert.Null(storedConfigurations.First().SchemaName);
-            Assert.Null(storedConfigurations.First().GoalWorkerCount);
-            Assert.Null(storedConfigurations.First().Active);
-        }
-
-        [Fact]
-        public void ShouldThrowIfAnyNull()
-        {
-            var system = new SystemUnderTest();
+            system.Creator.TryConnectFailsWith = new Exception();
             
             Assert.ThrowsAny<Exception>(() => system.Configuration.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
-                    Server = null,
+                    Server = "Server",
                     Database = "TestDatabase",
                     User = "testUser",
-                    Password = "awesomePassword",
-                    UserForCreate = "createUser",
-                    PasswordForCreate = "createPassword",
+                    Password = "awesomePassword"
                 }));
+        }
+        
+        [Fact]
+        public void ShouldTryConnectWithStorageConnectionString()
+        {
+            var system = new SystemUnderTest();
+            
+            system.Configuration.CreateServerConfiguration(
+                new CreateServerConfiguration
+                {
+                    Server = "AwesomeServer",
+                    Database = "TestDatabase",
+                    User = "testUser",
+                    Password = "awesomePassword"
+                });
+            
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", system.Creator.ConnectionTriedWith);
+        }
+        
+        [Fact]
+        public void ShouldTryConnectWithCreatorConnectionString()
+        {
+            var system = new SystemUnderTest();
+            
+            system.Configuration.CreateServerConfiguration(
+                new CreateServerConfiguration
+                {
+                    Server = "AwesomeServer",
+                    Database = "TestDatabase",
+                    SchemaCreatorUser = "createUser",
+                    SchemaCreatorPassword = "createPassword"
+                });
+            
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.Creator.ConnectionTriedWith);
+        }
+       
+        [Fact]
+        public void ShouldCreateSchemaInDatabaseWithGivenConnectionsString()
+        {
+            var system = new SystemUnderTest();
+            
+            system.Configuration.CreateServerConfiguration(
+                new CreateServerConfiguration
+                {
+                    Server = "AwesomeServer",
+                    Database = "TestDatabase",
+                    SchemaCreatorUser = "createUser",
+                    SchemaCreatorPassword = "createPassword",
+                    SchemaName = "schema"
+                });
+            
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.Creator.SchemaCreatedWith.Last().ConnectionString);
+            Assert.Equal("schema", system.Creator.SchemaCreatedWith.Last().SchemaName);
         }
     }
 }

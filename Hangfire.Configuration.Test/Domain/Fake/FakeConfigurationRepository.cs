@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             configuration.Id = existing?.Id ?? configuration.Id ?? NextId();
             Data = Data.Append(configuration).OrderBy(x => x.Id).ToArray();
         }
-        
+
         public void HasGoalWorkerCount(int goalWorkerCount) => Has(new StoredConfiguration {GoalWorkerCount = goalWorkerCount});
 
         public void Has(StoredConfiguration configuration)
@@ -43,8 +43,5 @@ namespace Hangfire.Configuration.Test.Domain.Fake
                 Has(storedConfiguration);
             }
         }
-        
-        public void TryConnect(string connectionString){}
-        public void CreateHangfireSchema(string schemaName, string connectionString){}
     }
 }

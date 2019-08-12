@@ -191,9 +191,9 @@ $@"
                 </div>
                 <div class='col'>
                     <label for='userForCreate'>Admin user: </label><br>
-                    <input type='text' id='userForCreate' name='userForCreate' value='{_inputedServerConfiguration.UserForCreate}' style='width:200px'>
+                    <input type='text' id='userForCreate' name='userForCreate' value='{_inputedServerConfiguration.SchemaCreatorUser}' style='width:200px'>
                     <br><label for='passwordForCreate'>Admin password: </label><br>
-                    <input type='text' id='passwordForCreate' name='passwordForCreate' value='{_inputedServerConfiguration.PasswordForCreate}' style='width:200px'>
+                    <input type='text' id='passwordForCreate' name='passwordForCreate' value='{_inputedServerConfiguration.SchemaCreatorPassword}' style='width:200px'>
                     <br><br><button type='submit'>Create</button>{errorMsg}
                 </div>
             </div>
