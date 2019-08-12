@@ -27,16 +27,23 @@ namespace Hangfire.Configuration
 			_createServerConfiguration = new CreateServerConfiguration();
 		}
 
-		public override async Task Invoke(IOwinContext context)
+		public override Task Invoke(IOwinContext context)
+		{
+			handleRequest(context);
+			return Task.CompletedTask;
+		}
+
+		private void handleRequest(IOwinContext context)
 		{
 			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation, _createServerConfiguration);
-			
+
 			if (context.Request.Path.StartsWithSegments(new PathString("/saveWorkerGoalCount")))
 			{
 				saveWorkerGoalCount(context.Request, page);
 				context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
 				return;
 			}
+
 			if (context.Request.Path.StartsWithSegments(new PathString("/createNewServerConfiguration")))
 			{
 				if (createNewServerConfiguration(context.Request, page))
@@ -44,26 +51,27 @@ namespace Hangfire.Configuration
 					context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
 					return;
 				}
+			}
 
-            }
 			if (context.Request.Path.StartsWithSegments(new PathString("/activateServer")))
 			{
 				activateServer(context.Request);
 				context.Response.Redirect(context.Request.PathBase.Value);
 				return;
 			}
+
 			if (context.Request.Path.StartsWithSegments(new PathString("/savedConfiguration")))
 			{
 				page.DisplayConfirmationMessage();
 			}
 
-            var html = page.ToString();
-            context.Response.StatusCode = (int)HttpStatusCode.OK;
-            context.Response.ContentType = "text/html";
-            context.Response.Write(html);
-        }
-		
-		
+			var html = page.ToString();
+			context.Response.StatusCode = (int) HttpStatusCode.OK;
+			context.Response.ContentType = "text/html";
+			context.Response.Write(html);
+		}
+
+
 		private void saveWorkerGoalCount(IOwinRequest request, ConfigurationPage page)
 		{
 			var workers = tryParseNullable(request.Query["workers"]);
