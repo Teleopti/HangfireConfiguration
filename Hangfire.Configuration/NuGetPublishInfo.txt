@@ -1,6 +1,9 @@
+Prereq nuget configuration
+* Download Nuget with credential provider to project folder (https://pkgs.dev.azure.com/{org_name}/_apis/public/nuget/client/CredentialProviderBundle.zip)
+* Add source feed to nuget (in Rider, Name "TeleoptiNugets" url https://teleopti.pkgs.visualstudio.com/_packaging/TeleoptiNugets/nuget/v3/index.json)
+
 to create a new version of the nuget package: 
-* Change version in csproj file
+* Change version in csproj file and AssemblyInfo
 * Build in release mode (generates package in bin/release folder)
-* Download Nuget with credential provider to project folder
-* Add source feed to nuget
+* Commit and push
 * Then publish to feed: nuget.exe push -Source "TeleoptiNugets" -ApiKey AzureDevOps bin/release/Hangfire.Configuration.X.X.X.X.nupkg
