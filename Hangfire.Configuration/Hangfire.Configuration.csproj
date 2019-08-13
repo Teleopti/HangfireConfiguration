@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>bin\Release\</PackageOutputPath>
-    <Version>0.0.1.10</Version>
+    <Version>0.0.1.12</Version>
     <Authors>Calabrio</Authors>
     <Description>Hangfire Extension used for scaling workers</Description>    
   </PropertyGroup>
@@ -87,6 +87,12 @@
     <None Include="NuGetPublishInfo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+      cd $(SolutionDir)
+      if $(ConfigurationName) == Release nuget.exe push -Source "TeleoptiNugets" -ApiKey AzureDevOps $(TargetDir)Hangfire.Configuration.$(Version).nupkg
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
@@ -94,7 +100,4 @@
     <Target Name="AfterBuild">
     </Target>
     -->
-<!--  <Target Name="AfterBuild">-->
-<!--    nuget.exe push -Source "TeleoptiNugets" -ApiKey AzureDevOps bin/release/Hangfire.Configuration.X.X.X.X.nupkg-->
-<!--  </Target>-->
 </Project>
