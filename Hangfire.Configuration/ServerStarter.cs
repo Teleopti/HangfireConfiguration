@@ -74,7 +74,6 @@ namespace Hangfire.Configuration
                     appliedStorageOptions.PrepareSchemaIfNecessary = storageOptions.PrepareSchemaIfNecessary;
                     appliedStorageOptions.QueuePollInterval = storageOptions.QueuePollInterval;
                     appliedStorageOptions.SlidingInvisibilityTimeout = storageOptions.SlidingInvisibilityTimeout;
-                    appliedStorageOptions.InvisibilityTimeout = storageOptions.InvisibilityTimeout;
                     appliedStorageOptions.JobExpirationCheckInterval = storageOptions.JobExpirationCheckInterval;
                     appliedStorageOptions.CountersAggregateInterval = storageOptions.CountersAggregateInterval;
                     appliedStorageOptions.DashboardJobListLimit = storageOptions.DashboardJobListLimit;

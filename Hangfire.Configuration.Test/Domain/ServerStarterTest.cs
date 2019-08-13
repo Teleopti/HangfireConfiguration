@@ -169,7 +169,6 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 QueuePollInterval = TimeSpan.FromSeconds(1.0),
                 SlidingInvisibilityTimeout = TimeSpan.FromSeconds(2),
-                InvisibilityTimeout = TimeSpan.FromMinutes(3),
                 JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
                 CountersAggregateInterval = TimeSpan.FromMinutes(5.0),
                 PrepareSchemaIfNecessary = !new SqlServerStorageOptions().PrepareSchemaIfNecessary,
@@ -183,7 +182,6 @@ namespace Hangfire.Configuration.Test.Domain
             var storage = system.Hangfire.StartedServers.Single().storage as FakeJobStorage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
-            Assert.Equal(options.InvisibilityTimeout, storage.Options.InvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
             Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
             Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
@@ -205,7 +203,6 @@ namespace Hangfire.Configuration.Test.Domain
             var storage = system.Hangfire.StartedServers.Single().storage as FakeJobStorage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
-            Assert.Equal(options.InvisibilityTimeout, storage.Options.InvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
             Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
             Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
