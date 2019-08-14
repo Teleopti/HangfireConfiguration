@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
@@ -15,7 +13,6 @@ namespace Hangfire.Configuration
 	{
 		private readonly Configuration _configuration;
 		private readonly HangfireConfigurationInterfaceOptions _options;
-		private CreateServerConfiguration _createServerConfiguration;
 
 		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options) : base(next)
 		{
@@ -28,8 +25,6 @@ namespace Hangfire.Configuration
 				new ConfigurationRepository(_options.ConnectionString),
 				new HangfireSchemaCreator()
 			);
-			
-			_createServerConfiguration = new CreateServerConfiguration();
 		}
 
 		public override Task Invoke(IOwinContext context)
@@ -40,7 +35,7 @@ namespace Hangfire.Configuration
 
 		private void handleRequest(IOwinContext context)
 		{
-			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation, _createServerConfiguration);
+			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation);
 
 			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
 			{
@@ -48,13 +43,10 @@ namespace Hangfire.Configuration
 				return;
 			}
 
-			if (context.Request.Path.StartsWithSegments(new PathString("/createNewServerConfiguration")))
+			if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
 			{
-				if (createNewServerConfiguration(context.Request, page))
-				{
-					context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
-					return;
-				}
+				createNewServerConfiguration(context);
+				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/activateServer"))
@@ -62,12 +54,7 @@ namespace Hangfire.Configuration
 				activateServer(context);
 				return;
 			}
-
-			if (context.Request.Path.StartsWithSegments(new PathString("/savedConfiguration")))
-			{
-				page.DisplayConfirmationMessage();
-			}
-
+			
 			var html = page.ToString();
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";
@@ -77,7 +64,7 @@ namespace Hangfire.Configuration
 
 		private void saveWorkerGoalCount(IOwinContext context)
 		{
-			var parsed = ParseRequestBody(context.Request);
+			var parsed = parseRequestBody(context.Request);
 			var configurationId = tryParseNullable(parsed.SelectToken("configurationId").Value<string>());
 			var workers = tryParseNullable(parsed.SelectToken("workers").Value<string>());
 			
@@ -87,8 +74,42 @@ namespace Hangfire.Configuration
 			context.Response.ContentType = "text/html";
 			context.Response.Write("Worker goal count was saved successfully!");
 		}
+		
+		private void createNewServerConfiguration(IOwinContext context)
+		{
+			var parsed = parseRequestBody(context.Request);
+			var configuration = new CreateServerConfiguration
+			{
+				Server = parsed.SelectToken("server").Value<string>(),
+				Database = parsed.SelectToken("database").Value<string>(),
+				User = parsed.SelectToken("user").Value<string>(),
+				Password = parsed.SelectToken("password").Value<string>(),
+				SchemaName = parsed.SelectToken("schemaName").Value<string>(),
+				SchemaCreatorUser = parsed.SelectToken("schemaCreatorUser").Value<string>(),
+				SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>()
+			};
 
-		private static JObject ParseRequestBody(IOwinRequest request)
+			try
+			{
+				_configuration.CreateServerConfiguration(configuration);
+				context.Response.StatusCode = (int) HttpStatusCode.OK;
+			}
+			catch (Exception ex)
+			{
+				context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+				context.Response.Write(ex.Message);
+			}
+		}
+		
+		private void activateServer(IOwinContext context)
+		{
+			var parsed = parseRequestBody(context.Request);
+			var configurationId = parsed.SelectToken("configurationId").Value<int>();
+			_configuration.ActivateServer(configurationId);
+			context.Response.StatusCode = (int) HttpStatusCode.OK;
+		}
+		
+		private static JObject parseRequestBody(IOwinRequest request)
 		{
 			string text;
 			using (var reader = new StreamReader(request.Body))
@@ -96,36 +117,7 @@ namespace Hangfire.Configuration
 			var parsed = JObject.Parse(text);
 			return parsed;
 		}
-
-		private bool createNewServerConfiguration(IOwinRequest request, ConfigurationPage page)
-		{
-			_createServerConfiguration.Server = request.Query["server"];
-			_createServerConfiguration.Database = request.Query["database"];
-			_createServerConfiguration.User = request.Query["user"];
-			_createServerConfiguration.Password = request.Query["password"];
-			_createServerConfiguration.SchemaName = request.Query["schemaName"];
-			_createServerConfiguration.SchemaCreatorUser = request.Query["userForCreate"];
-			_createServerConfiguration.SchemaCreatorPassword = request.Query["passwordForCreate"];
-
-			try
-			{
-				_configuration.CreateServerConfiguration(_createServerConfiguration);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				page.DisplayErrorMessage(ex.Message);
-				return false;
-			}
-		}
-
-		private void activateServer(IOwinContext context)
-		{
-			var parsed = ParseRequestBody(context.Request);
-			var configurationId = parsed.SelectToken("configurationId").Value<int>();
-			_configuration.ActivateServer(configurationId);
-			context.Response.StatusCode = (int) HttpStatusCode.OK;
-		}
+		
 
 	
 		private int? tryParseNullable(string value) => 
