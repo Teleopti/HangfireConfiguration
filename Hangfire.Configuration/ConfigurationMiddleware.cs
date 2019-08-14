@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
 using Microsoft.Owin;
+using Newtonsoft.Json.Linq;
 
 namespace Hangfire.Configuration
 {
@@ -38,10 +42,9 @@ namespace Hangfire.Configuration
 		{
 			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation, _createServerConfiguration);
 
-			if (context.Request.Path.StartsWithSegments(new PathString("/saveWorkerGoalCount")))
+			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
 			{
-				saveWorkerGoalCount(context.Request, page);
-				context.Response.Redirect(context.Request.PathBase.Value + "/savedConfiguration");
+				saveWorkerGoalCount(context);
 				return;
 			}
 
@@ -54,10 +57,9 @@ namespace Hangfire.Configuration
 				}
 			}
 
-			if (context.Request.Path.StartsWithSegments(new PathString("/activateServer")))
+			if (context.Request.Path.Value.Equals("/activateServer"))
 			{
-				activateServer(context.Request);
-				context.Response.Redirect(context.Request.PathBase.Value);
+				activateServer(context);
 				return;
 			}
 
@@ -73,11 +75,26 @@ namespace Hangfire.Configuration
 		}
 
 
-		private void saveWorkerGoalCount(IOwinRequest request, ConfigurationPage page)
+		private void saveWorkerGoalCount(IOwinContext context)
 		{
-			var workers = tryParseNullable(request.Query["workers"]);
-			var configurationId = tryParseNullable(request.Query["configurationId"]);
+			var parsed = ParseRequestBody(context.Request);
+			var configurationId = tryParseNullable(parsed.SelectToken("configurationId").Value<string>());
+			var workers = tryParseNullable(parsed.SelectToken("workers").Value<string>());
+			
 			_configuration.WriteGoalWorkerCount(workers, configurationId);
+			
+			context.Response.StatusCode = (int) HttpStatusCode.OK;
+			context.Response.ContentType = "text/html";
+			context.Response.Write("Worker goal count was saved successfully!");
+		}
+
+		private static JObject ParseRequestBody(IOwinRequest request)
+		{
+			string text;
+			using (var reader = new StreamReader(request.Body))
+				text = reader.ReadToEnd();
+			var parsed = JObject.Parse(text);
+			return parsed;
 		}
 
 		private bool createNewServerConfiguration(IOwinRequest request, ConfigurationPage page)
@@ -102,10 +119,12 @@ namespace Hangfire.Configuration
 			}
 		}
 
-		private void activateServer(IOwinRequest request)
+		private void activateServer(IOwinContext context)
 		{
-			var id = int.Parse(request.Query["configurationId"]);
-			_configuration.ActivateServer(id);
+			var parsed = ParseRequestBody(context.Request);
+			var configurationId = parsed.SelectToken("configurationId").Value<int>();
+			_configuration.ActivateServer(configurationId);
+			context.Response.StatusCode = (int) HttpStatusCode.OK;
 		}
 
 	

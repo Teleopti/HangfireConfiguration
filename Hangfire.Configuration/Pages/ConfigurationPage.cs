@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing;
 using System.Linq;
 using Hangfire.Dashboard;
 
@@ -64,8 +61,41 @@ namespace Hangfire.Configuration.Pages
                 WriteCreateConfiguration();
             }
 
+            WriteScripts();
             WriteLiteral("</body>");
             WriteLiteral("</html>");
+        }
+
+        private void WriteScripts()
+        {
+            WriteLiteral($@"
+<script>
+
+function saveForm(formId, path, doPostBackOnOk) {{    
+    var formElement = document.querySelector('#' + formId);
+    var formData = new FormData(formElement);
+    var request = new XMLHttpRequest();
+    
+    request.onload = function() {{
+            if (request.status != 200) {{ 
+                alert('Error ${{request.status}}: ${{request.statusText}}');
+            }} else if ( doPostBackOnOk ) {{ 
+                window.location.reload(true);
+            }} else {{ 
+                alert(request.response);
+            }}
+    }};    
+
+    let jsonObject = {{}};
+    for (const [key, value]  of formData.entries()) {{
+        jsonObject[key] = value;
+    }}
+    request.open('POST', path);
+    //request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    request.send(JSON.stringify(jsonObject));
+}}
+</script>");
+
         }
 
         private void WriteHead()
@@ -102,9 +132,9 @@ namespace Hangfire.Configuration.Pages
             {
                 activateForm = $@"              
                 <div>    
-                    <form action='{_basePath}/activateServer'>
+                    <form id=""activateForm_{configuration.Id}"">
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                        <button type='submit'>Activate configuration</button>
+                        <button type='button' onClick=""saveForm('activateForm_{configuration.Id}', '{_basePath}/activateServer', true)"">Activate configuration</button>
                     </form>
                 </div>";
             }
@@ -117,11 +147,11 @@ namespace Hangfire.Configuration.Pages
                 <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
                 <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>
                 <div>
-                    <form action='{_basePath}/saveWorkerGoalCount'>
+                    <form id=""workerCountForm_{configuration.Id}"">
                         <label for='workers'>Worker goal count: </label>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-                        <button type='submit'>Submit</button>
+                        <button type='button' onClick=""saveForm('workerCountForm_{configuration.Id}', '{_basePath}/saveWorkerGoalCount')"">Submit</button>
                     </form>
                 </div>
                 {activateForm}
@@ -138,11 +168,11 @@ namespace Hangfire.Configuration.Pages
             <fieldset>
                 <legend>Hangfire worker goal configuration</legend>
                 <div>
-                    <form action='{_basePath}/saveWorkerGoalCount'>
+                    <form id=""workerCountForm_{configuration.Id}"">
                         <label for='workers'>Worker goal count: </label>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-                        <button type='submit'>Submit</button>
+                        <button type='button' onClick=""saveForm('workerCountForm_{configuration.Id}', '{_basePath}/saveWorkerGoalCount')"">Submit</button>
                     </form>
                 </div>
             </fieldset>");
