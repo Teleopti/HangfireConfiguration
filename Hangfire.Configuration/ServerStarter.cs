@@ -127,7 +127,7 @@ namespace Hangfire.Configuration
                 var legacyConfiguration = configurations.First();
                 legacyConfiguration.ConnectionString = connectionString;
                 legacyConfiguration.SchemaName = schemaName;
-                if (configurations.Where(x => (x.Active != null && x.Active.Value)).IsEmpty())
+                if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
                     legacyConfiguration.Active = true;
 
                 _repository.WriteConfiguration(legacyConfiguration);
