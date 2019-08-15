@@ -62,6 +62,8 @@ namespace Hangfire.Configuration
 
             var storedConfigs = _repository.ReadConfigurations().ToArray();
 
+            var activeConfiguration = storedConfigs.FirstOrDefault(x => x.Active ?? false) ?? storedConfigs.FirstOrDefault();
+            
             storedConfigs.ForEach(storedConfig =>
             {
                 var appliedStorageOptions = new SqlServerStorageOptions
@@ -91,12 +93,15 @@ namespace Hangfire.Configuration
                     options ?? new ConfigurationOptions()
                 );
 
-                _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, additionalProcesses);
+                var appliedAdditionalProcess = new IBackgroundProcess[] {};
+                if ( storedConfig.Id == activeConfiguration.Id ) 
+                    appliedAdditionalProcess = additionalProcesses;
+                    
+                _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, appliedAdditionalProcess);
 
                 runningServers.Add(new RunningServer() {Number = serverNumber, Storage = sqlJobStorage});
                 serverNumber++;
 
-                additionalProcesses = new IBackgroundProcess[] { };
             });
 
             return runningServers;

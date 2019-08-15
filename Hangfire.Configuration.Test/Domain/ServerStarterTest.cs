@@ -226,5 +226,19 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(2, result.Last().Number);
             Assert.Same(system.Hangfire.StartedServers.Last().storage, result.Last().Storage);
         }
+        
+        [Fact]
+        public void ShouldPassBackgroundProcessesToActiveServer()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration());
+            system.Repository.Has(new StoredConfiguration() {Active = true});
+
+            system.ServerStarter.StartServers(null, null, null, new Worker());
+
+            Assert.Empty(system.Hangfire.StartedServers.First().backgroundProcesses);
+            Assert.NotEmpty(system.Hangfire.StartedServers.Last().backgroundProcesses);
+        }        
+        
     }
 }
