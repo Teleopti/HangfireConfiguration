@@ -52,7 +52,8 @@ namespace Hangfire.Configuration
             var runningServers = new List<RunningServer>();
             var serverNumber = 1;
 
-            configureDefaultStorage(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
+            new DefaultServerConfigurator(_repository).
+                Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
 
             //Mutation not good
             if (serverOptions != null)
@@ -108,30 +109,5 @@ namespace Hangfire.Configuration
         }
 
         //TODO: unit of work
-        private void configureDefaultStorage(string connectionString, string schemaName)
-        {
-            if (connectionString == null)
-                return;
-            var configurations = _repository.ReadConfigurations().ToArray();
-            if (configurations.IsEmpty())
-            {
-                _repository.WriteConfiguration(new StoredConfiguration
-                {
-                    ConnectionString = connectionString,
-                    SchemaName = schemaName,
-                    Active = true
-                });
-            }
-            else
-            {
-                var legacyConfiguration = configurations.First();
-                legacyConfiguration.ConnectionString = connectionString;
-                legacyConfiguration.SchemaName = schemaName;
-                if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
-                    legacyConfiguration.Active = true;
-
-                _repository.WriteConfiguration(legacyConfiguration);
-            }
-        }
     }
 }

@@ -48,6 +48,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationMiddleware.cs" />
     <Compile Include="ConfigurationRepository.cs" />
+    <Compile Include="DefaultServerConfigurator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HangfireSchemaCreator.cs" />
     <Compile Include="IHangfireSchemaCreator.cs" />
