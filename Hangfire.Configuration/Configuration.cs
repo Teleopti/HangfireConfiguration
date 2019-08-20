@@ -84,9 +84,6 @@ namespace Hangfire.Configuration
             }
         }
 
-        private void createEmptyDefault() =>
-            _repository.WriteConfiguration(new StoredConfiguration());
-
         private string getDatabaseName(string connectionString)
         {
             var builder = new SqlConnectionStringBuilder(connectionString);
