@@ -12,6 +12,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		private const string MasterDatabaseName = "master";
 		private const string DefaultDatabaseName = @"Hangfire.Configuration.SqlServer.Tests";
 
+		private const string LoginUser = "HangfireTest";
+		private const string LoginUserPassword = "test";
+		
+		
 		private const string DefaultConnectionStringTemplate
 			//= @"Server=.\sqlexpress;Database={0};Trusted_Connection=True;";
 			= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
@@ -29,6 +33,16 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public static string GetConnectionString()
 		{
 			return String.Format(getConnectionStringTemplate(), GetDatabaseName());
+		}
+
+		public static string GetLoginUser()
+		{
+			return LoginUser;
+		}
+
+		public static string GetLoginUserPassword()
+		{
+			return LoginUserPassword;
 		}
 
 		private static string getConnectionStringTemplate()
