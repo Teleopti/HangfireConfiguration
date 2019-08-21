@@ -26,8 +26,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldWriteGoalWorkerCount(int workers)
         {
             var system = new SystemUnderTest();
-            
-            system.Configuration.WriteGoalWorkerCount(workers);
+
+            system.Configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
             Assert.Equal(workers, system.Repository.Workers);
         }
@@ -41,11 +41,11 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = 1
             });
 
-            system.Configuration.WriteGoalWorkerCount(null);
+            system.Configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
 
             Assert.Null(system.Repository.Workers);
         }
-        
+
         [Fact]
         public void ShouldReadGoalWorkerCountWithId()
         {
@@ -59,15 +59,15 @@ namespace Hangfire.Configuration.Test.Domain
                 Id = 2,
                 GoalWorkerCount = 40
             });
-            
+
             Assert.Equal(40, system.Configuration.ReadGoalWorkerCount(2));
-        }         
-        
+        }
+
         [Fact]
         public void ShouldReadNullWhenNoConfiguration()
         {
             var system = new SystemUnderTest();
-            
+
             Assert.Null(system.Configuration.ReadGoalWorkerCount());
             Assert.Null(system.Configuration.ReadGoalWorkerCount(1));
         }
@@ -84,7 +84,11 @@ namespace Hangfire.Configuration.Test.Domain
                 Id = 2
             });
 
-            system.Configuration.WriteGoalWorkerCount(5, 2);
+            system.Configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount
+            {
+                ConfigurationId = 2,
+                Workers = 5
+            });
 
             Assert.Equal(5, system.Repository.Data.Single(x => x.Id == 2).GoalWorkerCount);
         }

@@ -65,6 +65,7 @@
     <Compile Include="SqlServerObjectsInstaller.cs" />
     <Compile Include="StoredConfiguration.cs" />
     <Compile Include="WorkerDeterminer.cs" />
+    <Compile Include="WriteGoalWorkerCount.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Install.sql" />

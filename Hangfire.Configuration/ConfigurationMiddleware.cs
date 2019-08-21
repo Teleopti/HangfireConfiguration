@@ -63,10 +63,12 @@ namespace Hangfire.Configuration
 		private void saveWorkerGoalCount(IOwinContext context)
 		{
 			var parsed = parseRequestBody(context.Request);
-			var configurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>());
-			var workers = tryParseNullable(parsed.SelectToken("workers").Value<string>());
 			
-			_configuration.WriteGoalWorkerCount(workers, configurationId);
+			_configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount
+			{
+				ConfigurationId =  tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
+				Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
+			});
 			
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";

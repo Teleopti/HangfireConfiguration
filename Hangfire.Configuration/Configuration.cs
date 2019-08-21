@@ -18,17 +18,19 @@ namespace Hangfire.Configuration
 
         public int? ReadGoalWorkerCount(int? configurationId = null)
         {
-            return configurationId == null ? _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount : _repository.ReadConfigurations().FirstOrDefault(x => x.Id == configurationId)?.GoalWorkerCount;
+            return configurationId == null ? 
+                _repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount : 
+                _repository.ReadConfigurations().FirstOrDefault(x => x.Id == configurationId)?.GoalWorkerCount;
         }
 
-        public void WriteGoalWorkerCount(int? workers, int? configurationId = null)
+        public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
         {
             var configurations = _repository.ReadConfigurations();
             var configuration = new StoredConfiguration();
             if (configurations.Any())
             {
-                if (configurationId != null)
-                    configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
+                if (command.ConfigurationId != null)
+                    configuration = configurations.FirstOrDefault(x => x.Id == command.ConfigurationId);
                 else
                     configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
 
@@ -36,7 +38,7 @@ namespace Hangfire.Configuration
                     configuration = configurations.First();
             }
 
-            configuration.GoalWorkerCount = workers;
+            configuration.GoalWorkerCount = command.Workers;
             _repository.WriteConfiguration(configuration);
         }
 
