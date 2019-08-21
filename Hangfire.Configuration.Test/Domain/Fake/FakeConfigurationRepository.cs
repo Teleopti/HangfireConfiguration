@@ -8,8 +8,8 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 
-        private int _id;
-        private int NextId() => _id++;
+        private int _nextId = 1;
+        private int NextId() => _nextId++;
 
         public IEnumerable<StoredConfiguration> ReadConfigurations() => Data.ToArray();
 

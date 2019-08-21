@@ -8,7 +8,7 @@ namespace Hangfire.Configuration
 		{
 			builder.Map(pathMatch, subApp =>
 			{
-				subApp.Use(typeof(ConfigurationMiddleware), options);
+				subApp.Use(typeof(ConfigurationMiddleware), options, builder.Properties["CompositionRoot"]);
 			});
 		}
 		

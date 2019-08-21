@@ -1,15 +1,24 @@
+using System;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Storage;
 using Microsoft.Owin.Builder;
+using Microsoft.Owin.Testing;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test
 {
     public class SystemUnderTest : CompositionRoot
     {
+        private readonly Lazy<TestServer> _testServer;
+
         public SystemUnderTest()
         {
             AppBuilder = new AppBuilder();
-
+            _testServer = new Lazy<TestServer>(() => TestServer.Create(app =>
+            {
+                app.Properties.Add("CompositionRoot", this);
+                app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
+            }));
+            
             Repository = new FakeConfigurationRepository();
             Creator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
@@ -22,6 +31,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 
         public AppBuilder AppBuilder { get; }
+        public TestServer TestServer => _testServer.Value;
 
         public FakeMonitoringApi Monitor { get; }
         public FakeConfigurationRepository Repository { get; }

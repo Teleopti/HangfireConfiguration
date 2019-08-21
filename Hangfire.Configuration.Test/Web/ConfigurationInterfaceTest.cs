@@ -1,86 +1,111 @@
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Hangfire.Configuration.Test.Infrastructure;
-using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
-    [Collection("Infrastructure")]
     public class ConfigurationInterfaceTest
     {
-        private readonly TestServer _testServer = TestServer.Create(app =>
-        {
-            app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions
-            {
-                ConnectionString = ConnectionUtils.GetConnectionString()
-            });
-        });
-            
-        [Fact, CleanDatabase]
+        [Fact]
         public void ShouldFindConfigurationInterface()
         {
-            using(_testServer)
-            {
-                var response = _testServer.HttpClient.GetAsync("/config").Result;
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            var system = new SystemUnderTest();
+            var response = system.TestServer.HttpClient.GetAsync("/config").Result;
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public void ShouldNotFindConfigurationInterface()
+        {
+            var system = new SystemUnderTest();
+            var response = system.TestServer.HttpClient.GetAsync("/configIncorrect").Result;
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
         
-        [Fact, CleanDatabase]
+        [Fact]
         public void ShouldSaveWorkerGoalCount()
         {
-            using(_testServer)
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
             {
-                var response = _testServer.HttpClient.PostAsync(
-                        "/config/saveWorkerGoalCount", 
-                        new StringContent(JsonConvert.SerializeObject(new {configurationId = 1, workers = 10})))
-                        .Result;
-
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+                Id = 1,
+                GoalWorkerCount = 3
+            });
+            
+            var response = system.TestServer.HttpClient.PostAsync(
+                    "/config/saveWorkerGoalCount",
+                    new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        configurationId = 1, 
+                        workers = 10
+                    })))
+                .Result;
+            
+            Assert.Equal(1, system.Repository.Data.Single().Id);
+            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
         }
         
-        [Fact, CleanDatabase]
+        [Fact]
+        public void ShouldSaveWorkerGoalCountWithEmptyDatabase()
+        {
+            var system = new SystemUnderTest();
+            
+            var response = system.TestServer.HttpClient.PostAsync(
+                    "/config/saveWorkerGoalCount",
+                    new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        workers = 10
+                    })))
+                .Result;
+            
+            Assert.Equal(1, system.Repository.Data.Single().Id);
+            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+        }
+
+        [Fact]
         public void ShouldActivateServer()
         {
-            using(_testServer)
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
             {
-                var response = _testServer.HttpClient.PostAsync(
-                        "/config/activateServer", 
-                        new StringContent(JsonConvert.SerializeObject(new {configurationId = 1})))
-                        .Result;
-
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+                Id = 2
+            });
+            
+            var response = system.TestServer.HttpClient.PostAsync(
+                    "/config/activateServer",
+                    new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        configurationId = 2
+                    })))
+                .Result;
+            
+            Assert.True(system.Repository.Data.Single().Active);
         }
-        
-        [Fact, CleanDatabase]
+
+        [Fact]
         public void ShouldCreateNewServerConfiguration()
         {
-            using(_testServer)
-            {
-                var loginUser = ConnectionUtils.GetLoginUser();
-                var loginUserPassword = ConnectionUtils.GetLoginUserPassword();
-                
-                var response = _testServer.HttpClient.PostAsync(
-                        "/config/createNewServerConfiguration", 
-                        new StringContent(JsonConvert.SerializeObject(
-                            new
-                            {
-                                server = ".",
-                                database = ConnectionUtils.GetDatabaseName(),
-                                user = loginUser,
-                                password = loginUserPassword,
-                                schemaName = "TestSchema",
-                                schemaCreatorUser = loginUser,
-                                schemaCreatorPassword = loginUserPassword
-                            })))
-                    .Result;
+            var system = new SystemUnderTest();
+            
+            var response = system.TestServer.HttpClient.PostAsync(
+                    "/config/createNewServerConfiguration",
+                    new StringContent(JsonConvert.SerializeObject(
+                        new
+                        {
+                            server = ".",
+                            database = "database",
+                            user = "user",
+                            password = "password",
+                            schemaName = "TestSchema",
+                            schemaCreatorUser = "schemaCreatorUser",
+                            schemaCreatorPassword = "schemaCreatorPassword"
+                        })))
+                .Result;
 
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            Assert.Equal(1, system.Repository.Data.Single().Id);
+            Assert.Contains("database", system.Repository.Data.Single().ConnectionString);
         }
     }
 }

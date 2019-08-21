@@ -14,14 +14,15 @@ namespace Hangfire.Configuration
 		private readonly Configuration _configuration;
 		private readonly HangfireConfigurationInterfaceOptions _options;
 
-		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options) : base(next)
+		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot) : base(next)
 		{
 			_options = options;
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = new SqlConnection(_options.ConnectionString))
 					SqlServerObjectsInstaller.Install(c);
 
-			_configuration = new CompositionRoot().BuildConfiguration(_options.ConnectionString);
+			compositionRoot = compositionRoot ?? new CompositionRoot();
+			_configuration = compositionRoot.BuildConfiguration(_options.ConnectionString);
 		}
 
 		public override Task Invoke(IOwinContext context)
@@ -62,7 +63,7 @@ namespace Hangfire.Configuration
 		private void saveWorkerGoalCount(IOwinContext context)
 		{
 			var parsed = parseRequestBody(context.Request);
-			var configurationId = tryParseNullable(parsed.SelectToken("configurationId").Value<string>());
+			var configurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>());
 			var workers = tryParseNullable(parsed.SelectToken("workers").Value<string>());
 			
 			_configuration.WriteGoalWorkerCount(workers, configurationId);
