@@ -20,11 +20,8 @@ namespace Hangfire.Configuration
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = new SqlConnection(_options.ConnectionString))
 					SqlServerObjectsInstaller.Install(c);
-			
-			_configuration = new Configuration(
-				new ConfigurationRepository(_options.ConnectionString),
-				new HangfireSchemaCreator()
-			);
+
+			_configuration = new CompositionRoot().BuildConfiguration(_options.ConnectionString);
 		}
 
 		public override Task Invoke(IOwinContext context)
