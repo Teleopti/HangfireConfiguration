@@ -11,6 +11,7 @@ namespace Hangfire.Configuration
             _repository = repository;
         }
 
+        //TODO: unit of work 
         public void Configure(string defaultConnectionString, string defaultSchema)
         {
             if (defaultConnectionString == null)

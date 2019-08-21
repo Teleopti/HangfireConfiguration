@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Hangfire.Common;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Server;
 using Hangfire.SqlServer;
@@ -25,12 +27,37 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration());
+            var serverOptions = new BackgroundJobServerOptions
+            {
+                Queues = new[] {"queue1", "queue2"},
+                ServerTimeout = new TimeSpan(20),
+                HeartbeatInterval = new TimeSpan(30),
+                ShutdownTimeout = new TimeSpan(40),
+                ServerCheckInterval = new TimeSpan(50),
+                CancellationCheckInterval = new TimeSpan(60),
+                SchedulePollingInterval = new TimeSpan(70),
+                StopTimeout =  new TimeSpan(80),
+                Activator = new JobActivator(),
+                FilterProvider = new JobFilterCollection(),
+                TaskScheduler = TaskScheduler.Current,
+                TimeZoneResolver = new DefaultTimeZoneResolver()
+            };
 
-            system.ServerStarter.StartServers(null, new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}}, null);
+            system.ServerStarter.StartServers(null, serverOptions, null);
 
-            Assert.Equal(new[] {"queue1", "queue2"}, system.Hangfire.StartedServers.Single().options.Queues);
-        }
-        
+            Assert.Equal(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
+            Assert.Equal(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
+            Assert.Equal(serverOptions.HeartbeatInterval, system.Hangfire.StartedServers.Single().options.HeartbeatInterval);
+            Assert.Equal(serverOptions.ShutdownTimeout, system.Hangfire.StartedServers.Single().options.ShutdownTimeout);
+            Assert.Equal(serverOptions.ServerCheckInterval, system.Hangfire.StartedServers.Single().options.ServerCheckInterval);
+            Assert.Equal(serverOptions.CancellationCheckInterval, system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
+            Assert.Equal(serverOptions.SchedulePollingInterval, system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
+            Assert.Equal(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
+            Assert.Equal(serverOptions.Activator, system.Hangfire.StartedServers.Single().options.Activator);
+            Assert.Equal(serverOptions.FilterProvider, system.Hangfire.StartedServers.Single().options.FilterProvider);
+            Assert.Equal(serverOptions.TaskScheduler, system.Hangfire.StartedServers.Single().options.TaskScheduler);
+            Assert.Equal(serverOptions.TimeZoneResolver, system.Hangfire.StartedServers.Single().options.TimeZoneResolver);
+        }        
 
         [Fact]
         public void ShouldPassNullServerNameToHangfire()
@@ -238,7 +265,26 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Empty(system.Hangfire.StartedServers.First().backgroundProcesses);
             Assert.NotEmpty(system.Hangfire.StartedServers.Last().backgroundProcesses);
+        }
+
+        [Fact]
+        public void ShouldGetWorkerCountForTwoServers()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration() {GoalWorkerCount = 20});
+            system.Repository.Has(new StoredConfiguration() {GoalWorkerCount = 100});
+            var configurationOptions = new ConfigurationOptions()
+            {
+                MinimumServers = 1
+            };
+            
+            system.ServerStarter.StartServers(configurationOptions, null, null);
+
+            var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
+            Assert.Equal(new [] {20, 100}, actual);
         }        
+        
+        
         
     }
 }

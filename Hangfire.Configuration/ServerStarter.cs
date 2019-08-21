@@ -55,12 +55,6 @@ namespace Hangfire.Configuration
             new DefaultServerConfigurator(_repository).
                 Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
 
-            //Mutation not good
-            if (serverOptions != null)
-                serverOptions.ServerName = null;
-            else
-                serverOptions = new BackgroundJobServerOptions();
-
             var storedConfigs = _repository.ReadConfigurations().ToArray();
 
             var activeConfiguration = storedConfigs.FirstOrDefault(x => x.Active ?? false) ?? storedConfigs.FirstOrDefault();
@@ -87,27 +81,45 @@ namespace Hangfire.Configuration
 
                 var sqlJobStorage = _hangfire.MakeSqlJobStorage(storedConfig.ConnectionString, appliedStorageOptions);
 
-                serverOptions.WorkerCount = WorkerDeterminer.DetermineWorkerCount
+                var workerCount = WorkerDeterminer.DetermineWorkerCount
                 (
                     sqlJobStorage.GetMonitoringApi(),
                     storedConfig.GoalWorkerCount,
                     options ?? new ConfigurationOptions()
                 );
 
+                var appliedServerOptions = new BackgroundJobServerOptions
+                {
+                    WorkerCount = workerCount,
+                };
+
+                if (serverOptions != null)
+                {
+                    appliedServerOptions.Queues = serverOptions.Queues;
+                    appliedServerOptions.Activator = serverOptions.Activator;
+                    appliedServerOptions.FilterProvider = serverOptions.FilterProvider;
+                    appliedServerOptions.HeartbeatInterval = serverOptions.HeartbeatInterval;
+                    appliedServerOptions.ServerTimeout = serverOptions.ServerTimeout;
+                    appliedServerOptions.ShutdownTimeout = serverOptions.ShutdownTimeout;
+                    appliedServerOptions.StopTimeout = serverOptions.StopTimeout;
+                    appliedServerOptions.TaskScheduler = serverOptions.TaskScheduler;
+                    appliedServerOptions.CancellationCheckInterval = serverOptions.CancellationCheckInterval;
+                    appliedServerOptions.SchedulePollingInterval = serverOptions.SchedulePollingInterval;
+                    appliedServerOptions.ServerCheckInterval = serverOptions.ServerCheckInterval;
+                    appliedServerOptions.TimeZoneResolver = serverOptions.TimeZoneResolver;
+                }
+
                 var appliedAdditionalProcess = new IBackgroundProcess[] {};
                 if ( storedConfig.Id == activeConfiguration.Id ) 
                     appliedAdditionalProcess = additionalProcesses;
                     
-                _hangfire.UseHangfireServer(_builder, sqlJobStorage, serverOptions, appliedAdditionalProcess);
+                _hangfire.UseHangfireServer(_builder, sqlJobStorage, appliedServerOptions, appliedAdditionalProcess);
 
                 runningServers.Add(new RunningServer() {Number = serverNumber, Storage = sqlJobStorage});
                 serverNumber++;
-
             });
 
             return runningServers;
         }
-
-        //TODO: unit of work
     }
 }
