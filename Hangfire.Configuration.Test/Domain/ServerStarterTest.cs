@@ -53,10 +53,6 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(serverOptions.CancellationCheckInterval, system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
             Assert.Equal(serverOptions.SchedulePollingInterval, system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
             Assert.Equal(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
-            Assert.Equal(serverOptions.Activator, system.Hangfire.StartedServers.Single().options.Activator);
-            Assert.Equal(serverOptions.FilterProvider, system.Hangfire.StartedServers.Single().options.FilterProvider);
-            Assert.Equal(serverOptions.TaskScheduler, system.Hangfire.StartedServers.Single().options.TaskScheduler);
-            Assert.Equal(serverOptions.TimeZoneResolver, system.Hangfire.StartedServers.Single().options.TimeZoneResolver);
         }        
 
         [Fact]
