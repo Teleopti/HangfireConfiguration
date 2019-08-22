@@ -50,31 +50,7 @@ namespace Hangfire.Configuration.Pages
         private void WriteScripts()
         {
             WriteLiteral($@"
-<script>
-
-function postForm(formId, path, reloadOnOk) {{    
-    var formElement = document.querySelector('#' + formId);
-    var formData = new FormData(formElement);
-    var request = new XMLHttpRequest();
-    
-    request.onload = function() {{
-            if (request.status != 200) {{ 
-                alert('Error: ' + request.status + ' : ' + request.response);
-            }} else if ( reloadOnOk ) {{ 
-                window.location.reload(true);
-            }} else {{ 
-                alert(request.response);
-            }}
-    }};    
-
-    let jsonObject = {{}};
-    for (const [key, value]  of formData.entries()) {{
-        jsonObject[key] = value;
-    }}
-    request.open('POST', path);
-    //request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    request.send(JSON.stringify(jsonObject));
-}}
+<script src='{_basePath}/postForm.js'>
 </script>");
         }
 
@@ -141,7 +117,7 @@ function postForm(formId, path, reloadOnOk) {{
         <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
         <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>
         <div>
-            <form id=""workerCountForm_{configuration.Id}"">
+            <form class='workerCountForm' id=""workerCountForm_{configuration.Id}"">
                 <label for='workers'>Worker goal count: </label>
                 <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                 <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
@@ -161,11 +137,11 @@ function postForm(formId, path, reloadOnOk) {{
 <fieldset>
     <legend>Hangfire worker goal configuration</legend>
     <div>
-        <form id=""workerCountForm_{configuration.Id}"">
+        <form  class='workerCountForm' id=""workerCountForm_{configuration.Id}"">
             <label for='workers'>Worker goal count: </label>
             <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
             <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-            <button type='button' onClick=""postForm('workerCountForm_{configuration.Id}', '{_basePath}/saveWorkerGoalCount')"">Submit</button>
+            <button type='button' class='workerCountSubmit'>Submit</button>
         </form>
     </div>
 </fieldset>");
