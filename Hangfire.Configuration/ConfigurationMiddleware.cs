@@ -61,7 +61,7 @@ if(submitButton) {{
         for (const [key, value]  of formData.entries()) {{
             jsonObject[key] = value;
         }}
-        request.open('POST', 'path/saveWorkerGoalCount');
+        request.open('POST', '{context.Request.PathBase.Value}/saveWorkerGoalCount');
         //request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         request.send(JSON.stringify(jsonObject));
     }});
