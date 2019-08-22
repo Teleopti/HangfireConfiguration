@@ -1,4 +1,5 @@
-﻿using Owin;
+﻿using System;
+using Owin;
 
 namespace Hangfire.Configuration
 {
@@ -8,7 +9,8 @@ namespace Hangfire.Configuration
 		{
 			builder.Map(pathMatch, subApp =>
 			{
-				subApp.Use(typeof(ConfigurationMiddleware), options, builder.Properties["CompositionRoot"]);
+				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : null;
+				subApp.Use(typeof(ConfigurationMiddleware), options, compositionRoot);
 			});
 		}
 		
