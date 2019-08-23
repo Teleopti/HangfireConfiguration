@@ -33,7 +33,7 @@ namespace Hangfire.Configuration
 
 		private void handleRequest(IOwinContext context)
 		{
-			if (context.Request.Path.Value.Equals("/postForm.js"))
+			if (context.Request.Path.Value.Equals("/script"))
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.OK;
 				context.Response.ContentType = "application/javascript";

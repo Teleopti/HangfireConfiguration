@@ -87,7 +87,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Pages\postForm.js" />
+    <EmbeddedResource Include="Pages\script.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

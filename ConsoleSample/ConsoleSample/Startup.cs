@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Configuration;
@@ -33,9 +36,18 @@ namespace ConsoleSample
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireSchema = "HangFireCustomSchemaName";
             
-            app.Use((c, next) =>
+            app.Use((context, next) =>
             {
-                c.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
+                // simulate a hosting site with content security policy
+                context.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
+    
+                // simulate a hosting site with a static file handler
+                if (context.Request.Uri.AbsolutePath.Split('/').Last().Contains("."))
+                {
+                    context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                    return Task.CompletedTask;
+                }
+    
                 return next.Invoke();
             });
 

@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Pages
         private void WriteScripts()
         {
             WriteLiteral($@"
-<script src='{_basePath}/postForm.js'>
+<script src='{_basePath}/script'>
 </script>");
         }
 
