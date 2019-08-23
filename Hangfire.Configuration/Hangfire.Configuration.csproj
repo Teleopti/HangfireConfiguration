@@ -89,6 +89,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Pages\script.js" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\styles.css" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

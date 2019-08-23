@@ -26,7 +26,9 @@ namespace Hangfire.Configuration.Pages
         {
             WriteLiteral("<html>");
             WriteLiteral($@"<base href=""{_basePath}/"">");
-            WriteHead();
+            WriteLiteral("<head>");
+            WriteLiteral(@"<link rel=""stylesheet"" type=""text/css"" href=""styles""/>");
+            WriteLiteral("</head>");
             WriteLiteral("<body>");
             WriteLiteral("<h2>Hangfire configuration</h2>");
 
@@ -42,25 +44,12 @@ namespace Hangfire.Configuration.Pages
             }
             else
                 WriteGoalWorkerCountForm(configurations);
-            
-            WriteScripts();
+
+            WriteLiteral($@"<script src='{_basePath}/script'></script>");
             WriteLiteral("</body>");
             WriteLiteral("</html>");
         }
 
-        private void WriteScripts()
-        {
-            WriteLiteral($@"
-<script src='{_basePath}/script'>
-</script>");
-        }
-
-        private void WriteHead()
-        {
-            WriteLiteral("<head>");
-            WriteStyle();
-            WriteLiteral("</head>");
-        }
         private void WriteInformationHeader()
         {
             WriteLiteral(@"
@@ -75,7 +64,7 @@ namespace Hangfire.Configuration.Pages
     </p>
 </fieldset>");
         }
-        
+
         private void WriteConfigurations(ServerConfigurationViewModel[] configurations)
         {
             if (configurations.Any())
@@ -147,7 +136,7 @@ namespace Hangfire.Configuration.Pages
     </div>
 </fieldset>");
         }
-        
+
         private void WriteCreateConfiguration()
         {
             WriteLiteral(
@@ -179,77 +168,5 @@ namespace Hangfire.Configuration.Pages
     </form>
 </fieldset>");
         }
-
-        private void WriteStyle() =>
-            WriteLiteral(
-                @"
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin-left: 20px
-    }
-
-    h2 {
-        font-size: 30px;
-        font-weight: 500
-    }
-
-    div {
-        padding-top: 3px
-    }
-
-    .configLabel {
-        padding-right: 10px;
-        padding-top: 30px;
-        color: #888;
-        font-weight: bold;
-    }
-
-    p {
-        font-size: 12px;
-        line-height: 14px;
-    }
-
-    label {
-        padding: 10px 0px 10px;
-        color: #888;
-        font-weight: bold;
-    }
-
-    form.input {
-        width: 200px
-    }
-
-    button {
-        padding: 1px 5px;
-        font-size: 12px;
-        line-height: 1.5;
-        border-radius: 3px;
-        color: #fff;
-        background-color: #337ab7;
-        border: 1px solid transparent;
-    }
-
-    fieldset {
-        -webkit-border-radius: 8px;
-        -moz-border-radius: 8px;
-        border-radius: 8px;
-        border: 1px solid #428bca;
-        line-height: 1.5em;
-    }
-
-    legend {
-        font-size: 16px;
-        font-weight: bold;
-    }
-
-    .flex-grid {
-        display: flex;
-    }
-
-    .col {
-        flex: 1;
-    }
-</style>");
     }
 }

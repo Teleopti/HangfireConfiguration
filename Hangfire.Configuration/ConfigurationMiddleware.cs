@@ -42,6 +42,15 @@ namespace Hangfire.Configuration
 				return;
 			}
 			
+			if (context.Request.Path.Value.Equals("/styles"))
+			{
+				context.Response.StatusCode = (int) HttpStatusCode.OK;
+				context.Response.ContentType = "text/css";
+				using(var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css"))
+					stream.CopyTo(context.Response.Body);
+				return;
+			}
+			
 			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation);
 
 			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
