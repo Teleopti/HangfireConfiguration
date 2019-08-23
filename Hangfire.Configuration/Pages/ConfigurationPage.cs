@@ -67,8 +67,6 @@ namespace Hangfire.Configuration.Pages
 
         private void WriteConfiguration(ServerConfigurationViewModel configuration)
         {
-            var activateForm = "";
-
             WriteLiteral($@"
                 <div class='col'>
                     <fieldset>
