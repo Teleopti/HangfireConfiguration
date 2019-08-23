@@ -1,4 +1,5 @@
 var forms = document.querySelectorAll('form');
+
 forms.forEach(function(form) {
 
     var button = form.querySelector('button');
@@ -12,16 +13,16 @@ forms.forEach(function(form) {
         
         var request = new XMLHttpRequest();
         request.onload = function() {
-            if (request.status != 200) {
+            if (request.status !== 200) {
                 alert('Error: ' + request.status + ' : ' + request.response);
             } else if ( reloadOnOk ) {
-                window.location.reload(true);
+                window.location.reload();
             } else {
                 alert(request.response);
             }
         };
         
-        let jsonObject = {};
+        var jsonObject = {};
         for (const [key, value]  of formData.entries()) {
             jsonObject[key] = value;
         }
