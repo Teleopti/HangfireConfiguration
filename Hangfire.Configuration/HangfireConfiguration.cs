@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 using Owin;
@@ -8,7 +9,7 @@ namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        private static IEnumerable<RunningServer> _runningServers;
+        private static IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
 
         public static IEnumerable<RunningServer> RunningServers() => _runningServers;
 

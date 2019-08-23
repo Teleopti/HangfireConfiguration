@@ -49,6 +49,29 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
+        public void ShouldBuildWithNullValues()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 1,
+                ConnectionString = null,
+                SchemaName = null,
+                Active = null,
+                GoalWorkerCount = null
+            });
+
+            var result = system.Configuration.BuildServerConfigurations();
+
+            Assert.Equal(1, result.Single().Id);
+            Assert.Null(result.Single().ServerName);
+            Assert.Null(result.Single().DatabaseName);
+            Assert.Null(result.Single().SchemaName);
+            Assert.Null(result.Single().Active);
+            Assert.Null(result.Single().Workers);
+        }
+        
+        [Fact]
         public void ShouldBuildForMultipleConfigurations()
         {
             var system = new SystemUnderTest();
@@ -82,28 +105,5 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(10, result.Single().Workers);
         }
-
-        [Fact]
-        public void ShouldBuildWithDefaultServerTitle()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-
-            var result = system.Configuration.BuildServerConfigurations();
-
-            Assert.Equal("Default Hangfire configuration", result.Single().Title);
-        }
-        [Fact]
-        public void ShouldBuildWithAddedServerTitle()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration());
-
-            var result = system.Configuration.BuildServerConfigurations();
-
-            Assert.Equal("Added Hangfire configuration", result.Last().Title);
-        }
-
     }
 }

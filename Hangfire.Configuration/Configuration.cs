@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using static System.String;
 
 namespace Hangfire.Configuration
 {
@@ -52,9 +52,8 @@ namespace Hangfire.Configuration
                 ServerName = getServerName(x?.ConnectionString),
                 DatabaseName = getDatabaseName(x?.ConnectionString),
                 SchemaName = x?.SchemaName,
-                Active = x?.Active == true ? "Active" : "Inactive",
+                Active = x?.Active != null ? (x?.Active == true ? "Active" : "Inactive") : null,
                 Workers = x?.GoalWorkerCount,
-                Title = i == 0 ? "Default Hangfire configuration" : "Added Hangfire configuration"
             });
         }
 
@@ -89,13 +88,13 @@ namespace Hangfire.Configuration
         private string getDatabaseName(string connectionString)
         {
             var builder = new SqlConnectionStringBuilder(connectionString);
-            return builder.InitialCatalog;
+            return IsNullOrEmpty(builder.InitialCatalog) ? null : builder.InitialCatalog;
         }
 
         private string getServerName(string connectionString)
         {
             var builder = new SqlConnectionStringBuilder(connectionString);
-            return builder.DataSource;
+            return IsNullOrEmpty(builder.DataSource) ? null : builder.DataSource;
         }
     }
 }

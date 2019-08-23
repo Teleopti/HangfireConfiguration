@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Dashboard;
 
@@ -34,16 +35,15 @@ namespace Hangfire.Configuration.Pages
 
             WriteInformationHeader();
 
+            configurations = configurations.Any() ? configurations : new[] {new ServerConfigurationViewModel()};
+            
+            WriteLiteral("<div class='flex-grid'>");
+            foreach (var configuration in configurations)
+                WriteConfiguration(configuration);
+            WriteLiteral("</div>");
+
             if (_allowNewServerCreation)
-            {
-                WriteConfigurations(configurations);
-                if (configurations.Count() < 2)
-                {
-                    WriteCreateConfiguration();
-                }
-            }
-            else
-                WriteGoalWorkerCountForm(configurations);
+                WriteCreateConfiguration(configurations);
 
             WriteLiteral($@"<script src='{_basePath}/script'></script>");
             WriteLiteral("</body>");
@@ -65,80 +65,52 @@ namespace Hangfire.Configuration.Pages
 </fieldset>");
         }
 
-        private void WriteConfigurations(ServerConfigurationViewModel[] configurations)
-        {
-            if (configurations.Any())
-            {
-                WriteLiteral("<div class='flex-grid'>");
-
-                foreach (var configuration in configurations)
-                {
-                    WriteConfiguration(configuration);
-                }
-
-                WriteLiteral("</div>");
-            }
-            else
-            {
-                WriteConfiguration(new ServerConfigurationViewModel());
-            }
-        }
-
         private void WriteConfiguration(ServerConfigurationViewModel configuration)
         {
             var activateForm = "";
 
-            if (configuration.Active == "Inactive")
+            WriteLiteral($@"
+                <div class='col'>
+                    <fieldset>
+                        <legend>Configuration {(configuration.Active != null ? " - " + configuration.Active : null)}</legend>");
+
+            if (!string.IsNullOrEmpty(configuration.ServerName))
             {
-                activateForm = $@"              
-<div>    
-    <form class='form' id=""activateForm_{configuration.Id}"" action='activateServer' data-reload='true'>
-        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-        <button class='button' type='button'>Activate configuration</button>
-    </form>
-</div>";
+                WriteLiteral($@"
+                    <div><span class='configLabel'>Server:</span><span>{configuration.ServerName}</span></div>
+                    <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
+                    <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>");
             }
 
-            WriteLiteral($@"        
-<div class='col'>
-    <fieldset style='height: 190px'>
-        <legend>{configuration.Title} - {configuration.Active}</legend>
-        <div><span class='configLabel'>Server:</span><span>{configuration.ServerName}</span></div>
-        <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
-        <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>
-        <div>
-            <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
-                <label for='workers'>Worker goal count: </label>
-                <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-                <button class='button' type='button'>Submit</button>
-            </form>
-        </div>
-        {activateForm}
-    </fieldset>
-</div>");
+            WriteLiteral($@"
+                <div>
+                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
+                        <label for='workers'>Worker goal count: </label>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
+                        <button class='button' type='button'>Submit</button>
+                    </form>
+                </div>");
+
+            if (configuration.Active == "Inactive")
+            {
+                WriteLiteral($@"
+                    <div>
+                        <form class='form' id=""activateForm_{configuration.Id}"" action='activateServer' data-reload='true'>
+                            <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                            <button class='button' type='button'>Activate configuration</button>
+                        </form>
+                    </div>");
+            }
+
+            WriteLiteral($@"</fieldset></div>");
         }
 
-        private void WriteGoalWorkerCountForm(ServerConfigurationViewModel[] configurations)
+        private void WriteCreateConfiguration(IEnumerable<ServerConfigurationViewModel> configurations)
         {
-            var configuration = configurations?.FirstOrDefault() ?? new ServerConfigurationViewModel();
+            if (configurations.Count() >= 2)
+                return;
 
-            WriteLiteral($@"        
-<fieldset>
-    <legend>Hangfire worker goal configuration</legend>
-    <div>
-        <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
-            <label for='workers'>Worker goal count: </label>
-            <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-            <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-            <button class='button' type='button'>Submit</button>
-        </form>
-    </div>
-</fieldset>");
-        }
-
-        private void WriteCreateConfiguration()
-        {
             WriteLiteral(
                 $@"
 <fieldset>

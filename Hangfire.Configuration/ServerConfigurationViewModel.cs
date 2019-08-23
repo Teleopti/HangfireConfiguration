@@ -10,6 +10,5 @@ namespace Hangfire.Configuration
         public string SchemaName { get; set; }
         public string Active { get; set; }
         public int? Workers { get; set; }
-        public string Title { get; set; } = "Hangfire configuration";
     }
 }
