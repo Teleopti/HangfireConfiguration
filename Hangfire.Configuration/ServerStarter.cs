@@ -50,72 +50,68 @@ namespace Hangfire.Configuration
             SqlServerStorageOptions storageOptions,
             params IBackgroundProcess[] additionalProcesses)
         {
-            var serverNumber = 1;
-            new DefaultServerConfigurator(_repository).Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
+            serverOptions = serverOptions ?? new BackgroundJobServerOptions();
+            storageOptions = storageOptions ?? new SqlServerStorageOptions();
 
-            var storedConfigs = _repository.ReadConfigurations().ToArray();
-            var activeConfiguration = storedConfigs.FirstOrDefault(x => x.Active ?? false) ?? storedConfigs.FirstOrDefault();
+            new DefaultServerConfigurator(_repository)
+                .Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
 
-            return storedConfigs.Select(storedConfig =>
+            var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
+
+            return _repository
+                .ReadConfigurations()
+                .OrderBy(x => !(x.Active ?? false))
+                .ThenBy(x => x.Id)
+                .Select(configuration => startServer(configuration, options, serverOptions, storageOptions, backgroundProcesses))
+                .Select((s, i) => new RunningServer
                 {
-                    var appliedStorageOptions = buildSqlServerStorageOptions(storageOptions, storedConfig.SchemaName);
-                    var sqlJobStorage = _hangfire.MakeSqlJobStorage(storedConfig.ConnectionString, appliedStorageOptions);
-
-                    var workerCount = WorkerDeterminer.DetermineWorkerCount
-                    (
-                        sqlJobStorage.GetMonitoringApi(),
-                        storedConfig.GoalWorkerCount,
-                        options ?? new ConfigurationOptions()
-                    );
-                    var appliedServerOptions = buildBackgroundJobServerOptions(serverOptions, workerCount);
-
-                    var appliedAdditionalProcess = new IBackgroundProcess[] { };
-                    if (storedConfig.Id == activeConfiguration.Id)
-                        appliedAdditionalProcess = additionalProcesses;
-
-                    _hangfire.UseHangfireServer(_builder, sqlJobStorage, appliedServerOptions, appliedAdditionalProcess);
-
-                    var runningServer = new RunningServer() {Number = serverNumber, Storage = sqlJobStorage};
-                    serverNumber++;
-
-                    return runningServer;
+                    Number = i + 1,
+                    Storage = s
                 })
                 .ToArray();
         }
 
-        private BackgroundJobServerOptions buildBackgroundJobServerOptions(BackgroundJobServerOptions serverOptions, int workerCount)
+        private JobStorage startServer(
+            StoredConfiguration configuration,
+            ConfigurationOptions options,
+            BackgroundJobServerOptions serverOptions,
+            SqlServerStorageOptions storageOptions,
+            List<IBackgroundProcess> backgroundProcesses)
         {
-            var appliedServerOptions = new BackgroundJobServerOptions();
-            
-            if (serverOptions != null)
-            {
-                appliedServerOptions.Queues = serverOptions.Queues;
-                appliedServerOptions.HeartbeatInterval = serverOptions.HeartbeatInterval;
-                appliedServerOptions.ServerTimeout = serverOptions.ServerTimeout;
-                appliedServerOptions.ShutdownTimeout = serverOptions.ShutdownTimeout;
-                appliedServerOptions.StopTimeout = serverOptions.StopTimeout;
-                appliedServerOptions.CancellationCheckInterval = serverOptions.CancellationCheckInterval;
-                appliedServerOptions.SchedulePollingInterval = serverOptions.SchedulePollingInterval;
-                appliedServerOptions.ServerCheckInterval = serverOptions.ServerCheckInterval;
-            }
+            storageOptions = copyOptions(storageOptions);
+            storageOptions.SchemaName = configuration.SchemaName;
+            var jobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, storageOptions);
 
-            appliedServerOptions.WorkerCount = workerCount;
-            
-            return appliedServerOptions;
+            serverOptions = copyOptions(serverOptions);
+            serverOptions.WorkerCount = WorkerDeterminer.DetermineWorkerCount(jobStorage.GetMonitoringApi(), configuration.GoalWorkerCount, options);
+            _hangfire.UseHangfireServer(
+                _builder,
+                jobStorage,
+                serverOptions,
+                backgroundProcesses.ToArray()
+            );
+            backgroundProcesses.Clear();
+
+            return jobStorage;
         }
 
-        private SqlServerStorageOptions buildSqlServerStorageOptions(SqlServerStorageOptions storageOptions, string schemaName)
-        {
-            var appliedStorageOptions = new SqlServerStorageOptions();
-            if (storageOptions != null)
+        private static BackgroundJobServerOptions copyOptions(BackgroundJobServerOptions serverOptions) =>
+            new BackgroundJobServerOptions
             {
-                var options = JsonConvert.SerializeObject(storageOptions);
-                appliedStorageOptions = JsonConvert.DeserializeObject<SqlServerStorageOptions>(options);
-            }
+                Queues = serverOptions.Queues,
+                HeartbeatInterval = serverOptions.HeartbeatInterval,
+                ServerTimeout = serverOptions.ServerTimeout,
+                ShutdownTimeout = serverOptions.ShutdownTimeout,
+                StopTimeout = serverOptions.StopTimeout,
+                CancellationCheckInterval = serverOptions.CancellationCheckInterval,
+                SchedulePollingInterval = serverOptions.SchedulePollingInterval,
+                ServerCheckInterval = serverOptions.ServerCheckInterval,
+                WorkerCount = serverOptions.WorkerCount
+            };
 
-            appliedStorageOptions.SchemaName = schemaName;
-
-            return appliedStorageOptions;
-        }
+        private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
+            JsonConvert.DeserializeObject<SqlServerStorageOptions>(
+                JsonConvert.SerializeObject(storageOptions)
+            );
     }
 }

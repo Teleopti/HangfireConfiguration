@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Test.Domain
                 ServerCheckInterval = new TimeSpan(50),
                 CancellationCheckInterval = new TimeSpan(60),
                 SchedulePollingInterval = new TimeSpan(70),
-                StopTimeout =  new TimeSpan(80),
+                StopTimeout = new TimeSpan(80),
                 Activator = new JobActivator(),
                 FilterProvider = new JobFilterCollection(),
                 TaskScheduler = TaskScheduler.Current,
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(serverOptions.CancellationCheckInterval, system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
             Assert.Equal(serverOptions.SchedulePollingInterval, system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
             Assert.Equal(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
-        }        
+        }
 
         [Fact]
         public void ShouldPassNullServerNameToHangfire()
@@ -249,18 +249,18 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(2, result.Last().Number);
             Assert.Same(system.Hangfire.StartedServers.Last().storage, result.Last().Storage);
         }
-        
+
         [Fact]
         public void ShouldPassBackgroundProcessesToActiveServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration() {Active = true});
+            system.Repository.Has(new StoredConfiguration {ConnectionString = "inactive"});
+            system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
 
             system.ServerStarter.StartServers(null, null, null, new Worker());
 
-            Assert.Empty(system.Hangfire.StartedServers.First().backgroundProcesses);
-            Assert.NotEmpty(system.Hangfire.StartedServers.Last().backgroundProcesses);
+            Assert.Empty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "inactive").backgroundProcesses);
+            Assert.NotEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "active").backgroundProcesses);
         }
 
         [Fact]
@@ -273,14 +273,11 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 MinimumServers = 1
             };
-            
+
             system.ServerStarter.StartServers(configurationOptions, null, null);
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
-            Assert.Equal(new [] {20, 100}, actual);
-        }        
-        
-        
-        
+            Assert.Equal(new[] {20, 100}, actual);
+        }
     }
 }

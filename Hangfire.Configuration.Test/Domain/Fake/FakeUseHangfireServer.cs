@@ -16,8 +16,8 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             _monitor = monitor;
         }
         
-        public IEnumerable<(IAppBuilder builder, JobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
-            new (IAppBuilder builder, JobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
+        public IEnumerable<(IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
+            new (IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
 
         public IAppBuilder UseHangfireServer(
             IAppBuilder builder,
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses)
         {
-            StartedServers = StartedServers.Append((builder, storage, options, additionalProcesses));
+            StartedServers = StartedServers.Append((builder, storage as FakeJobStorage, options, additionalProcesses));
             return builder;
         }
 
