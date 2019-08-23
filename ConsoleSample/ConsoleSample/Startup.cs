@@ -32,6 +32,12 @@ namespace ConsoleSample
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireSchema = "HangFireCustomSchemaName";
+            
+            app.Use((c, next) =>
+            {
+                c.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
+                return next.Invoke();
+            });
 
             app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
             {

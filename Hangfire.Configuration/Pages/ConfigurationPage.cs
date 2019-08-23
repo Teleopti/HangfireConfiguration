@@ -25,6 +25,7 @@ namespace Hangfire.Configuration.Pages
         private void buildHtml(ServerConfigurationViewModel[] configurations)
         {
             WriteLiteral("<html>");
+            WriteLiteral($@"<base href=""{_basePath}/"">");
             WriteHead();
             WriteLiteral("<body>");
             WriteLiteral("<h2>Hangfire configuration</h2>");
@@ -102,9 +103,9 @@ namespace Hangfire.Configuration.Pages
             {
                 activateForm = $@"              
 <div>    
-    <form id=""activateForm_{configuration.Id}"">
+    <form class='form' id=""activateForm_{configuration.Id}"" action='activateServer' data-reload='true'>
         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-        <button type='button' onClick=""postForm('activateForm_{configuration.Id}', '{_basePath}/activateServer', true)"">Activate configuration</button>
+        <button class='button' type='button'>Activate configuration</button>
     </form>
 </div>";
             }
@@ -117,11 +118,11 @@ namespace Hangfire.Configuration.Pages
         <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
         <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>
         <div>
-            <form class='workerCountForm' id=""workerCountForm_{configuration.Id}"">
+            <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
                 <label for='workers'>Worker goal count: </label>
                 <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                 <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-                <button type='button' onClick=""postForm('workerCountForm_{configuration.Id}', '{_basePath}/saveWorkerGoalCount')"">Submit</button>
+                <button class='button' type='button'>Submit</button>
             </form>
         </div>
         {activateForm}
@@ -137,11 +138,11 @@ namespace Hangfire.Configuration.Pages
 <fieldset>
     <legend>Hangfire worker goal configuration</legend>
     <div>
-        <form  class='workerCountForm' id=""workerCountForm_{configuration.Id}"">
+        <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
             <label for='workers'>Worker goal count: </label>
             <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
             <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-            <button type='button' class='workerCountSubmit'>Submit</button>
+            <button class='button' type='button'>Submit</button>
         </form>
     </div>
 </fieldset>");
@@ -153,7 +154,7 @@ namespace Hangfire.Configuration.Pages
                 $@"
 <fieldset>
     <legend>Create new Hangfire server</legend>
-    <form id=""createForm"">
+    <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
         <div class='flex-grid'>
             <div style='width: 240px'>
                 <label for='server'>Server: </label><br>
@@ -172,7 +173,7 @@ namespace Hangfire.Configuration.Pages
                 <input type='text' id='schemaCreatorUser' name='schemaCreatorUser' style='width:200px'>
                 <br><label for='schemaCreatorPassword'>Creator password: </label><br>
                 <input type='text' id='schemaCreatorPassword' name='schemaCreatorPassword' style='width:200px'>
-                <br><br><button type='button' onClick=""postForm('createForm', '{_basePath}/createNewServerConfiguration', true)"">Create</button>
+                <br><br><button class='button' type='button'>Create</button>
             </div>
         </div>
     </form>
