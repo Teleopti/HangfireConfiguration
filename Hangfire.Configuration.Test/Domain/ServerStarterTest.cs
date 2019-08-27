@@ -133,7 +133,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerStarter.StartServers(null, null, null);
 
-            Assert.Equal("connectionString", (system.Hangfire.StartedServers.Single().storage as FakeJobStorage).ConnectionString);
+            Assert.Equal("connectionString", (system.Hangfire.StartedServers.Single().storage).ConnectionString);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerStarter.StartServers(null, null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
 
-            Assert.False((system.Hangfire.StartedServers.Single().storage as FakeJobStorage).Options.PrepareSchemaIfNecessary);
+            Assert.False((system.Hangfire.StartedServers.Single().storage).Options.PrepareSchemaIfNecessary);
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerStarter.StartServers(null, null, new SqlServerStorageOptions {SchemaName = "Ignored"});
 
-            Assert.Equal("SchemaName", (system.Hangfire.StartedServers.Single().storage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SchemaName", (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerStarter.StartServers(null, null, null);
 
-            Assert.Equal("SchemaName", (system.Hangfire.StartedServers.Single().storage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SchemaName", (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 
         [Fact]
@@ -178,8 +178,8 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerStarter.StartServers(null, null, null);
 
-            Assert.Equal("SchemaName1", (system.Hangfire.StartedServers.First().storage as FakeJobStorage).Options.SchemaName);
-            Assert.Equal("SchemaName2", (system.Hangfire.StartedServers.Last().storage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SchemaName1", (system.Hangfire.StartedServers.First().storage).Options.SchemaName);
+            Assert.Equal("SchemaName2", (system.Hangfire.StartedServers.Last().storage).Options.SchemaName);
         }
 
         [Fact]
@@ -202,7 +202,7 @@ namespace Hangfire.Configuration.Test.Domain
             };
             system.ServerStarter.StartServers(null, null, options);
 
-            var storage = system.Hangfire.StartedServers.Single().storage as FakeJobStorage;
+            var storage = system.Hangfire.StartedServers.Single().storage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -223,7 +223,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(null, null, null);
 
             var options = new SqlServerStorageOptions();
-            var storage = system.Hangfire.StartedServers.Single().storage as FakeJobStorage;
+            var storage = system.Hangfire.StartedServers.Single().storage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -278,6 +278,17 @@ namespace Hangfire.Configuration.Test.Domain
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.Equal(new[] {20, 100}, actual);
+        }
+        
+        [Fact]
+        public void ShouldSetCurrentActiveJobStorage()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration(){Active = true});
+
+            system.ServerStarter.StartServers(null, null, null, new Worker());
+
+            Assert.Equal(system.Hangfire.StartedServers.Single().storage, system.Hangfire.CurrentStorage);
         }
     }
 }
