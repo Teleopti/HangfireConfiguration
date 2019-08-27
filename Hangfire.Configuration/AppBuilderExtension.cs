@@ -1,20 +1,20 @@
 ﻿using System;
-using Owin;
+using Microsoft.AspNetCore.Builder;
 
 namespace Hangfire.Configuration
 {
 	public static class AppBuilderExtension
 	{
-		public static void UseHangfireConfigurationInterface(this IAppBuilder builder, string pathMatch, HangfireConfigurationInterfaceOptions options)
-		{
+		public static void UseHangfireConfigurationInterface(this IApplicationBuilder builder, string pathMatch, HangfireConfigurationInterfaceOptions options)
+        {
 			builder.Map(pathMatch, subApp =>
 			{
 				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : null;
-				subApp.Use(typeof(ConfigurationMiddleware), options, compositionRoot);
+				subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot);
 			});
 		}
 		
-		public static HangfireConfiguration UseHangfireConfiguration(this IAppBuilder builder, ConfigurationOptions options) =>
+		public static HangfireConfiguration UseHangfireConfiguration(this IApplicationBuilder builder, ConfigurationOptions options) =>
 			new HangfireConfiguration(builder, options);
 	}
 	

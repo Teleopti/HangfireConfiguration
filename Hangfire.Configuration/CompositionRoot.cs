@@ -1,11 +1,11 @@
 using Hangfire.Storage;
-using Owin;
+using Microsoft.AspNetCore.Builder;
 
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
     {
-        public ServerStarter BuildServerStarter(IAppBuilder appBuilder, ConfigurationOptions options) 
+        public ServerStarter BuildServerStarter(IApplicationBuilder appBuilder, ConfigurationOptions options) 
         {
             return new ServerStarter(appBuilder, BuildHangfire(), BuildRepository(options.ConnectionString));
         }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Owin.Hosting;
+using Microsoft.AspNetCore.Hosting;
 
 namespace ConsoleSample
 {
@@ -7,16 +7,19 @@ namespace ConsoleSample
     {
         public static void Main()
         {
-            using (WebApp.Start<Startup>("http://localhost:12345"))
-            {
-                while (true)
-                {
-                    var command = Console.ReadLine();
+            var nodeAddress = $"http://localhost:12345";
+            IWebHostBuilder builder = new WebHostBuilder()
+                .UseUrls(nodeAddress)
+                .UseStartup<Startup>()
+                .UseKestrel();
 
-                    if (command == null || command.Equals("stop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        break;
-                    }
+            using (var host = builder.Build())
+            {
+                host.Start();
+
+                Console.WriteLine("Use Ctrl-C to shutdown the host...");
+                host.WaitForShutdown();
+            }
 //
 //                    if (command.StartsWith("add", StringComparison.OrdinalIgnoreCase))
 //                    {
@@ -36,8 +39,8 @@ namespace ConsoleSample
 //                            Console.WriteLine(ex.Message);
 //                        }
 //                    }
-                }
-            }
+//                }
+//            }
 
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();

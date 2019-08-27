@@ -4,19 +4,21 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 
 namespace Hangfire.Configuration
 {
-	public class ConfigurationMiddleware : OwinMiddleware
+	public class ConfigurationMiddleware
 	{
 		private readonly Configuration _configuration;
-		private readonly HangfireConfigurationInterfaceOptions _options;
+        private readonly RequestDelegate _next;
+        private readonly HangfireConfigurationInterfaceOptions _options;
 
-		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot) : base(next)
+		public ConfigurationMiddleware(RequestDelegate next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot)
 		{
-			_options = options;
+            _next = next;
+            _options = options;
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = new SqlConnection(_options.ConnectionString))
 					SqlServerObjectsInstaller.Install(c);
@@ -25,13 +27,12 @@ namespace Hangfire.Configuration
 			_configuration = compositionRoot.BuildConfiguration(_options.ConnectionString);
 		}
 
-		public override Task Invoke(IOwinContext context)
+		public async Task Invoke(HttpContext context)
 		{
-			handleRequest(context);
-			return Task.CompletedTask;
+			await handleRequest(context);
 		}
 
-		private void handleRequest(IOwinContext context)
+		private async Task handleRequest(HttpContext context)
 		{
 			if (context.Request.Path.Value.Equals("/script"))
 			{
@@ -39,7 +40,7 @@ namespace Hangfire.Configuration
 				context.Response.ContentType = "application/javascript";
 				using(var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.script.js"))
 					stream.CopyTo(context.Response.Body);
-				return;
+                return;
 			}
 			
 			if (context.Request.Path.Value.Equals("/styles"))
@@ -48,39 +49,39 @@ namespace Hangfire.Configuration
 				context.Response.ContentType = "text/css";
 				using(var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css"))
 					stream.CopyTo(context.Response.Body);
-				return;
+                return;
 			}
 			
 			var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation);
 
 			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
 			{
-				saveWorkerGoalCount(context);
-				return;
+				await saveWorkerGoalCount(context);
+                return;
 			}
 
 			if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
 			{
-				createNewServerConfiguration(context);
-				return;
+				await createNewServerConfiguration(context);
+                return;
 			}
 
 			if (context.Request.Path.Value.Equals("/activateServer"))
 			{
-				activateServer(context);
-				return;
+				await activateServer(context);
+                return;
 			}
 			
 			var html = page.ToString();
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";
-			context.Response.Write(html);
+			await context.Response.WriteAsync(html);
 		}
 
 
-		private void saveWorkerGoalCount(IOwinContext context)
+		private async Task saveWorkerGoalCount(HttpContext context)
 		{
-			var parsed = parseRequestBody(context.Request);
+			var parsed = await parseRequestBody(context.Request);
 			
 			_configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount
 			{
@@ -90,12 +91,12 @@ namespace Hangfire.Configuration
 			
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";
-			context.Response.Write("Worker goal count was saved successfully!");
+			await context.Response.WriteAsync("Worker goal count was saved successfully!");
 		}
 		
-		private void createNewServerConfiguration(IOwinContext context)
+		private async Task createNewServerConfiguration(HttpContext context)
 		{
-			var parsed = parseRequestBody(context.Request);
+			var parsed = await parseRequestBody(context.Request);
 			var configuration = new CreateServerConfiguration
 			{
 				Server = parsed.SelectToken("server").Value<string>(),
@@ -115,29 +116,27 @@ namespace Hangfire.Configuration
 			catch (Exception ex)
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-				context.Response.Write(ex.Message);
+				await context.Response.WriteAsync(ex.Message);
 			}
 		}
 		
-		private void activateServer(IOwinContext context)
+		private async Task activateServer(HttpContext context)
 		{
-			var parsed = parseRequestBody(context.Request);
+			var parsed = await parseRequestBody(context.Request);
 			var configurationId = parsed.SelectToken("configurationId").Value<int>();
 			_configuration.ActivateServer(configurationId);
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 		}
 		
-		private static JObject parseRequestBody(IOwinRequest request)
+		private static async Task<JObject> parseRequestBody(HttpRequest request)
 		{
 			string text;
 			using (var reader = new StreamReader(request.Body))
-				text = reader.ReadToEnd();
+				text = await reader.ReadToEndAsync();
 			var parsed = JObject.Parse(text);
 			return parsed;
 		}
 		
-
-	
 		private int? tryParseNullable(string value) => 
 			int.TryParse(value, out var outValue) ? (int?) outValue : null;
 	}

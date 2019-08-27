@@ -7,7 +7,8 @@ using Hangfire.Common;
 using Hangfire.Configuration;
 using Hangfire.Server;
 using Hangfire.SqlServer;
-using Owin;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 namespace ConsoleSample
 {
@@ -22,7 +23,7 @@ namespace ConsoleSample
 
     public class Startup
     {
-        public void Configuration(IAppBuilder app)
+        public void Configuration(IApplicationBuilder app)
         {
             GlobalConfiguration.Configuration
                 .UseColouredConsoleLogProvider()
@@ -30,7 +31,7 @@ namespace ConsoleSample
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
-            app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions { ShowExceptionDetails = true });
+            app.UseDeveloperExceptionPage();
 
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
@@ -42,7 +43,7 @@ namespace ConsoleSample
                 context.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
     
                 // simulate a hosting site with a static file handler
-                if (context.Request.Uri.AbsolutePath.Split('/').Last().Contains("."))
+                if (context.Request.Path.Value.Split('/').Last().Contains("."))
                 {
                     context.Response.StatusCode = (int) HttpStatusCode.NotFound;
                     return Task.CompletedTask;

@@ -21,27 +21,24 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
         private static void closeOpenConnections()
 		{
-			var closeExistingConnSql = String.Format(
-				@"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
-				ConnectionUtils.GetDatabaseName());
+			var closeExistingConnSql =
+                $@"if db_id('{ConnectionUtils.GetDatabaseName()}') is not null alter database [{ConnectionUtils.GetDatabaseName()}] set single_user with rollback immediate";
 
 			executeSql(closeExistingConnSql);
 		}
 
 		private static void dropDb()
 		{
-			var dropDatabaseSql = String.Format(
-				@"if db_id('{0}') is not null drop database [{0}]",
-				ConnectionUtils.GetDatabaseName());
+			var dropDatabaseSql =
+                $@"if db_id('{ConnectionUtils.GetDatabaseName()}') is not null drop database [{ConnectionUtils.GetDatabaseName()}]";
 			
 			executeSql(dropDatabaseSql);
 		}
 
 		private static void createDb()
 		{
-			var createDatabaseSql = String.Format(
-				@"if db_id('{0}') is null create database [{0}] COLLATE SQL_Latin1_General_CP1_CS_AS",
-				ConnectionUtils.GetDatabaseName());
+			var createDatabaseSql =
+                $@"if db_id('{ConnectionUtils.GetDatabaseName()}') is null create database [{ConnectionUtils.GetDatabaseName()}] COLLATE SQL_Latin1_General_CP1_CS_AS";
 
 			executeSql(createDatabaseSql);
 		}

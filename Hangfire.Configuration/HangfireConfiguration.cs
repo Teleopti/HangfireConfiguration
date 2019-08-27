@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
-using Owin;
+using Microsoft.AspNetCore.Builder;
 
 namespace Hangfire.Configuration
 {
@@ -13,11 +13,11 @@ namespace Hangfire.Configuration
 
         public static IEnumerable<RunningServer> RunningServers() => _runningServers;
 
-        private readonly IAppBuilder _builder;
+        private readonly IApplicationBuilder _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
 
-        public HangfireConfiguration(IAppBuilder builder, ConfigurationOptions options)
+        public HangfireConfiguration(IApplicationBuilder builder, ConfigurationOptions options)
         {
             _builder = builder;
             _options = options;

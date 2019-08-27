@@ -1,5 +1,4 @@
 using System;
-using System.Data.SqlClient;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {

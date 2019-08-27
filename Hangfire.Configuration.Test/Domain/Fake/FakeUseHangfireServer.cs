@@ -3,6 +3,7 @@ using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 using Hangfire.Storage;
+using Microsoft.AspNetCore.Builder;
 using Owin;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
@@ -16,11 +17,21 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             _monitor = monitor;
         }
         
-        public IEnumerable<(IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
-            new (IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
+        public IEnumerable<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
+            new (object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
 
         public IAppBuilder UseHangfireServer(
             IAppBuilder builder,
+            JobStorage storage,
+            BackgroundJobServerOptions options,
+            params IBackgroundProcess[] additionalProcesses)
+        {
+            StartedServers = StartedServers.Append((builder, storage as FakeJobStorage, options, additionalProcesses));
+            return builder;
+        }
+
+        public IApplicationBuilder UseHangfireServer(
+            IApplicationBuilder builder,
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses)

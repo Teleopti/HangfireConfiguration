@@ -11,8 +11,9 @@
 
   <ItemGroup>
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.0" />
-    <PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>

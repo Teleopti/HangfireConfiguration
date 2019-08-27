@@ -1,8 +1,11 @@
 using System;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Storage;
-using Microsoft.Owin.Builder;
-using Microsoft.Owin.Testing;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder.Internal;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hangfire.Configuration.Test
 {
@@ -12,12 +15,14 @@ namespace Hangfire.Configuration.Test
 
         public SystemUnderTest()
         {
-            AppBuilder = new AppBuilder();
-            _testServer = new Lazy<TestServer>(() => TestServer.Create(app =>
-            {
-                app.Properties.Add("CompositionRoot", this);
-                app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
-            }));
+            AppBuilder = new ApplicationBuilder(new DefaultServiceProviderFactory().CreateServiceProvider(new ServiceCollection()));
+            var hostBuilder = new WebHostBuilder()
+                .Configure(app =>
+                {
+                    app.Properties.Add("CompositionRoot", this);
+                    app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
+                });
+            _testServer = new Lazy<TestServer>(() => new TestServer(hostBuilder));
             
             Repository = new FakeConfigurationRepository();
             Creator = new FakeHangfireSchemaCreator();
@@ -30,7 +35,7 @@ namespace Hangfire.Configuration.Test
         }
 
 
-        public AppBuilder AppBuilder { get; }
+        public IApplicationBuilder AppBuilder { get; }
         public TestServer TestServer => _testServer.Value;
 
         public FakeMonitoringApi Monitor { get; }

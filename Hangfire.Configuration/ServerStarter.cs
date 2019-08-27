@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Builder;
 using Newtonsoft.Json;
-using Owin;
 
 namespace Hangfire.Configuration
 {
     public interface IHangfire
     {
-        IAppBuilder UseHangfireServer(
-            IAppBuilder builder,
+        IApplicationBuilder UseHangfireServer(
+            IApplicationBuilder builder,
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses);
@@ -20,12 +20,12 @@ namespace Hangfire.Configuration
 
     public class RealHangfire : IHangfire
     {
-        public IAppBuilder UseHangfireServer(
-            IAppBuilder builder,
+        public IApplicationBuilder UseHangfireServer(
+            IApplicationBuilder builder,
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses) =>
-            builder.UseHangfireServer(storage, options, additionalProcesses);
+            builder.UseHangfireServer(storage: storage, options: options, additionalProcesses: additionalProcesses);
 
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new SqlServerStorage(connectionString, options);
@@ -33,11 +33,11 @@ namespace Hangfire.Configuration
 
     public class ServerStarter
     {
-        private readonly IAppBuilder _builder;
+        private readonly IApplicationBuilder _builder;
         private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
 
-        public ServerStarter(IAppBuilder builder, IHangfire hangfire, IConfigurationRepository repository)
+        public ServerStarter(IApplicationBuilder builder, IHangfire hangfire, IConfigurationRepository repository)
         {
             _builder = builder;
             _hangfire = hangfire;
