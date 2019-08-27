@@ -9,6 +9,7 @@ using Hangfire.Server;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConsoleSample
 {
@@ -23,7 +24,12 @@ namespace ConsoleSample
 
     public class Startup
     {
-        public void Configuration(IApplicationBuilder app)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddHangfire(config => {});
+        }
+
+        public void Configure(IApplicationBuilder app)
         {
             GlobalConfiguration.Configuration
                 .UseColouredConsoleLogProvider()

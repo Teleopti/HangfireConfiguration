@@ -15,7 +15,11 @@ namespace Hangfire.Configuration
         private readonly RequestDelegate _next;
         private readonly HangfireConfigurationInterfaceOptions _options;
 
-		public ConfigurationMiddleware(RequestDelegate next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot)
+        public ConfigurationMiddleware(RequestDelegate next, HangfireConfigurationInterfaceOptions options) : this(next,options,null)
+        {
+        }
+
+        public ConfigurationMiddleware(RequestDelegate next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot)
 		{
             _next = next;
             _options = options;

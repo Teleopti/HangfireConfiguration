@@ -9,9 +9,11 @@ namespace Hangfire.Configuration
         {
 			builder.Map(pathMatch, subApp =>
 			{
-				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : null;
-				subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot);
-			});
+				if (builder.Properties.TryGetValue("CompositionRoot", out var compositionRoot))
+                    subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot as CompositionRoot);
+                else
+                    subApp.UseMiddleware<ConfigurationMiddleware>(options);
+            });
 		}
 		
 		public static HangfireConfiguration UseHangfireConfiguration(this IApplicationBuilder builder, ConfigurationOptions options) =>
