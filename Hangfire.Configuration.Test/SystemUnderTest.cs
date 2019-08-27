@@ -18,7 +18,7 @@ namespace Hangfire.Configuration.Test
                 app.Properties.Add("CompositionRoot", this);
                 app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
             }));
-            
+
             Repository = new FakeConfigurationRepository();
             Creator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
@@ -27,6 +27,7 @@ namespace Hangfire.Configuration.Test
             Configuration = BuildConfiguration(null);
             ServerStarter = BuildServerStarter(AppBuilder, new ConfigurationOptions());
             Determiner = BuildWorkerDeterminer(null);
+            HangfireStarter = new HangfireStarter(Hangfire, Repository);
         }
 
 
@@ -41,6 +42,7 @@ namespace Hangfire.Configuration.Test
         public WorkerDeterminer Determiner { get; }
         public Configuration Configuration { get; }
         public ServerStarter ServerStarter { get; }
+        public HangfireStarter HangfireStarter { get; }
 
 
         public sealed override IConfigurationRepository BuildRepository(string connectionString) => Repository;

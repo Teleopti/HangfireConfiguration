@@ -52,6 +52,7 @@
     <Compile Include="DefaultServerConfigurator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="HangfireSchemaCreator.cs" />
+    <Compile Include="HangfireStarter.cs" />
     <Compile Include="IHangfireSchemaCreator.cs" />
     <Compile Include="ServerConfigurationViewModel.cs" />
     <Compile Include="CreateServerConfiguration.cs" />
