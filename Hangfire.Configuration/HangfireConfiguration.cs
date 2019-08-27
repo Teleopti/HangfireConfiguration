@@ -21,16 +21,17 @@ namespace Hangfire.Configuration
         {
             _builder = builder;
             _options = options;
-            _compositionRoot = new CompositionRoot();
+            _compositionRoot = new CompositionRoot(); 
         }
 
-
-        public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, SqlServerStorageOptions storageOptions, IBackgroundProcess[] additionalProcesses)
+        public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
         {
             _runningServers = _compositionRoot.BuildServerStarter(_builder, _options)
-                .StartServers(_options, serverOptions, storageOptions, additionalProcesses);
+                .StartServers(_options, serverOptions, additionalProcesses);
             return this;
         }
+
+        
         
         
         

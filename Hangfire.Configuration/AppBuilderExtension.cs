@@ -1,4 +1,5 @@
 ﻿using System;
+using Hangfire.SqlServer;
 using Owin;
 
 namespace Hangfire.Configuration
@@ -27,6 +28,7 @@ namespace Hangfire.Configuration
 		public int MinimumWorkerCount { get; set; } = 1;
 		public int MaximumGoalWorkerCount { get; set; } = 100;
 		public int MinimumServers { get; set; } = 2;
+		public SqlServerStorageOptions StorageOptions { get; set; }
 	}
 	
 	public class HangfireConfigurationInterfaceOptions

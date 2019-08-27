@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            }, null, null);
+            }, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -61,7 +61,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            }, null, null);
+            }, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",

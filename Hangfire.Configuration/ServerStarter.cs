@@ -47,14 +47,12 @@ namespace Hangfire.Configuration
             _repository = repository;
         }
 
-        public IEnumerable<RunningServer> StartServers(
-            ConfigurationOptions options,
+        public IEnumerable<RunningServer> StartServers(ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
-            SqlServerStorageOptions storageOptions,
             params IBackgroundProcess[] additionalProcesses)
         {
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
-            storageOptions = storageOptions ?? new SqlServerStorageOptions();
+           var storageOptions = options?.StorageOptions ?? new SqlServerStorageOptions();
 
             new DefaultServerConfigurator(_repository)
                 .Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
