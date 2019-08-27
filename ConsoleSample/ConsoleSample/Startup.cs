@@ -16,8 +16,8 @@ namespace ConsoleSample
     {
         public void Execute(BackgroundProcessContext context)
         {
-            Console.WriteLine("10 second tick!");
-            context.StoppingToken.Wait(TimeSpan.FromSeconds(10));
+            Console.WriteLine("20 second tick!");
+            context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
         }
     }
 
@@ -81,7 +81,7 @@ namespace ConsoleSample
                         EnableHeavyMigrations = true,
                         PrepareSchemaIfNecessary = true,
                         SchemaName = "NotUsedSchemaName"
-                    },
+                    }, 
                     new[] {new CustomBackgroundProcess()}
                 );
 

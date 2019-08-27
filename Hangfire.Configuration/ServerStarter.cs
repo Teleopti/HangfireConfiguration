@@ -16,6 +16,7 @@ namespace Hangfire.Configuration
             params IBackgroundProcess[] additionalProcesses);
 
         JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options);
+        void UseStorage(JobStorage jobStorage);
     }
 
     public class RealHangfire : IHangfire
@@ -29,6 +30,8 @@ namespace Hangfire.Configuration
 
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new SqlServerStorage(connectionString, options);
+
+        public void UseStorage(JobStorage jobStorage) => GlobalConfiguration.Configuration.UseStorage(jobStorage);
     }
 
     public class ServerStarter
@@ -81,6 +84,8 @@ namespace Hangfire.Configuration
             storageOptions = copyOptions(storageOptions);
             storageOptions.SchemaName = configuration.SchemaName;
             var jobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, storageOptions);
+            if (configuration.Active == true)
+                _hangfire.UseStorage(jobStorage);
 
             serverOptions = copyOptions(serverOptions);
             serverOptions.WorkerCount = WorkerDeterminer.DetermineWorkerCount(jobStorage.GetMonitoringApi(), configuration.GoalWorkerCount, options);

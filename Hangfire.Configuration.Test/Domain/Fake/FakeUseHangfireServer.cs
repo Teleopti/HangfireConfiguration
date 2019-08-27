@@ -11,6 +11,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
     public class FakeHangfire : IHangfire
     {
         private readonly FakeMonitoringApi _monitor;
+        public JobStorage CurrentStorage;
 
         public FakeHangfire(FakeMonitoringApi monitor)
         {
@@ -42,6 +43,11 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new FakeJobStorage(connectionString, options, _monitor );
+
+        public void UseStorage(JobStorage jobStorage)
+        {
+            CurrentStorage = jobStorage;
+        }
     }
     
     public class FakeJobStorage : JobStorage
@@ -63,5 +69,6 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             throw new System.NotImplementedException();
         }
+
     }
 }
