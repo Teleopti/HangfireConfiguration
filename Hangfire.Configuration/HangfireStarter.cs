@@ -7,16 +7,16 @@ namespace Hangfire.Configuration
 {
     public class HangfireStarter
     {
-        private readonly IHangfire _hangfire;
+        private readonly IHangfireStorage _hangfireStorage;
         private readonly IConfigurationRepository _repository;
 
-        public HangfireStarter(IHangfire hangfire, IConfigurationRepository repository)
+        public HangfireStarter(IHangfireStorage hangfireStorage, IConfigurationRepository repository)
         {
-            _hangfire = hangfire;
+            _hangfireStorage = hangfireStorage;
             _repository = repository;
         }
 
-        public IEnumerable<JobStorage> Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public IEnumerable<StorageWithConfiguration> Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             new DefaultServerConfigurator(_repository)
                 .Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
@@ -29,21 +29,31 @@ namespace Hangfire.Configuration
                 .ToArray();
         }
         
-        private JobStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+        private StorageWithConfiguration makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             options.SchemaName = configuration.SchemaName;
-            var jobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options);
+            var jobStorage = _hangfireStorage.MakeSqlJobStorage(configuration.ConnectionString, options);
             
             if (configuration.Active == true)
-                _hangfire.UseStorage(jobStorage);
-            
-            return jobStorage;
+                _hangfireStorage.UseStorage(jobStorage);
+
+            return new StorageWithConfiguration
+            {
+                Configuration = configuration,
+                JobStorage = jobStorage
+            };
         }
         
         private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
             JsonConvert.DeserializeObject<SqlServerStorageOptions>(
                 JsonConvert.SerializeObject(storageOptions)
             );
+    }
+
+    public class StorageWithConfiguration
+    {
+        public StoredConfiguration Configuration;
+        public JobStorage JobStorage;
     }
 }

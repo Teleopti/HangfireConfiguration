@@ -9,14 +9,6 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 {
     public class FakeHangfire : IHangfire
     {
-        private readonly FakeMonitoringApi _monitor;
-        public JobStorage CurrentStorage;
-
-        public FakeHangfire(FakeMonitoringApi monitor)
-        {
-            _monitor = monitor;
-        }
-        
         public IEnumerable<(IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
             new (IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
 
@@ -29,16 +21,27 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             StartedServers = StartedServers.Append((builder, storage as FakeJobStorage, options, additionalProcesses));
             return builder;
         }
+    }
 
+    public class FakeHangfireStorage : IHangfireStorage
+    {
+        private readonly FakeMonitoringApi _monitor;
+        public JobStorage Current;
+
+        public FakeHangfireStorage(FakeMonitoringApi monitor)
+        {
+            _monitor = monitor;
+        }        
+        
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new FakeJobStorage(connectionString, options, _monitor );
 
         public void UseStorage(JobStorage jobStorage)
         {
-            CurrentStorage = jobStorage;
+            Current = jobStorage;
         }
     }
-    
+
     public class FakeJobStorage : JobStorage
     {
         public string ConnectionString { get; }
@@ -58,6 +61,5 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             throw new System.NotImplementedException();
         }
-
     }
 }

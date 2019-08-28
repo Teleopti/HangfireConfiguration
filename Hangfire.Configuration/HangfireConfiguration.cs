@@ -9,10 +9,6 @@ namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        private static IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
-
-        public static IEnumerable<RunningServer> RunningServers() => _runningServers;
-
         private readonly IAppBuilder _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
@@ -24,20 +20,42 @@ namespace Hangfire.Configuration
             _compositionRoot = new CompositionRoot(); 
         }
 
-        public HangfireConfiguration StartServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        public StartedHangfire Start(SqlServerStorageOptions storageOptions)
         {
-            _runningServers = _compositionRoot.BuildServerStarter(_builder, _options)
-                .StartServers(_options, serverOptions, additionalProcesses);
-            return this;
+            var starter = _compositionRoot.BuildStarter(_options);
+            var storages = starter.Start(_options, storageOptions);
+            
+            return new StartedHangfire(_compositionRoot.BuildServerStarter(_builder,_options), storages, _options);
         }
-
-        
-        
-        
         
         
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString) => 
             new CompositionRoot().BuildWorkerDeterminer(connectionString);
     }
+
+    public class StartedHangfire
+    {
+        private  IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
+
+        public  IEnumerable<RunningServer> RunningServers() => _runningServers;
+        
+        private readonly ServerStarter _serverStarter;
+        private readonly IEnumerable<StorageWithConfiguration> _storages;
+        private readonly ConfigurationOptions _options;
+
+        public StartedHangfire(ServerStarter serverStarter, IEnumerable<StorageWithConfiguration> storages, ConfigurationOptions options)
+        {
+            _serverStarter = serverStarter;
+            _storages = storages;
+            _options = options;
+        }
+        
+        public StartedHangfire WithConfiguredServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        {
+            _runningServers = _serverStarter.StartServers(_options, serverOptions, _storages, additionalProcesses);
+            return this;
+        }
+    }
+    
 }

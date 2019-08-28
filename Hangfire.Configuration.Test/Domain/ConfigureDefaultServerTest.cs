@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null);
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.ServerStarter.StartServers(new ConfigurationOptions(), null);
+            system.HangfireStarter.Start(new ConfigurationOptions(), null);
 
             Assert.Empty(system.Repository.Data);
         }
@@ -34,7 +34,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 54});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null);
@@ -47,7 +47,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null);
@@ -61,7 +61,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
             }, null);
@@ -74,7 +74,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
@@ -89,7 +89,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
@@ -104,7 +104,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
             }, null);
@@ -119,7 +119,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = false});
             system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
             }, null);
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = null});
             system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
             }, null);
@@ -150,7 +150,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "default", Active = true});
 
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.HangfireStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
             }, null);

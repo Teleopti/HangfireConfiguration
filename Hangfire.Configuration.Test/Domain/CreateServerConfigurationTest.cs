@@ -31,11 +31,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldSetGoalWorkerCountToDefaultConfiguration()
         {
             var system = new SystemUnderTest();
+            var storages = system.HangfireStarter.Start(null, null);
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            }, null);
+            }, null, storages);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -57,11 +58,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReadAllConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            var configuration = new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            }, null);
+            };
+            var storages = system.HangfireStarter.Start(configuration, null);
+            system.ServerStarter.StartServers(configuration, null, storages);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -82,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenConnectionFails()
         {
             var system = new SystemUnderTest();
-            system.Creator.TryConnectFailsWith = new Exception();
+            system.SchemaCreator.TryConnectFailsWith = new Exception();
 
             Assert.ThrowsAny<Exception>(() => system.Configuration.CreateServerConfiguration(
                 new CreateServerConfiguration
@@ -108,7 +111,7 @@ namespace Hangfire.Configuration.Test.Domain
                     Password = "awesomePassword"
                 });
 
-            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", system.Creator.ConnectionTriedWith);
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", system.SchemaCreator.ConnectionTriedWith);
         }
 
         [Fact]
@@ -125,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaCreatorPassword = "createPassword"
                 });
 
-            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.Creator.ConnectionTriedWith);
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.SchemaCreator.ConnectionTriedWith);
         }
 
         [Fact]
@@ -143,8 +146,8 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaName = "schema"
                 });
 
-            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.Creator.SchemaCreatedWith.Last().ConnectionString);
-            Assert.Equal("schema", system.Creator.SchemaCreatedWith.Last().SchemaName);
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.SchemaCreator.SchemaCreatedWith.Last().ConnectionString);
+            Assert.Equal("schema", system.SchemaCreator.SchemaCreatedWith.Last().SchemaName);
         }
     }
 }

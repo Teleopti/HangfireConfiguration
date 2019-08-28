@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.HangfireStarter.Start(new ConfigurationOptions() {DefaultHangfireConnectionString = "HangfireConnectionString"}, null);
 
-            Assert.NotNull(system.Hangfire.CurrentStorage);
+            Assert.NotNull(system.HangfireStorage.Current);
         }
         
         //Should this maybe throw???? 
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.HangfireStarter.Start(null, null);
 
-            Assert.Null(system.Hangfire.CurrentStorage);
+            Assert.Null(system.HangfireStorage.Current);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.HangfireStarter.Start(null, null);
 
-            Assert.NotNull(system.Hangfire.CurrentStorage);
+            Assert.NotNull(system.HangfireStorage.Current);
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.HangfireStarter.Start(null, null);
 
-            Assert.Equal("ActiveSchema", (system.Hangfire.CurrentStorage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("ActiveSchema", (system.HangfireStorage.Current as FakeJobStorage).Options.SchemaName);
         }
         
         [Fact]
@@ -62,8 +62,8 @@ namespace Hangfire.Configuration.Test.Domain
 
             var storages = system.HangfireStarter.Start(null, null);
             
-            Assert.Equal("FirstSchema", (storages.First() as FakeJobStorage).Options.SchemaName);
-            Assert.Equal("SecondSchema", (storages.Last() as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("FirstSchema", (storages.First().JobStorage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SecondSchema", (storages.Last().JobStorage as FakeJobStorage).Options.SchemaName);
         }        
         
         [Fact]
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration.Test.Domain
             var storages = system.HangfireStarter.Start(null, null);
 
             var options = new SqlServerStorageOptions();
-            var storage = storages.Single() as FakeJobStorage;
+            var storage = storages.Single().JobStorage as FakeJobStorage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -107,7 +107,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var storages = system.HangfireStarter.Start(null, options);
 
-            var storage = storages.Single() as FakeJobStorage;
+            var storage = storages.Single().JobStorage as FakeJobStorage;
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -125,9 +125,9 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
 
-            system.ServerStarter.StartServers(null, null);
+            var storages = system.HangfireStarter.Start(null, null);
 
-            Assert.Equal("SchemaName", (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+            Assert.Equal("SchemaName", (storages.Single().JobStorage as FakeJobStorage).Options.SchemaName);
         }
         
         [Fact]
@@ -137,13 +137,34 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
             system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
 
-            system.ServerStarter.StartServers(null, null);
+            var storages = system.HangfireStarter.Start(null, null);
 
-            Assert.Equal("SchemaName1", (system.Hangfire.StartedServers.First().storage).Options.SchemaName);
-            Assert.Equal("SchemaName2", (system.Hangfire.StartedServers.Last().storage).Options.SchemaName);
-        }        
-
+            Assert.Equal("SchemaName1", (storages.First().JobStorage as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SchemaName2", (storages.Last().JobStorage as FakeJobStorage).Options.SchemaName);
+        }
         
+        [Fact]
+        public void ShouldStartWithJobStorageWithConfiguration()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            
+            var storages = system.HangfireStarter.Start(null, null);
 
+            Assert.Equal("SchemaName", storages.Single().Configuration.SchemaName);
+        }
+        
+        [Fact]
+        public void ShouldStartWithJobStorageWithConfiguration2()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
+            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
+            
+            var storages = system.HangfireStarter.Start(null, null);
+
+            Assert.Equal("SchemaName1", storages.First().Configuration.SchemaName);
+            Assert.Equal("SchemaName2", storages.Last().Configuration.SchemaName);
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
     {
         public ServerStarter BuildServerStarter(IAppBuilder appBuilder, ConfigurationOptions options) 
         {
-            return new ServerStarter(appBuilder, BuildHangfire(), BuildRepository(options.ConnectionString));
+            return new ServerStarter(appBuilder, BuildHangfire());
         }
 
         public virtual IHangfire BuildHangfire()
@@ -38,6 +38,16 @@ namespace Hangfire.Configuration
         public virtual IConfigurationRepository BuildRepository(string connectionString)
         {
             return new ConfigurationRepository(connectionString);
+        }
+
+        public HangfireStarter BuildStarter(ConfigurationOptions options)
+        {
+            return new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString));
+        }
+
+        public virtual IHangfireStorage BuildHangfireStorage()
+        {
+            return new RealHangfireStorage();
         }
     }
 }

@@ -30,24 +30,24 @@ namespace ConsoleSample
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
-            app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions { ShowExceptionDetails = true });
+            app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
 
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireSchema = "HangFireCustomSchemaName";
-            
+
             app.Use((context, next) =>
             {
                 // simulate a hosting site with content security policy
                 context.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
-    
+
                 // simulate a hosting site with a static file handler
                 if (context.Request.Uri.AbsolutePath.Split('/').Last().Contains("."))
                 {
                     context.Response.StatusCode = (int) HttpStatusCode.NotFound;
                     return Task.CompletedTask;
                 }
-    
+
                 return next.Invoke();
             });
 
@@ -63,31 +63,35 @@ namespace ConsoleSample
                     ConnectionString = configurationConnectionString,
                     DefaultHangfireConnectionString = defaultHangfireConnectionString,
                     DefaultSchemaName = defaultHangfireSchema,
-                    StorageOptions = new SqlServerStorageOptions
-                    {
-                        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                        QueuePollInterval = TimeSpan.Zero,
-                        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
-                        UseRecommendedIsolationLevel = true,
-                        UsePageLocksOnDequeue = true,
-                        DisableGlobalLocks = true,
-                        EnableHeavyMigrations = true,
-                        PrepareSchemaIfNecessary = true,
-                        SchemaName = "NotUsedSchemaName"
-                    }                    
                 })
-                .StartServers(
+                .Start(new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
+                    UseRecommendedIsolationLevel = true,
+                    UsePageLocksOnDequeue = true,
+                    DisableGlobalLocks = true,
+                    EnableHeavyMigrations = true,
+                    PrepareSchemaIfNecessary = true,
+                    SchemaName = "NotUsedSchemaName"
+                })
+                .WithConfiguredServers(
                     new BackgroundJobServerOptions
                     {
                         Queues = new[] {"critical", "default"},
-                    }, 
+                    },
                     new[] {new CustomBackgroundProcess()}
-                );
+                )
+                .RunningServers()
+                .Select(server =>
+                {
+                    Console.WriteLine("Starting dashboard for server: "  + server.Number);
+                    app.UseHangfireDashboard($"/HangfireDashboard{server.Number}", new DashboardOptions(), server.Storage);
+                    return server;
 
-            foreach (var server in HangfireConfiguration.RunningServers())
-            {
-                app.UseHangfireDashboard($"/HangfireDashboard{server.Number}", new DashboardOptions(), server.Storage);
-            }
+                }).ToArray();
+
         }
     }
 }
