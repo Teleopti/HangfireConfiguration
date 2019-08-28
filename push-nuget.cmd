@@ -1,0 +1,1 @@
+nuget.exe push -Source https://teleopti.pkgs.visualstudio.com/_packaging/TeleoptiNugets/nuget/v3/index.json -ApiKey AzureDevOps Hangfire.Configuration.0.2.0.nupkg

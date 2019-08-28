@@ -5,4 +5,5 @@ Prereq nuget configuration
 to create a new version of the nuget package: 
 * Change version in csproj file and AssemblyInfo
 * Commit and push
-* Build Hangfire.Configuration solution in release mode. Nuget push will be done automatically using PostBuildEvent
+* Build Hangfire.Configuration solution in release mode. Nuget push will be done manually using the command 
+nuget.exe push -Source https://teleopti.pkgs.visualstudio.com/_packaging/TeleoptiNugets/nuget/v3/index.json -ApiKey AzureDevOps Hangfire.Configuration.$(Version).nupkg
