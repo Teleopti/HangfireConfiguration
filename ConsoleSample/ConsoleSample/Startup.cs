@@ -69,14 +69,8 @@ namespace ConsoleSample
                 {
                     ConnectionString = configurationConnectionString,
                     DefaultHangfireConnectionString = defaultHangfireConnectionString,
-                    DefaultSchemaName = defaultHangfireSchema
-                })
-                .StartServers(
-                    new BackgroundJobServerOptions
-                    {
-                        Queues = new[] {"critical", "default"},
-                    },
-                    new SqlServerStorageOptions
+                    DefaultSchemaName = defaultHangfireSchema,
+                    StorageOptions = new SqlServerStorageOptions
                     {
                         CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                         QueuePollInterval = TimeSpan.Zero,
@@ -87,6 +81,12 @@ namespace ConsoleSample
                         EnableHeavyMigrations = true,
                         PrepareSchemaIfNecessary = true,
                         SchemaName = "NotUsedSchemaName"
+                    }                    
+                })
+                .StartServers(
+                    new BackgroundJobServerOptions
+                    {
+                        Queues = new[] {"critical", "default"},
                     }, 
                     new[] {new CustomBackgroundProcess()}
                 );

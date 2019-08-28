@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null, null);
+            }, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.ServerStarter.StartServers(new ConfigurationOptions(), null, null);
+            system.ServerStarter.StartServers(new ConfigurationOptions(), null);
 
             Assert.Empty(system.Repository.Data);
         }
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null, null);
+            }, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null, null);
+            }, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }
@@ -64,7 +64,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null, null);
+            }, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
-            }, null, null);
+            }, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
@@ -93,7 +93,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
-            }, null, null);
+            }, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
@@ -107,7 +107,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null, null);
+            }, null);
 
             Assert.Equal("newDefault", system.Repository.Data.Single().ConnectionString);
         }
@@ -122,7 +122,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null, null);
+            }, null);
 
             Assert.False(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
@@ -138,7 +138,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null, null);
+            }, null);
 
             Assert.Null(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
@@ -153,7 +153,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerStarter.StartServers(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null, null);
+            }, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }
