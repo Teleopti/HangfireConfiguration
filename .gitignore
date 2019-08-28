@@ -237,3 +237,7 @@ docs/_build
 _site
 *.userprefs
 *.nupkg
+CredentialProvider.VSS.exe
+EULA_Microsoft Visual Studio Team Services Credential Provider.docx
+NuGet.exe
+ThirdPartyNotices.txt
