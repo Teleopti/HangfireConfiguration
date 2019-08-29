@@ -22,10 +22,11 @@ namespace Hangfire.Configuration
 
         public StartedHangfire Start(SqlServerStorageOptions storageOptions)
         {
+            var serverStarter = _compositionRoot.BuildServerStarter(_builder, _options);
             var starter = _compositionRoot.BuildStarter(_options);
-            var storages = starter.Start(_options, storageOptions);
+            var enabledStorages = starter.Start(_options, storageOptions);
             
-            return new StartedHangfire(_compositionRoot.BuildServerStarter(_builder,_options), storages, _options);
+            return new StartedHangfire(serverStarter, enabledStorages, _options);
         }
         
         
@@ -36,24 +37,24 @@ namespace Hangfire.Configuration
 
     public class StartedHangfire
     {
-        private  IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
+        //private  IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
 
-        public  IEnumerable<RunningServer> RunningServers() => _runningServers;
+        public  IEnumerable<StorageWithConfiguration> EnabledStorages() => _enabledStorages;
         
         private readonly ServerStarter _serverStarter;
-        private readonly IEnumerable<StorageWithConfiguration> _storages;
+        private readonly IEnumerable<StorageWithConfiguration> _enabledStorages;
         private readonly ConfigurationOptions _options;
 
-        public StartedHangfire(ServerStarter serverStarter, IEnumerable<StorageWithConfiguration> storages, ConfigurationOptions options)
+        public StartedHangfire(ServerStarter serverStarter, IEnumerable<StorageWithConfiguration> enabledStorages, ConfigurationOptions options)
         {
             _serverStarter = serverStarter;
-            _storages = storages;
+            _enabledStorages = enabledStorages;
             _options = options;
         }
         
-        public StartedHangfire WithConfiguredServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        public StartedHangfire WithServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
         {
-            _runningServers = _serverStarter.StartServers(_options, serverOptions, _storages, additionalProcesses);
+            _serverStarter.StartServers(_options, serverOptions, _enabledStorages, additionalProcesses);
             return this;
         }
     }

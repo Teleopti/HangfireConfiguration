@@ -144,19 +144,17 @@ namespace Hangfire.Configuration.Test.Domain
         }
         
         [Fact]
-        public void ShouldReturnStartedServers()
+        public void ShouldStartServersWithStorages()
         {
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration());
             system.Repository.Has(new StoredConfiguration());
             var storages = system.HangfireStarter.Start(null, null);
 
-            var result = system.ServerStarter.StartServers(null, null, storages);
+            system.ServerStarter.StartServers(null, null, storages);
 
-            Assert.Equal(1, result.First().Number);
-            Assert.Same(system.Hangfire.StartedServers.First().storage, result.First().Storage);
-            Assert.Equal(2, result.Last().Number);
-            Assert.Same(system.Hangfire.StartedServers.Last().storage, result.Last().Storage);
+            Assert.Same(system.Hangfire.StartedServers.First().storage, storages.First().JobStorage);
+            Assert.Same(system.Hangfire.StartedServers.Last().storage, storages.Last().JobStorage);
         }
 
         [Fact]

@@ -16,7 +16,7 @@ namespace Hangfire.Configuration
             _hangfire = hangfire;
         }
 
-        public IEnumerable<RunningServer> StartServers(
+        public void StartServers(
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
             IEnumerable<StorageWithConfiguration> jobStorages,
@@ -25,13 +25,8 @@ namespace Hangfire.Configuration
             var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
 
-            return jobStorages
-                .Select(x => startServer(x, options, serverOptions, backgroundProcesses))
-                .Select((s, i) => new RunningServer
-                {
-                    Number = i + 1,
-                    Storage = s
-                })
+            jobStorages
+                .Select(storage => startServer(storage, options, serverOptions, backgroundProcesses))
                 .ToArray();
         }
 

@@ -76,20 +76,24 @@ namespace ConsoleSample
                     PrepareSchemaIfNecessary = true,
                     SchemaName = "NotUsedSchemaName"
                 })
-                .WithConfiguredServers(
+                .WithServers(
                     new BackgroundJobServerOptions
                     {
                         Queues = new[] {"critical", "default"},
                     },
                     new[] {new CustomBackgroundProcess()}
                 )
-                .RunningServers()
-                .Select(server =>
+                .EnabledStorages()
+                .Select((es, i) =>
                 {
-                    Console.WriteLine("Starting dashboard for server: "  + server.Number);
-                    app.UseHangfireDashboard($"/HangfireDashboard{server.Number}", new DashboardOptions(), server.Storage);
-                    return server;
-
+                    var number = i + 1; 
+                    app.UseHangfireDashboard($"/HangfireDashboard{number}", new DashboardOptions(), es.JobStorage);
+                    Console.WriteLine($@"Starting dashboard for storage {number}: 
+                                                Schema: {es.Configuration.SchemaName} 
+                                                GoalWorkerCount: {es.Configuration.GoalWorkerCount} 
+                                                Connection: {es.Configuration.ConnectionString} 
+                                                Active: { es.Configuration.Active },");
+                    return es;
                 }).ToArray();
 
         }
