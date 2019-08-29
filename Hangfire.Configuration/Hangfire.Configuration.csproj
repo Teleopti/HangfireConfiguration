@@ -56,11 +56,9 @@
     <Compile Include="Hangfire.cs" />
     <Compile Include="HangfireSchemaCreator.cs" />
     <Compile Include="HangfireStarter.cs" />
-    <Compile Include="IHangfireSchemaCreator.cs" />
     <Compile Include="ServerConfigurationViewModel.cs" />
     <Compile Include="CreateServerConfiguration.cs" />
     <Compile Include="HangfireConfiguration.cs" />
-    <Compile Include="IConfigurationRepository.cs" />
     <Compile Include="Pages\ConfigurationPage.cs" />
     <Compile Include="AppBuilderExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

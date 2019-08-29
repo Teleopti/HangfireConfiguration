@@ -8,6 +8,12 @@ using SqlSetup = Hangfire.Configuration.SqlServerObjectsInstaller;
 
 namespace Hangfire.Configuration
 {
+    public interface IConfigurationRepository
+    {
+        IEnumerable<StoredConfiguration> ReadConfigurations();
+        void WriteConfiguration(StoredConfiguration configuration);
+    }
+
     public class ConfigurationRepository : IConfigurationRepository
     {
         private readonly Func<IDbConnection> _connectionFactory;

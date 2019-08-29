@@ -2,6 +2,12 @@ using System.Data.SqlClient;
 
 namespace Hangfire.Configuration
 {
+    public interface IHangfireSchemaCreator
+    {
+        void TryConnect(string connectionString);
+        void CreateHangfireSchema(string schemaName, string connectionStringForCreate);
+    }
+
     public class HangfireSchemaCreator : IHangfireSchemaCreator
     {
         public void TryConnect(string connectionString)
