@@ -5,49 +5,24 @@ namespace Hangfire.Configuration
 {
     public class CompositionRoot
     {
-        public ServerStarter BuildServerStarter(IAppBuilder appBuilder, ConfigurationOptions options) 
-        {
-            return new ServerStarter(appBuilder, BuildHangfire());
-        }
+        public ServerStarter BuildServerStarter(IAppBuilder appBuilder, ConfigurationOptions options) => new ServerStarter(appBuilder, BuildHangfire());
 
-        public virtual IHangfire BuildHangfire()
-        {
-            return new RealHangfire();
-        }
+        public virtual IHangfire BuildHangfire() => new RealHangfire();
 
-        public WorkerDeterminer BuildWorkerDeterminer(string connectionString)
-        {
-            return new WorkerDeterminer(BuildConfiguration(connectionString), BuildMonitoringApi());
-        }
+        public WorkerDeterminer BuildWorkerDeterminer(string connectionString) => new WorkerDeterminer(BuildConfiguration(connectionString), BuildMonitoringApi());
 
-        public virtual IMonitoringApi BuildMonitoringApi()
-        {
-            return JobStorage.Current.GetMonitoringApi();
-        }
+        public virtual IMonitoringApi BuildMonitoringApi() => JobStorage.Current.GetMonitoringApi();
 
-        public Configuration BuildConfiguration(string connectionString)
-        {
-            return new Configuration(BuildRepository(connectionString), BuildHangfireSchemaCreator());
-        }
+        public Configuration BuildConfiguration(string connectionString) => new Configuration(BuildRepository(connectionString), BuildHangfireSchemaCreator());
 
-        public virtual IHangfireSchemaCreator BuildHangfireSchemaCreator()
-        {
-            return new HangfireSchemaCreator();
-        }
+        public virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() => new HangfireSchemaCreator();
 
-        public virtual IConfigurationRepository BuildRepository(string connectionString)
-        {
-            return new ConfigurationRepository(connectionString);
-        }
+        public virtual IConfigurationRepository BuildRepository(string connectionString) => new ConfigurationRepository(connectionString);
 
-        public HangfireStarter BuildStarter(ConfigurationOptions options)
-        {
-            return new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString));
-        }
+        public virtual IDistributedLock BuildDistributedLock(string connectionString) => new DistributedLock("HangfireConfigurationLock", connectionString);
 
-        public virtual IHangfireStorage BuildHangfireStorage()
-        {
-            return new RealHangfireStorage();
-        }
+        public HangfireStarter BuildStarter(ConfigurationOptions options) => new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString), BuildDistributedLock(options.ConnectionString));
+
+        public virtual IHangfireStorage BuildHangfireStorage() => new RealHangfireStorage();
     }
 }

@@ -41,6 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -50,6 +51,7 @@
     <Compile Include="ConfigurationMiddleware.cs" />
     <Compile Include="ConfigurationRepository.cs" />
     <Compile Include="DefaultServerConfigurator.cs" />
+    <Compile Include="DistributedLock.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Hangfire.cs" />
     <Compile Include="HangfireSchemaCreator.cs" />

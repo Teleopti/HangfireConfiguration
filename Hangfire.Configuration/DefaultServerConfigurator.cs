@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 namespace Hangfire.Configuration
@@ -5,10 +6,12 @@ namespace Hangfire.Configuration
     public class DefaultServerConfigurator
     {
         private readonly IConfigurationRepository _repository;
+        private readonly IDistributedLock _distributedLock;
 
-        public DefaultServerConfigurator(IConfigurationRepository repository)
+        public DefaultServerConfigurator(IConfigurationRepository repository, IDistributedLock distributedLock)
         {
             _repository = repository;
+            _distributedLock = distributedLock;
         }
 
         //TODO: unit of work 
@@ -16,25 +19,29 @@ namespace Hangfire.Configuration
         {
             if (defaultConnectionString == null)
                 return;
-            var configurations = _repository.ReadConfigurations().ToArray();
-            if (configurations.IsEmpty())
+            
+            using (_distributedLock.TakeLock(TimeSpan.FromSeconds(10)))
             {
-                _repository.WriteConfiguration(new StoredConfiguration
+                var configurations = _repository.ReadConfigurations().ToArray();
+                if (configurations.IsEmpty())
                 {
-                    ConnectionString = defaultConnectionString,
-                    SchemaName = defaultSchema,
-                    Active = true
-                });
-            }
-            else
-            {
-                var legacyConfiguration = configurations.First();
-                legacyConfiguration.ConnectionString = defaultConnectionString;
-                legacyConfiguration.SchemaName = defaultSchema;
-                if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
-                    legacyConfiguration.Active = true;
+                    _repository.WriteConfiguration(new StoredConfiguration
+                    {
+                        ConnectionString = defaultConnectionString,
+                        SchemaName = defaultSchema,
+                        Active = true
+                    });
+                }
+                else
+                {
+                    var legacyConfiguration = configurations.First();
+                    legacyConfiguration.ConnectionString = defaultConnectionString;
+                    legacyConfiguration.SchemaName = defaultSchema;
+                    if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
+                        legacyConfiguration.Active = true;
 
-                _repository.WriteConfiguration(legacyConfiguration);
+                    _repository.WriteConfiguration(legacyConfiguration);
+                }    
             }
         }
     }

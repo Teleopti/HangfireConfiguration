@@ -24,6 +24,7 @@ namespace Hangfire.Configuration.Test
             Monitor = new FakeMonitoringApi();
             HangfireStorage = new FakeHangfireStorage(Monitor);
             Hangfire = new FakeHangfire();
+            DistributedLock = new FakeDistributedLock();
 
             Configuration = BuildConfiguration(null);
             ServerStarter = BuildServerStarter(AppBuilder, new ConfigurationOptions());
@@ -39,6 +40,7 @@ namespace Hangfire.Configuration.Test
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfireStorage HangfireStorage { get; }
         public FakeHangfire Hangfire { get; }
+        public FakeDistributedLock DistributedLock { get; }
 
         public WorkerDeterminer Determiner { get; }
         public Configuration Configuration { get; }
@@ -51,5 +53,18 @@ namespace Hangfire.Configuration.Test
         public sealed override IHangfireStorage BuildHangfireStorage() => HangfireStorage;
         public sealed override IMonitoringApi BuildMonitoringApi() => Monitor;
         public sealed override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
+        public sealed override IDistributedLock BuildDistributedLock(string connectionString) => DistributedLock;
+    }
+
+    public class FakeDistributedLock : IDistributedLock, IDisposable
+    {
+        public IDisposable TakeLock(TimeSpan takeLockTimeout)
+        {
+            return this;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }

@@ -1,5 +1,5 @@
-using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
@@ -14,12 +14,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             Assert.Empty(repository.ReadConfigurations());
         }
-        
+
         [Fact, CleanDatabase]
         public void ShouldWrite()
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-			
+
             repository.WriteConfiguration(new StoredConfiguration
             {
                 ConnectionString = "connection string",
@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal("schema name", configuration.SchemaName);
             Assert.Equal(false, configuration.Active);
         }
-        
+
         [Fact, CleanDatabase]
         public void ShouldRead()
         {
@@ -52,6 +52,21 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal("schemaName", result.SchemaName);
             Assert.Equal(3, result.GoalWorkerCount);
             Assert.Equal(true, result.Active);
+        }
+
+        [Fact, CleanDatabase]
+        public void ShouldNotInsertMultiple()
+        {
+            int[] arr = Enumerable.Range(1, 10).ToArray();
+
+            Parallel.ForEach(arr, (item) =>
+            {
+                var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+                var configurator = new DefaultServerConfigurator(repository, new DistributedLock("HangfireConfigurationLock", ConnectionUtils.GetConnectionString()));
+                configurator.Configure(ConnectionUtils.GetConnectionString(), "SchemaName");
+            });
+
+            Assert.Single(new ConfigurationRepository(ConnectionUtils.GetConnectionString()).ReadConfigurations());
         }
     }
 }
