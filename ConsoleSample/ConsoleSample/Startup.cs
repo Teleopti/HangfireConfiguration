@@ -76,7 +76,7 @@ namespace ConsoleSample
                     PrepareSchemaIfNecessary = true,
                     SchemaName = "NotUsedSchemaName"
                 })
-                .WithServers(
+                .StartServers(
                     new BackgroundJobServerOptions
                     {
                         Queues = new[] {"critical", "default"},
@@ -88,14 +88,13 @@ namespace ConsoleSample
                 {
                     var number = i + 1; 
                     app.UseHangfireDashboard($"/HangfireDashboard{number}", new DashboardOptions(), es.JobStorage);
-                    Console.WriteLine($@"Starting dashboard for storage {number}: 
+                    Console.WriteLine($@"Started dashboard for storage {number}: 
                                                 Schema: {es.Configuration.SchemaName} 
                                                 GoalWorkerCount: {es.Configuration.GoalWorkerCount} 
                                                 Connection: {es.Configuration.ConnectionString} 
                                                 Active: { es.Configuration.Active },");
                     return es;
                 }).ToArray();
-
         }
     }
 }

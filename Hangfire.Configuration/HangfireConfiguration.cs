@@ -52,7 +52,7 @@ namespace Hangfire.Configuration
             _options = options;
         }
         
-        public StartedHangfire WithServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        public StartedHangfire StartServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
         {
             _serverStarter.StartServers(_options, serverOptions, _enabledStorages, additionalProcesses);
             return this;
