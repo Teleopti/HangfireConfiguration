@@ -61,9 +61,14 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             Parallel.ForEach(arr, (item) =>
             {
-                var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-                var configurator = new DefaultServerConfigurator(repository, new DistributedLock("HangfireConfigurationLock", ConnectionUtils.GetConnectionString()));
-                configurator.Configure(ConnectionUtils.GetConnectionString(), "SchemaName");
+                var connection = ConnectionUtils.GetConnectionString();
+                var repository = new ConfigurationRepository(connection);
+                var configurator = new DefaultServerConfigurator(repository, new DistributedLock("lockid", connection));
+                configurator.Configure( new ConfigurationOptions
+                {
+                    DefaultHangfireConnectionString = connection,
+                    DefaultSchemaName = "SchemaName"
+                });
             });
 
             Assert.Single(new ConfigurationRepository(ConnectionUtils.GetConnectionString()).ReadConfigurations());

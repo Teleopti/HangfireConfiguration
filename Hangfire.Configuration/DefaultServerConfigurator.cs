@@ -14,29 +14,28 @@ namespace Hangfire.Configuration
             _distributedLock = distributedLock;
         }
 
-        //TODO: unit of work 
-        public void Configure(string defaultConnectionString, string defaultSchema)
+        public void Configure(ConfigurationOptions options)
         {
-            if (defaultConnectionString == null)
+            if (options?.DefaultHangfireConnectionString == null)
                 return;
             
-            using (_distributedLock.TakeLock(TimeSpan.FromSeconds(10)))
+            using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
             {
                 var configurations = _repository.ReadConfigurations().ToArray();
                 if (configurations.IsEmpty())
                 {
                     _repository.WriteConfiguration(new StoredConfiguration
                     {
-                        ConnectionString = defaultConnectionString,
-                        SchemaName = defaultSchema,
+                        ConnectionString = options.DefaultHangfireConnectionString,
+                        SchemaName = options.DefaultSchemaName,
                         Active = true
                     });
                 }
                 else
                 {
                     var legacyConfiguration = configurations.First();
-                    legacyConfiguration.ConnectionString = defaultConnectionString;
-                    legacyConfiguration.SchemaName = defaultSchema;
+                    legacyConfiguration.ConnectionString = options.DefaultHangfireConnectionString;
+                    legacyConfiguration.SchemaName = options.DefaultSchemaName;
                     if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
                         legacyConfiguration.Active = true;
 

@@ -47,24 +47,11 @@ namespace Hangfire.Configuration.Test
         public ServerStarter ServerStarter { get; }
         public HangfireStarter HangfireStarter { get; }
 
-
         public sealed override IConfigurationRepository BuildRepository(string connectionString) => Repository;
         public sealed override IHangfire BuildHangfire() => Hangfire;
         public sealed override IHangfireStorage BuildHangfireStorage() => HangfireStorage;
         public sealed override IMonitoringApi BuildMonitoringApi() => Monitor;
         public sealed override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
         public sealed override IDistributedLock BuildDistributedLock(string connectionString) => DistributedLock;
-    }
-
-    public class FakeDistributedLock : IDistributedLock, IDisposable
-    {
-        public IDisposable TakeLock(TimeSpan takeLockTimeout)
-        {
-            return this;
-        }
-
-        public void Dispose()
-        {
-        }
     }
 }

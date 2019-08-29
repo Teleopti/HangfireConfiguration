@@ -56,6 +56,7 @@
     <Compile Include="Domain\ServerStarterTest.cs" />
     <Compile Include="Domain\ViewConfigurationsTest.cs" />
     <Compile Include="Domain\WorkerCountTest.cs" />
+    <Compile Include="Domain\Fake\FakeDistributedLock.cs" />
     <Compile Include="Infrastructure\CleanDatabaseAttribute.cs" />
     <Compile Include="Infrastructure\ConfigurationRepositoryGoalWorkerCountTest.cs" />
     <Compile Include="Infrastructure\ConnectionUtils.cs" />

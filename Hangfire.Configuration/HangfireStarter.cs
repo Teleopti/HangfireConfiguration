@@ -9,19 +9,18 @@ namespace Hangfire.Configuration
     {
         private readonly IHangfireStorage _hangfireStorage;
         private readonly IConfigurationRepository _repository;
-        private readonly IDistributedLock _distributedLock;
+        private readonly DefaultServerConfigurator _defaultServerConfigurator;
 
-        public HangfireStarter(IHangfireStorage hangfireStorage, IConfigurationRepository repository, IDistributedLock distributedLock)
+        public HangfireStarter(IHangfireStorage hangfireStorage, IConfigurationRepository repository, DefaultServerConfigurator defaultServerConfigurator)
         {
             _hangfireStorage = hangfireStorage;
             _repository = repository;
-            _distributedLock = distributedLock;
+            _defaultServerConfigurator = defaultServerConfigurator;
         }
 
         public IEnumerable<StorageWithConfiguration> Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
-            new DefaultServerConfigurator(_repository, _distributedLock)
-                .Configure(options?.DefaultHangfireConnectionString, options?.DefaultSchemaName);
+            _defaultServerConfigurator.Configure(options);
 
             return _repository
                 .ReadConfigurations()

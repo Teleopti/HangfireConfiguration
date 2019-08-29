@@ -19,10 +19,12 @@ namespace Hangfire.Configuration
 
         public virtual IConfigurationRepository BuildRepository(string connectionString) => new ConfigurationRepository(connectionString);
 
+        public virtual IHangfireStorage BuildHangfireStorage() => new RealHangfireStorage();
+
         public virtual IDistributedLock BuildDistributedLock(string connectionString) => new DistributedLock("HangfireConfigurationLock", connectionString);
 
-        public HangfireStarter BuildStarter(ConfigurationOptions options) => new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString), BuildDistributedLock(options.ConnectionString));
+        public DefaultServerConfigurator BuildDefaultServerConfigurator(string connectionString) => new DefaultServerConfigurator(BuildRepository(connectionString), BuildDistributedLock(connectionString));
 
-        public virtual IHangfireStorage BuildHangfireStorage() => new RealHangfireStorage();
+        public HangfireStarter BuildStarter(ConfigurationOptions options) => new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString), BuildDefaultServerConfigurator(options.ConnectionString));
     }
 }
