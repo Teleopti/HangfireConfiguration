@@ -51,6 +51,19 @@ namespace ConsoleSample
                 return next.Invoke();
             });
 
+            var storageOptions = new SqlServerStorageOptions
+            {
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.Zero,
+                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
+                UseRecommendedIsolationLevel = true,
+                UsePageLocksOnDequeue = true,
+                DisableGlobalLocks = true,
+                EnableHeavyMigrations = true,
+                PrepareSchemaIfNecessary = true,
+                SchemaName = "NotUsedSchemaName"
+            }; 
+
             app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
             {
                 ConnectionString = configurationConnectionString,
@@ -64,36 +77,21 @@ namespace ConsoleSample
                     DefaultHangfireConnectionString = defaultHangfireConnectionString,
                     DefaultSchemaName = defaultHangfireSchema,
                 })
-                .Start(new SqlServerStorageOptions
-                {
-                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                    QueuePollInterval = TimeSpan.Zero,
-                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
-                    UseRecommendedIsolationLevel = true,
-                    UsePageLocksOnDequeue = true,
-                    DisableGlobalLocks = true,
-                    EnableHeavyMigrations = true,
-                    PrepareSchemaIfNecessary = true,
-                    SchemaName = "NotUsedSchemaName"
-                })
-                .StartServers(
+                //.StartPublishers(storageOptions)
+                .StartWorkers(
+                    storageOptions,
                     new BackgroundJobServerOptions
                     {
                         Queues = new[] {"critical", "default"},
                     },
                     new[] {new CustomBackgroundProcess()}
                 )
-                .EnabledStorages()
-                .Select((es, i) =>
+                .EnabledJobStorages()
+                .Select(s =>
                 {
-                    var number = i + 1; 
-                    app.UseHangfireDashboard($"/HangfireDashboard{number}", new DashboardOptions(), es.JobStorage);
-                    Console.WriteLine($@"Started dashboard for storage {number}: 
-                                                Schema: {es.Configuration.SchemaName} 
-                                                GoalWorkerCount: {es.Configuration.GoalWorkerCount} 
-                                                Connection: {es.Configuration.ConnectionString} 
-                                                Active: { es.Configuration.Active },");
-                    return es;
+                    app.UseHangfireDashboard($"/HangfireDashboard{s.Number}", new DashboardOptions(), s.JobStorage);
+                    Console.WriteLine($@"Started dashboard for storage {s.Number}:");
+                    return s;
                 }).ToArray();
         }
     }

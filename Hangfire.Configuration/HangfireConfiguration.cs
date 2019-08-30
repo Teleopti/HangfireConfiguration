@@ -9,9 +9,14 @@ namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
+        public  IEnumerable<EnabledStorage> EnabledJobStorages() => _enabledStorages;
+
         private readonly IAppBuilder _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
+        private  IEnumerable<StorageWithConfiguration> _storagesWithConfiguration = Enumerable.Empty<StorageWithConfiguration>();
+        private  IEnumerable<EnabledStorage> _enabledStorages = Enumerable.Empty<EnabledStorage>();
+        
 
         public HangfireConfiguration(IAppBuilder builder, ConfigurationOptions options)
         {
@@ -20,13 +25,29 @@ namespace Hangfire.Configuration
             _compositionRoot = new CompositionRoot(); 
         }
 
-        public StartedHangfire Start(SqlServerStorageOptions storageOptions)
+        public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
-            var serverStarter = _compositionRoot.BuildServerStarter(_builder, _options);
             var starter = _compositionRoot.BuildStarter(_options);
-            var enabledStorages = starter.Start(_options, storageOptions);
+            _storagesWithConfiguration = starter.Start(_options, storageOptions);
+
+            _enabledStorages = _storagesWithConfiguration.Select((s, i) =>
+            {
+                return new EnabledStorage
+                {
+                    Number = i + 1,
+                    JobStorage = s.JobStorage
+                };
+            }).ToArray();
             
-            return new StartedHangfire(serverStarter, enabledStorages, _options);
+            return this;
+        }
+        
+        public HangfireConfiguration StartWorkers(SqlServerStorageOptions storageOptions, BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        {
+            StartPublishers(storageOptions);
+            var serverStarter = _compositionRoot.BuildServerStarter(_builder, _options);
+            serverStarter.StartServers(_options, serverOptions, _storagesWithConfiguration, additionalProcesses);
+            return this;
         }
         
         
@@ -35,28 +56,9 @@ namespace Hangfire.Configuration
             new CompositionRoot().BuildWorkerDeterminer(connectionString);
     }
 
-    public class StartedHangfire
+    public class EnabledStorage
     {
-        //private  IEnumerable<RunningServer> _runningServers = Enumerable.Empty<RunningServer>();
-
-        public  IEnumerable<StorageWithConfiguration> EnabledStorages() => _enabledStorages;
-        
-        private readonly ServerStarter _serverStarter;
-        private readonly IEnumerable<StorageWithConfiguration> _enabledStorages;
-        private readonly ConfigurationOptions _options;
-
-        public StartedHangfire(ServerStarter serverStarter, IEnumerable<StorageWithConfiguration> enabledStorages, ConfigurationOptions options)
-        {
-            _serverStarter = serverStarter;
-            _enabledStorages = enabledStorages;
-            _options = options;
-        }
-        
-        public StartedHangfire StartServers(BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
-        {
-            _serverStarter.StartServers(_options, serverOptions, _enabledStorages, additionalProcesses);
-            return this;
-        }
+        public int Number;
+        public JobStorage JobStorage;
     }
-    
 }
