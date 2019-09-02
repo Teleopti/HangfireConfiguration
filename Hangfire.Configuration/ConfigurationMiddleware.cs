@@ -4,17 +4,35 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Pages;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.Http;
+#else
 using Microsoft.Owin;
+#endif
 using Newtonsoft.Json.Linq;
 
 namespace Hangfire.Configuration
 {
+#if NETSTANDARD2_0
+	public class ConfigurationMiddleware
+#else
 	public class ConfigurationMiddleware : OwinMiddleware
+#endif
 	{
 		private readonly Configuration _configuration;
 		private readonly HangfireConfigurationInterfaceOptions _options;
 
-		public ConfigurationMiddleware(OwinMiddleware next, HangfireConfigurationInterfaceOptions options, CompositionRoot compositionRoot) : base(next)
+		public ConfigurationMiddleware(
+#if NETSTANDARD2_0
+			RequestDelegate next, 
+#else
+			OwinMiddleware next, 
+#endif
+			HangfireConfigurationInterfaceOptions options, 
+			CompositionRoot compositionRoot)
+#if !NETSTANDARD2_0
+		: base(next)
+#endif
 		{
 			_options = options;
 			if (_options.PrepareSchemaIfNecessary)
@@ -25,13 +43,21 @@ namespace Hangfire.Configuration
 			_configuration = compositionRoot.BuildConfiguration(_options.ConnectionString);
 		}
 
+#if NETSTANDARD2_0
+		public Task Invoke(HttpContext context)
+#else
 		public override Task Invoke(IOwinContext context)
+#endif
 		{
 			handleRequest(context);
 			return Task.CompletedTask;
 		}
-
+		
+#if NETSTANDARD2_0
+		private void handleRequest(HttpContext context)
+#else
 		private void handleRequest(IOwinContext context)
+#endif
 		{
 			if (context.Request.Path.Value.Equals("/script"))
 			{
@@ -74,11 +100,16 @@ namespace Hangfire.Configuration
 			var html = page.ToString();
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";
-			context.Response.Write(html);
+			//context.Response.Write(html);
+			context.Response.WriteAsync(html).Wait();
 		}
 
 
+#if NETSTANDARD2_0
+		private void saveWorkerGoalCount(HttpContext context)
+#else
 		private void saveWorkerGoalCount(IOwinContext context)
+#endif
 		{
 			var parsed = parseRequestBody(context.Request);
 			
@@ -90,10 +121,14 @@ namespace Hangfire.Configuration
 			
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 			context.Response.ContentType = "text/html";
-			context.Response.Write("Worker goal count was saved successfully!");
+			context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
 		}
 		
+#if NETSTANDARD2_0
+		private void createNewServerConfiguration(HttpContext context)
+#else
 		private void createNewServerConfiguration(IOwinContext context)
+#endif
 		{
 			var parsed = parseRequestBody(context.Request);
 			var configuration = new CreateServerConfiguration
@@ -115,11 +150,15 @@ namespace Hangfire.Configuration
 			catch (Exception ex)
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-				context.Response.Write(ex.Message);
+				context.Response.WriteAsync(ex.Message).Wait();
 			}
 		}
 		
+#if NETSTANDARD2_0
+		private void activateServer(HttpContext context)
+#else
 		private void activateServer(IOwinContext context)
+#endif
 		{
 			var parsed = parseRequestBody(context.Request);
 			var configurationId = parsed.SelectToken("configurationId").Value<int>();
@@ -127,7 +166,11 @@ namespace Hangfire.Configuration
 			context.Response.StatusCode = (int) HttpStatusCode.OK;
 		}
 		
-		private static JObject parseRequestBody(IOwinRequest request)
+#if NETSTANDARD2_0
+		private JObject parseRequestBody(HttpRequest request)
+#else
+		private JObject parseRequestBody(IOwinRequest request)
+#endif
 		{
 			string text;
 			using (var reader = new StreamReader(request.Body))

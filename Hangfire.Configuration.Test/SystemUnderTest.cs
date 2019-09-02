@@ -23,11 +23,11 @@ namespace Hangfire.Configuration.Test
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             HangfireStorage = new FakeHangfireStorage(Monitor);
-            Hangfire = new FakeHangfire();
+            Hangfire = new FakeHangfire(AppBuilder);
             DistributedLock = new FakeDistributedLock();
 
             Configuration = BuildConfiguration(null);
-            ServerStarter = BuildServerStarter(AppBuilder, new ConfigurationOptions());
+            ServerStarter = BuildServerStarter(AppBuilder);
             Determiner = BuildWorkerDeterminer(null);
             HangfireStarter = BuildStarter(new ConfigurationOptions());
         }
@@ -48,7 +48,7 @@ namespace Hangfire.Configuration.Test
         public HangfireStarter HangfireStarter { get; }
 
         public sealed override IConfigurationRepository BuildRepository(string connectionString) => Repository;
-        public sealed override IHangfire BuildHangfire() => Hangfire;
+        public sealed override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         public sealed override IHangfireStorage BuildHangfireStorage() => HangfireStorage;
         public sealed override IMonitoringApi BuildMonitoringApi() => Monitor;
         public sealed override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;

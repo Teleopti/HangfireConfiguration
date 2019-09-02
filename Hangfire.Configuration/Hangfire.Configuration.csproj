@@ -1,23 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
         <RootNamespace>Hangfire.Configuration</RootNamespace>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.0.1.20</Version>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="1.60.6" />
-      <PackageReference Include="Hangfire.SqlServer" Version="1.7.0" />
-      <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
+        <PackageReference Include="Dapper" Version="1.60.6" />
+        <PackageReference Include="Hangfire.SqlServer" Version="1.7.0" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+        <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.7.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
     </ItemGroup>
     <ItemGroup>
-      <Reference Include="System.Transactions" />
+        <Reference Include="System.Transactions" />
     </ItemGroup>
     <ItemGroup>
-      <None Remove="Install.sql" />
-      <EmbeddedResource Include="Install.sql" />
-      <None Remove="Pages\script.js" />
-      <EmbeddedResource Include="Pages\script.js" />
-      <None Remove="Pages\styles.css" />
-      <EmbeddedResource Include="Pages\styles.css" />
+        <None Remove="Install.sql" />
+        <EmbeddedResource Include="Install.sql" />
+        <None Remove="Pages\script.js" />
+        <EmbeddedResource Include="Pages\script.js" />
+        <None Remove="Pages\styles.css" />
+        <EmbeddedResource Include="Pages\styles.css" />
     </ItemGroup>
 </Project>

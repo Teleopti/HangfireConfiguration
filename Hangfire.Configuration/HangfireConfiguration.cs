@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
-using Owin;
 
 namespace Hangfire.Configuration
 {
@@ -11,14 +10,13 @@ namespace Hangfire.Configuration
     {
         public  IEnumerable<EnabledStorage> EnabledJobStorages() => _enabledStorages;
 
-        private readonly IAppBuilder _builder;
+        private readonly object _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
         private  IEnumerable<StorageWithConfiguration> _storagesWithConfiguration = Enumerable.Empty<StorageWithConfiguration>();
         private  IEnumerable<EnabledStorage> _enabledStorages = Enumerable.Empty<EnabledStorage>();
         
-
-        public HangfireConfiguration(IAppBuilder builder, ConfigurationOptions options)
+        public HangfireConfiguration(object builder, ConfigurationOptions options)
         {
             _builder = builder;
             _options = options;
@@ -45,7 +43,7 @@ namespace Hangfire.Configuration
         public HangfireConfiguration StartWorkers(SqlServerStorageOptions storageOptions, BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
         {
             StartPublishers(storageOptions);
-            var serverStarter = _compositionRoot.BuildServerStarter(_builder, _options);
+            var serverStarter = _compositionRoot.BuildServerStarter(_builder);
             serverStarter.StartServers(_options, serverOptions, _storagesWithConfiguration, additionalProcesses);
             return this;
         }

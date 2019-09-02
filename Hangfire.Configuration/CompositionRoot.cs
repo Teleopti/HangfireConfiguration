@@ -1,13 +1,13 @@
 using Hangfire.Storage;
-using Owin;
 
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
     {
-        public ServerStarter BuildServerStarter(IAppBuilder appBuilder, ConfigurationOptions options) => new ServerStarter(appBuilder, BuildHangfire());
+        public ServerStarter BuildServerStarter(object appBuilder) => 
+            new ServerStarter(BuildHangfire(appBuilder));
 
-        public virtual IHangfire BuildHangfire() => new RealHangfire();
+        public virtual IHangfire BuildHangfire(object appBuilder) => new RealHangfire(appBuilder);
 
         public WorkerDeterminer BuildWorkerDeterminer(string connectionString) => new WorkerDeterminer(BuildConfiguration(connectionString), BuildMonitoringApi());
 

@@ -1,18 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
-using Owin;
 
 namespace Hangfire.Configuration
 {
     public class ServerStarter
     {
-        private readonly IAppBuilder _builder;
         private readonly IHangfire _hangfire;
 
-        public ServerStarter(IAppBuilder builder, IHangfire hangfire)
+        public ServerStarter(IHangfire hangfire)
         {
-            _builder = builder;
             _hangfire = hangfire;
         }
 
@@ -43,7 +40,6 @@ namespace Hangfire.Configuration
                 options
             );
             _hangfire.UseHangfireServer(
-                _builder,
                 storage.JobStorage,
                 serverOptions,
                 backgroundProcesses.ToArray()

@@ -1,22 +1,40 @@
-﻿using System;
-using Hangfire.SqlServer;
+﻿#if NET472
 using Owin;
+#else
+using Microsoft.AspNetCore.Builder;
+#endif
+
+#if NETSTANDARD2_0
+#else
+#endif
 
 namespace Hangfire.Configuration
 {
-	public static class AppBuilderExtension
+	public static class ApplicationBuilderExtension
 	{
+#if NETSTANDARD2_0
+		public static void UseHangfireConfigurationInterface(this IApplicationBuilder builder, string pathMatch, HangfireConfigurationInterfaceOptions options)
+#else
 		public static void UseHangfireConfigurationInterface(this IAppBuilder builder, string pathMatch, HangfireConfigurationInterfaceOptions options)
+#endif
 		{
 			builder.Map(pathMatch, subApp =>
 			{
 				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : null;
+#if NETSTANDARD2_0
+				subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot);
+#else
 				subApp.Use(typeof(ConfigurationMiddleware), options, compositionRoot);
+#endif
 			});
 		}
-		
+
+#if NETSTANDARD2_0
+		public static HangfireConfiguration UseHangfireConfiguration(this IApplicationBuilder builder, ConfigurationOptions options) =>
+#else
 		public static HangfireConfiguration UseHangfireConfiguration(this IAppBuilder builder, ConfigurationOptions options) =>
-			new HangfireConfiguration(builder, options);
+#endif
+		new HangfireConfiguration(null, options);
 	}
 	
 	public class ConfigurationOptions

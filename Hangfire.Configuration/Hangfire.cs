@@ -1,13 +1,17 @@
+using System;
 using Hangfire.Server;
 using Hangfire.SqlServer;
+#if NET472
 using Owin;
+#else
+using Microsoft.AspNetCore.Builder;
+#endif
 
 namespace Hangfire.Configuration
 {
     public interface IHangfire
     {
-        IAppBuilder UseHangfireServer(
-            IAppBuilder builder,
+        void UseHangfireServer(
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses);
@@ -21,12 +25,24 @@ namespace Hangfire.Configuration
 
     public class RealHangfire : IHangfire
     {
-        public IAppBuilder UseHangfireServer(
-            IAppBuilder builder,
+        private readonly object _applicationBuilder;
+
+        public RealHangfire(object applicationBuilder)
+        {
+            _applicationBuilder = applicationBuilder;
+        }
+        
+        public void UseHangfireServer(
             JobStorage storage,
             BackgroundJobServerOptions options,
-            params IBackgroundProcess[] additionalProcesses) =>
-            builder.UseHangfireServer(storage, options, additionalProcesses);
+            params IBackgroundProcess[] additionalProcesses)
+        {
+#if NETSTANDARD2_0
+            ((IApplicationBuilder) _applicationBuilder).UseHangfireServer(options, additionalProcesses, storage);
+#else
+            ((IAppBuilder) _applicationBuilder).UseHangfireServer(storage, options, additionalProcesses);
+#endif
+        }
     }
 
     public class RealHangfireStorage : IHangfireStorage

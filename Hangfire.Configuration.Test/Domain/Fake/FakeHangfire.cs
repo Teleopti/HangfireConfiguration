@@ -9,17 +9,22 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 {
     public class FakeHangfire : IHangfire
     {
-        public IEnumerable<(IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
-            new (IAppBuilder builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
+        private readonly object _appBuilder;
 
-        public IAppBuilder UseHangfireServer(
-            IAppBuilder builder,
+        public FakeHangfire(object appBuilder)
+        {
+            _appBuilder = appBuilder;
+        }
+        
+        public IEnumerable<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
+            new (object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
+
+        public void UseHangfireServer(
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses)
         {
-            StartedServers = StartedServers.Append((builder, storage as FakeJobStorage, options, additionalProcesses));
-            return builder;
+            StartedServers = StartedServers.Append((_appBuilder, storage as FakeJobStorage, options, additionalProcesses)).ToArray();
         }
     }
 
