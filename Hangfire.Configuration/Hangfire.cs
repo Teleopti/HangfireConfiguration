@@ -37,7 +37,7 @@ namespace Hangfire.Configuration
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses)
         {
-#if NETSTANDARD2_0
+#if !NET472
             ((IApplicationBuilder) _applicationBuilder).UseHangfireServer(options, additionalProcesses, storage);
 #else
             ((IAppBuilder) _applicationBuilder).UseHangfireServer(storage, options, additionalProcesses);

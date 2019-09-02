@@ -7,7 +7,15 @@ using Hangfire.Common;
 using Hangfire.Configuration;
 using Hangfire.Server;
 using Hangfire.SqlServer;
+#if !NET472
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+
+#else
 using Owin;
+#endif
 
 namespace ConsoleSample
 {
@@ -22,7 +30,18 @@ namespace ConsoleSample
 
     public class Startup
     {
+#if !NET472
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddHangfire(x => { });
+        }
+
+        public void Configure(IApplicationBuilder app)
+#else
         public void Configuration(IAppBuilder app)
+#endif
+
         {
             GlobalConfiguration.Configuration
                 .UseColouredConsoleLogProvider()
@@ -30,7 +49,11 @@ namespace ConsoleSample
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
 
+#if !NET472
+            app.UseDeveloperExceptionPage();
+#else
             app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
+#endif
 
             var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
             var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
@@ -42,7 +65,7 @@ namespace ConsoleSample
                 context.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
 
                 // simulate a hosting site with a static file handler
-                if (context.Request.Uri.AbsolutePath.Split('/').Last().Contains("."))
+                if (context.Request.Path.Value.Split('/').Last().Contains("."))
                 {
                     context.Response.StatusCode = (int) HttpStatusCode.NotFound;
                     return Task.CompletedTask;
@@ -62,7 +85,7 @@ namespace ConsoleSample
                 EnableHeavyMigrations = true,
                 PrepareSchemaIfNecessary = true,
                 SchemaName = "NotUsedSchemaName"
-            }; 
+            };
 
             app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
             {
@@ -71,7 +94,7 @@ namespace ConsoleSample
                 PrepareSchemaIfNecessary = true
             });
 
-            app.UseHangfireConfiguration(new ConfigurationOptions
+            var storages = app.UseHangfireConfiguration(new ConfigurationOptions
                 {
                     ConnectionString = configurationConnectionString,
                     DefaultHangfireConnectionString = defaultHangfireConnectionString,
@@ -86,13 +109,13 @@ namespace ConsoleSample
                     },
                     new[] {new CustomBackgroundProcess()}
                 )
-                .EnabledJobStorages()
-                .Select(s =>
-                {
-                    app.UseHangfireDashboard($"/HangfireDashboard{s.Number}", new DashboardOptions(), s.JobStorage);
-                    Console.WriteLine($@"Started dashboard for storage {s.Number}:");
-                    return s;
-                }).ToArray();
+                .EnabledJobStorages();
+
+            foreach (var s in storages)
+            {
+                app.UseHangfireDashboard($"/HangfireDashboard{s.Number}", new DashboardOptions(), s.JobStorage);
+                Console.WriteLine($@"Started dashboard for storage {s.Number}:");
+            }
         }
     }
 }

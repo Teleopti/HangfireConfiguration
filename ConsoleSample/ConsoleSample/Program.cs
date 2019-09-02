@@ -2,7 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
+#if !NET472
+using Microsoft.AspNetCore.Hosting;
+#else
 using Microsoft.Owin.Hosting;
+#endif
 
 namespace ConsoleSample
 {
@@ -10,47 +14,64 @@ namespace ConsoleSample
     {
         public static void Main()
         {
-            using (WebApp.Start<Startup>("http://localhost:12345"))
+            var nodeAddress = $"http://localhost:12345";
+
+#if !NET472
+            using (var host = new WebHostBuilder()
+                .UseUrls(nodeAddress)
+                .UseStartup<Startup>()
+                .UseKestrel()
+                .Build())
             {
-                while (true)
-                {
-                    var command = Console.ReadLine();
-
-                    if (command == null || command.Equals("stop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        break;
-                    }
-
-                    if (command.StartsWith("add", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            var workCount = int.Parse(command.Substring(4));
-                            for (var i = 0; i < workCount; i++)
-                            {
-                                var number = i;
-                                BackgroundJob.Enqueue<Services>(x => x.Random(number));
-                            }
-
-                            Console.WriteLine("Jobs enqueued.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                }
+                host.Start();
+                MainLoop();
             }
+#else
+            using (WebApp.Start<Startup>(nodeAddress))
+                MainLoop();
+#endif
 
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();
+        }
+
+        private static void MainLoop()
+        {
+            while (true)
+            {
+                var command = Console.ReadLine();
+
+                if (command == null || command.Equals("stop", StringComparison.OrdinalIgnoreCase))
+                {
+                    break;
+                }
+
+                if (command.StartsWith("add", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var workCount = int.Parse(command.Substring(4));
+                        for (var i = 0; i < workCount; i++)
+                        {
+                            var number = i;
+                            BackgroundJob.Enqueue<Services>(x => x.Random(number));
+                        }
+
+                        Console.WriteLine("Jobs enqueued.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
         }
     }
 
     public class Services
     {
         private static readonly Random Rand = new Random();
-        
+
         [Queue("critical")]
         public async Task Random(int number)
         {
@@ -69,5 +90,4 @@ namespace ConsoleSample
             Console.WriteLine("Finished task: " + number);
         }
     }
-    
 }

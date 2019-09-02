@@ -38,8 +38,6 @@ namespace Hangfire.Configuration
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = new SqlConnection(_options.ConnectionString))
 					SqlServerObjectsInstaller.Install(c);
-
-			compositionRoot = compositionRoot ?? new CompositionRoot();
 			_configuration = compositionRoot.BuildConfiguration(_options.ConnectionString);
 		}
 

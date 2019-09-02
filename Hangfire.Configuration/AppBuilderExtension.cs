@@ -16,7 +16,7 @@ namespace Hangfire.Configuration
 		{
 			builder.Map(pathMatch, subApp =>
 			{
-				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : null;
+				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : new CompositionRoot();
 #if NETSTANDARD2_0
 				subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot);
 #else
@@ -30,7 +30,7 @@ namespace Hangfire.Configuration
 #else
 		public static HangfireConfiguration UseHangfireConfiguration(this IAppBuilder builder, ConfigurationOptions options) =>
 #endif
-		new HangfireConfiguration(null, options);
+		new HangfireConfiguration(builder, options);
 	}
 	
 	public class ConfigurationOptions
