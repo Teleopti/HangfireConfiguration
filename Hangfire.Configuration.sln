@@ -6,9 +6,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample\ConsoleSample.csproj", "{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{4D51C400-EA14-4AFA-9BC9-12389E336C04}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content", "Content", "{4D51C400-EA14-4AFA-9BC9-12389E336C04}"
 ProjectSection(SolutionItems) = preProject
 	NuGetPublishInfo.txt = NuGetPublishInfo.txt
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{57AA34F3-4E6D-47BF-BE50-DA00BD6F0661}"
+ProjectSection(SolutionItems) = preProject
+	push-nuget.bat = push-nuget.bat
 EndProjectSection
 EndProject
 Global
