@@ -1,8 +1,14 @@
 using System;
+using System.Net.Http;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Storage;
+#if !NET472
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Hosting;
+#else
 using Microsoft.Owin.Builder;
 using Microsoft.Owin.Testing;
+#endif
 
 namespace Hangfire.Configuration.Test
 {
@@ -12,12 +18,21 @@ namespace Hangfire.Configuration.Test
 
         public SystemUnderTest()
         {
-            AppBuilder = new AppBuilder();
-            _testServer = new Lazy<TestServer>(() => TestServer.Create(app =>
-            {
-                app.Properties.Add("CompositionRoot", this);
-                app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
-            }));
+            AppBuilder = new object();
+            _testServer = new Lazy<TestServer>(() =>
+#if !NET472
+                        new TestServer(new WebHostBuilder().Configure(app =>
+#else
+                        TestServer.Create(app =>
+#endif
+                        {
+                            app.Properties.Add("CompositionRoot", this);
+                            app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
+                        }))
+#if !NET472
+                        )
+#endif
+                ;
 
             Repository = new FakeConfigurationRepository();
             SchemaCreator = new FakeHangfireSchemaCreator();
@@ -31,9 +46,13 @@ namespace Hangfire.Configuration.Test
             Determiner = BuildWorkerDeterminer(null);
             HangfireStarter = BuildStarter(new ConfigurationOptions());
         }
-        
-        public AppBuilder AppBuilder { get; }
-        public TestServer TestServer => _testServer.Value;
+
+        public object AppBuilder { get; }
+#if !NET472
+        public HttpClient TestClient => _testServer.Value.CreateClient();
+#else
+        public HttpClient TestClient => _testServer.Value.HttpClient;
+#endif
 
         public FakeMonitoringApi Monitor { get; }
         public FakeConfigurationRepository Repository { get; }

@@ -1,11 +1,7 @@
-﻿#if NET472
-using Owin;
-#else
+﻿#if NETSTANDARD2_0
 using Microsoft.AspNetCore.Builder;
-#endif
-
-#if NETSTANDARD2_0
 #else
+using Owin;
 #endif
 
 namespace Hangfire.Configuration

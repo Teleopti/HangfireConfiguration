@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldFindConfigurationInterface()
         {
             var system = new SystemUnderTest();
-            var response = system.TestServer.HttpClient.GetAsync("/config").Result;
+            var response = system.TestClient.GetAsync("/config").Result;
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -20,7 +20,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldNotFindConfigurationInterface()
         {
             var system = new SystemUnderTest();
-            var response = system.TestServer.HttpClient.GetAsync("/configIncorrect").Result;
+            var response = system.TestClient.GetAsync("/configIncorrect").Result;
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
         
@@ -34,7 +34,7 @@ namespace Hangfire.Configuration.Test.Web
                 GoalWorkerCount = 3
             });
             
-            var response = system.TestServer.HttpClient.PostAsync(
+            var response = system.TestClient.PostAsync(
                     "/config/saveWorkerGoalCount",
                     new StringContent(JsonConvert.SerializeObject(new
                     {
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Test.Web
         {
             var system = new SystemUnderTest();
             
-            var response = system.TestServer.HttpClient.PostAsync(
+            var response = system.TestClient.PostAsync(
                     "/config/saveWorkerGoalCount",
                     new StringContent(JsonConvert.SerializeObject(new
                     {
@@ -73,7 +73,7 @@ namespace Hangfire.Configuration.Test.Web
                 Id = 2
             });
             
-            var response = system.TestServer.HttpClient.PostAsync(
+            var response = system.TestClient.PostAsync(
                     "/config/activateServer",
                     new StringContent(JsonConvert.SerializeObject(new
                     {
@@ -89,7 +89,7 @@ namespace Hangfire.Configuration.Test.Web
         {
             var system = new SystemUnderTest();
             
-            var response = system.TestServer.HttpClient.PostAsync(
+            var response = system.TestClient.PostAsync(
                     "/config/createNewServerConfiguration",
                     new StringContent(JsonConvert.SerializeObject(
                         new

@@ -3,7 +3,6 @@ using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 using Hangfire.Storage;
-using Owin;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
