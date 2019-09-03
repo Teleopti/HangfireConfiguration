@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class ConfigureDefaultServerTest
+    public class ConfigureAutoUpdatedServerTest
     {
         [Fact]
         public void ShouldConfigureDefaultServer()
@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString"
+                AutoUpdatedHangfireConnectionString = "connectionString"
             }, null, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString"
+                AutoUpdatedHangfireConnectionString = "connectionString"
             }, null, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString"
+                AutoUpdatedHangfireConnectionString = "connectionString"
             }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString"
+                AutoUpdatedHangfireConnectionString = "connectionString"
             }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);
@@ -76,8 +76,8 @@ namespace Hangfire.Configuration.Test.Domain
             
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString",
-                DefaultSchemaName = "schemaName"
+                AutoUpdatedHangfireConnectionString = "connectionString",
+                AutoUpdatedHangfireSchemaName = "schemaName"
             }, null, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
@@ -91,8 +91,8 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "connectionString",
-                DefaultSchemaName = "schemaName"
+                AutoUpdatedHangfireConnectionString = "connectionString",
+                AutoUpdatedHangfireSchemaName = "schemaName"
             }, null, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
@@ -106,7 +106,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "newDefault"
+                AutoUpdatedHangfireConnectionString = "newDefault"
             }, null, null);
 
             Assert.Equal("newDefault", system.Repository.Data.Single().ConnectionString);
@@ -121,7 +121,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "newDefault"
+                AutoUpdatedHangfireConnectionString = "newDefault"
             }, null, null);
 
             Assert.False(system.Repository.Data.First().Active);
@@ -137,7 +137,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "newDefault"
+                AutoUpdatedHangfireConnectionString = "newDefault"
             }, null, null);
 
             Assert.Null(system.Repository.Data.First().Active);
@@ -152,7 +152,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "newDefault"
+                AutoUpdatedHangfireConnectionString = "newDefault"
             }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);

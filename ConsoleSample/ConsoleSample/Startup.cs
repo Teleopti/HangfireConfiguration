@@ -97,8 +97,8 @@ namespace ConsoleSample
             var storages = app.UseHangfireConfiguration(new ConfigurationOptions
                 {
                     ConnectionString = configurationConnectionString,
-                    DefaultHangfireConnectionString = defaultHangfireConnectionString,
-                    DefaultSchemaName = defaultHangfireSchema,
+                    AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
+                    AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
                 })
 //                .StartPublishers(storageOptions)
                 .StartWorkerServers(

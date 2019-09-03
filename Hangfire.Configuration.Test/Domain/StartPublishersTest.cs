@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.PublisherStarter.Start(new ConfigurationOptions {DefaultHangfireConnectionString = "HangfireConnectionString"}, null);
+            system.PublisherStarter.Start(new ConfigurationOptions {AutoUpdatedHangfireConnectionString = "HangfireConnectionString"}, null);
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }

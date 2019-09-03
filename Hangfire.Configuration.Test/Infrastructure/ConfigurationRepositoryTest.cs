@@ -66,8 +66,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
                 var configurator = new DefaultServerConfigurator(repository, new DistributedLock("lockid", connection));
                 configurator.Configure( new ConfigurationOptions
                 {
-                    DefaultHangfireConnectionString = connection,
-                    DefaultSchemaName = "SchemaName"
+                    AutoUpdatedHangfireConnectionString = connection,
+                    AutoUpdatedHangfireSchemaName = "SchemaName"
                 });
             });
 

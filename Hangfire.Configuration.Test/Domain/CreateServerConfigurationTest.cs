@@ -33,8 +33,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "defaultConnectionString",
-                DefaultSchemaName = "defaultSchemaName"
+                AutoUpdatedHangfireConnectionString = "defaultConnectionString",
+                AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
@@ -59,8 +59,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                DefaultHangfireConnectionString = "defaultConnectionString",
-                DefaultSchemaName = "defaultSchemaName"
+                AutoUpdatedHangfireConnectionString = "defaultConnectionString",
+                AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {

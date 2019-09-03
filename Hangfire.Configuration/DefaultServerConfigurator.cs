@@ -16,7 +16,7 @@ namespace Hangfire.Configuration
 
         public void Configure(ConfigurationOptions options)
         {
-            if (options?.DefaultHangfireConnectionString == null)
+            if (options?.AutoUpdatedHangfireConnectionString == null)
                 return;
             
             using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
@@ -26,16 +26,16 @@ namespace Hangfire.Configuration
                 {
                     _repository.WriteConfiguration(new StoredConfiguration
                     {
-                        ConnectionString = options.DefaultHangfireConnectionString,
-                        SchemaName = options.DefaultSchemaName,
+                        ConnectionString = options.AutoUpdatedHangfireConnectionString,
+                        SchemaName = options.AutoUpdatedHangfireSchemaName,
                         Active = true
                     });
                 }
                 else
                 {
                     var legacyConfiguration = configurations.First();
-                    legacyConfiguration.ConnectionString = options.DefaultHangfireConnectionString;
-                    legacyConfiguration.SchemaName = options.DefaultSchemaName;
+                    legacyConfiguration.ConnectionString = options.AutoUpdatedHangfireConnectionString;
+                    legacyConfiguration.SchemaName = options.AutoUpdatedHangfireSchemaName;
                     if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
                         legacyConfiguration.Active = true;
 
