@@ -5,20 +5,20 @@ using Newtonsoft.Json;
 
 namespace Hangfire.Configuration
 {
-    public class HangfireStarter
+    public class StorageCreator
     {
-        private readonly IHangfireStorage _hangfireStorage;
+        private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
         private readonly DefaultServerConfigurator _defaultServerConfigurator;
 
-        public HangfireStarter(IHangfireStorage hangfireStorage, IConfigurationRepository repository, DefaultServerConfigurator defaultServerConfigurator)
+        public StorageCreator(IHangfire hangfire, IConfigurationRepository repository, DefaultServerConfigurator defaultServerConfigurator)
         {
-            _hangfireStorage = hangfireStorage;
+            _hangfire = hangfire;
             _repository = repository;
             _defaultServerConfigurator = defaultServerConfigurator;
         }
 
-        public IEnumerable<StorageWithConfiguration> Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public IEnumerable<HangfireStorage> Create(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _defaultServerConfigurator.Configure(options);
 
@@ -29,32 +29,21 @@ namespace Hangfire.Configuration
                 .Select(configuration => makeJobStorage(configuration, storageOptions))
                 .ToArray();
         }
-        
-        private StorageWithConfiguration makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+
+        private HangfireStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             options.SchemaName = configuration.SchemaName;
-            var jobStorage = _hangfireStorage.MakeSqlJobStorage(configuration.ConnectionString, options);
-            
-            if (configuration.Active == true)
-                _hangfireStorage.UseStorage(jobStorage);
-
-            return new StorageWithConfiguration
+            return new HangfireStorage
             {
                 Configuration = configuration,
-                JobStorage = jobStorage
+                JobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options)
             };
         }
-        
+
         private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
             JsonConvert.DeserializeObject<SqlServerStorageOptions>(
                 JsonConvert.SerializeObject(storageOptions)
             );
-    }
-
-    public class StorageWithConfiguration
-    {
-        public StoredConfiguration Configuration;
-        public JobStorage JobStorage;
     }
 }

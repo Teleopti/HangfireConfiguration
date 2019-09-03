@@ -11,9 +11,8 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(configurationOptions, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -24,9 +23,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(8);
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -38,9 +36,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.HasGoalWorkerCount(8);
             system.Monitor.AnnounceServer("restartedServer", new ServerContext());
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -53,9 +50,9 @@ namespace Hangfire.Configuration.Test.Domain
             system.Monitor.AnnounceServer("server1", new ServerContext());
             system.Monitor.AnnounceServer("restartedServer", new ServerContext());
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
+
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
@@ -68,9 +65,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Monitor.AnnounceServer("server2", new ServerContext());
             system.Monitor.AnnounceServer("server3", new ServerContext());
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -81,9 +77,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(0);
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -94,9 +89,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(-1);
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -107,9 +101,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(101);
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -122,13 +115,13 @@ namespace Hangfire.Configuration.Test.Domain
             system.Monitor.AnnounceServer("server1", new ServerContext());
             system.Monitor.AnnounceServer("server2", new ServerContext());
             var configurationOptions = new ConfigurationOptions() {DefaultHangfireConnectionString = "connection", DefaultSchemaName = "schema"};
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
-        
+
+
         [Fact]
         public void ShouldUseDefaultGoalWorkerCount()
         {
@@ -139,9 +132,8 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultSchemaName = "schema",
                 DefaultGoalWorkerCount = 12
             };
-            var storages = system.HangfireStarter.Start(configurationOptions, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -153,13 +145,12 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.HasGoalWorkerCount(0);
             var configurationOptions = new ConfigurationOptions()
             {
-                DefaultHangfireConnectionString = "connection", 
-                DefaultSchemaName = "schema", 
+                DefaultHangfireConnectionString = "connection",
+                DefaultSchemaName = "schema",
                 MinimumWorkerCount = 2
             };
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -171,13 +162,12 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.HasGoalWorkerCount(202);
             var configurationOptions = new ConfigurationOptions()
             {
-                DefaultHangfireConnectionString = "connection", 
-                DefaultSchemaName = "schema", 
+                DefaultHangfireConnectionString = "connection",
+                DefaultSchemaName = "schema",
                 MaximumGoalWorkerCount = 200
             };
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(100, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -189,13 +179,12 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.HasGoalWorkerCount(15);
             var configurationOptions = new ConfigurationOptions()
             {
-                DefaultHangfireConnectionString = "connection", 
-                DefaultSchemaName = "schema", 
+                DefaultHangfireConnectionString = "connection",
+                DefaultSchemaName = "schema",
                 MinimumServers = 3
             };
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -211,13 +200,12 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultSchemaName = "schema",
                 MinimumWorkerCount = 6
             };
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
-        
+
         [Fact]
         public void ShouldGetGoalForFirstServerWhenMinimumServersIsZero()
         {
@@ -229,11 +217,10 @@ namespace Hangfire.Configuration.Test.Domain
                 DefaultSchemaName = "schema",
                 MinimumServers = 0
             };
-            var storages = system.HangfireStarter.Start(null, null);
 
-            system.ServerStarter.StartServers(configurationOptions, null, storages);
+            system.WorkerServerStarter.Start(configurationOptions, null, null);
 
             Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }        
+        }
     }
 }

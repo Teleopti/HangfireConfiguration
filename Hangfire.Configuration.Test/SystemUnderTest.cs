@@ -27,24 +27,25 @@ namespace Hangfire.Configuration.Test
 #endif
                         {
                             app.Properties.Add("CompositionRoot", this);
-                            app.UseHangfireConfigurationInterface("/config", new HangfireConfigurationInterfaceOptions());
+                            app.UseHangfireConfigurationUI("/config", new HangfireConfigurationUIOptions());
                         }))
 #if !NET472
                         )
 #endif
                 ;
 
+            var connection = new ConfigurationConnection();
+
             Repository = new FakeConfigurationRepository();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
-            HangfireStorage = new FakeHangfireStorage(Monitor);
-            Hangfire = new FakeHangfire(AppBuilder);
+            Hangfire = new FakeHangfire(AppBuilder, Monitor);
             DistributedLock = new FakeDistributedLock();
 
             Configuration = BuildConfiguration(null);
-            ServerStarter = BuildServerStarter(AppBuilder);
+            WorkerServerStarter = BuildWorkerServerStarter(AppBuilder, connection);
             Determiner = BuildWorkerDeterminer(null);
-            HangfireStarter = BuildStarter(new ConfigurationOptions());
+            PublisherStarter = BuildPublisherStarter(connection);
         }
 
         public object AppBuilder { get; }
@@ -54,23 +55,20 @@ namespace Hangfire.Configuration.Test
         public HttpClient TestClient => _testServer.Value.HttpClient;
 #endif
 
-        public FakeMonitoringApi Monitor { get; }
+	    public FakeMonitoringApi Monitor { get; }
         public FakeConfigurationRepository Repository { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
-        public FakeHangfireStorage HangfireStorage { get; }
         public FakeHangfire Hangfire { get; }
         public FakeDistributedLock DistributedLock { get; }
 
         public WorkerDeterminer Determiner { get; }
         public Configuration Configuration { get; }
-        public ServerStarter ServerStarter { get; }
-        public HangfireStarter HangfireStarter { get; }
+        public WorkerServerStarter WorkerServerStarter { get; }
+        public PublisherStarter PublisherStarter { get; }
 
-        public sealed override IConfigurationRepository BuildRepository(string connectionString) => Repository;
-        public sealed override IHangfire BuildHangfire(object appBuilder) => Hangfire;
-        public sealed override IHangfireStorage BuildHangfireStorage() => HangfireStorage;
-        public sealed override IMonitoringApi BuildMonitoringApi() => Monitor;
-        public sealed override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
-        public sealed override IDistributedLock BuildDistributedLock(string connectionString) => DistributedLock;
+        protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
+        protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
+        protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
+        protected override IDistributedLock BuildDistributedLock(ConfigurationConnection connection) => DistributedLock;
     }
 }

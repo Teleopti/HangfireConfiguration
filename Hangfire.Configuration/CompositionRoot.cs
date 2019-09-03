@@ -4,27 +4,37 @@ namespace Hangfire.Configuration
 {
     public class CompositionRoot
     {
-        public ServerStarter BuildServerStarter(object appBuilder) => 
-            new ServerStarter(BuildHangfire(appBuilder));
+        // outer services
+        public WorkerServerStarter BuildWorkerServerStarter(object appBuilder, ConfigurationConnection connection) =>
+            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection));
 
-        public virtual IHangfire BuildHangfire(object appBuilder) => new RealHangfire(appBuilder);
+        public PublisherStarter BuildPublisherStarter(ConfigurationConnection connection) =>
+            new PublisherStarter(buildStorageCreator(null, connection));
 
-        public WorkerDeterminer BuildWorkerDeterminer(string connectionString) => new WorkerDeterminer(BuildConfiguration(connectionString), BuildMonitoringApi());
+        public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
+            new WorkerDeterminer(BuildConfiguration(connection));
 
-        public virtual IMonitoringApi BuildMonitoringApi() => JobStorage.Current.GetMonitoringApi();
+        public Configuration BuildConfiguration(ConfigurationConnection connection) =>
+            new Configuration(BuildRepository(connection), BuildHangfireSchemaCreator());
 
-        public Configuration BuildConfiguration(string connectionString) => new Configuration(BuildRepository(connectionString), BuildHangfireSchemaCreator());
+        // internal services
+        private StorageCreator buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
+            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection));
 
-        public virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() => new HangfireSchemaCreator();
+        private DefaultServerConfigurator buildDefaultServerConfigurator(ConfigurationConnection connection) =>
+            new DefaultServerConfigurator(BuildRepository(connection), BuildDistributedLock(connection));
 
-        public virtual IConfigurationRepository BuildRepository(string connectionString) => new ConfigurationRepository(connectionString);
+        // boundry
+        protected virtual IHangfire BuildHangfire(object appBuilder) =>
+            new RealHangfire(appBuilder);
 
-        public virtual IHangfireStorage BuildHangfireStorage() => new RealHangfireStorage();
+        protected virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() =>
+            new HangfireSchemaCreator();
 
-        public virtual IDistributedLock BuildDistributedLock(string connectionString) => new DistributedLock("HangfireConfigurationLock", connectionString);
+        protected virtual IConfigurationRepository BuildRepository(ConfigurationConnection connection) =>
+            new ConfigurationRepository(connection);
 
-        public DefaultServerConfigurator BuildDefaultServerConfigurator(string connectionString) => new DefaultServerConfigurator(BuildRepository(connectionString), BuildDistributedLock(connectionString));
-
-        public HangfireStarter BuildStarter(ConfigurationOptions options) => new HangfireStarter(BuildHangfireStorage(), BuildRepository(options.ConnectionString), BuildDefaultServerConfigurator(options.ConnectionString));
+        protected virtual IDistributedLock BuildDistributedLock(ConfigurationConnection connection) =>
+            new DistributedLock("HangfireConfigurationLock", connection.ConnectionString);
     }
 }

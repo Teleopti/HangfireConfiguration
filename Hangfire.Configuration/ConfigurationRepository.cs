@@ -18,11 +18,16 @@ namespace Hangfire.Configuration
     {
         private readonly Func<IDbConnection> _connectionFactory;
 
-        public ConfigurationRepository(string connectionString)
+
+        public ConfigurationRepository(string connectionString) : this(new ConfigurationConnection {ConnectionString = connectionString})
+        {
+        }
+
+        public ConfigurationRepository(ConfigurationConnection options)
         {
             _connectionFactory = () =>
             {
-                var conn = new SqlConnection(connectionString);
+                var conn = new SqlConnection(options.ConnectionString);
                 conn.Open();
                 return conn;
             };
@@ -35,7 +40,9 @@ namespace Hangfire.Configuration
                 return connection.Query<StoredConfiguration>(
                     $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active FROM [{SqlSetup.SchemaName}].Configuration"
                 ).ToArray();
-            };
+            }
+
+            ;
         }
 
         public void WriteConfiguration(StoredConfiguration configuration)

@@ -10,10 +10,10 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null);
+            }, null, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.HangfireStarter.Start(new ConfigurationOptions(), null);
+            system.WorkerServerStarter.Start(new ConfigurationOptions(), null, null);
 
             Assert.Empty(system.Repository.Data);
         }
@@ -34,10 +34,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 54});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null);
+            }, null, null);
 
             Assert.Equal("connectionString", system.Repository.Data.Single().ConnectionString);
         }
@@ -47,10 +47,10 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null);
+            }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }
@@ -61,10 +61,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString"
-            }, null);
+            }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }
@@ -74,11 +74,11 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
-            }, null);
+            }, null, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
@@ -89,11 +89,11 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "connectionString",
                 DefaultSchemaName = "schemaName"
-            }, null);
+            }, null, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
@@ -104,10 +104,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault"});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null);
+            }, null, null);
 
             Assert.Equal("newDefault", system.Repository.Data.Single().ConnectionString);
         }
@@ -119,10 +119,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = false});
             system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null);
+            }, null, null);
 
             Assert.False(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
@@ -135,10 +135,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {ConnectionString = "existingDefault", Active = null});
             system.Repository.Has(new StoredConfiguration {ConnectionString = "newStorageConnection", Active = true});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null);
+            }, null, null);
 
             Assert.Null(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
@@ -150,10 +150,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {ConnectionString = "default", Active = true});
 
-            system.HangfireStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "newDefault"
-            }, null);
+            }, null, null);
 
             Assert.True(system.Repository.Data.Single().Active);
         }

@@ -1,52 +1,57 @@
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {
-    public class ServerStarter
+    public class WorkerServerStarter
     {
         private readonly IHangfire _hangfire;
+        private readonly WorkerDeterminer _workerDeterminer;
+        private readonly StorageCreator _storageCreator;
 
-        public ServerStarter(IHangfire hangfire)
+        public WorkerServerStarter(
+	        IHangfire hangfire, 
+	        WorkerDeterminer workerDeterminer,
+	        StorageCreator storageCreator)
         {
-            _hangfire = hangfire;
+	        _hangfire = hangfire;
+	        _workerDeterminer = workerDeterminer;
+	        _storageCreator = storageCreator;
         }
 
-        public void StartServers(
+        public void Start(
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
-            IEnumerable<StorageWithConfiguration> jobStorages,
+            SqlServerStorageOptions storageOptions,
             params IBackgroundProcess[] additionalProcesses)
         {
             var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
 
-            jobStorages
-                .Select(storage => startServer(storage, options, serverOptions, backgroundProcesses))
-                .ToArray();
+            foreach (var storage in _storageCreator.Create(options, storageOptions))
+	            startWorkerServer(storage, options, serverOptions, backgroundProcesses);
         }
 
-        private JobStorage startServer(
-            StorageWithConfiguration storage,
+        private void startWorkerServer(
+            HangfireStorage hangfireStorage,
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
             List<IBackgroundProcess> backgroundProcesses)
         {
             serverOptions = copyOptions(serverOptions);
-            serverOptions.WorkerCount = WorkerDeterminer.DetermineWorkerCount(
-                storage.JobStorage.GetMonitoringApi(),
-                storage.Configuration.GoalWorkerCount,
+            serverOptions.WorkerCount = _workerDeterminer.DetermineWorkerCount(
+                hangfireStorage.JobStorage.GetMonitoringApi(),
+                hangfireStorage.Configuration.GoalWorkerCount,
                 options
             );
             _hangfire.UseHangfireServer(
-                storage.JobStorage,
+                hangfireStorage.JobStorage,
                 serverOptions,
                 backgroundProcesses.ToArray()
             );
             backgroundProcesses.Clear();
-
-            return storage.JobStorage;
         }
 
         private static BackgroundJobServerOptions copyOptions(BackgroundJobServerOptions serverOptions) =>

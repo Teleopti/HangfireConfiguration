@@ -31,12 +31,11 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldSetGoalWorkerCountToDefaultConfiguration()
         {
             var system = new SystemUnderTest();
-            var storages = system.HangfireStarter.Start(null, null);
-            system.ServerStarter.StartServers(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            }, null, storages);
+            }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -58,13 +57,11 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReadAllConfigurations()
         {
             var system = new SystemUnderTest();
-            var configuration = new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 DefaultHangfireConnectionString = "defaultConnectionString",
                 DefaultSchemaName = "defaultSchemaName"
-            };
-            var storages = system.HangfireStarter.Start(configuration, null);
-            system.ServerStarter.StartServers(configuration, null, storages);
+            }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",

@@ -87,7 +87,7 @@ namespace ConsoleSample
                 SchemaName = "NotUsedSchemaName"
             };
 
-            app.UseHangfireConfigurationInterface("/HangfireConfiguration", new HangfireConfigurationInterfaceOptions
+            app.UseHangfireConfigurationUI("/HangfireConfiguration", new HangfireConfigurationUIOptions
             {
                 ConnectionString = configurationConnectionString,
                 AllowNewServerCreation = true,
@@ -100,8 +100,8 @@ namespace ConsoleSample
                     DefaultHangfireConnectionString = defaultHangfireConnectionString,
                     DefaultSchemaName = defaultHangfireSchema,
                 })
-                //.StartPublishers(storageOptions)
-                .StartWorkers(
+//                .StartPublishers(storageOptions)
+                .StartWorkerServers(
                     storageOptions,
                     new BackgroundJobServerOptions
                     {
@@ -111,11 +111,6 @@ namespace ConsoleSample
                 )
                 .EnabledJobStorages();
 
-            foreach (var s in storages)
-            {
-                app.UseHangfireDashboard($"/HangfireDashboard{s.Number}", new DashboardOptions(), s.JobStorage);
-                Console.WriteLine($@"Started dashboard for storage {s.Number}:");
-            }
         }
     }
 }

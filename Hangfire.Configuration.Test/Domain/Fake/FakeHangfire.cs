@@ -9,13 +9,17 @@ namespace Hangfire.Configuration.Test.Domain.Fake
     public class FakeHangfire : IHangfire
     {
         private readonly object _appBuilder;
+        private readonly FakeMonitoringApi _monitoringApi;
 
-        public FakeHangfire(object appBuilder)
+        public FakeJobStorage LastCreatedStorage;
+
+        public FakeHangfire(object appBuilder, FakeMonitoringApi monitoringApi)
         {
             _appBuilder = appBuilder;
+            _monitoringApi = monitoringApi;
         }
-        
-        public IEnumerable<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } = 
+
+        public IEnumerable<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; set; } =
             new (object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)[0];
 
         public void UseHangfireServer(
@@ -25,24 +29,11 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             StartedServers = StartedServers.Append((_appBuilder, storage as FakeJobStorage, options, additionalProcesses)).ToArray();
         }
-    }
 
-    public class FakeHangfireStorage : IHangfireStorage
-    {
-        private readonly FakeMonitoringApi _monitor;
-        public JobStorage Current;
-
-        public FakeHangfireStorage(FakeMonitoringApi monitor)
+        public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options)
         {
-            _monitor = monitor;
-        }        
-        
-        public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
-            new FakeJobStorage(connectionString, options, _monitor );
-
-        public void UseStorage(JobStorage jobStorage)
-        {
-            Current = jobStorage;
+            LastCreatedStorage = new FakeJobStorage(connectionString, options, _monitoringApi);
+            return LastCreatedStorage;
         }
     }
 

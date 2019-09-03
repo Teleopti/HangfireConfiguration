@@ -1,4 +1,3 @@
-using System;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if NET472
@@ -15,12 +14,8 @@ namespace Hangfire.Configuration
             JobStorage storage,
             BackgroundJobServerOptions options,
             params IBackgroundProcess[] additionalProcesses);
-    }
 
-    public interface IHangfireStorage
-    {
         JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options);
-        void UseStorage(JobStorage jobStorage);
     }
 
     public class RealHangfire : IHangfire
@@ -31,7 +26,7 @@ namespace Hangfire.Configuration
         {
             _applicationBuilder = applicationBuilder;
         }
-        
+
         public void UseHangfireServer(
             JobStorage storage,
             BackgroundJobServerOptions options,
@@ -43,13 +38,8 @@ namespace Hangfire.Configuration
             ((IAppBuilder) _applicationBuilder).UseHangfireServer(storage, options, additionalProcesses);
 #endif
         }
-    }
 
-    public class RealHangfireStorage : IHangfireStorage
-    {
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new SqlServerStorage(connectionString, options);
-
-        public void UseStorage(JobStorage jobStorage) => GlobalConfiguration.Configuration.UseStorage(jobStorage);
     }
 }
