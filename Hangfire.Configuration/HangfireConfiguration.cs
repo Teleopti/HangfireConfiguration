@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
 using Hangfire.SqlServer;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.Builder;
+#else
+using Owin;
+#endif
 
 namespace Hangfire.Configuration
 {
@@ -10,7 +15,7 @@ namespace Hangfire.Configuration
     {
         private IEnumerable<EnabledStorage> _enabledStorages = Enumerable.Empty<EnabledStorage>();
         public IEnumerable<EnabledStorage> EnabledJobStorages() => _enabledStorages;
-        
+
         private readonly object _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
@@ -21,6 +26,15 @@ namespace Hangfire.Configuration
             _options = options;
             _compositionRoot = new CompositionRoot();
         }
+
+        public static HangfireConfiguration UseHangfireConfiguration(ConfigurationOptions options) => UseHangfireConfiguration(null, options);
+
+#if NETSTANDARD2_0
+        public static HangfireConfiguration UseHangfireConfiguration(IApplicationBuilder builder, ConfigurationOptions options) =>
+#else
+        public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options) =>
+#endif
+            new HangfireConfiguration(builder, options);
 
         public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
