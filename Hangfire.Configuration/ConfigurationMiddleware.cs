@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Net;
@@ -29,16 +30,18 @@ namespace Hangfire.Configuration
             OwinMiddleware next,
 #endif
             HangfireConfigurationUIOptions options,
-            CompositionRoot compositionRoot)
+            IDictionary<string, object> properties)
 #if !NETSTANDARD2_0
             : base(next)
 #endif
         {
             _options = options;
+            _configuration = HangfireConfiguration
+                .UseHangfireConfiguration(null, new ConfigurationOptions {ConnectionString = _options.ConnectionString}, properties)
+                .ConfigurationApi();
             if (_options.PrepareSchemaIfNecessary)
                 using (var c = new SqlConnection(_options.ConnectionString))
                     SqlServerObjectsInstaller.Install(c);
-            _configuration = compositionRoot.BuildConfiguration(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
         }
 
 #if NETSTANDARD2_0

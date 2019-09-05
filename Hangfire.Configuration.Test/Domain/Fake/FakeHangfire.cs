@@ -11,7 +11,8 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         private readonly object _appBuilder;
         private readonly FakeMonitoringApi _monitoringApi;
 
-        public FakeJobStorage LastCreatedStorage;
+        public FakeJobStorage LastCreatedStorage => CreatedStorages.LastOrDefault();
+        public IEnumerable<FakeJobStorage> CreatedStorages = Enumerable.Empty<FakeJobStorage>();
 
         public FakeHangfire(object appBuilder, FakeMonitoringApi monitoringApi)
         {
@@ -32,8 +33,9 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options)
         {
-            LastCreatedStorage = new FakeJobStorage(connectionString, options, _monitoringApi);
-            return LastCreatedStorage;
+            var storage = new FakeJobStorage(connectionString, options, _monitoringApi);
+            CreatedStorages = CreatedStorages.Append(storage).ToArray();
+            return storage;
         }
     }
 

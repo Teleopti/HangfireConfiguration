@@ -1,10 +1,9 @@
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("Infrastructure")]
+    [Collection("NotParallel")]
     public class ConfigurationRepositoryTest
     {
         [Fact, CleanDatabase]
@@ -54,24 +53,5 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal(true, result.Active);
         }
 
-        [Fact, CleanDatabase]
-        public void ShouldNotInsertMultiple()
-        {
-            int[] arr = Enumerable.Range(1, 10).ToArray();
-
-            Parallel.ForEach(arr, (item) =>
-            {
-                var connection = ConnectionUtils.GetConnectionString();
-                var repository = new ConfigurationRepository(connection);
-                var configurator = new DefaultServerConfigurator(repository, new DistributedLock("lockid", connection));
-                configurator.Configure( new ConfigurationOptions
-                {
-                    AutoUpdatedHangfireConnectionString = connection,
-                    AutoUpdatedHangfireSchemaName = "SchemaName"
-                });
-            });
-
-            Assert.Single(new ConfigurationRepository(ConnectionUtils.GetConnectionString()).ReadConfigurations());
-        }
     }
 }

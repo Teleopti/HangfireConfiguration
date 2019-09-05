@@ -16,11 +16,10 @@ namespace Hangfire.Configuration
 		{
 			builder.Map(pathMatch, subApp =>
 			{
-				var compositionRoot = builder.Properties.ContainsKey("CompositionRoot") ? builder.Properties["CompositionRoot"] : new CompositionRoot();
 #if NETSTANDARD2_0
-				subApp.UseMiddleware<ConfigurationMiddleware>(options, compositionRoot);
+				subApp.UseMiddleware<ConfigurationMiddleware>(options, builder.Properties);
 #else
-				subApp.Use(typeof(ConfigurationMiddleware), options, compositionRoot);
+				subApp.Use(typeof(ConfigurationMiddleware), options, builder.Properties);
 #endif
 			});
 		}

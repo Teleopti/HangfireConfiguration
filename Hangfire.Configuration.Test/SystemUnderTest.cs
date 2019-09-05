@@ -1,14 +1,12 @@
-using System;
-using System.Net.Http;
-using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.Storage;
 #if !NET472
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
 #else
-using Microsoft.Owin.Builder;
 using Microsoft.Owin.Testing;
 #endif
+using System;
+using System.Net.Http;
+using Hangfire.Configuration.Test.Domain.Fake;
 
 namespace Hangfire.Configuration.Test
 {
@@ -44,10 +42,11 @@ namespace Hangfire.Configuration.Test
 
             Configuration = BuildConfiguration(null);
             WorkerServerStarter = BuildWorkerServerStarter(AppBuilder, connection);
-            Determiner = BuildWorkerDeterminer(null);
+            WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);
+            PublisherQueries = BuildPublishersQuerier();
         }
-
+        
         public object AppBuilder { get; }
 #if !NET472
         public HttpClient TestClient => _testServer.Value.CreateClient();
@@ -61,10 +60,11 @@ namespace Hangfire.Configuration.Test
         public FakeHangfire Hangfire { get; }
         public FakeDistributedLock DistributedLock { get; }
 
-        public WorkerDeterminer Determiner { get; }
         public Configuration Configuration { get; }
+        public WorkerDeterminer WorkerDeterminer { get; }
         public WorkerServerStarter WorkerServerStarter { get; }
         public PublisherStarter PublisherStarter { get; }
+        public PublisherQueries PublisherQueries { get;}
 
         protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;

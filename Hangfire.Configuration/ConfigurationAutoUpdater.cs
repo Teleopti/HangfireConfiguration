@@ -3,18 +3,18 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public class DefaultServerConfigurator
+    public class ConfigurationAutoUpdater
     {
         private readonly IConfigurationRepository _repository;
         private readonly IDistributedLock _distributedLock;
 
-        public DefaultServerConfigurator(IConfigurationRepository repository, IDistributedLock distributedLock)
+        public ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock)
         {
             _repository = repository;
             _distributedLock = distributedLock;
         }
 
-        public void Configure(ConfigurationOptions options)
+        public void Update(ConfigurationOptions options)
         {
             if (options?.AutoUpdatedHangfireConnectionString == null)
                 return;

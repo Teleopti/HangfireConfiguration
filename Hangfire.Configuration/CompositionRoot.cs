@@ -1,5 +1,3 @@
-using Hangfire.Storage;
-
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
@@ -9,22 +7,29 @@ namespace Hangfire.Configuration
             new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection));
 
         public PublisherStarter BuildPublisherStarter(ConfigurationConnection connection) =>
-            new PublisherStarter(buildStorageCreator(null, connection));
+            new PublisherStarter(buildStorageCreator(null, connection), _hangfireStorageState);
 
         public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
             new WorkerDeterminer(BuildConfiguration(connection));
 
         public Configuration BuildConfiguration(ConfigurationConnection connection) =>
             new Configuration(BuildRepository(connection), BuildHangfireSchemaCreator());
+        
+        public PublisherQueries BuildPublishersQuerier() =>
+            new PublisherQueries(_hangfireStorageState);
+
 
         // internal services
+        private HangfireStorageState _hangfireStorageState = new HangfireStorageState();
+
         private StorageCreator buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
-            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection));
+            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _hangfireStorageState);
 
-        private DefaultServerConfigurator buildDefaultServerConfigurator(ConfigurationConnection connection) =>
-            new DefaultServerConfigurator(BuildRepository(connection), BuildDistributedLock(connection));
+        private ConfigurationAutoUpdater buildDefaultServerConfigurator(ConfigurationConnection connection) =>
+            new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection));
 
-        // boundry
+        
+        // boundary
         protected virtual IHangfire BuildHangfire(object appBuilder) =>
             new RealHangfire(appBuilder);
 

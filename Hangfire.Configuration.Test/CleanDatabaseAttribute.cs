@@ -2,9 +2,10 @@ using System;
 using System.Data.SqlClient;
 using System.Reflection;
 using Dapper;
+using Hangfire.Configuration.Test.Infrastructure;
 using Xunit.Sdk;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test
 {
     public class CleanDatabaseAttribute : BeforeAfterTestAttribute
     {

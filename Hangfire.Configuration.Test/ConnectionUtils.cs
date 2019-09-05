@@ -1,7 +1,6 @@
 using System;
-using System.Data.SqlClient;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test
 {
 	public static class ConnectionUtils
 	{

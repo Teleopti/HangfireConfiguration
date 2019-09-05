@@ -94,7 +94,7 @@ namespace ConsoleSample
                 PrepareSchemaIfNecessary = true
             });
 
-            var storages = app.UseHangfireConfiguration(new ConfigurationOptions
+            app.UseHangfireConfiguration(new ConfigurationOptions
                 {
                     ConnectionString = configurationConnectionString,
                     AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
@@ -108,9 +108,8 @@ namespace ConsoleSample
                         Queues = new[] {"critical", "default"},
                     },
                     new[] {new CustomBackgroundProcess()}
-                )
-                .EnabledJobStorages();
-
+                );
+            //dashboard here
         }
     }
 }

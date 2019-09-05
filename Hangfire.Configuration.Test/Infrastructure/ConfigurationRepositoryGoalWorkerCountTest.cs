@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("Infrastructure")]
+    [Collection("NotParallel")]
     public class ConfigurationRepositoryGoalWorkerCountTest
     {
         [Fact, CleanDatabase]

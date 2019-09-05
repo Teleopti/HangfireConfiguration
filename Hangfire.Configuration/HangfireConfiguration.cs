@@ -7,25 +7,25 @@ using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Builder;
 #else
 using Owin;
+
 #endif
 
 namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        private IEnumerable<EnabledStorage> _enabledStorages = Enumerable.Empty<EnabledStorage>();
-        public IEnumerable<EnabledStorage> EnabledJobStorages() => _enabledStorages;
-
         private readonly object _builder;
         private readonly ConfigurationOptions _options;
         private readonly CompositionRoot _compositionRoot;
 
-        public HangfireConfiguration(object builder, ConfigurationOptions options)
+        private HangfireConfiguration(object builder, ConfigurationOptions options, IDictionary<string, object> properties)
         {
             _builder = builder;
             _options = options;
-            _compositionRoot = new CompositionRoot();
+            _compositionRoot = properties.ContainsKey("CompositionRoot") ? (CompositionRoot) properties["CompositionRoot"] : new CompositionRoot();
         }
+
+        public static HangfireConfiguration Current { get; private set; }
 
         public static HangfireConfiguration UseHangfireConfiguration(ConfigurationOptions options) => UseHangfireConfiguration(null, options);
 
@@ -34,17 +34,19 @@ namespace Hangfire.Configuration
 #else
         public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options) =>
 #endif
-            new HangfireConfiguration(builder, options);
+            UseHangfireConfiguration(builder, options, null);
+
+#if NETSTANDARD2_0
+        public static HangfireConfiguration UseHangfireConfiguration(IApplicationBuilder builder, ConfigurationOptions options, IDictionary<string, object> properties) =>
+#else
+        public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options, IDictionary<string, object> properties) =>
+#endif
+            Current = new HangfireConfiguration(builder, options, properties);
 
         public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
             var starter = _compositionRoot.BuildPublisherStarter(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
-            _enabledStorages = starter.Start(_options, storageOptions)
-                .Select((s, i) => new EnabledStorage
-                {
-                    Number = i + 1,
-                    JobStorage = s
-                }).ToArray();
+            starter.Start(_options, storageOptions);
             return this;
         }
 
@@ -61,11 +63,11 @@ namespace Hangfire.Configuration
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
             new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
-    }
 
-    public class EnabledStorage
-    {
-        public int Number;
-        public JobStorage JobStorage;
+        public IEnumerable<JobStorage> QueryPublishers() =>
+            _compositionRoot.BuildPublishersQuerier().QueryPublishers();
+
+        internal Configuration ConfigurationApi() =>
+            _compositionRoot.BuildConfiguration(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
     }
 }

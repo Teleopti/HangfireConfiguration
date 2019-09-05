@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
 using Xunit;
 
@@ -9,7 +8,7 @@ namespace Hangfire.Configuration.Test.Domain
     public class StartPublishersTest
     {
         [Fact]
-        public void ShouldStart()
+        public void ShouldConfigureAndStartWithAutoUpdatedConnectionString()
         {
             var system = new SystemUnderTest();
 
@@ -17,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
-        
+
         //Should this maybe throw???? 
         [Fact]
         public void ShouldNotStart()
@@ -40,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
 
-        [Fact(Skip = "Should probably assert that we get the active one when querying")]
+        [Fact]
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
@@ -51,30 +50,17 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.Options.SchemaName);
         }
-        
-        [Fact]
-        public void ShouldReturnConfiguredStorages()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration() {SchemaName = "FirstSchema"});
-            system.Repository.Has(new StoredConfiguration() {SchemaName = "SecondSchema"});
 
-            var storages = system.PublisherStarter.Start(null, null);
-            
-            Assert.Equal("FirstSchema", (storages.First() as FakeJobStorage).Options.SchemaName);
-            Assert.Equal("SecondSchema", (storages.Last() as FakeJobStorage).Options.SchemaName);
-        }        
-        
         [Fact]
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.Repository.Has(new StoredConfiguration {Active = true});
 
-            var storages = system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start(null, null);
 
             var options = new SqlServerStorageOptions();
-            var storage = storages.Single() as FakeJobStorage;
+            var storage = system.Hangfire.CreatedStorages.Single();
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -84,13 +70,13 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(options.TransactionTimeout, storage.Options.TransactionTimeout);
             Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
             Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
-        }        
+        }
 
         [Fact]
         public void ShouldUseStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.Repository.Has(new StoredConfiguration {Active = true});
             var options = new SqlServerStorageOptions
             {
                 QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -104,9 +90,9 @@ namespace Hangfire.Configuration.Test.Domain
                 UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
             };
 
-            var storages = system.PublisherStarter.Start(null, options);
+            system.PublisherStarter.Start(null, options);
 
-            var storage = storages.Single() as FakeJobStorage;
+            var storage = system.Hangfire.CreatedStorages.Single();
             Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
             Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
             Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
@@ -117,29 +103,43 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
             Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
         }
-        
+
         [Fact]
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName"});
 
-            var storages = system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start(null, null);
 
-            Assert.Equal("SchemaName", (storages.Single() as FakeJobStorage).Options.SchemaName);
+            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().Options.SchemaName);
         }
-        
+
         [Fact]
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
+            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName1"});
+            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName2"});
 
-            var storages = system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start(null, null);
 
-            Assert.Equal("SchemaName1", (storages.First() as FakeJobStorage).Options.SchemaName);
-            Assert.Equal("SchemaName2", (storages.Last() as FakeJobStorage).Options.SchemaName);
+            var storages = system.Hangfire.CreatedStorages;
+            Assert.Equal("SchemaName1", storages.First().Options.SchemaName);
+            Assert.Equal("SchemaName2", storages.Last().Options.SchemaName);
+        }
+
+        [Fact]
+        public void ShouldNotCreateInactiveStorages()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {Active = false});
+            system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.Repository.Has(new StoredConfiguration {Active = false});
+
+            system.PublisherStarter.Start(null, null);
+
+            Assert.Same("active", system.Hangfire.CreatedStorages.Single().ConnectionString);
         }
     }
 }

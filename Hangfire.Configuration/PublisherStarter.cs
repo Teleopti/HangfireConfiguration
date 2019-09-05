@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
@@ -13,9 +11,7 @@ namespace Hangfire.Configuration
             _storageCreator = storageCreator;
         }
 
-        public IEnumerable<JobStorage> Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions) =>
-            _storageCreator.Create(options, storageOptions)
-                .Select(x => x.JobStorage)
-                .ToArray();
+        public void Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions) =>
+            _storageCreator.CreateActive(options, storageOptions);
     }
 }
