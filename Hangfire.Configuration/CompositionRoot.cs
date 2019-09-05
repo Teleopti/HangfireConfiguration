@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
             new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection));
 
         public PublisherStarter BuildPublisherStarter(ConfigurationConnection connection) =>
-            new PublisherStarter(buildStorageCreator(null, connection), _hangfireStorageState);
+            new PublisherStarter(buildStorageCreator(null, connection));
 
         public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
             new WorkerDeterminer(BuildConfiguration(connection));
