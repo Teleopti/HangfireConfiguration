@@ -22,7 +22,7 @@ namespace Hangfire.Configuration
         {
             _builder = builder;
             _options = options;
-            _compositionRoot = properties.ContainsKey("CompositionRoot") ? (CompositionRoot) properties["CompositionRoot"] : new CompositionRoot();
+            _compositionRoot = (properties?.ContainsKey("CompositionRoot") ?? false) ? (CompositionRoot) properties["CompositionRoot"] : new CompositionRoot();
         }
 
         public static HangfireConfiguration Current { get; private set; }
@@ -34,7 +34,7 @@ namespace Hangfire.Configuration
 #else
         public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options) =>
 #endif
-            UseHangfireConfiguration(builder, options, null);
+            UseHangfireConfiguration(builder, options, builder?.Properties);
 
 #if NETSTANDARD2_0
         public static HangfireConfiguration UseHangfireConfiguration(IApplicationBuilder builder, ConfigurationOptions options, IDictionary<string, object> properties) =>

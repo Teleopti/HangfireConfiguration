@@ -1,8 +1,10 @@
 #if !NET472
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder.Internal;
 #else
 using Microsoft.Owin.Testing;
+using Microsoft.Owin.Builder;
 #endif
 using System;
 using System.Net.Http;
@@ -16,7 +18,11 @@ namespace Hangfire.Configuration.Test
 
         public SystemUnderTest()
         {
-            AppBuilder = new object();
+#if !NET472
+            ApplicationBuilder = new ApplicationBuilder(null);
+#else
+            ApplicationBuilder = new AppBuilder();
+#endif
             _testServer = new Lazy<TestServer>(() =>
 #if !NET472
                         new TestServer(new WebHostBuilder().Configure(app =>
@@ -37,20 +43,22 @@ namespace Hangfire.Configuration.Test
             Repository = new FakeConfigurationRepository();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
-            Hangfire = new FakeHangfire(AppBuilder, Monitor);
+            Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
             DistributedLock = new FakeDistributedLock();
 
             Configuration = BuildConfiguration(null);
-            WorkerServerStarter = BuildWorkerServerStarter(AppBuilder, connection);
+            WorkerServerStarter = BuildWorkerServerStarter(ApplicationBuilder, connection);
             WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);
             PublisherQueries = BuildPublishersQuerier();
         }
         
-        public object AppBuilder { get; }
+        
 #if !NET472
+        public ApplicationBuilder ApplicationBuilder { get; }
         public HttpClient TestClient => _testServer.Value.CreateClient();
 #else
+        public AppBuilder ApplicationBuilder { get; }
         public HttpClient TestClient => _testServer.Value.HttpClient;
 #endif
 

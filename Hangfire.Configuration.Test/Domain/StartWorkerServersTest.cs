@@ -73,7 +73,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null);
 
-            Assert.Same(system.AppBuilder, system.Hangfire.StartedServers.Single().builder);
+            Assert.Same(system.ApplicationBuilder, system.Hangfire.StartedServers.Single().builder);
         }
 
         [Fact]
