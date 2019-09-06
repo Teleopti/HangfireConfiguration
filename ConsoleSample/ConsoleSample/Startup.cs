@@ -9,7 +9,6 @@ using Hangfire.Server;
 using Hangfire.SqlServer;
 #if !NET472
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 

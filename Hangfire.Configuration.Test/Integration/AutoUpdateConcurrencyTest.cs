@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire.Configuration.Test.Infrastructure;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Integration

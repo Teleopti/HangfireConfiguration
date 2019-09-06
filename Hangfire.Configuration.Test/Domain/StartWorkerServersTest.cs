@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Hangfire.Common;
 using Hangfire.Server;
@@ -181,6 +182,19 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("SchemaName2", (system.Hangfire.StartedServers.Last().storage).Options.SchemaName);
         }
 
+        [Fact]
+        public void ShouldUseDefaultSchemaName()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {SchemaName = null});
+
+            system.WorkerServerStarter.Start(null, null, null);
+
+            var defaultSchema = typeof(SqlServerStorageOptions).Assembly.GetType("Hangfire.SqlServer.Constants")
+                .GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+            Assert.Equal(defaultSchema, (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+        }
+        
         [Fact]
         public void ShouldPassStorageOptionsToHangfire()
         {
