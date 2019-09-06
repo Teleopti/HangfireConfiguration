@@ -60,14 +60,18 @@ namespace Hangfire.Configuration
             return this;
         }
 
-        [Obsolete("Dont use directly, will be removed")]
-        public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
-            new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
+        public IEnumerable<WorkerServer> QueryAllWorkerServers(SqlServerStorageOptions storageOptions) => 
+            _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+                .QueryAllWorkerServers(_options, storageOptions);
 
         public IEnumerable<JobStorage> QueryPublishers() =>
             _compositionRoot.BuildPublishersQuerier().QueryPublishers();
 
         internal Configuration ConfigurationApi() =>
             _compositionRoot.BuildConfiguration(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
+        
+        [Obsolete("Dont use directly, will be removed")]
+        public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
+            new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
     }
 }

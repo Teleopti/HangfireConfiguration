@@ -51,9 +51,9 @@ namespace Hangfire.Configuration.Test
             WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);
             PublisherQueries = BuildPublishersQuerier();
+            WorkerServerQueries = BuildWorkerServersQuerier(connection);
         }
-        
-        
+
 #if !NET472
         public ApplicationBuilder ApplicationBuilder { get; }
         public HttpClient TestClient => _testServer.Value.CreateClient();
@@ -73,6 +73,7 @@ namespace Hangfire.Configuration.Test
         public WorkerServerStarter WorkerServerStarter { get; }
         public PublisherStarter PublisherStarter { get; }
         public PublisherQueries PublisherQueries { get;}
+        public WorkerServerQueries WorkerServerQueries { get; set; }
 
         protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;

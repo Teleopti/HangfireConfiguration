@@ -17,6 +17,9 @@ namespace Hangfire.Configuration
         
         public PublisherQueries BuildPublishersQuerier() =>
             new PublisherQueries(_hangfireStorageState);
+        
+        public WorkerServerQueries BuildWorkerServersQuerier(ConfigurationConnection connection) => 
+            new WorkerServerQueries(buildStorageCreator(null, connection));
 
 
         // internal services

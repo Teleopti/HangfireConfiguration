@@ -93,22 +93,28 @@ namespace ConsoleSample
                 PrepareSchemaIfNecessary = true
             });
 
+            int serverId = 1;
             app.UseHangfireConfiguration(new ConfigurationOptions
                 {
                     ConnectionString = configurationConnectionString,
                     AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
                     AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
                 })
+                .QueryAllWorkerServers(storageOptions)
+                .ForEach(s =>
+                {
+                    app.UseHangfireDashboard($"/dashboard{serverId}", new DashboardOptions(), s.JobStorage);
+                    serverId++;
+                });
 //                .StartPublishers(storageOptions)
-                .StartWorkerServers(
-                    storageOptions,
-                    new BackgroundJobServerOptions
-                    {
-                        Queues = new[] {"critical", "default"},
-                    },
-                    new[] {new CustomBackgroundProcess()}
-                );
-            //dashboard here
+//                .StartWorkerServers(
+//                    storageOptions,
+//                    new BackgroundJobServerOptions
+//                    {
+//                        Queues = new[] {"critical", "default"},
+//                    },
+//                    new[] {new CustomBackgroundProcess()}
+//                );
         }
     }
 }
