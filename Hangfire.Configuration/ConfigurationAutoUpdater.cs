@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Hangfire.Configuration
@@ -18,30 +19,64 @@ namespace Hangfire.Configuration
         {
             if (options?.AutoUpdatedHangfireConnectionString == null)
                 return;
-            
+
             using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
             {
-                var configurations = _repository.ReadConfigurations().ToArray();
-                if (configurations.IsEmpty())
+                var configurations = _repository.ReadConfigurations();
+
+                var configuration = configurations.SingleOrDefault(x => x.ConnectionString == null);
+
+                if (configuration != null)
                 {
-                    _repository.WriteConfiguration(new StoredConfiguration
-                    {
-                        ConnectionString = options.AutoUpdatedHangfireConnectionString,
-                        SchemaName = options.AutoUpdatedHangfireSchemaName,
-                        Active = true
-                    });
+                    configuration.Active = true;
+                }
+                else if (configurations.IsEmpty())
+                {
+                    configuration = new StoredConfiguration {Active = true};
                 }
                 else
                 {
-                    var legacyConfiguration = configurations.First();
-                    legacyConfiguration.ConnectionString = options.AutoUpdatedHangfireConnectionString;
-                    legacyConfiguration.SchemaName = options.AutoUpdatedHangfireSchemaName;
-                    if (configurations.Where(x => (x.Active ?? false)).IsEmpty())
-                        legacyConfiguration.Active = true;
+                    configuration = configurations.FirstOrDefault(x => isMarked(x.ConnectionString));
+                    if (configuration == null)
+                        return;
+                }
 
-                    _repository.WriteConfiguration(legacyConfiguration);
-                }    
+//
+//                var configuration = configurations.FirstOrDefault(x => isMarked(x.ConnectionString));
+//                if (configuration == null)
+//                {
+//                    configuration = configurations.SingleOrDefault(x => x.ConnectionString == null);
+//                    if (configuration == null)
+//                        configuration = new StoredConfiguration {Active = true};
+//                }
+                
+                configuration.ConnectionString = markConnectionString(options.AutoUpdatedHangfireConnectionString);
+                configuration.SchemaName = options.AutoUpdatedHangfireSchemaName;
+
+                _repository.WriteConfiguration(configuration);
             }
+        }
+
+        private static bool isMarked(string connectionString) =>
+            new SqlConnectionStringBuilder(connectionString)
+                .ApplicationName
+                .EndsWith(".AutoUpdate");
+
+        private static string markConnectionString(string connectionString)
+        {
+            var builder = new SqlConnectionStringBuilder(connectionString);
+            if (applicationNameIsNotSet(builder))
+                builder.ApplicationName = "Hangfire";
+            builder.ApplicationName += ".AutoUpdate";
+            return builder.ToString();
+        }
+
+        // because builder will return a app name even though the connection string does not have one
+        private static bool applicationNameIsNotSet(SqlConnectionStringBuilder builder)
+        {
+            return string.IsNullOrEmpty(builder.ApplicationName) ||
+                   builder.ApplicationName == ".Net SqlClient Data Provider" ||
+                   builder.ApplicationName == "Core .Net SqlClient Data Provider";
         }
     }
 }

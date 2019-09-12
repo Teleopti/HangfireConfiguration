@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.SqlServer;
 using Xunit;
@@ -12,7 +13,14 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.PublisherStarter.Start(new ConfigurationOptions {AutoUpdatedHangfireConnectionString = "HangfireConnectionString"}, null);
+            system.PublisherStarter.Start(
+                new ConfigurationOptions
+                {
+                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder
+                    {
+                        DataSource = "Hangfire"
+                    }.ToString()
+                }, null);
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }

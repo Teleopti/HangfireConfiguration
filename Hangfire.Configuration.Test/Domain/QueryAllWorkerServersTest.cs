@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
@@ -35,9 +36,14 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration());
 
-            var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(new ConfigurationOptions{AutoUpdatedHangfireConnectionString = "hangfire"}, null);
+            var workerServers = system.WorkerServerQueries
+                .QueryAllWorkerServers(
+                new ConfigurationOptions
+                {
+                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
+                }, null);
 
-            Assert.Equal("hangfire", system.Repository.Data.Single().ConnectionString);
+            Assert.Contains("Hangfire", system.Repository.Data.Single().ConnectionString);
         }
         
         [Fact]

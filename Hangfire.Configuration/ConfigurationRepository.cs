@@ -40,9 +40,7 @@ namespace Hangfire.Configuration
                 return connection.Query<StoredConfiguration>(
                     $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active FROM [{SqlSetup.SchemaName}].Configuration"
                 ).ToArray();
-            }
-
-            ;
+            };
         }
 
         public void WriteConfiguration(StoredConfiguration configuration)

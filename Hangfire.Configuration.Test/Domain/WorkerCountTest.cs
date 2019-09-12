@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Server;
 using Xunit;
@@ -12,7 +13,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.WorkerServerStarter.Start(
-                new ConfigurationOptions {AutoUpdatedHangfireConnectionString = "connection", AutoUpdatedHangfireSchemaName = "schema"},
+                new ConfigurationOptions
+                {
+                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(), 
+                },
                 null, null);
 
             Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -122,8 +126,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = "connection",
-                AutoUpdatedHangfireSchemaName = "schema",
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
                 DefaultGoalWorkerCount = 12
             }, null, null);
 

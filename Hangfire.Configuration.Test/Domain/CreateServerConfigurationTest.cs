@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
 
@@ -33,7 +34,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = "defaultConnectionString",
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
                 AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
@@ -59,7 +60,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = "defaultConnectionString",
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
                 AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
             system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
