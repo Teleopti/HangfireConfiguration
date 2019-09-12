@@ -196,6 +196,19 @@ namespace Hangfire.Configuration.Test.Domain
         }
         
         [Fact]
+        public void ShouldUseDefaultSchemaNameWhenEmpty()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {SchemaName = ""});
+
+            system.WorkerServerStarter.Start(null, null, null);
+
+            var defaultSchema = typeof(SqlServerStorageOptions).Assembly.GetType("Hangfire.SqlServer.Constants")
+                .GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null);
+            Assert.Equal(defaultSchema, (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+        }
+
+        [Fact]
         public void ShouldPassStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();

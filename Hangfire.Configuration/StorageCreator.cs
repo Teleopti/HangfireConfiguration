@@ -49,7 +49,10 @@ namespace Hangfire.Configuration
         private HangfireStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
-            options.SchemaName = configuration.SchemaName ?? "HangFire";
+            if (string.IsNullOrEmpty(configuration.SchemaName))
+                options.SchemaName = "HangFire";
+            else
+                options.SchemaName = configuration.SchemaName;
 
             var storage = new HangfireStorage
             {
