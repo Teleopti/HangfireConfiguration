@@ -103,7 +103,7 @@ namespace ConsoleSample
                 .QueryAllWorkerServers(storageOptions)
                 .ForEach(s =>
                 {
-                    app.UseHangfireDashboard($"/dashboard{serverId}", new DashboardOptions(), s.JobStorage);
+                    app.UseHangfireDashboard($"/HangfireDashboard{serverId}", new DashboardOptions(), s.JobStorage);
                     serverId++;
                 });
 //                .StartPublishers(storageOptions)
