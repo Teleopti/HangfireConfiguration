@@ -23,11 +23,13 @@ namespace Hangfire.Configuration
             using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
             {
                 var configurations = _repository.ReadConfigurations();
-
-                var configuration = configurations.SingleOrDefault(x => x.ConnectionString == null);
-
-                if (configuration != null)
+                
+                StoredConfiguration configuration;
+                
+                var legacyConfiguration = configurations.SingleOrDefault(isLegacy);
+                if (legacyConfiguration != null)
                 {
+                    configuration = legacyConfiguration;
                     configuration.Active = true;
                 }
                 else if (configurations.IsEmpty())
@@ -36,19 +38,10 @@ namespace Hangfire.Configuration
                 }
                 else
                 {
-                    configuration = configurations.FirstOrDefault(x => isMarked(x.ConnectionString));
+                    configuration = configurations.FirstOrDefault(isMarked);
                     if (configuration == null)
                         return;
                 }
-
-//
-//                var configuration = configurations.FirstOrDefault(x => isMarked(x.ConnectionString));
-//                if (configuration == null)
-//                {
-//                    configuration = configurations.SingleOrDefault(x => x.ConnectionString == null);
-//                    if (configuration == null)
-//                        configuration = new StoredConfiguration {Active = true};
-//                }
                 
                 configuration.ConnectionString = markConnectionString(options.AutoUpdatedHangfireConnectionString);
                 configuration.SchemaName = options.AutoUpdatedHangfireSchemaName;
@@ -57,8 +50,11 @@ namespace Hangfire.Configuration
             }
         }
 
-        private static bool isMarked(string connectionString) =>
-            new SqlConnectionStringBuilder(connectionString)
+        private static bool isLegacy(StoredConfiguration configuration) =>
+            configuration.ConnectionString == null;
+        
+        private static bool isMarked(StoredConfiguration configuration) =>
+            new SqlConnectionStringBuilder(configuration.ConnectionString)
                 .ApplicationName
                 .EndsWith(".AutoUpdate");
 
