@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hangfire.Configuration
@@ -63,5 +64,10 @@ namespace Hangfire.Configuration
             }
         }
 
+        public IEnumerable<StoredConfiguration> ReadConfigurations() => 
+            _repository.ReadConfigurations();
+
+        public void WriteConfigurations(StoredConfiguration configuration) => 
+            _repository.WriteConfiguration(configuration);
     }
 }
