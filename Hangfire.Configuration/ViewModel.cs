@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 namespace Hangfire.Configuration
 {
-    public class ServerConfigurationViewModel
+    public class ViewModel
     {
         public int? Id { get; set; }
         public string ServerName { get; set; }

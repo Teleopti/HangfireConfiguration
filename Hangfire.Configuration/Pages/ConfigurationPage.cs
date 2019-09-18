@@ -6,24 +6,24 @@ namespace Hangfire.Configuration.Pages
 {
     public class ConfigurationPage : RazorPage
     {
-        private readonly Configuration _configuration;
+        private readonly ViewModelBuilder _viewModelBuilder;
         private readonly string _basePath;
-        private readonly bool _allowNewServerCreation;
+        private readonly HangfireConfigurationUIOptions _options;
 
-        public ConfigurationPage(Configuration configuration, string basePath, bool allowNewServerCreation)
+        public ConfigurationPage(HangfireConfiguration configuration, string basePath, HangfireConfigurationUIOptions options)
         {
-            _configuration = configuration;
+            _viewModelBuilder = configuration.ViewModelBuilder();
             _basePath = basePath;
-            _allowNewServerCreation = allowNewServerCreation;
+            _options = options;
         }
 
         public override void Execute()
         {
-            var configurations = _configuration.BuildServerConfigurations().ToArray();
+            var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
             buildHtml(configurations);
         }
 
-        private void buildHtml(ServerConfigurationViewModel[] configurations)
+        private void buildHtml(ViewModel[] configurations)
         {
             WriteLiteral("<html>");
             WriteLiteral($@"<base href=""{_basePath}/"">");
@@ -35,14 +35,14 @@ namespace Hangfire.Configuration.Pages
 
             WriteInformationHeader();
 
-            configurations = configurations.Any() ? configurations : new[] {new ServerConfigurationViewModel()};
+            configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
             
             WriteLiteral("<div class='flex-grid'>");
             foreach (var configuration in configurations)
                 WriteConfiguration(configuration);
             WriteLiteral("</div>");
 
-            if (_allowNewServerCreation)
+            if (_options.AllowNewServerCreation)
                 WriteCreateConfiguration(configurations);
 
             WriteLiteral($@"<script src='{_basePath}/script'></script>");
@@ -65,7 +65,7 @@ namespace Hangfire.Configuration.Pages
 </fieldset>");
         }
 
-        private void WriteConfiguration(ServerConfigurationViewModel configuration)
+        private void WriteConfiguration(ViewModel configuration)
         {
             WriteLiteral($@"
                 <div class='col'>
@@ -104,7 +104,7 @@ namespace Hangfire.Configuration.Pages
             WriteLiteral($@"</fieldset></div>");
         }
 
-        private void WriteCreateConfiguration(IEnumerable<ServerConfigurationViewModel> configurations)
+        private void WriteCreateConfiguration(IEnumerable<ViewModel> configurations)
         {
             if (configurations.Count() >= 2)
                 return;

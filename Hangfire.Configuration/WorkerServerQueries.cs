@@ -7,23 +7,20 @@ namespace Hangfire.Configuration
     public class WorkerServerQueries
     {
         private readonly StorageCreator _storageCreator;
+        private readonly StorageState _state;
 
-        public WorkerServerQueries(StorageCreator storageCreator)
+        public WorkerServerQueries(StorageCreator storageCreator, StorageState state)
         {
             _storageCreator = storageCreator;
+            _state = state;
         }
 
-        public IEnumerable<WorkerServer> QueryAllWorkerServers(ConfigurationOptions options, SqlServerStorageOptions storageOptions) =>
-            _storageCreator
-                .Create(options, storageOptions)
-                .Select(s => new WorkerServer
-                {
-                    JobStorage = s.JobStorage
-                });
-    }
-
-    public class WorkerServer
-    {
-        public JobStorage JobStorage { get; set; }
+        public IEnumerable<JobStorage> QueryAllWorkerServers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        {
+            _storageCreator.Create(options, storageOptions);
+            return _state.State
+                .Select(s => s.JobStorage)
+                .ToArray();
+        }
     }
 }

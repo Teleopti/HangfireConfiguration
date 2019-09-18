@@ -46,12 +46,13 @@ namespace Hangfire.Configuration.Test
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
             DistributedLock = new FakeDistributedLock();
 
-            Configuration = BuildConfiguration(null);
+            ConfigurationApi = BuildConfigurationApi(null);
             WorkerServerStarter = BuildWorkerServerStarter(ApplicationBuilder, connection);
             WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);
             PublisherQueries = BuildPublishersQuerier();
             WorkerServerQueries = BuildWorkerServersQuerier(connection);
+            ViewModelBuilder = BuildViewModelBuilder(connection);
         }
 
 #if !NET472
@@ -68,12 +69,13 @@ namespace Hangfire.Configuration.Test
         public FakeHangfire Hangfire { get; }
         public FakeDistributedLock DistributedLock { get; }
 
-        public Configuration Configuration { get; }
+        public ConfigurationApi ConfigurationApi { get; }
         public WorkerDeterminer WorkerDeterminer { get; }
         public WorkerServerStarter WorkerServerStarter { get; }
         public PublisherStarter PublisherStarter { get; }
         public PublisherQueries PublisherQueries { get;}
-        public WorkerServerQueries WorkerServerQueries { get; set; }
+        public WorkerServerQueries WorkerServerQueries { get; }
+        public ViewModelBuilder ViewModelBuilder { get; }
 
         protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;

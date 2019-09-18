@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            system.Configuration.ActivateServer(1);
+            system.ConfigurationApi.ActivateServer(1);
 
             var storedConfiguration = system.Repository.Data.Single();
             Assert.Equal(true, storedConfiguration.Active);
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Test.Domain
                 new StoredConfiguration {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"}
             );
 
-            system.Configuration.ActivateServer(2);
+            system.ConfigurationApi.ActivateServer(2);
 
             Assert.Equal(false, system.Repository.Data.Single(x => x.Id == 1).Active);
         }

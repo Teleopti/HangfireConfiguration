@@ -4,34 +4,36 @@ namespace Hangfire.Configuration
     {
         // outer services
         public WorkerServerStarter BuildWorkerServerStarter(object appBuilder, ConfigurationConnection connection) =>
-            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection));
+            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection), _storageState);
 
         public PublisherStarter BuildPublisherStarter(ConfigurationConnection connection) =>
             new PublisherStarter(buildStorageCreator(null, connection));
 
         public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
-            new WorkerDeterminer(BuildConfiguration(connection));
+            new WorkerDeterminer(BuildRepository(connection));
 
-        public Configuration BuildConfiguration(ConfigurationConnection connection) =>
-            new Configuration(BuildRepository(connection), BuildHangfireSchemaCreator());
-        
+        public ConfigurationApi BuildConfigurationApi(ConfigurationConnection connection) =>
+            new ConfigurationApi(BuildRepository(connection), BuildHangfireSchemaCreator());
+
         public PublisherQueries BuildPublishersQuerier() =>
-            new PublisherQueries(_hangfireStorageState);
-        
-        public WorkerServerQueries BuildWorkerServersQuerier(ConfigurationConnection connection) => 
-            new WorkerServerQueries(buildStorageCreator(null, connection));
+            new PublisherQueries(_storageState);
 
+        public WorkerServerQueries BuildWorkerServersQuerier(ConfigurationConnection connection) =>
+            new WorkerServerQueries(buildStorageCreator(null, connection), _storageState);
+
+        public ViewModelBuilder BuildViewModelBuilder(ConfigurationConnection connection) =>
+            new ViewModelBuilder(BuildRepository(connection));
 
         // internal services
-        private HangfireStorageState _hangfireStorageState = new HangfireStorageState();
+        private StorageState _storageState = new StorageState();
 
         private StorageCreator buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
-            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _hangfireStorageState);
+            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _storageState);
 
         private ConfigurationAutoUpdater buildDefaultServerConfigurator(ConfigurationConnection connection) =>
             new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection));
 
-        
+
         // boundary
         protected virtual IHangfire BuildHangfire(object appBuilder) =>
             new RealHangfire(appBuilder);

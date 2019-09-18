@@ -6,15 +6,15 @@ namespace Hangfire.Configuration
 {
     public class PublisherQueries
     {
-        private readonly HangfireStorageState _storageState;
+        private readonly StorageState _storageState;
 
-        public PublisherQueries(HangfireStorageState storageState)
+        public PublisherQueries(StorageState storageState)
         {
             _storageState = storageState;
         }
         
         public IEnumerable<JobStorage> QueryPublishers() => 
-            _storageState.StorageState
+            _storageState.State
                 .Where(x => x.Configuration.Active.Value)
                 .Select(x => x.JobStorage)
                 .ToArray();

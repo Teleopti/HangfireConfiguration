@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration()
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
                 AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
                 AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
-            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
                 SchemaName = "newSchemaName",
@@ -48,7 +48,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaCreatorPassword = "createPassword",
             });
 
-            system.Configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
+            system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
 
             var config = system.Repository.ReadConfigurations();
             Assert.Equal(10, config.First().GoalWorkerCount);
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
                 AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
                 AutoUpdatedHangfireSchemaName = "defaultSchemaName"
             }, null, null);
-            system.Configuration.CreateServerConfiguration(new CreateServerConfiguration
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
                 Database = "database",
@@ -85,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.SchemaCreator.TryConnectFailsWith = new Exception();
 
-            Assert.ThrowsAny<Exception>(() => system.Configuration.CreateServerConfiguration(
+            Assert.ThrowsAny<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     Server = "Server",
@@ -100,7 +100,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.Configuration.CreateServerConfiguration(
+            system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     Server = "AwesomeServer",
@@ -117,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.Configuration.CreateServerConfiguration(
+            system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     Server = "AwesomeServer",
@@ -134,7 +134,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.Configuration.CreateServerConfiguration(
+            system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     Server = "AwesomeServer",
@@ -146,6 +146,24 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.SchemaCreator.SchemaCreatedWith.Last().ConnectionString);
             Assert.Equal("schema", system.SchemaCreator.SchemaCreatedWith.Last().SchemaName);
+        }
+        
+        [Fact]
+        public void ShouldSaveNewServerConfigurationUsingConnectionStrings()
+        {
+            var system = new SystemUnderTest();
+
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+            {
+                StorageConnectionString = "storage",
+                SchemaCreatorConnectionString = "creator",
+                SchemaName = "schema"
+            });
+
+            var storedConfiguration = system.Repository.Data.Last();
+            Assert.Equal("creator", system.SchemaCreator.SchemaCreatedWith.Last().ConnectionString);
+            Assert.Equal("storage", storedConfiguration.ConnectionString);
+            Assert.Equal("schema", storedConfiguration.SchemaName);
         }
     }
 }

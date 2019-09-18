@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = true
             });
 
-            var result = system.Configuration.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(1, result.Single().Id);
             Assert.Equal("Server", result.Single().ServerName);
@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            var result = system.Configuration.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(2, result.Single().Id);
             Assert.Equal("Server2", result.Single().ServerName);
@@ -61,7 +61,7 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = null
             });
 
-            var result = system.Configuration.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(1, result.Single().Id);
             Assert.Null(result.Single().ServerName);
@@ -90,7 +90,7 @@ namespace Hangfire.Configuration.Test.Domain
                     Active = false
                 });
 
-            var result = system.Configuration.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(2, result.Count());
         }
@@ -101,7 +101,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 10});
 
-            var result = system.Configuration.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(10, result.Single().Workers);
         }

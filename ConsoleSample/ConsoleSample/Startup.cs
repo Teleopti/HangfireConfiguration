@@ -93,7 +93,6 @@ namespace ConsoleSample
                 PrepareSchemaIfNecessary = true
             });
 
-            int serverId = 1;
             app.UseHangfireConfiguration(new ConfigurationOptions
                 {
                     ConnectionString = configurationConnectionString,
@@ -101,10 +100,10 @@ namespace ConsoleSample
                     AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
                 })
                 .QueryAllWorkerServers(storageOptions)
+                .Select((storage, i) => (storage: storage, i: i))
                 .ForEach(s =>
                 {
-                    app.UseHangfireDashboard($"/HangfireDashboard{serverId}", new DashboardOptions(), s.JobStorage);
-                    serverId++;
+                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(), s.storage);
                 });
 //                .StartPublishers(storageOptions)
 //                .StartWorkerServers(

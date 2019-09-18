@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Hangfire.Common;
 using Hangfire.Storage;
 
@@ -6,21 +7,23 @@ namespace Hangfire.Configuration
 {
 	public class WorkerDeterminer
 	{
-		private readonly Configuration _configuration;
+		private readonly IConfigurationRepository _repository;
 
-		public WorkerDeterminer(Configuration configuration)
+		public WorkerDeterminer(IConfigurationRepository repository)
 		{
-			_configuration = configuration;
+			_repository = repository;
 		}
 		
 		[Obsolete("Dont use, will be removed")]
-		public int DetermineStartingServerWorkerCount() =>
-			DetermineWorkerCount
+		public int DetermineStartingServerWorkerCount()
+		{
+			return DetermineWorkerCount
 			(
 				JobStorage.Current.GetMonitoringApi(),
-				_configuration.ReadGoalWorkerCount()
+				_repository.ReadConfigurations().FirstOrDefault()?.GoalWorkerCount
 			);
-		
+		}
+
 		internal int DetermineWorkerCount(IMonitoringApi monitor, int? goalWorkerCount, ConfigurationOptions options = null)
 		{
 			options = options ?? new ConfigurationOptions();

@@ -20,8 +20,9 @@ namespace Hangfire.Configuration
     public class ConfigurationMiddleware : OwinMiddleware
 #endif
     {
-        private readonly Configuration _configuration;
         private readonly HangfireConfigurationUIOptions _options;
+        private readonly HangfireConfiguration _configuration;
+        private readonly ConfigurationApi _configurationApi;
 
         public ConfigurationMiddleware(
 #if NETSTANDARD2_0
@@ -36,9 +37,8 @@ namespace Hangfire.Configuration
 #endif
         {
             _options = options;
-            _configuration = HangfireConfiguration
-                .UseHangfireConfiguration(null, new ConfigurationOptions {ConnectionString = _options.ConnectionString}, properties)
-                .ConfigurationApi();
+            _configuration = HangfireConfiguration.UseHangfireConfiguration(null, new ConfigurationOptions {ConnectionString = _options.ConnectionString}, properties);
+            _configurationApi = _configuration.ConfigurationApi();
             if (_options.PrepareSchemaIfNecessary)
                 using (var c = new SqlConnection(_options.ConnectionString))
                     SqlServerObjectsInstaller.Install(c);
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration
                 return;
             }
 
-            var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options.AllowNewServerCreation);
+            var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
 
             if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
             {
@@ -114,7 +114,7 @@ namespace Hangfire.Configuration
         {
             var parsed = parseRequestBody(context.Request);
 
-            _configuration.WriteGoalWorkerCount(new WriteGoalWorkerCount
+            _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
             {
                 ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
                 Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
@@ -145,7 +145,7 @@ namespace Hangfire.Configuration
 
             try
             {
-                _configuration.CreateServerConfiguration(configuration);
+                _configurationApi.CreateServerConfiguration(configuration);
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
             }
             catch (Exception ex)
@@ -163,7 +163,7 @@ namespace Hangfire.Configuration
         {
             var parsed = parseRequestBody(context.Request);
             var configurationId = parsed.SelectToken("configurationId").Value<int>();
-            _configuration.ActivateServer(configurationId);
+            _configurationApi.ActivateServer(configurationId);
             context.Response.StatusCode = (int) HttpStatusCode.OK;
         }
 

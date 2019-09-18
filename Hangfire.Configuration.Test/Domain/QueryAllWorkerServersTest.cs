@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Single();
 
-            Assert.Same(system.Hangfire.CreatedStorages.Single(), workerServer.JobStorage);
+            Assert.Same(system.Hangfire.CreatedStorages.Single(), workerServer);
         }
         
         [Fact]

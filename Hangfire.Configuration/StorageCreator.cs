@@ -10,9 +10,9 @@ namespace Hangfire.Configuration
         private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
         private readonly ConfigurationAutoUpdater _configurationAutoUpdater;
-        private readonly HangfireStorageState _storageState;
+        private readonly StorageState _storageState;
 
-        internal StorageCreator(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, HangfireStorageState storageState)
+        internal StorageCreator(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, StorageState storageState)
         {
             _hangfire = hangfire;
             _repository = repository;
@@ -20,11 +20,10 @@ namespace Hangfire.Configuration
             _storageState = storageState;
         }
 
-        public IEnumerable<HangfireStorage> Create(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public void Create(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _configurationAutoUpdater.Update(options);
             create(storageOptions, _repository.ReadConfigurations());
-            return _storageState.StorageState;
         }
 
         public void CreateActive(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
@@ -37,16 +36,16 @@ namespace Hangfire.Configuration
             SqlServerStorageOptions storageOptions, 
             IEnumerable<StoredConfiguration> configurations)
         {
-            if (_storageState.StorageState != null)
+            if (_storageState.State != null)
                 return;
-            _storageState.StorageState = configurations
+            _storageState.State = configurations
                 .OrderBy(x => !(x.Active ?? false))
                 .ThenBy(x => x.Id)
                 .Select(configuration => makeJobStorage(configuration, storageOptions))
                 .ToArray();
         }
 
-        private HangfireStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+        private Storage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             if (string.IsNullOrEmpty(configuration.SchemaName))
@@ -54,7 +53,7 @@ namespace Hangfire.Configuration
             else
                 options.SchemaName = configuration.SchemaName;
 
-            var storage = new HangfireStorage
+            var storage = new Storage
             {
                 Configuration = configuration,
                 JobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options)
