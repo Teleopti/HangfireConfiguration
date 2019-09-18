@@ -67,7 +67,7 @@ namespace Hangfire.Configuration
         public IEnumerable<StoredConfiguration> ReadConfigurations() => 
             _repository.ReadConfigurations();
 
-        public void WriteConfigurations(StoredConfiguration configuration) => 
+        public void WriteConfiguration(StoredConfiguration configuration) => 
             _repository.WriteConfiguration(configuration);
     }
 }

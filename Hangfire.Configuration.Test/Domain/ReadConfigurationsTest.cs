@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.WriteConfigurations(new StoredConfiguration
+            system.ConfigurationApi.WriteConfiguration(new StoredConfiguration
             {
                 Id = 22,
                 ConnectionString = "connection",
