@@ -4,14 +4,14 @@ using Newtonsoft.Json;
 
 namespace Hangfire.Configuration
 {
-    public class StorageCreator
+    public class StateMaintainer
     {
         private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
         private readonly ConfigurationAutoUpdater _configurationAutoUpdater;
         private readonly State _state;
 
-        internal StorageCreator(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, State state)
+        internal StateMaintainer(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, State state)
         {
             _hangfire = hangfire;
             _repository = repository;
@@ -21,19 +21,19 @@ namespace Hangfire.Configuration
 
         public void Refresh(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
-            // shouldnt do this all the time
             _configurationAutoUpdater.Update(options);
-            
+
             // maybe not reload all the time
-            var configurations = _repository.ReadConfigurations();
-            configurations.ForEach(c =>
-            {
-                var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);
-                if (existing != null)
-                    existing.Configuration = c;
-                else
-                    _state.Configurations = _state.Configurations.Append(makeJobStorage(c, storageOptions)).ToArray();
-            });
+            _repository.ReadConfigurations()
+                .ForEach(c =>
+                {
+                    // is this thread safe?
+                    var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);
+                    if (existing != null)
+                        existing.Configuration = c;
+                    else
+                        _state.Configurations = _state.Configurations.Append(makeJobStorage(c, storageOptions)).ToArray();
+                });
         }
 
         private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)

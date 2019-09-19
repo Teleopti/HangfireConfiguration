@@ -8,7 +8,8 @@ namespace Hangfire.Configuration
     {
         private readonly IConfigurationRepository _repository;
         private readonly IDistributedLock _distributedLock;
-
+        private bool _hasUpdated;
+        
         public ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock)
         {
             _repository = repository;
@@ -17,6 +18,10 @@ namespace Hangfire.Configuration
 
         public void Update(ConfigurationOptions options)
         {
+            if (_hasUpdated)
+                return;
+            _hasUpdated = true;
+            
             if (options?.AutoUpdatedHangfireConnectionString == null)
                 return;
 

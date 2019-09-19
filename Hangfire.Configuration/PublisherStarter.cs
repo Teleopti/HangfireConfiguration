@@ -5,18 +5,18 @@ namespace Hangfire.Configuration
 {
     public class PublisherStarter
     {
-        private readonly StorageCreator _storageCreator;
+        private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
 
-        public PublisherStarter(StorageCreator storageCreator, State state)
+        public PublisherStarter(StateMaintainer stateMaintainer, State state)
         {
-            _storageCreator = storageCreator;
+            _stateMaintainer = stateMaintainer;
             _state = state;
         }
 
         public void Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
-            _storageCreator.Refresh(options, storageOptions);
+            _stateMaintainer.Refresh(options, storageOptions);
             _state.Configurations.Where(x => x.Configuration.Active.GetValueOrDefault())
                 .ForEach(x => { x.CreateJobStorage(); });
         }

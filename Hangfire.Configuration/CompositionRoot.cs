@@ -27,8 +27,8 @@ namespace Hangfire.Configuration
         // internal services
         private State _state = new State();
 
-        private StorageCreator buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
-            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _state);
+        private StateMaintainer buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
+            new StateMaintainer(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _state);
 
         private ConfigurationAutoUpdater buildDefaultServerConfigurator(ConfigurationConnection connection) =>
             new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection));

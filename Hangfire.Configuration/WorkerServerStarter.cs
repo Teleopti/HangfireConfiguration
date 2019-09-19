@@ -9,18 +9,18 @@ namespace Hangfire.Configuration
     {
         private readonly IHangfire _hangfire;
         private readonly WorkerDeterminer _workerDeterminer;
-        private readonly StorageCreator _storageCreator;
+        private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
 
         public WorkerServerStarter(
             IHangfire hangfire,
             WorkerDeterminer workerDeterminer,
-            StorageCreator storageCreator,
+            StateMaintainer stateMaintainer,
             State state)
         {
             _hangfire = hangfire;
             _workerDeterminer = workerDeterminer;
-            _storageCreator = storageCreator;
+            _stateMaintainer = stateMaintainer;
             _state = state;
         }
 
@@ -34,7 +34,7 @@ namespace Hangfire.Configuration
             var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
 
-            _storageCreator.Refresh(options, storageOptions);
+            _stateMaintainer.Refresh(options, storageOptions);
             _state.Configurations
                 .OrderBy(x => !(x.Configuration.Active ?? false))
                 .ForEach(x =>
