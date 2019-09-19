@@ -16,6 +16,7 @@ namespace Hangfire.Configuration
     {
         private readonly object _builder;
         private readonly ConfigurationOptions _options;
+        private SqlServerStorageOptions _storageOptions;
         private readonly CompositionRoot _compositionRoot;
 
         private HangfireConfiguration(object builder, ConfigurationOptions options, IDictionary<string, object> properties)
@@ -43,6 +44,12 @@ namespace Hangfire.Configuration
 #endif
             Current = new HangfireConfiguration(builder, options, properties);
 
+        public HangfireConfiguration UseStorageOptions(SqlServerStorageOptions storageOptions)
+        {
+            _storageOptions = storageOptions;
+            return this;
+        }
+
         public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
             var starter = _compositionRoot.BuildPublisherStarter(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
@@ -60,11 +67,12 @@ namespace Hangfire.Configuration
             return this;
         }
 
+        public IEnumerable<JobStorage> QueryAllWorkerServers() => QueryAllWorkerServers(_storageOptions);
         public IEnumerable<JobStorage> QueryAllWorkerServers(SqlServerStorageOptions storageOptions) => 
             _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
                 .QueryAllWorkerServers(_options, storageOptions);
 
-        public IEnumerable<JobStorage> QueryPublishers() => QueryPublishers(null);
+        public IEnumerable<JobStorage> QueryPublishers() => QueryPublishers(_storageOptions);
         public IEnumerable<JobStorage> QueryPublishers(SqlServerStorageOptions storageOptions) =>
             _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
                 .QueryPublishers(_options, storageOptions);
@@ -78,5 +86,6 @@ namespace Hangfire.Configuration
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
             new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
+
     }
 }

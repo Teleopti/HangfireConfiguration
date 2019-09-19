@@ -99,7 +99,8 @@ namespace ConsoleSample
                     AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
                     AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
                 })
-                .QueryAllWorkerServers(storageOptions)
+                .UseStorageOptions(storageOptions)
+                .QueryAllWorkerServers()
                 .Select((storage, i) => (storage: storage, i: i))
                 .ForEach(s =>
                 {
