@@ -147,7 +147,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.PublisherStarter.Start(null, null);
 
-            Assert.Same("active", system.Hangfire.CreatedStorages.Single().ConnectionString);
+            Assert.Equal("active", system.Hangfire.CreatedStorages.Single().ConnectionString);
         }
     }
 }

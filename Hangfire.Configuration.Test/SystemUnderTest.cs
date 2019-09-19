@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test
             WorkerServerStarter = BuildWorkerServerStarter(ApplicationBuilder, connection);
             WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);
-            PublisherQueries = BuildPublishersQuerier();
+            PublisherQueries = BuildPublishersQuerier(connection);
             WorkerServerQueries = BuildWorkerServersQuerier(connection);
             ViewModelBuilder = BuildViewModelBuilder(connection);
         }

@@ -1,5 +1,7 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
+using Hangfire.SqlServer;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -13,7 +15,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start(null, null);
 
-            var storage = system.PublisherQueries.QueryPublishers();
+            var storage = system.PublisherQueries.QueryPublishers(null, null);
 
             Assert.NotNull(storage.Single());
         }
@@ -25,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = ";"});
             system.PublisherStarter.Start(null, null);
 
-            var storage = system.PublisherQueries.QueryPublishers()
+            var storage = system.PublisherQueries.QueryPublishers(null, null)
                 .Single() as FakeJobStorage;
 
             Assert.Equal(";", storage.ConnectionString);
@@ -38,7 +40,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start(null, null);
 
-            var storage = system.PublisherQueries.QueryPublishers().Single();
+            var storage = system.PublisherQueries.QueryPublishers(null, null).Single();
 
             Assert.Same(system.Hangfire.CreatedStorages.Single(), storage);
         }
@@ -52,11 +54,11 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {Active = false});
             system.PublisherStarter.Start(null, null);
 
-            var storage = system.PublisherQueries.QueryPublishers().Single() as FakeJobStorage;
+            var storage = system.PublisherQueries.QueryPublishers(null, null).Single() as FakeJobStorage;
 
             Assert.Equal("active", storage.ConnectionString);
         }
-        
+
         [Fact]
         public void ShouldReturnTheActiveStorageAfterServerStart()
         {
@@ -65,9 +67,51 @@ namespace Hangfire.Configuration.Test.Domain
             system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "string"});
             system.WorkerServerStarter.Start(null, null, null);
 
-            var storage = system.PublisherQueries.QueryPublishers().Single() as FakeJobStorage;
+            var storage = system.PublisherQueries.QueryPublishers(null, null).Single() as FakeJobStorage;
 
             Assert.Equal("string", storage.ConnectionString);
+        }
+
+        [Fact]
+        public void ShouldReturnTheChangedActiveStorage()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "one"});
+            system.Repository.Has(new StoredConfiguration {Active = false, ConnectionString = "two"});
+            system.PublisherStarter.Start(null, null);
+            var configurationId = system.Repository.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
+            system.ConfigurationApi.ActivateServer(configurationId);
+
+            var storage = system.PublisherQueries.QueryPublishers(null, null).Single() as FakeJobStorage;
+
+            Assert.Equal("two", storage.ConnectionString);
+        }
+
+        [Fact]
+        public void ShouldAutoUpdate()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration());
+
+            system.PublisherQueries
+                .QueryPublishers(
+                    new ConfigurationOptions
+                    {
+                        AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
+                    }, null);
+
+            Assert.Contains("Hangfire", system.Repository.Data.Single().ConnectionString);
+        }
+
+        [Fact]
+        public void ShouldQueryPublishersWithDefaultSqlStorageOptions()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {Active = true});
+
+            system.PublisherQueries.QueryPublishers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+
+            Assert.False(system.Hangfire.CreatedStorages.Single().Options.PrepareSchemaIfNecessary);
         }
     }
 }

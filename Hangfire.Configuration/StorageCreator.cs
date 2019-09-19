@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Hangfire.SqlServer;
 using Newtonsoft.Json;
@@ -10,42 +9,34 @@ namespace Hangfire.Configuration
         private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
         private readonly ConfigurationAutoUpdater _configurationAutoUpdater;
-        private readonly StorageState _storageState;
+        private readonly State _state;
 
-        internal StorageCreator(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, StorageState storageState)
+        internal StorageCreator(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, State state)
         {
             _hangfire = hangfire;
             _repository = repository;
             _configurationAutoUpdater = configurationAutoUpdater;
-            _storageState = storageState;
+            _state = state;
         }
 
-        public void Create(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public void Refresh(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
+            // shouldnt do this all the time
             _configurationAutoUpdater.Update(options);
-            create(storageOptions, _repository.ReadConfigurations());
+            
+            // maybe not reload all the time
+            var configurations = _repository.ReadConfigurations();
+            configurations.ForEach(c =>
+            {
+                var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);
+                if (existing != null)
+                    existing.Configuration = c;
+                else
+                    _state.Configurations = _state.Configurations.Append(makeJobStorage(c, storageOptions)).ToArray();
+            });
         }
 
-        public void CreateActive(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
-        {
-            _configurationAutoUpdater.Update(options);
-            create(storageOptions, _repository.ReadConfigurations().Where(x => x.Active.GetValueOrDefault()));
-        }
-
-        private void create(
-            SqlServerStorageOptions storageOptions, 
-            IEnumerable<StoredConfiguration> configurations)
-        {
-            if (_storageState.State != null)
-                return;
-            _storageState.State = configurations
-                .OrderBy(x => !(x.Active ?? false))
-                .ThenBy(x => x.Id)
-                .Select(configuration => makeJobStorage(configuration, storageOptions))
-                .ToArray();
-        }
-
-        private Storage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+        private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             if (string.IsNullOrEmpty(configuration.SchemaName))
@@ -53,13 +44,11 @@ namespace Hangfire.Configuration
             else
                 options.SchemaName = configuration.SchemaName;
 
-            var storage = new Storage
+            return new ConfigurationAndStorage
             {
-                Configuration = configuration,
-                JobStorage = _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options)
+                JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
+                Configuration = configuration
             };
-
-            return storage;
         }
 
         private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>

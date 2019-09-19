@@ -6,17 +6,23 @@ namespace Hangfire.Configuration
 {
     public class PublisherQueries
     {
-        private readonly StorageState _storageState;
+        private readonly State _state;
+        private readonly StorageCreator _creator;
 
-        public PublisherQueries(StorageState storageState)
+        public PublisherQueries(State state, StorageCreator creator)
         {
-            _storageState = storageState;
+            _state = state;
+            _creator = creator;
         }
-        
-        public IEnumerable<JobStorage> QueryPublishers() => 
-            _storageState.State
+
+        public IEnumerable<JobStorage> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        {
+            _creator.Refresh(options, storageOptions);
+           return  _state.Configurations
                 .Where(x => x.Configuration.Active.Value)
-                .Select(x => x.JobStorage)
+                .Select(x => x.CreateJobStorage())
                 .ToArray();
+        }
+
     }
 }

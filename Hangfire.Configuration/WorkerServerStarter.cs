@@ -10,13 +10,13 @@ namespace Hangfire.Configuration
         private readonly IHangfire _hangfire;
         private readonly WorkerDeterminer _workerDeterminer;
         private readonly StorageCreator _storageCreator;
-        private readonly StorageState _state;
+        private readonly State _state;
 
         public WorkerServerStarter(
             IHangfire hangfire,
             WorkerDeterminer workerDeterminer,
             StorageCreator storageCreator,
-            StorageState state)
+            State state)
         {
             _hangfire = hangfire;
             _workerDeterminer = workerDeterminer;
@@ -34,13 +34,17 @@ namespace Hangfire.Configuration
             var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
 
-            _storageCreator.Create(options, storageOptions);
-            foreach (var storage in _state.State)
-                startWorkerServer(storage, options, serverOptions, backgroundProcesses);
+            _storageCreator.Refresh(options, storageOptions);
+            _state.Configurations
+                .OrderBy(x => !(x.Configuration.Active ?? false))
+                .ForEach(x =>
+                {
+                    startWorkerServer(x, options, serverOptions, backgroundProcesses);
+                });
         }
 
         private void startWorkerServer(
-            Storage storage,
+            ConfigurationAndStorage configurationAndStorage,
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
             List<IBackgroundProcess> backgroundProcesses)
@@ -49,13 +53,13 @@ namespace Hangfire.Configuration
             
             if (options.UseWorkerDeterminer)
                 serverOptions.WorkerCount = _workerDeterminer.DetermineWorkerCount(
-                    storage.JobStorage.GetMonitoringApi(),
-                    storage.Configuration.GoalWorkerCount,
+                    configurationAndStorage.CreateJobStorage().GetMonitoringApi(),
+                    configurationAndStorage.Configuration.GoalWorkerCount,
                     options
                 );
             
             _hangfire.UseHangfireServer(
-                storage.JobStorage,
+                configurationAndStorage.CreateJobStorage(),
                 serverOptions,
                 backgroundProcesses.ToArray()
             );

@@ -4,10 +4,10 @@ namespace Hangfire.Configuration
     {
         // outer services
         public WorkerServerStarter BuildWorkerServerStarter(object appBuilder, ConfigurationConnection connection) =>
-            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection), _storageState);
+            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), buildStorageCreator(appBuilder, connection), _state);
 
         public PublisherStarter BuildPublisherStarter(ConfigurationConnection connection) =>
-            new PublisherStarter(buildStorageCreator(null, connection));
+            new PublisherStarter(buildStorageCreator(null, connection), _state);
 
         public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
             new WorkerDeterminer(BuildRepository(connection));
@@ -15,20 +15,20 @@ namespace Hangfire.Configuration
         public ConfigurationApi BuildConfigurationApi(ConfigurationConnection connection) =>
             new ConfigurationApi(BuildRepository(connection), BuildHangfireSchemaCreator());
 
-        public PublisherQueries BuildPublishersQuerier() =>
-            new PublisherQueries(_storageState);
+        public PublisherQueries BuildPublishersQuerier(ConfigurationConnection connection) =>
+            new PublisherQueries(_state, buildStorageCreator(null, connection));
 
         public WorkerServerQueries BuildWorkerServersQuerier(ConfigurationConnection connection) =>
-            new WorkerServerQueries(buildStorageCreator(null, connection), _storageState);
+            new WorkerServerQueries(buildStorageCreator(null, connection), _state);
 
         public ViewModelBuilder BuildViewModelBuilder(ConfigurationConnection connection) =>
             new ViewModelBuilder(BuildRepository(connection));
 
         // internal services
-        private StorageState _storageState = new StorageState();
+        private State _state = new State();
 
         private StorageCreator buildStorageCreator(object appBuilder, ConfigurationConnection connection) =>
-            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _storageState);
+            new StorageCreator(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _state);
 
         private ConfigurationAutoUpdater buildDefaultServerConfigurator(ConfigurationConnection connection) =>
             new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection));

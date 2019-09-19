@@ -64,8 +64,10 @@ namespace Hangfire.Configuration
             _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
                 .QueryAllWorkerServers(_options, storageOptions);
 
-        public IEnumerable<JobStorage> QueryPublishers() =>
-            _compositionRoot.BuildPublishersQuerier().QueryPublishers();
+        public IEnumerable<JobStorage> QueryPublishers() => QueryPublishers(null);
+        public IEnumerable<JobStorage> QueryPublishers(SqlServerStorageOptions storageOptions) =>
+            _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+                .QueryPublishers(_options, storageOptions);
 
         public ConfigurationApi ConfigurationApi() =>
             _compositionRoot.BuildConfigurationApi(new ConfigurationConnection {ConnectionString = _options.ConnectionString});

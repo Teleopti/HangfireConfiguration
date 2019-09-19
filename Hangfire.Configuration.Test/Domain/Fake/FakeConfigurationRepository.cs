@@ -1,8 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
+    public static class Blip
+    {
+        public static T Copy<T>(this T instance)
+        {
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(instance));
+        }
+    }
+    
     public class FakeConfigurationRepository : IConfigurationRepository
     {
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
@@ -11,10 +20,12 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         private int _nextId = 1;
         private int NextId() => _nextId++;
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations() => Data.ToArray();
+        public IEnumerable<StoredConfiguration> ReadConfigurations() =>
+            Data.Select(x => x.Copy()).ToArray();
 
         public void WriteConfiguration(StoredConfiguration configuration)
         {
+            configuration = configuration.Copy();
             if (configuration.Id != null)
                 Data = Data.Where(x => x.Id != configuration.Id).ToArray();
             var existing = Data.SingleOrDefault(x => x.Id == configuration.Id);
