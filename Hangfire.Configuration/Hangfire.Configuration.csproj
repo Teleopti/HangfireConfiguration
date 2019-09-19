@@ -3,7 +3,7 @@
         <RootNamespace>Hangfire.Configuration</RootNamespace>
         <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0.3.12</Version>
+        <Version>0.3.13</Version>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Dapper" Version="1.60.6" />
