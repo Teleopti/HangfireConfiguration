@@ -74,7 +74,7 @@ namespace Hangfire.Configuration
 
         public IEnumerable<JobStorage> QueryPublishers() => QueryPublishers(_storageOptions);
         public IEnumerable<JobStorage> QueryPublishers(SqlServerStorageOptions storageOptions) =>
-            _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+            _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options?.ConnectionString})
                 .QueryPublishers(_options, storageOptions);
 
         public ConfigurationApi ConfigurationApi() =>
