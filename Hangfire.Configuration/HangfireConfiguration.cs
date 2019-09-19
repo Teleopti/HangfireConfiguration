@@ -17,6 +17,7 @@ namespace Hangfire.Configuration
         private readonly object _builder;
         private readonly ConfigurationOptions _options;
         private SqlServerStorageOptions _storageOptions;
+        private BackgroundJobServerOptions _serverOptions;
         private readonly CompositionRoot _compositionRoot;
 
         private HangfireConfiguration(object builder, ConfigurationOptions options, IDictionary<string, object> properties)
@@ -50,42 +51,62 @@ namespace Hangfire.Configuration
             return this;
         }
 
-        public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
+        public HangfireConfiguration UseServerOptions(BackgroundJobServerOptions serverOptions)
         {
-            var starter = _compositionRoot.BuildPublisherStarter(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
-            starter.Start(_options, storageOptions);
+            _serverOptions = serverOptions;
             return this;
         }
 
-        public HangfireConfiguration StartWorkerServers(SqlServerStorageOptions storageOptions, BackgroundJobServerOptions serverOptions, IBackgroundProcess[] additionalProcesses)
+        public HangfireConfiguration StartPublishers() => StartPublishers(_storageOptions);
+
+        public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
+            _storageOptions = storageOptions ?? _storageOptions;
+            _compositionRoot.BuildPublisherStarter(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+                .Start(_options, storageOptions);
+            return this;
+        }
+
+        public HangfireConfiguration StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses) => 
+            StartWorkerServers(_storageOptions, _serverOptions, additionalProcesses);
+        public HangfireConfiguration StartWorkerServers(SqlServerStorageOptions storageOptions, BackgroundJobServerOptions serverOptions, IEnumerable<IBackgroundProcess> additionalProcesses)
+        {
+            _storageOptions = storageOptions ?? _storageOptions;
+            _serverOptions = serverOptions ?? _serverOptions;
             _compositionRoot.BuildWorkerServerStarter(
                     _builder,
                     new ConfigurationConnection {ConnectionString = _options.ConnectionString}
                 )
-                .Start(_options, serverOptions, storageOptions, additionalProcesses);
+                .Start(_options, serverOptions, storageOptions, additionalProcesses.ToArray());
             return this;
         }
 
         public IEnumerable<JobStorage> QueryAllWorkerServers() => QueryAllWorkerServers(_storageOptions);
-        public IEnumerable<JobStorage> QueryAllWorkerServers(SqlServerStorageOptions storageOptions) => 
-            _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+
+        public IEnumerable<JobStorage> QueryAllWorkerServers(SqlServerStorageOptions storageOptions)
+        {
+            _storageOptions = storageOptions ?? _storageOptions;
+            return _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
                 .QueryAllWorkerServers(_options, storageOptions);
+        }
 
         public IEnumerable<JobStorage> QueryPublishers() => QueryPublishers(_storageOptions);
-        public IEnumerable<JobStorage> QueryPublishers(SqlServerStorageOptions storageOptions) =>
-            _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options?.ConnectionString})
+
+        public IEnumerable<JobStorage> QueryPublishers(SqlServerStorageOptions storageOptions)
+        {
+            _storageOptions = storageOptions ?? _storageOptions;
+            return _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options?.ConnectionString})
                 .QueryPublishers(_options, storageOptions);
+        }
 
         public ConfigurationApi ConfigurationApi() =>
             _compositionRoot.BuildConfigurationApi(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
 
-        internal ViewModelBuilder ViewModelBuilder() => 
+        internal ViewModelBuilder ViewModelBuilder() =>
             _compositionRoot.BuildViewModelBuilder(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
 
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
             new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
-
     }
 }
