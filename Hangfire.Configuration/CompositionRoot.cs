@@ -31,7 +31,7 @@ namespace Hangfire.Configuration
             new StateMaintainer(BuildHangfire(appBuilder), BuildRepository(connection), buildDefaultServerConfigurator(connection), _state);
 
         private ConfigurationAutoUpdater buildDefaultServerConfigurator(ConfigurationConnection connection) =>
-            new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection));
+            new ConfigurationAutoUpdater(BuildRepository(connection), BuildDistributedLock(connection), _state);
 
 
         // boundary

@@ -18,7 +18,7 @@ namespace Hangfire.Configuration
         public IEnumerable<JobStorage> QueryAllWorkerServers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _stateMaintainer.Refresh(options, storageOptions);
-            return _state.Configurations.Values
+            return _state.Configurations
                 .Select(s => s.CreateJobStorage())
                 .ToArray();
         }

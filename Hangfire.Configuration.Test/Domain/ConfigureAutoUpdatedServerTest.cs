@@ -7,7 +7,7 @@ namespace Hangfire.Configuration.Test.Domain
     public class ConfigureAutoUpdatedServerTest
     {
         [Fact]
-        public void ShouldConfigureDefaultServer()
+        public void ShouldConfigureAutoUpdatedServer()
         {
             var system = new SystemUnderTest();
 
@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldNotConfigureDefaultServerIfNoneGiven()
+        public void ShouldNotConfigureAutoUpdatedServerIfNoneGiven()
         {
             var system = new SystemUnderTest();
 
@@ -198,13 +198,13 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.True(system.Repository.Data.Single().Active);
         }
-        
+
         [Fact]
         public void ShouldNotActivateWhenUpdating()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder{ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
-            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder{DataSource = "DataSource"}.ToString(), Active = true});
+            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(), Active = true});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -214,7 +214,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.False(system.Repository.Data.First().Active);
             Assert.True(system.Repository.Data.Last().Active);
         }
-        
+
         [Fact]
         public void ShouldSaveSchemaName()
         {
@@ -228,7 +228,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
         }
-        
+
         [Fact]
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
@@ -242,6 +242,43 @@ namespace Hangfire.Configuration.Test.Domain
             }, null, null);
 
             Assert.Equal("schemaName", system.Repository.Data.Single().SchemaName);
+        }
+
+        [Fact]
+        public void ShouldOnlyAutoUpdateOnce()
+        {
+            var system = new SystemUnderTest();
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString()
+            }, null, null);
+
+            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString()
+            }, null);
+
+            var dataSource = new SqlConnectionStringBuilder(system.Repository.Data.Single().ConnectionString).DataSource;
+            Assert.Equal("FirstUpdate", dataSource);
+        }
+
+        [Fact]
+        public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
+        {
+            var system = new SystemUnderTest();
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString()
+            }, null, null);
+            system.Repository.Data = Enumerable.Empty<StoredConfiguration>();
+            
+            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString()
+            }, null);
+
+            var dataSource = new SqlConnectionStringBuilder(system.Repository.Data.Single().ConnectionString).DataSource;
+            Assert.Equal("SecondUpdate", dataSource);
         }
     }
 }

@@ -113,5 +113,20 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.False(system.Hangfire.CreatedStorages.Single().Options.PrepareSchemaIfNecessary);
         }
+        
+        [Fact]
+        public void ShouldReturnTheChangedActiveStorageWhenInactiveWasDeleted()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "one"});
+            system.Repository.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "two"});
+            system.PublisherQueries.QueryPublishers(null, null);
+            system.Repository.Data = system.Repository.Data.Where(x => x.Id == 2).ToArray();
+            system.ConfigurationApi.ActivateServer(2);
+            
+            var storage = system.PublisherQueries.QueryPublishers(null, null);
+            
+            Assert.Equal("two", (storage.Single() as FakeJobStorage).ConnectionString);
+        }
     }
 }

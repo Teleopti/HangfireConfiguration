@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -8,23 +9,22 @@ namespace Hangfire.Configuration
     {
         private readonly IConfigurationRepository _repository;
         private readonly IDistributedLock _distributedLock;
-        private bool _hasUpdated;
+        private readonly State _state;
         
-        public ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock)
+        public ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock, State state)
         {
             _repository = repository;
             _distributedLock = distributedLock;
+            _state = state;
         }
 
-        public void Update(ConfigurationOptions options)
+        public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> configs)
         {
-            if (_hasUpdated)
-                return;
-            _hasUpdated = true;
+            if (!shouldUpdate(options, configs)) 
+                return false;
             
-            if (options?.AutoUpdatedHangfireConnectionString == null)
-                return;
-
+            _state.ConfigurationAutoUpdaterRan = true;
+            
             using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
             {
                 var configurations = _repository.ReadConfigurations();
@@ -45,7 +45,7 @@ namespace Hangfire.Configuration
                 {
                     configuration = configurations.FirstOrDefault(isMarked);
                     if (configuration == null)
-                        return;
+                        return false;
                 }
                 
                 configuration.ConnectionString = markConnectionString(options.AutoUpdatedHangfireConnectionString);
@@ -53,6 +53,22 @@ namespace Hangfire.Configuration
 
                 _repository.WriteConfiguration(configuration);
             }
+
+            return true;
+        }
+
+        private bool shouldUpdate(ConfigurationOptions options, IEnumerable<StoredConfiguration> configurations)
+        {
+            if (options?.AutoUpdatedHangfireConnectionString == null)
+                return false;
+
+            if (configurations.IsEmpty())
+                return true;            
+            
+            if (_state.ConfigurationAutoUpdaterRan)
+                return false;
+            
+            return true;
         }
 
         private static bool isLegacy(StoredConfiguration configuration) =>

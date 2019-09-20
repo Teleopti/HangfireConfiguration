@@ -35,7 +35,7 @@ namespace Hangfire.Configuration
             serverOptions = serverOptions ?? new BackgroundJobServerOptions();
 
             _stateMaintainer.Refresh(options, storageOptions);
-            _state.Configurations.Values
+            _state.Configurations
                 .OrderBy(x => !(x.Configuration.Active ?? false))
                 .ForEach(x =>
                 {

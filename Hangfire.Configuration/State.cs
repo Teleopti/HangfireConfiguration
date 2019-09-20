@@ -7,7 +7,8 @@ namespace Hangfire.Configuration
 {
     public class State
     {
-        public readonly ConcurrentDictionary<int, ConfigurationAndStorage> Configurations = new ConcurrentDictionary<int, ConfigurationAndStorage>();
+        public IEnumerable<ConfigurationAndStorage> Configurations = Enumerable.Empty<ConfigurationAndStorage>();
+        public bool ConfigurationAutoUpdaterRan { get; set; }
     }
 
     public class ConfigurationAndStorage
