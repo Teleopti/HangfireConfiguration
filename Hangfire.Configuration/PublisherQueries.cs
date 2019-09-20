@@ -18,7 +18,7 @@ namespace Hangfire.Configuration
         public IEnumerable<JobStorage> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _creator.Refresh(options, storageOptions);
-           return  _state.Configurations
+           return  _state.Configurations.Values
                 .Where(x => x.Configuration.Active.Value)
                 .Select(x => x.CreateJobStorage())
                 .ToArray();

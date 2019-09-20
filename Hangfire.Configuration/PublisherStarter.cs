@@ -17,7 +17,7 @@ namespace Hangfire.Configuration
         public void Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _stateMaintainer.Refresh(options, storageOptions);
-            _state.Configurations.Where(x => x.Configuration.Active.GetValueOrDefault())
+            _state.Configurations.Values.Where(x => x.Configuration.Active.GetValueOrDefault())
                 .ForEach(x => { x.CreateJobStorage(); });
         }
     }

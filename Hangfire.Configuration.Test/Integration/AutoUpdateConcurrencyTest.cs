@@ -14,7 +14,7 @@ using Microsoft.Owin.Testing;
 namespace Hangfire.Configuration.Test.Integration
 {
     [Collection("NotParallel")]
-    public partial class AutoUpdateConcurrencyTest
+    public class AutoUpdateConcurrencyTest
     {
         [Fact, CleanDatabase]
         public void ShouldNotInsertMultiple()

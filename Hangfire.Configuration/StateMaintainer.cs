@@ -1,4 +1,3 @@
-using System.Linq;
 using Hangfire.SqlServer;
 using Newtonsoft.Json;
 
@@ -27,12 +26,14 @@ namespace Hangfire.Configuration
             _repository.ReadConfigurations()
                 .ForEach(c =>
                 {
-                    // is this thread safe?
-                    var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);
-                    if (existing != null)
-                        existing.Configuration = c;
-                    else
-                        _state.Configurations = _state.Configurations.Append(makeJobStorage(c, storageOptions)).ToArray();
+                    _state.Configurations.AddOrUpdate(
+                        c.Id.Value,
+                        (id) => makeJobStorage(c, storageOptions),
+                        (id, e) =>
+                        {
+                            e.Configuration = c;
+                            return e;
+                        });
                 });
         }
 
