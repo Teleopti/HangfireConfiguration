@@ -261,21 +261,6 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
         }
 
-        [Fact(Skip = "Not sure")]
-        public void ShouldReturnStartedServers()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration());
-//
-//            var result = system.WorkerServerStarter.Start(null, null, null);
-//
-//            Assert.Equal(1, result.First().Number);
-//            Assert.Same(system.Hangfire.StartedServers.First().storage, result.First().Storage);
-//            Assert.Equal(2, result.Last().Number);
-//            Assert.Same(system.Hangfire.StartedServers.Last().storage, result.Last().Storage);
-        }
-
         [Fact]
         public void ShouldPassBackgroundProcessesToActiveServer()
         {

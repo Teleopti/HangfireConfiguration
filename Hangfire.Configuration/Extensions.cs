@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public static class Extensions
+    internal static class Extensions
     {
-        public static bool IsEmpty<T>(this IEnumerable<T> source)
+        internal static bool IsEmpty<T>(this IEnumerable<T> source)
         {
             return !source.Any();
         }
         
-        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
+        internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
         {
             foreach (T item in source)
             {

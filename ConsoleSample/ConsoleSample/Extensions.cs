@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hangfire.Configuration.Test
+namespace ConsoleSample
 {
-    public static class Extensions
+    internal static class Extensions
     {
-        public static void Times(this int times, Action action)
+        internal static bool IsEmpty<T>(this IEnumerable<T> source)
         {
-            Enumerable.Range(0, times).ForEach(i => action());
+            return !source.Any();
         }
         
         internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
@@ -20,5 +20,6 @@ namespace Hangfire.Configuration.Test
 
             return source;
         }
+        
     }
 }

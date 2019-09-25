@@ -9,7 +9,7 @@ namespace Hangfire.Configuration
         private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
 
-        public WorkerServerQueries(StateMaintainer stateMaintainer, State state)
+        internal WorkerServerQueries(StateMaintainer stateMaintainer, State state)
         {
             _stateMaintainer = stateMaintainer;
             _state = state;

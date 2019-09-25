@@ -12,7 +12,7 @@ namespace Hangfire.Configuration
         private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
 
-        public WorkerServerStarter(
+        internal WorkerServerStarter(
             IHangfire hangfire,
             WorkerDeterminer workerDeterminer,
             StateMaintainer stateMaintainer,

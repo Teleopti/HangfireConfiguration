@@ -9,7 +9,7 @@ namespace Hangfire.Configuration
         private readonly State _state;
         private readonly StateMaintainer _creator;
 
-        public PublisherQueries(State state, StateMaintainer creator)
+        internal PublisherQueries(State state, StateMaintainer creator)
         {
             _state = state;
             _creator = creator;

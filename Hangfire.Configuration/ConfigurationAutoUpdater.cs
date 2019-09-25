@@ -11,7 +11,7 @@ namespace Hangfire.Configuration
         private readonly IDistributedLock _distributedLock;
         private readonly State _state;
         
-        public ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock, State state)
+        internal ConfigurationAutoUpdater(IConfigurationRepository repository, IDistributedLock distributedLock, State state)
         {
             _repository = repository;
             _distributedLock = distributedLock;

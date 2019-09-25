@@ -8,7 +8,7 @@ namespace Hangfire.Configuration
         private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
 
-        public PublisherStarter(StateMaintainer stateMaintainer, State state)
+        internal PublisherStarter(StateMaintainer stateMaintainer, State state)
         {
             _stateMaintainer = stateMaintainer;
             _state = state;

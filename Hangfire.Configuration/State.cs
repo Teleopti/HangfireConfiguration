@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public class State
+    internal class State
     {
         public IEnumerable<ConfigurationAndStorage> Configurations = Enumerable.Empty<ConfigurationAndStorage>();
         public bool ConfigurationAutoUpdaterRan { get; set; }
     }
 
-    public class ConfigurationAndStorage
+    internal class ConfigurationAndStorage
     {
         public StoredConfiguration Configuration;
         public Func<JobStorage> JobStorageCreator;
