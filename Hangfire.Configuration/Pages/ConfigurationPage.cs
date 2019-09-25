@@ -53,16 +53,32 @@ namespace Hangfire.Configuration.Pages
         private void WriteInformationHeader()
         {
             WriteLiteral(@"
-<fieldset>
-    <legend>Information</legend>
-    <p>
-        <bold>*Worker goal count:</bold> Configuration value to set the goal number of workers to dynamically scale
-        workers per server.<br>On start up of each Hangfire server, the server will be assigned a number of workers approximate
-        for equal distribution of the goal workers count.<br>This is an approximation for reasons like: the number of existing servers is
-        not exact, rounding, minimum 1 worker assigned.<br>As the servers randomly reset, the goal will eventually be
-        met.<br>Default goal is 10 if no value is specified
-    </p>
-</fieldset>");
+                <fieldset>
+                    <legend>Information</legend>");
+            if (_options.AllowNewServerCreation)
+                WriteStorageActivationInformation();
+            WriteWorkerGoalCountInformation();
+            WriteLiteral(@"</fieldset>");
+        }
+
+        private void WriteStorageActivationInformation()
+        {
+            WriteLiteral(@"
+                 <p>
+                    <b>Activate configuration:</b> When active configuration is changed, the jobs will eventually be put on queue for the active one.
+                </p>");
+        }
+        
+        private void WriteWorkerGoalCountInformation()
+        {
+            WriteLiteral(@"
+                <p>
+                    <b>Worker goal count:</b> Configuration value to set the goal number of workers to dynamically scale
+                    workers per server.<br>On start up of each Hangfire server, the server will be assigned a number of workers approximate
+                    for equal distribution of the goal workers count.<br>This is an approximation for reasons like: the number of existing servers is
+                    not exact, rounding, minimum 1 worker assigned.<br>As the servers randomly reset, the goal will eventually be
+                    met.<br>Default goal is 10 if no value is specified
+                 </p>");
         }
 
         private void WriteConfiguration(ViewModel configuration)
