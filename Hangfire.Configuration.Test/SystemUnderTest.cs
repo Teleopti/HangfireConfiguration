@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test
 #endif
                         {
                             app.Properties.Add("CompositionRoot", this);
-                            app.UseHangfireConfigurationUI("/config", new HangfireConfigurationUIOptions());
+                            app.UseHangfireConfigurationUI("/config", new ConfigurationOptions());
                         }))
 #if !NET472
                         )

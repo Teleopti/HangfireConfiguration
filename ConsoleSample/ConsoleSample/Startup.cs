@@ -86,19 +86,18 @@ namespace ConsoleSample
                 SchemaName = "NotUsedSchemaName"
             };
 
-            app.UseHangfireConfigurationUI("/HangfireConfiguration", new HangfireConfigurationUIOptions
+            var options = new ConfigurationOptions
             {
                 ConnectionString = configurationConnectionString,
                 AllowNewServerCreation = true,
-                PrepareSchemaIfNecessary = true
-            });
+                PrepareSchemaIfNecessary = true,
+                AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
+                AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
+            };
+            
+            app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
-            app.UseHangfireConfiguration(new ConfigurationOptions
-                {
-                    ConnectionString = configurationConnectionString,
-                    AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
-                    AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
-                })
+            app.UseHangfireConfiguration(options)
                 .UseStorageOptions(storageOptions)
                 .QueryAllWorkerServers()
                 .Select((storage, i) => (storage: storage, i: i))

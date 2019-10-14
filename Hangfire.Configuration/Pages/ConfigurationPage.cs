@@ -8,9 +8,9 @@ namespace Hangfire.Configuration.Pages
     {
         private readonly ViewModelBuilder _viewModelBuilder;
         private readonly string _basePath;
-        private readonly HangfireConfigurationUIOptions _options;
+        private readonly ConfigurationOptions _options;
 
-        public ConfigurationPage(HangfireConfiguration configuration, string basePath, HangfireConfigurationUIOptions options)
+        public ConfigurationPage(HangfireConfiguration configuration, string basePath, ConfigurationOptions options)
         {
             _viewModelBuilder = configuration.ViewModelBuilder();
             _basePath = basePath;

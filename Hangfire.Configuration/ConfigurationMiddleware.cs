@@ -20,7 +20,7 @@ namespace Hangfire.Configuration
     public class ConfigurationMiddleware : OwinMiddleware
 #endif
     {
-        private readonly HangfireConfigurationUIOptions _options;
+        private readonly ConfigurationOptions _options;
         private readonly HangfireConfiguration _configuration;
         private readonly ConfigurationApi _configurationApi;
 
@@ -30,14 +30,14 @@ namespace Hangfire.Configuration
 #else
             OwinMiddleware next,
 #endif
-            HangfireConfigurationUIOptions options,
+            ConfigurationOptions options,
             IDictionary<string, object> properties)
 #if !NETSTANDARD2_0
             : base(next)
 #endif
         {
             _options = options;
-            _configuration = HangfireConfiguration.UseHangfireConfiguration(null, new ConfigurationOptions {ConnectionString = _options.ConnectionString}, properties);
+            _configuration = HangfireConfiguration.UseHangfireConfiguration(null, _options, properties);
             _configurationApi = _configuration.ConfigurationApi();
             if (_options.PrepareSchemaIfNecessary)
                 using (var c = new SqlConnection(_options.ConnectionString))

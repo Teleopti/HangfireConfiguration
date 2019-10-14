@@ -9,9 +9,9 @@ namespace Hangfire.Configuration
 	public static class ApplicationBuilderExtension
 	{
 #if NETSTANDARD2_0
-		public static void UseHangfireConfigurationUI(this IApplicationBuilder builder, string pathMatch, HangfireConfigurationUIOptions options)
+		public static void UseHangfireConfigurationUI(this IApplicationBuilder builder, string pathMatch, ConfigurationOptions options)
 #else
-		public static void UseHangfireConfigurationUI(this IAppBuilder builder, string pathMatch, HangfireConfigurationUIOptions options)
+		public static void UseHangfireConfigurationUI(this IAppBuilder builder, string pathMatch, ConfigurationOptions options)
 #endif
 		{
 			builder.Map(pathMatch, subApp =>
