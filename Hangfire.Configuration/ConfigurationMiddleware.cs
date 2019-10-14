@@ -112,17 +112,25 @@ namespace Hangfire.Configuration
         private void saveWorkerGoalCount(IOwinContext context)
 #endif
         {
-            var parsed = parseRequestBody(context.Request);
-
-            _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
+            try
             {
-                ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
-                Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
-            });
+                var parsed = parseRequestBody(context.Request);
 
-            context.Response.StatusCode = (int) HttpStatusCode.OK;
-            context.Response.ContentType = "text/html";
-            context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
+                _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
+                {
+                    ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
+                    Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
+                });
+
+                context.Response.StatusCode = (int) HttpStatusCode.OK;
+                context.Response.ContentType = "text/html";
+                context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                context.Response.WriteAsync(ex.Message).Wait();
+            }
         }
 
 #if NETSTANDARD2_0

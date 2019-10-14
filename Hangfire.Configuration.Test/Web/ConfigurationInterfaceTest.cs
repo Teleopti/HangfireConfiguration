@@ -2,6 +2,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
@@ -45,6 +46,31 @@ namespace Hangfire.Configuration.Test.Web
             
             Assert.Equal(1, system.Repository.Data.Single().Id);
             Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+        }
+        
+        [Fact]
+        public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
+        {
+            var system = new SystemUnderTest(new ConfigurationOptions{MaximumGoalWorkerCount = 10});
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 1,
+                GoalWorkerCount = 3
+            });
+            
+            var response = system.TestClient.PostAsync(
+                    "/config/saveWorkerGoalCount",
+                    new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        configurationId = 1, 
+                        workers = 11
+                    })))
+                .Result;
+            
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var message = response.Content.ReadAsStringAsync().Result;
+            Assert.NotEmpty(message);
+            Assert.DoesNotContain("<", message);
         }
         
         [Fact]

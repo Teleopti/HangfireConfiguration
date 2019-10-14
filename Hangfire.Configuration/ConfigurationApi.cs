@@ -8,15 +8,23 @@ namespace Hangfire.Configuration
     {
         private readonly IConfigurationRepository _repository;
         private readonly IHangfireSchemaCreator _creator;
+        private readonly ConfigurationOptions _options;
 
-        public ConfigurationApi(IConfigurationRepository repository, IHangfireSchemaCreator creator)
+        public ConfigurationApi(
+            IConfigurationRepository repository, 
+            IHangfireSchemaCreator creator,
+            ConfigurationOptions options)
         {
             _repository = repository;
             _creator = creator;
+            _options = options;
         }
 
         public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
         {
+            if (command.Workers > _options.MaximumGoalWorkerCount)
+                throw new Exception("Invalid goal worker count.");
+
             var configurations = _repository.ReadConfigurations();
             var configuration = new StoredConfiguration();
             if (configurations.Any())
@@ -31,6 +39,7 @@ namespace Hangfire.Configuration
             }
 
             configuration.GoalWorkerCount = command.Workers;
+
             _repository.WriteConfiguration(configuration);
         }
 
@@ -64,10 +73,10 @@ namespace Hangfire.Configuration
             }
         }
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations() => 
+        public IEnumerable<StoredConfiguration> ReadConfigurations() =>
             _repository.ReadConfigurations();
 
-        public void WriteConfiguration(StoredConfiguration configuration) => 
+        public void WriteConfiguration(StoredConfiguration configuration) =>
             _repository.WriteConfiguration(configuration);
     }
 }

@@ -14,10 +14,12 @@ namespace Hangfire.Configuration.Test
 {
     public class SystemUnderTest : CompositionRoot
     {
+        private readonly ConfigurationOptions _options;
         private readonly Lazy<TestServer> _testServer;
 
-        public SystemUnderTest()
+        public SystemUnderTest(ConfigurationOptions options = null)
         {
+            _options = options ?? new ConfigurationOptions();
 #if !NET472
             ApplicationBuilder = new ApplicationBuilder(null);
 #else
@@ -31,7 +33,7 @@ namespace Hangfire.Configuration.Test
 #endif
                         {
                             app.Properties.Add("CompositionRoot", this);
-                            app.UseHangfireConfigurationUI("/config", new ConfigurationOptions());
+                            app.UseHangfireConfigurationUI("/config", _options);
                         }))
 #if !NET472
                         )
@@ -46,7 +48,7 @@ namespace Hangfire.Configuration.Test
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
             DistributedLock = new FakeDistributedLock();
 
-            ConfigurationApi = BuildConfigurationApi(null);
+            ConfigurationApi = BuildConfigurationApi(_options);
             WorkerServerStarter = BuildWorkerServerStarter(ApplicationBuilder, connection);
             WorkerDeterminer = BuildWorkerDeterminer(null);
             PublisherStarter = BuildPublisherStarter(connection);

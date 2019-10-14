@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -50,6 +51,44 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             Assert.Equal(5, system.Repository.Data.Single(x => x.Id == 2).GoalWorkerCount);
+        }
+
+        [Fact]
+        public void ShouldThrowIfGoalWorkerCountHigherThan100()
+        {
+            var system = new SystemUnderTest();
+
+            var e = Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 101}));
+            Assert.Equal("Invalid goal worker count.", e.Message);
+        }
+
+        [Fact]
+        public void ShouldNotWriteIfGoalWorkerCountHigherThan100()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 1,
+                GoalWorkerCount = 10
+            });
+
+            try
+            {
+                system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {ConfigurationId = 1, Workers = 101});
+            }
+            catch (Exception e)
+            {
+            }
+
+            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+        }
+
+        [Fact]
+        public void ShouldThrowIfGoalWorkerCountHigherThanOptions()
+        {
+            var system = new SystemUnderTest(new ConfigurationOptions {MaximumGoalWorkerCount = 5});
+
+            Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 6}));
         }
     }
 }

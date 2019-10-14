@@ -278,14 +278,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetWorkerCountForTwoServers()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration() {GoalWorkerCount = 20});
-            system.Repository.Has(new StoredConfiguration() {GoalWorkerCount = 100});
-            var configurationOptions = new ConfigurationOptions()
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 20});
+            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 100});
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 MinimumServers = 1
-            };
-
-            system.WorkerServerStarter.Start(configurationOptions, null, null);
+            }, null, null);
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.Equal(new[] {20, 100}, actual);

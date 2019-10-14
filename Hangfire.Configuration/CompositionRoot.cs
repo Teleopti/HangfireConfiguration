@@ -12,8 +12,8 @@ namespace Hangfire.Configuration
         public WorkerDeterminer BuildWorkerDeterminer(ConfigurationConnection connection) =>
             new WorkerDeterminer(BuildRepository(connection));
 
-        public ConfigurationApi BuildConfigurationApi(ConfigurationConnection connection) =>
-            new ConfigurationApi(BuildRepository(connection), BuildHangfireSchemaCreator());
+        public ConfigurationApi BuildConfigurationApi(ConfigurationOptions options) =>
+            new ConfigurationApi(BuildRepository(new ConfigurationConnection() {ConnectionString = options.ConnectionString}), BuildHangfireSchemaCreator(), options);
 
         public PublisherQueries BuildPublishersQuerier(ConfigurationConnection connection) =>
             new PublisherQueries(_state, buildStorageCreator(null, connection));

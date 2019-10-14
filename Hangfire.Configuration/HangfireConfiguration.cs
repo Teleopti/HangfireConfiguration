@@ -100,7 +100,7 @@ namespace Hangfire.Configuration
         }
 
         public ConfigurationApi ConfigurationApi() =>
-            _compositionRoot.BuildConfigurationApi(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
+            _compositionRoot.BuildConfigurationApi(_options);
 
         internal ViewModelBuilder ViewModelBuilder() =>
             _compositionRoot.BuildViewModelBuilder(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
