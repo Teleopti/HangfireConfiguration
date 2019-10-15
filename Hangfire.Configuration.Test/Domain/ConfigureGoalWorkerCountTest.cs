@@ -76,7 +76,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {ConfigurationId = 1, Workers = 101});
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 

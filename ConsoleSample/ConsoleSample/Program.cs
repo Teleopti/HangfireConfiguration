@@ -73,7 +73,7 @@ namespace ConsoleSample
         private static readonly Random Rand = new Random();
 
         [Queue("critical")]
-        public async Task Random(int number)
+        public void Random(int number)
         {
             int time;
             lock (Rand)
