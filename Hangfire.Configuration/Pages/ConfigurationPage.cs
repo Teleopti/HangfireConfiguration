@@ -66,7 +66,8 @@ namespace Hangfire.Configuration.Pages
             WriteLiteral(@"
                 <h3>Activate configuration</h3>
                  <p>
-                    When active configuration is changed, the jobs will eventually be put on queue for the active one.
+                    When active configuration is changed, the jobs will eventually be put on queue for the active one.<br>
+                    The active configuration will be the one receiving the new jobs, but the inactive one will continue processing the old jobs already queued.
                 </p>");
         }
         
