@@ -15,7 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace Hangfire.Configuration
 {
 #if NETSTANDARD2_0
-	public class ConfigurationMiddleware
+    public class ConfigurationMiddleware
 #else
     public class ConfigurationMiddleware : OwinMiddleware
 #endif
@@ -26,7 +26,7 @@ namespace Hangfire.Configuration
 
         public ConfigurationMiddleware(
 #if NETSTANDARD2_0
-			RequestDelegate next,
+            RequestDelegate next,
 #else
             OwinMiddleware next,
 #endif
@@ -45,7 +45,7 @@ namespace Hangfire.Configuration
         }
 
 #if NETSTANDARD2_0
-		public Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
 #else
         public override Task Invoke(IOwinContext context)
 #endif
@@ -55,7 +55,7 @@ namespace Hangfire.Configuration
         }
 
 #if NETSTANDARD2_0
-		private void handleRequest(HttpContext context)
+        private void handleRequest(HttpContext context)
 #else
         private void handleRequest(IOwinContext context)
 #endif
@@ -78,63 +78,55 @@ namespace Hangfire.Configuration
                 return;
             }
 
-            var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
-
             if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
             {
-                saveWorkerGoalCount(context);
+                processRequest(context, () => saveWorkerGoalCount(context));
                 return;
             }
 
             if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
             {
-                createNewServerConfiguration(context);
+                processRequest(context, () => createNewServerConfiguration(context));
                 return;
             }
 
             if (context.Request.Path.Value.Equals("/activateServer"))
             {
-                activateServer(context);
+                processRequest(context, () =>
+                {
+                    var parsed = parseRequestBody(context.Request);
+                    var configurationId = parsed.SelectToken("configurationId").Value<int>();
+                    _configurationApi.ActivateServer(configurationId);
+                });
                 return;
             }
 
-            var html = page.ToString();
-            context.Response.StatusCode = (int) HttpStatusCode.OK;
-            context.Response.ContentType = "text/html";
-            //context.Response.Write(html);
-            context.Response.WriteAsync(html).Wait();
+            processRequest(context, () =>
+            {
+                var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
+                var html = page.ToString();
+                context.Response.WriteAsync(html).Wait();
+            });
         }
 
 
 #if NETSTANDARD2_0
-		private void saveWorkerGoalCount(HttpContext context)
+        private void saveWorkerGoalCount(HttpContext context)
 #else
         private void saveWorkerGoalCount(IOwinContext context)
 #endif
         {
-            try
+            var parsed = parseRequestBody(context.Request);
+            _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
             {
-                var parsed = parseRequestBody(context.Request);
-
-                _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
-                {
-                    ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
-                    Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
-                });
-
-                context.Response.StatusCode = (int) HttpStatusCode.OK;
-                context.Response.ContentType = "text/html";
-                context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
-            }
-            catch (Exception ex)
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                context.Response.WriteAsync(ex.Message).Wait();
-            }
+                ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
+                Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
+            });
+            context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
         }
 
 #if NETSTANDARD2_0
-		private void createNewServerConfiguration(HttpContext context)
+        private void createNewServerConfiguration(HttpContext context)
 #else
         private void createNewServerConfiguration(IOwinContext context)
 #endif
@@ -150,33 +142,11 @@ namespace Hangfire.Configuration
                 SchemaCreatorUser = parsed.SelectToken("schemaCreatorUser").Value<string>(),
                 SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>()
             };
-
-            try
-            {
-                _configurationApi.CreateServerConfiguration(configuration);
-                context.Response.StatusCode = (int) HttpStatusCode.OK;
-            }
-            catch (Exception ex)
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                context.Response.WriteAsync(ex.Message).Wait();
-            }
+            _configurationApi.CreateServerConfiguration(configuration);
         }
 
 #if NETSTANDARD2_0
-		private void activateServer(HttpContext context)
-#else
-        private void activateServer(IOwinContext context)
-#endif
-        {
-            var parsed = parseRequestBody(context.Request);
-            var configurationId = parsed.SelectToken("configurationId").Value<int>();
-            _configurationApi.ActivateServer(configurationId);
-            context.Response.StatusCode = (int) HttpStatusCode.OK;
-        }
-
-#if NETSTANDARD2_0
-		private JObject parseRequestBody(HttpRequest request)
+        private JObject parseRequestBody(HttpRequest request)
 #else
         private JObject parseRequestBody(IOwinRequest request)
 #endif
@@ -188,8 +158,26 @@ namespace Hangfire.Configuration
             return parsed;
         }
 
-
         private int? tryParseNullable(string value) =>
             int.TryParse(value, out var outValue) ? (int?) outValue : null;
+
+#if NETSTANDARD2_0
+        private void processRequest(HttpContext context, Action action)
+#else
+        private void processRequest(IOwinContext context, Action action)
+#endif
+        {
+            try
+            {
+                context.Response.StatusCode = (int) HttpStatusCode.OK;
+                context.Response.ContentType = "text/html";
+                action.Invoke();
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                context.Response.WriteAsync(ex.Message).Wait();
+            }
+        }
     }
 }

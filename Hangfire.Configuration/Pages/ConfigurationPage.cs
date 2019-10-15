@@ -64,16 +64,18 @@ namespace Hangfire.Configuration.Pages
         private void WriteStorageActivationInformation()
         {
             WriteLiteral(@"
+                <h3>Activate configuration</h3>
                  <p>
-                    <b>Activate configuration:</b> When active configuration is changed, the jobs will eventually be put on queue for the active one.
+                    When active configuration is changed, the jobs will eventually be put on queue for the active one.
                 </p>");
         }
         
         private void WriteWorkerGoalCountInformation()
         {
             WriteLiteral(@"
+                <h3>Worker goal count</h3>
                 <p>
-                    <b>Worker goal count:</b> Configuration value to set the goal number of workers to dynamically scale
+                    Configuration value to set the goal number of workers to dynamically scale
                     workers per server.<br>On start up of each Hangfire server, the server will be assigned a number of workers approximate
                     for equal distribution of the goal workers count.<br>This is an approximation for reasons like: the number of existing servers is
                     not exact, rounding, minimum 1 worker assigned.<br>As the servers randomly reset, the goal will eventually be
@@ -91,9 +93,9 @@ namespace Hangfire.Configuration.Pages
             if (!string.IsNullOrEmpty(configuration.ServerName))
             {
                 WriteLiteral($@"
-                    <div><span class='configLabel'>Server:</span><span>{configuration.ServerName}</span></div>
-                    <div><span class='configLabel'>Database:</span><span>{configuration.DatabaseName}</span></div>
-                    <div><span class='configLabel'>Schema name:</span><span>{configuration.SchemaName}</span></div>");
+                    <div><label>Server:</label><span>{configuration.ServerName}</span></div>
+                    <div><label>Database:</label><span>{configuration.DatabaseName}</span></div>
+                    <div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
             }
 
             WriteLiteral($@"
@@ -103,6 +105,7 @@ namespace Hangfire.Configuration.Pages
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
                         <button class='button' type='button'>Submit</button>
+                            (Default: {_options.DefaultGoalWorkerCount}, Max: {_options.MaximumGoalWorkerCount})
                     </form>
                 </div>");
 

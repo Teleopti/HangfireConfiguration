@@ -1,5 +1,6 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
     margin-left: 20px
 }
 
@@ -8,24 +9,21 @@ h2 {
     font-weight: 500
 }
 
+h3 {
+    font-weight: 700;
+    margin: 0;
+}
+
 div {
     padding-top: 3px
 }
 
-.configLabel {
-    padding-right: 10px;
-    padding-top: 30px;
-    color: #888;
-    font-weight: bold;
-}
-
 p {
-    font-size: 12px;
-    line-height: 14px;
+    margin-top: 0;
 }
 
 label {
-    padding: 10px 0px 10px;
+    margin-right: 10px;
     color: #888;
     font-weight: bold;
 }
@@ -49,7 +47,6 @@ fieldset {
     -moz-border-radius: 8px;
     border-radius: 8px;
     border: 1px solid #428bca;
-    line-height: 1.5em;
 }
 
 legend {
