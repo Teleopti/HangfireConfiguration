@@ -134,25 +134,30 @@ namespace Hangfire.Configuration.Pages
     <legend>Create new Hangfire server</legend>
     <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
         <div class='flex-grid'>
-            <div style='width: 240px'>
+            <fieldset>
+                <h3>SQL server</h3>
                 <label for='server'>Server: </label><br>
-                <input type='text' id='server' name='server'  style='width:200px'>
-                <br><label for='database'>Database: </label><br>
-                <input type='text' id='database' name='database' style='width:200px'>
-                <br><label for='schemaName'>Schema: </label><br>
-                <input type='text' id='schemaName' name='schemaName' style='width:200px'>
-                <br><label for='user'>User: </label><br>
-                <input type='text' id='user' name='user' style='width:200px'>
-                <br><label for='password'>Password: </label><br>
-                <input type='text' id='password' name='password' style='width:200px'>
-            </div>
-            <div class='col'>
+                <input type='text' id='server' name='server'><br>
+                <label for='database'>Database (existing): </label><br>
+                <input type='text' id='database' name='database'><br>
+                <label for='schemaName'>Schema (optional): </label><br>
+                <input type='text' id='schemaName' name='schemaName'>
+             </fieldset>
+             <fieldset>
+                <h3>Hangfire worker server credentials</h3>
+                <label for='user'>SQL User Name (existing):</label><br>
+                <input type='text' id='user' name='user'><br>
+                <label for='password'>SQL Password: </label><br>
+                <input type='text' id='password' name='password'>
+            </fieldset>
+            <fieldset>
+                <h3>Database credentials to create Hangfire storage</h3>
                 <label for='schemaCreatorUser'>Creator user: </label><br>
-                <input type='text' id='schemaCreatorUser' name='schemaCreatorUser' style='width:200px'>
-                <br><label for='schemaCreatorPassword'>Creator password: </label><br>
-                <input type='text' id='schemaCreatorPassword' name='schemaCreatorPassword' style='width:200px'>
-                <br><br><button class='button' type='button'>Create</button>
-            </div>
+                <input type='text' id='schemaCreatorUser' name='schemaCreatorUser'><br>
+                <label for='schemaCreatorPassword'>Creator password: </label><br>
+                <input type='text' id='schemaCreatorPassword' name='schemaCreatorPassword'><br><br>
+                <button class='button' type='button'>Create</button>
+            </fieldset>
         </div>
     </form>
 </fieldset>");
