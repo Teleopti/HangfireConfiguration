@@ -190,9 +190,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null);
 
-            var defaultSchema = typeof(SqlServerStorageOptions).Assembly.GetType("Hangfire.SqlServer.Constants")
-                .GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null);
-            Assert.Equal(defaultSchema, (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+            Assert.Equal(DefaultSchemaName.Name(), (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
         
         [Fact]
@@ -203,9 +201,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null);
 
-            var defaultSchema = typeof(SqlServerStorageOptions).Assembly.GetType("Hangfire.SqlServer.Constants")
-                .GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null);
-            Assert.Equal(defaultSchema, (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+            Assert.Equal(DefaultSchemaName.Name(), (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 
         [Fact]

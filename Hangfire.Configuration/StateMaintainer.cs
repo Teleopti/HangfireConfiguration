@@ -49,7 +49,7 @@ namespace Hangfire.Configuration
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             if (string.IsNullOrEmpty(configuration.SchemaName))
-                options.SchemaName = "HangFire";
+                options.SchemaName = DefaultSchemaName.Name();
             else
                 options.SchemaName = configuration.SchemaName;
 

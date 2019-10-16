@@ -2,6 +2,7 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -144,10 +145,10 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaName = "schema"
                 });
 
-            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.SchemaCreator.SchemaCreatedWith.Last().ConnectionString);
-            Assert.Equal("schema", system.SchemaCreator.SchemaCreatedWith.Last().SchemaName);
+            Assert.Contains("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword", system.SchemaCreator.Schemas.Last().ConnectionString);
+            Assert.Equal("schema", system.SchemaCreator.Schemas.Last().SchemaName);
         }
-        
+
         [Fact]
         public void ShouldSaveNewServerConfigurationUsingConnectionStrings()
         {
@@ -161,9 +162,62 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var storedConfiguration = system.Repository.Data.Last();
-            Assert.Equal("creator", system.SchemaCreator.SchemaCreatedWith.Last().ConnectionString);
+            Assert.Equal("creator", system.SchemaCreator.Schemas.Last().ConnectionString);
             Assert.Equal("storage", storedConfiguration.ConnectionString);
             Assert.Equal("schema", storedConfiguration.SchemaName);
+        }
+
+        [Fact]
+        public void ShouldThrowWhenSchemaAlreadyExists()
+        {
+            var system = new SystemUnderTest();
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+            {
+                Server = "server",
+                Database = "existingDatabase",
+                SchemaName = "existingSchema"
+            });
+
+            var e = Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
+                new CreateServerConfiguration
+                {
+                    Server = "server",
+                    Database = "existingDatabase",
+                    SchemaName = "existingSchema"
+                }));
+            Assert.Equal("Schema already exists.", e.Message);
+        }
+
+        [Fact]
+        public void ShouldThrowWhenDefaultSchemaNameAlreadyExists()
+        {
+            var system = new SystemUnderTest();
+            var connection = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "existingDatabase"}.ToString();
+            system.SchemaCreator.Has(DefaultSchemaName.Name(), connection);
+
+            Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
+                new CreateServerConfiguration
+                {
+                    SchemaCreatorConnectionString = connection,
+                    SchemaName = null
+                }));
+        }
+
+        [Fact]
+        public void ShouldCreateSchemaWithSameNameInDifferentDatabase()
+        {
+            var system = new SystemUnderTest();
+            system.SchemaCreator.Has("schemaName", "connectionOne");
+
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+            {
+                SchemaCreatorConnectionString = "connectionTwo",
+                SchemaName = "schemaName"
+            });
+
+            Assert.Equal(2, system.SchemaCreator.Schemas.Count());
+            Assert.Equal("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
+            Assert.Equal("connectionTwo", system.SchemaCreator.Schemas.Last().ConnectionString);
         }
     }
 }

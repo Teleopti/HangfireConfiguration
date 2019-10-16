@@ -11,7 +11,7 @@ namespace Hangfire.Configuration
         private readonly ConfigurationOptions _options;
 
         public ConfigurationApi(
-            IConfigurationRepository repository, 
+            IConfigurationRepository repository,
             IHangfireSchemaCreator creator,
             ConfigurationOptions options)
         {
@@ -52,6 +52,9 @@ namespace Hangfire.Configuration
             var creatorConnectionString = config.SchemaCreatorConnectionString ??
                                           $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword}";
             _creator.TryConnect(creatorConnectionString);
+
+            if (_creator.SchemaExists(config.SchemaName ?? DefaultSchemaName.Name(), creatorConnectionString))
+                throw new Exception("Schema already exists.");
 
             _creator.CreateHangfireSchema(config.SchemaName, creatorConnectionString);
 

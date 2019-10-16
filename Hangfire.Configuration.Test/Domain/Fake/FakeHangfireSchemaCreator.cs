@@ -8,8 +8,11 @@ namespace Hangfire.Configuration.Test.Domain.Fake
     {
         public Exception TryConnectFailsWith;
         public IEnumerable<string> ConnectionTriedWith = Enumerable.Empty<string>();
-        public IEnumerable<(string SchemaName, string ConnectionString)> SchemaCreatedWith = Enumerable.Empty<(string SchemaName, string ConnectionString)>();
+        public IEnumerable<(string SchemaName, string ConnectionString)> Schemas = Enumerable.Empty<(string SchemaName, string ConnectionString)>();
 
+        public void Has(string schemaName, string connectionString) =>
+            Schemas = Schemas.Append((schemaName, connectionString)).ToArray();
+        
         public void TryConnect(string connectionString)
         {
             ConnectionTriedWith = ConnectionTriedWith.Append(connectionString).ToArray();
@@ -19,7 +22,17 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
         public void CreateHangfireSchema(string schemaName, string connectionString)
         {
-            SchemaCreatedWith = SchemaCreatedWith.Append((schemaName, connectionString)).ToArray();
+            Schemas = Schemas
+                .Append((schemaName ?? DefaultSchemaName.Name(), connectionString))
+                .ToArray();
+        }
+
+        public bool SchemaExists(string schemaName, string connectionString)
+        {
+            return Schemas
+                .Where(x => string.Equals(x.SchemaName, schemaName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.ConnectionString == connectionString)
+                .Any();
         }
     }
 }

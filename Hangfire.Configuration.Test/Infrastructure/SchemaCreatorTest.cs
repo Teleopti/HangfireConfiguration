@@ -44,5 +44,24 @@ namespace Hangfire.Configuration.Test.Infrastructure
             
             Assert.ThrowsAny<Exception>(() => creator.CreateHangfireSchema("HangfireTestSchema", "InvalidConnectionString"));
         }
+        
+        [Fact, CleanDatabase]
+        public void ShouldIndicateThatSchemaExists()
+        {
+            var creator = new HangfireSchemaCreator();
+            creator.CreateHangfireSchema("schema", ConnectionUtils.GetConnectionString());
+            
+            var result = creator.SchemaExists("schema", ConnectionUtils.GetConnectionString());
+            
+            Assert.True(result);
+        }
+        
+        [Fact, CleanDatabase]
+        public void ShouldIndicateThatSchemaDoesNotExists()
+        {
+            var creator = new HangfireSchemaCreator();
+            var result = creator.SchemaExists("nonExistingSchema", ConnectionUtils.GetConnectionString());
+            Assert.False(result);
+        }
     }
 }

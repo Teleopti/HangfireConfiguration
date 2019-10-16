@@ -1,11 +1,13 @@
 using System.Data.SqlClient;
+using Dapper;
 
 namespace Hangfire.Configuration
 {
     public interface IHangfireSchemaCreator
     {
         void TryConnect(string connectionString);
-        void CreateHangfireSchema(string schemaName, string connectionStringForCreate);
+        void CreateHangfireSchema(string schemaName, string connectionString);
+        bool SchemaExists(string schemaName, string connectionString);
     }
 
     public class HangfireSchemaCreator : IHangfireSchemaCreator
@@ -19,7 +21,13 @@ namespace Hangfire.Configuration
         public void CreateHangfireSchema(string schemaName, string connectionString)
         {
             using (var conn = new SqlConnection(connectionString))
-                Hangfire.SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
+                SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
+        }
+
+        public bool SchemaExists(string schemaName, string connectionString)
+        {
+            using (var conn = new SqlConnection(connectionString))
+                return conn.ExecuteScalar<int>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{schemaName}'") > 0;
         }
     }
 }
