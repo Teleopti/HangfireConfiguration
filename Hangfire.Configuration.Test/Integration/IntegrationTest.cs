@@ -1,3 +1,5 @@
+using System.Data.SqlClient;
+using System.Threading;
 using Xunit;
 #if !NET472
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +19,7 @@ namespace Hangfire.Configuration.Test.Integration
         public void ShouldStartServerWithWorkers()
         {
             new HangfireSchemaCreator().CreateHangfireSchema(null, ConnectionUtils.GetConnectionString());
+            SqlConnection.ClearAllPools(); // make the test stable for some reason
             
 #if !NET472
             new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
