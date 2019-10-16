@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Reflection;
+using System.Threading;
 using Dapper;
 using Hangfire.Configuration.Test.Infrastructure;
 using Xunit.Sdk;
@@ -16,8 +17,6 @@ namespace Hangfire.Configuration.Test
             createDb();
             createAdminLogin();
             initializeDb();
-            initializeHangfireSchema();
-            initializeHangfireStorage();
         }
 
         private static void closeOpenConnections()
@@ -57,40 +56,20 @@ BEGIN
 	ALTER SERVER ROLE [sysadmin] ADD MEMBER {login}	
 	ALTER LOGIN {login} ENABLE
 END";
+
             executeSql(createLoginSql);
         }
 
         private static void initializeDb()
         {
-            using (var connection = new SqlConnection(
-                ConnectionUtils.GetConnectionString()))
-            {
-                SqlServerObjectsInstaller.Install(connection);
-            }
-        }
-
-        private static void initializeHangfireSchema()
-        {
             using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString()))
-            {
-                SqlServer.SqlServerObjectsInstaller.Install(connection);
-            }
-        }
-
-        private static void initializeHangfireStorage()
-        {
-            GlobalConfiguration
-                .Configuration
-                .UseSqlServerStorage(ConnectionUtils.GetConnectionString());
+                SqlServerObjectsInstaller.Install(connection);
         }
 
         private static void executeSql(string sql)
         {
-            using (var connection = new SqlConnection(
-                ConnectionUtils.GetMasterConnectionString()))
-            {
+            using (var connection = new SqlConnection(ConnectionUtils.GetMasterConnectionString()))
                 connection.Execute(sql);
-            }
         }
     }
 }
