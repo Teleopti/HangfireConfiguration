@@ -27,7 +27,4 @@
         <None Remove="Pages\styles.css" />
         <EmbeddedResource Include="Pages\styles.css" />
     </ItemGroup>
-<!--    <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
-<!--        <Exec Command="push-nuget.bat $(SolutionDir) $(ConfigurationName) $(ProjectDir) $(Version)" WorkingDirectory="$(SolutionDir)" />-->
-<!--    </Target>-->
 </Project>
