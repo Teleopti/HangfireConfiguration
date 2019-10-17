@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
 
@@ -104,6 +105,21 @@ namespace Hangfire.Configuration.Test.Domain
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.Equal(10, result.Single().Workers);
+        }
+
+        [Fact]
+        public void ShouldBuildWithDefaultSchemaName()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                ConnectionString = new SqlConnectionStringBuilder {DataSource = "."}.ToString(),
+                SchemaName = null
+            });
+
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+            Assert.Equal(DefaultSchemaName.Name(), result.Single().SchemaName);
         }
     }
 }

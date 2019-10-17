@@ -13,32 +13,26 @@ namespace Hangfire.Configuration
         {
             _repository = repository;
         }
-        
+
         public IEnumerable<ViewModel> BuildServerConfigurations()
         {
-            var storedConfiguration = _repository.ReadConfigurations();
-
-            return storedConfiguration.Select((x, i) => new ViewModel
-            {
-                Id = x?.Id,
-                ServerName = getServerName(x?.ConnectionString),
-                DatabaseName = getDatabaseName(x?.ConnectionString),
-                SchemaName = x?.SchemaName,
-                Active = x?.Active != null ? (x?.Active == true ? "Active" : "Inactive") : null,
-                Workers = x?.GoalWorkerCount,
-            });
-        }
-        
-        private string getDatabaseName(string connectionString)
-        {
-            var builder = new SqlConnectionStringBuilder(connectionString);
-            return String.IsNullOrEmpty(builder.InitialCatalog) ? null : builder.InitialCatalog;
-        }
-
-        private string getServerName(string connectionString)
-        {
-            var builder = new SqlConnectionStringBuilder(connectionString);
-            return String.IsNullOrEmpty(builder.DataSource) ? null : builder.DataSource;
+            return _repository.ReadConfigurations()
+                .Select((x, i) =>
+                {
+                    var connectionString = new SqlConnectionStringBuilder(x.ConnectionString);
+                    var schemaName = x.SchemaName;
+                    if (x.ConnectionString != null)
+                        schemaName = schemaName ?? DefaultSchemaName.Name();
+                    return new ViewModel
+                    {
+                        Id = x.Id,
+                        ServerName = string.IsNullOrEmpty(connectionString.DataSource) ? null : connectionString.DataSource,
+                        DatabaseName = string.IsNullOrEmpty(connectionString.InitialCatalog) ? null : connectionString.InitialCatalog,
+                        SchemaName = schemaName,
+                        Active = x.Active != null ? (x.Active == true ? "Active" : "Inactive") : null,
+                        Workers = x.GoalWorkerCount,
+                    };
+                }).ToArray();
         }
     }
 }
