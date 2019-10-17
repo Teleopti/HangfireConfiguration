@@ -18,13 +18,13 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = true
             });
 
-            var result = system.ViewModelBuilder.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(1, result.Single().Id);
-            Assert.Equal("Server", result.Single().ServerName);
-            Assert.Equal("Test_Database", result.Single().DatabaseName);
-            Assert.Equal("schemaName", result.Single().SchemaName);
-            Assert.Equal("Active", result.Single().Active);
+            Assert.Equal(1, result.Id);
+            Assert.Equal("Server", result.ServerName);
+            Assert.Equal("Test_Database", result.DatabaseName);
+            Assert.Equal("schemaName", result.SchemaName);
+            Assert.Equal("Active", result.Active);
         }
 
         [Fact]
@@ -40,13 +40,13 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            var result = system.ViewModelBuilder.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(2, result.Single().Id);
-            Assert.Equal("Server2", result.Single().ServerName);
-            Assert.Equal("Test_Database_2", result.Single().DatabaseName);
-            Assert.Equal("schemaName2", result.Single().SchemaName);
-            Assert.Equal("Inactive", result.Single().Active);
+            Assert.Equal(2, result.Id);
+            Assert.Equal("Server2", result.ServerName);
+            Assert.Equal("Test_Database_2", result.DatabaseName);
+            Assert.Equal("schemaName2", result.SchemaName);
+            Assert.Equal("Inactive", result.Active);
         }
 
         [Fact]
@@ -62,14 +62,14 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = null
             });
 
-            var result = system.ViewModelBuilder.BuildServerConfigurations();
+            var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(1, result.Single().Id);
-            Assert.Null(result.Single().ServerName);
-            Assert.Null(result.Single().DatabaseName);
-            Assert.Null(result.Single().SchemaName);
-            Assert.Null(result.Single().Active);
-            Assert.Null(result.Single().Workers);
+            Assert.Equal(1, result.Id);
+            Assert.Null(result.ServerName);
+            Assert.Null(result.DatabaseName);
+            Assert.Null(result.SchemaName);
+            Assert.Null(result.Active);
+            Assert.Null(result.Workers);
         }
         
         [Fact]

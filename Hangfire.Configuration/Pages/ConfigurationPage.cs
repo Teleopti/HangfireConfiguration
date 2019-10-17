@@ -149,14 +149,14 @@ namespace Hangfire.Configuration.Pages
                 <label for='user'>SQL User Name (existing):</label><br>
                 <input type='text' id='user' name='user'><br>
                 <label for='password'>SQL Password: </label><br>
-                <input type='text' id='password' name='password'>
+                <input type='password' id='password' name='password'>
             </fieldset>
             <fieldset>
                 <h3>Database credentials to create Hangfire storage</h3>
                 <label for='schemaCreatorUser'>Creator user: </label><br>
                 <input type='text' id='schemaCreatorUser' name='schemaCreatorUser'><br>
                 <label for='schemaCreatorPassword'>Creator password: </label><br>
-                <input type='text' id='schemaCreatorPassword' name='schemaCreatorPassword'><br><br>
+                <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword'><br><br>
                 <button class='button' type='button'>Create</button>
             </fieldset>
         </div>
