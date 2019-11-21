@@ -2,9 +2,9 @@
 SET NOCOUNT ON
 SET XACT_ABORT ON
 DECLARE @TARGET_SCHEMA_VERSION INT;
-SET @TARGET_SCHEMA_VERSION = 1;
+SET @TARGET_SCHEMA_VERSION = 2;
 
-PRINT 'Installing Hangfire Configuration SQL objects...';
+PRINT 'Installing HangfireConfiguration SQL objects...';
 
 BEGIN TRANSACTION;
 
@@ -41,20 +41,11 @@ ELSE
 DECLARE @CURRENT_SCHEMA_VERSION int;
 SELECT @CURRENT_SCHEMA_VERSION = [Version] FROM [$(HangfireConfigurationSchema)].[Schema];
 
-PRINT 'Current Hangfire schema version: ' + CASE WHEN @CURRENT_SCHEMA_VERSION IS NULL THEN 'none' ELSE CONVERT(nvarchar, @CURRENT_SCHEMA_VERSION) END;
-
-IF @CURRENT_SCHEMA_VERSION IS NOT NULL AND @CURRENT_SCHEMA_VERSION > @TARGET_SCHEMA_VERSION
-BEGIN
-    ROLLBACK TRANSACTION;
-    PRINT 'Hangfire current database schema version ' + CAST(@CURRENT_SCHEMA_VERSION AS NVARCHAR) +
-          ' is newer than the configured SqlServerStorage schema version ' + CAST(@TARGET_SCHEMA_VERSION AS NVARCHAR) +
-          '. Will not apply any migrations.';
-    RETURN;
-END    
-
+PRINT 'Current HangfireConfiguration schema version: ' + CASE WHEN @CURRENT_SCHEMA_VERSION IS NULL THEN 'none' ELSE CONVERT(nvarchar, @CURRENT_SCHEMA_VERSION) END;
 
 IF @CURRENT_SCHEMA_VERSION IS NULL
 BEGIN
+	PRINT 'Installing HangfireConfiguration schema version 1';
     CREATE TABLE [$(HangfireConfigurationSchema)].[Configuration](
         [Id] [int] IDENTITY(1,1) NOT NULL,
         [Key] [nvarchar](100) NOT NULL,
@@ -68,12 +59,10 @@ BEGIN
     
     SET @CURRENT_SCHEMA_VERSION = 1;    
 END
-ELSE
-    PRINT 'Table [$(HangfireConfigurationSchema)].[Configuration] already exists';
 
 IF @CURRENT_SCHEMA_VERSION = 1
 BEGIN
-	PRINT 'Installing schema version 2';
+	PRINT 'Installing HangfireConfiguration schema version 2';
 
 	CREATE TABLE [$(HangfireConfigurationSchema)].[Configuration2] (
 		[Id] [int] IDENTITY(1,1) NOT NULL,
@@ -106,7 +95,20 @@ UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA
 IF @@ROWCOUNT = 0 
 	INSERT INTO [$(HangfireConfigurationSchema)].[Schema] ([Version]) VALUES (@CURRENT_SCHEMA_VERSION)        
 
-PRINT 'Hangfire configuration database schema installed';
+PRINT 'HangfireConfiguration database schema installed';
 
 COMMIT TRANSACTION;
-PRINT 'Hangfire configuration SQL objects installed';
+PRINT 'HangfireConfiguration SQL objects installed';
+
+
+-- DONT FORGET TO UPDATE THE STATEMENT "SET @TARGET_SCHEMA_VERSION = 101;" AT THE TOP OF THIS FILE
+--
+-- IF @CURRENT_SCHEMA_VERSION = 100
+-- BEGIN
+--     
+-- PRINT 'Installing HangfireConfiguration schema version 101';
+-- 
+-- Insert migration here
+-- 
+-- SET @CURRENT_SCHEMA_VERSION = 101;
+-- END
