@@ -132,11 +132,11 @@ namespace Hangfire.Configuration.Pages
             WriteLiteral(
                 $@"
 <fieldset>
-    <legend>Create new Hangfire server</legend>
+    <legend>Create new Hangfire storage</legend>
     <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
         <div class='flex-grid'>
             <fieldset>
-                <h3>SQL server</h3>
+                <h3>SQL storage</h3>
                 <label for='server'>Server: </label><br>
                 <input type='text' id='server' name='server'><br>
                 <label for='database'>Database (existing): </label><br>
@@ -145,17 +145,17 @@ namespace Hangfire.Configuration.Pages
                 <input type='text' id='schemaName' name='schemaName'>
              </fieldset>
              <fieldset>
-                <h3>Hangfire worker server credentials</h3>
-                <label for='user'>SQL User Name (existing):</label><br>
+                <h3>Application user</h3>
+                <label for='user'>SQL User Name:</label><br>
                 <input type='text' id='user' name='user'><br>
                 <label for='password'>SQL Password: </label><br>
                 <input type='password' id='password' name='password'>
             </fieldset>
             <fieldset>
-                <h3>Database credentials to create Hangfire storage</h3>
-                <label for='schemaCreatorUser'>Creator user: </label><br>
+                <h3>Patch user (with create permissions)</h3>
+                <label for='schemaCreatorUser'>SQL User Name: </label><br>
                 <input type='text' id='schemaCreatorUser' name='schemaCreatorUser'><br>
-                <label for='schemaCreatorPassword'>Creator password: </label><br>
+                <label for='schemaCreatorPassword'>SQL Password: </label><br>
                 <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword'><br><br>
                 <button class='button' type='button'>Create</button>
             </fieldset>
