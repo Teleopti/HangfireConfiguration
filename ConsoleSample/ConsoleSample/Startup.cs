@@ -100,10 +100,10 @@ namespace ConsoleSample
             app.UseHangfireConfiguration(options)
                 .UseStorageOptions(storageOptions)
                 .QueryAllWorkerServers()
-                .Select((storage, i) => (storage: storage, i: i))
+                .Select((configurationInfo, i) => (configurationInfo: configurationInfo, i: i))
                 .ForEach(s =>
                 {
-                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(), s.storage);
+                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(), s.configurationInfo.JobStorage);
                 });
 //                .StartPublishers(storageOptions)
 //                .StartWorkerServers(
