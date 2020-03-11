@@ -11,9 +11,9 @@ using Hangfire.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-
 #else
 using Owin;
+
 #endif
 
 namespace ConsoleSample
@@ -30,7 +30,6 @@ namespace ConsoleSample
     public class Startup
     {
 #if !NET472
-
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHangfire(x => { });
@@ -94,26 +93,34 @@ namespace ConsoleSample
                 AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
                 AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
             };
-            
+
+            Console.WriteLine();
+            Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
             app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
-            app.UseHangfireConfiguration(options)
-                .UseStorageOptions(storageOptions)
+            var hangfireConfiguration = app
+                    .UseHangfireConfiguration(options)
+                    .UseStorageOptions(storageOptions)
+                ;
+
+            hangfireConfiguration
                 .QueryAllWorkerServers()
                 .Select((configurationInfo, i) => (configurationInfo: configurationInfo, i: i))
                 .ForEach(s =>
                 {
+                    Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
                     app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(), s.configurationInfo.JobStorage);
                 });
-//                .StartPublishers(storageOptions)
-//                .StartWorkerServers(
-//                    storageOptions,
-//                    new BackgroundJobServerOptions
-//                    {
-//                        Queues = new[] {"critical", "default"},
-//                    },
-//                    new[] {new CustomBackgroundProcess()}
-//                );
+
+            hangfireConfiguration.StartPublishers(storageOptions)
+                .StartWorkerServers(
+                    storageOptions,
+                    new BackgroundJobServerOptions
+                    {
+                        Queues = new[] {"critical", "default"},
+                    },
+                    new[] {new CustomBackgroundProcess()}
+                );
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
+using Hangfire.Configuration;
 #if !NET472
 using Microsoft.AspNetCore.Hosting;
 #else
@@ -12,13 +14,15 @@ namespace ConsoleSample
 {
     public static class Program
     {
+        public static string NodeAddress = "http://localhost:12345";
+        
         public static void Main()
         {
-            var nodeAddress = $"http://localhost:12345";
-
+            Console.WriteLine("Starting site on " + NodeAddress);
+            
 #if !NET472
             using (var host = new WebHostBuilder()
-                .UseUrls(nodeAddress)
+                .UseUrls(NodeAddress)
                 .UseStartup<Startup>()
                 .UseKestrel()
                 .Build())
@@ -27,7 +31,7 @@ namespace ConsoleSample
                 MainLoop();
             }
 #else
-            using (WebApp.Start<Startup>(nodeAddress))
+            using (WebApp.Start<Startup>(NodeAddress))
                 MainLoop();
 #endif
 
@@ -37,6 +41,9 @@ namespace ConsoleSample
 
         private static void MainLoop()
         {
+            Console.WriteLine("Started.");
+            Console.WriteLine("'stop' to exit.");
+            Console.WriteLine("'add 1' to queue a job.");
             while (true)
             {
                 var command = Console.ReadLine();
@@ -54,7 +61,8 @@ namespace ConsoleSample
                         for (var i = 0; i < workCount; i++)
                         {
                             var number = i;
-                            BackgroundJob.Enqueue<Services>(x => x.Random(number));
+                            var client = new BackgroundJobClient(HangfireConfiguration.Current.QueryPublishers().First().JobStorage);
+                            client.Enqueue<Services>(x => x.Random(number));
                         }
 
                         Console.WriteLine("Jobs enqueued.");
