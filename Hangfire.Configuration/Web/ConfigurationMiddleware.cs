@@ -4,15 +4,14 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Hangfire.Configuration.Pages;
+using Newtonsoft.Json.Linq;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;
 #else
 using Microsoft.Owin;
 #endif
-using Newtonsoft.Json.Linq;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration.Web
 {
 #if NETSTANDARD2_0
     public class ConfigurationMiddleware
@@ -134,6 +133,7 @@ namespace Hangfire.Configuration
             var parsed = parseRequestBody(context.Request);
             var configuration = new CreateServerConfiguration
             {
+                Name = parsed.SelectToken("name")?.Value<string>(),
                 Server = parsed.SelectToken("server").Value<string>(),
                 Database = parsed.SelectToken("database").Value<string>(),
                 User = parsed.SelectToken("user").Value<string>(),

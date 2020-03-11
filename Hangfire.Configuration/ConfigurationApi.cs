@@ -60,6 +60,7 @@ namespace Hangfire.Configuration
 
             _repository.WriteConfiguration(new StoredConfiguration
             {
+                Name = config.Name,
                 ConnectionString = storageConnectionString,
                 SchemaName = config.SchemaName,
                 Active = false

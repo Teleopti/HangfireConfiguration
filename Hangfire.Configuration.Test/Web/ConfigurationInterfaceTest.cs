@@ -133,5 +133,29 @@ namespace Hangfire.Configuration.Test.Web
             Assert.Equal(1, system.Repository.Data.Single().Id);
             Assert.Contains("database", system.Repository.Data.Single().ConnectionString);
         }
+        
+        [Fact]
+        public void ShouldCreateNewServerConfigurationWithName()
+        {
+            var system = new SystemUnderTest();
+            
+            var response = system.TestClient.PostAsync(
+                    "/config/createNewServerConfiguration",
+                    new StringContent(JsonConvert.SerializeObject(
+                        new
+                        {
+                            server = ".",
+                            name = "name",
+                            database = "database",
+                            user = "user",
+                            password = "password",
+                            schemaName = "TestSchema",
+                            schemaCreatorUser = "schemaCreatorUser",
+                            schemaCreatorPassword = "schemaCreatorPassword"
+                        })))
+                .Result;
+
+            Assert.Equal("name", system.Repository.Data.Single().Name);
+        }
     }
 }

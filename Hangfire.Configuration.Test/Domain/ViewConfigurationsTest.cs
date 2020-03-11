@@ -121,5 +121,19 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(DefaultSchemaName.Name(), result.Single().SchemaName);
         }
+        
+        [Fact]
+        public void ShouldBuildWithConfigurationName()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Name = "name"
+            });
+
+            var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+            Assert.Equal("name", result.Single().Name);
+        }
     }
 }

@@ -37,14 +37,8 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
         public void Has(StoredConfiguration configuration)
         {
-            Data = Data.Append(new StoredConfiguration
-            {
-                Id = configuration.Id ?? NextId(),
-                GoalWorkerCount = configuration.GoalWorkerCount,
-                ConnectionString = configuration.ConnectionString,
-                SchemaName = configuration.SchemaName,
-                Active = configuration.Active
-            });
+            configuration.Id = configuration.Id ?? NextId();
+            Data = Data.Append(configuration.Copy()).ToArray();
         }
 
         public void Has(params StoredConfiguration[] configuration)

@@ -2,7 +2,7 @@
 SET NOCOUNT ON
 SET XACT_ABORT ON
 DECLARE @TARGET_SCHEMA_VERSION INT;
-SET @TARGET_SCHEMA_VERSION = 2;
+SET @TARGET_SCHEMA_VERSION = 3;
 
 PRINT 'Installing HangfireConfiguration SQL objects...';
 
@@ -90,6 +90,24 @@ BEGIN
 
 	SET @CURRENT_SCHEMA_VERSION = 2;
 END
+
+IF @CURRENT_SCHEMA_VERSION = 2
+BEGIN
+    
+    PRINT 'Installing HangfireConfiguration schema version 3';
+    
+    ALTER TABLE [$(HangfireConfigurationSchema)].[Configuration] ADD [Name] nvarchar(max) NULL
+    
+	EXEC sp_executesql N'
+		DECLARE @FirstConfigurationId INT;
+		SELECT @FirstConfigurationId = MIN(Id) FROM [$(HangfireConfigurationSchema)].[Configuration];
+		UPDATE [$(HangfireConfigurationSchema)].[Configuration] SET [Name] = ''Hangfire'' WHERE Id = @FirstConfigurationId;
+    ';
+    
+SET @CURRENT_SCHEMA_VERSION = 3;
+END
+
+
 
 UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA_VERSION
 IF @@ROWCOUNT = 0 

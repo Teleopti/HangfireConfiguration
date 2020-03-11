@@ -26,6 +26,7 @@ namespace Hangfire.Configuration
                     return new ViewModel
                     {
                         Id = x.Id,
+                        Name = x.Name,
                         ServerName = string.IsNullOrEmpty(connectionString.DataSource) ? null : connectionString.DataSource,
                         DatabaseName = string.IsNullOrEmpty(connectionString.InitialCatalog) ? null : connectionString.InitialCatalog,
                         SchemaName = schemaName,

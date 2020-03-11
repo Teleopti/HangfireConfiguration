@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 #else
 using Owin;
 #endif
+using Hangfire.Configuration.Web;
 
 namespace Hangfire.Configuration
 {

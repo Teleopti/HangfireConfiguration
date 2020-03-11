@@ -219,5 +219,22 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
             Assert.Equal("connectionTwo", system.SchemaCreator.Schemas.Last().ConnectionString);
         }
+
+        [Fact]
+        public void ShouldSaveNewServerConfigurationWithName()
+        {
+            var system = new SystemUnderTest();
+
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+            {
+                Name = "namedConfiguration",
+                StorageConnectionString = "storage",
+                SchemaCreatorConnectionString = "creator",
+                SchemaName = "schema"
+            });
+
+            var storedConfiguration = system.Repository.Data.Last();
+            Assert.Equal("namedConfiguration", storedConfiguration.Name);
+        }
     }
 }

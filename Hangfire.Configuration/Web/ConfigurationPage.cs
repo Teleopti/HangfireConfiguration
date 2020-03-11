@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Dashboard;
 
-namespace Hangfire.Configuration.Pages
+namespace Hangfire.Configuration.Web
 {
     public class ConfigurationPage : RazorPage
     {
@@ -86,10 +86,16 @@ namespace Hangfire.Configuration.Pages
 
         private void WriteConfiguration(ViewModel configuration)
         {
+            var title = "Configuration";
+            if (configuration.Name != null)
+                title = title + " - " + configuration.Name;
+            if (configuration.Active != null)
+                title = title + " - " + configuration.Active;
+            
             WriteLiteral($@"
                 <div class='col'>
                     <fieldset>
-                        <legend>Configuration {(configuration.Active != null ? " - " + configuration.Active : null)}</legend>");
+                        <legend>{title}</legend>");
 
             if (!string.IsNullOrEmpty(configuration.ServerName))
             {
@@ -134,6 +140,14 @@ namespace Hangfire.Configuration.Pages
 <fieldset>
     <legend>Create new Hangfire storage</legend>
     <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
+<!--
+        <div class='flex-grid'>
+            <fieldset>
+                <label for='server'>Name: </label><br>
+                <input type='text' id='name' name='name'><br>
+             </fieldset>
+        </div>
+-->
         <div class='flex-grid'>
             <fieldset>
                 <h3>SQL storage</h3>

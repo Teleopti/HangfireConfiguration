@@ -36,11 +36,18 @@ namespace Hangfire.Configuration
         public IEnumerable<StoredConfiguration> ReadConfigurations()
         {
             using (var connection = _connectionFactory())
-            {
                 return connection.Query<StoredConfiguration>(
-                    $@"SELECT Id, ConnectionString, SchemaName, GoalWorkerCount, Active FROM [{SqlSetup.SchemaName}].Configuration"
-                ).ToArray();
-            };
+                    $@"
+SELECT 
+    Id, 
+    Name, 
+    ConnectionString, 
+    SchemaName, 
+    GoalWorkerCount, 
+    Active 
+FROM 
+    [{SqlSetup.SchemaName}].Configuration
+").ToArray();
         }
 
         public void WriteConfiguration(StoredConfiguration configuration)
@@ -48,18 +55,46 @@ namespace Hangfire.Configuration
             using (var connection = _connectionFactory())
             {
                 if (configuration.Id != null)
-                {
-                    connection.Execute(
-                        $@"UPDATE [{SqlSetup.SchemaName}].Configuration SET ConnectionString = @connectionString, SchemaName = @schemaName, GoalWorkerCount = @goalWorkerCount, Active = @active WHERE Id = @id;",
-                        new {id = configuration.Id, connectionString = configuration.ConnectionString, schemaName = configuration.SchemaName, goalWorkerCount = configuration.GoalWorkerCount, active = configuration.Active});
-                }
+                    update(configuration, connection);
                 else
-                {
-                    connection.Execute(
-                        $@"INSERT INTO [{SqlSetup.SchemaName}].Configuration ([ConnectionString], [SchemaName], GoalWorkerCount, Active) VALUES (@connectionString, @schemaName, @goalWorkerCount, @active);",
-                        new {connectionString = configuration.ConnectionString, schemaName = configuration.SchemaName, goalWorkerCount = configuration.GoalWorkerCount, active = configuration.Active});
-                }
+                    insert(configuration, connection);
             }
+        }
+
+        private static void insert(StoredConfiguration configuration, IDbConnection connection)
+        {
+            connection.Execute(
+                $@"
+INSERT INTO 
+    [{SqlSetup.SchemaName}].Configuration 
+(
+    Name,
+    [ConnectionString], 
+    [SchemaName], 
+    GoalWorkerCount, 
+    Active
+) VALUES (
+    @Name,
+    @ConnectionString, 
+    @SchemaName, 
+    @GoalWorkerCount, 
+    @Active
+);", configuration);
+        }
+
+        private static void update(StoredConfiguration configuration, IDbConnection connection)
+        {
+            connection.Execute(
+                $@"
+UPDATE 
+    [{SqlSetup.SchemaName}].Configuration 
+SET 
+    ConnectionString = @ConnectionString, 
+    SchemaName = @SchemaName, 
+    GoalWorkerCount = @GoalWorkerCount, 
+    Active = @Active 
+WHERE 
+    Id = @Id;", configuration);
         }
     }
 }

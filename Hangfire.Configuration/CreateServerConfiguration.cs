@@ -5,6 +5,8 @@ namespace Hangfire.Configuration
         public string StorageConnectionString { get; set; }
         public string SchemaCreatorConnectionString { get; set; }
         
+        public string Name { get; set; }
+        
         public string Server { get; set; }
         public string Database { get; set; }
         public string User { get; set; }
