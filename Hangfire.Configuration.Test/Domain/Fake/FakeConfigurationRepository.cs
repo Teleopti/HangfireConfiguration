@@ -1,17 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
-    public static class Blip
-    {
-        public static T Copy<T>(this T instance)
-        {
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(instance));
-        }
-    }
-    
     public class FakeConfigurationRepository : IConfigurationRepository
     {
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();

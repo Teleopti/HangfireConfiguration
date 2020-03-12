@@ -8,7 +8,7 @@ namespace Hangfire.Configuration
     internal class State
     {
         public IEnumerable<ConfigurationAndStorage> Configurations = Enumerable.Empty<ConfigurationAndStorage>();
-        public bool ConfigurationAutoUpdaterRan { get; set; }
+        public bool ConfigurationUpdaterRan { get; set; }
     }
 
     internal class ConfigurationAndStorage

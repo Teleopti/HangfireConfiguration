@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Hangfire.Configuration.Test
 {
     public static class Extensions
     {
+        public static T Copy<T>(this T instance)
+        {
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(instance));
+        }
+
         public static void Times(this int times, Action action)
         {
             Enumerable.Range(0, times).ForEach(i => action());

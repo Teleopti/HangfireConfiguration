@@ -8,15 +8,15 @@ namespace Hangfire.Configuration
     {
         private readonly IHangfire _hangfire;
         private readonly IConfigurationRepository _repository;
-        private readonly ConfigurationAutoUpdater _configurationAutoUpdater;
+        private readonly ConfigurationUpdater _configurationUpdater;
         private readonly State _state;
         private readonly object _lock = new object();
 
-        internal StateMaintainer(IHangfire hangfire, IConfigurationRepository repository, ConfigurationAutoUpdater configurationAutoUpdater, State state)
+        internal StateMaintainer(IHangfire hangfire, IConfigurationRepository repository, ConfigurationUpdater configurationUpdater, State state)
         {
             _hangfire = hangfire;
             _repository = repository;
-            _configurationAutoUpdater = configurationAutoUpdater;
+            _configurationUpdater = configurationUpdater;
             _state = state;
         }
 
@@ -24,7 +24,7 @@ namespace Hangfire.Configuration
         {
             // maybe not reload all the time
             var configurations = _repository.ReadConfigurations();
-            var configurationChanged = _configurationAutoUpdater.Update(options, configurations);
+            var configurationChanged = _configurationUpdater.Update(options, configurations);
             if (configurationChanged)
                 configurations = _repository.ReadConfigurations();
 

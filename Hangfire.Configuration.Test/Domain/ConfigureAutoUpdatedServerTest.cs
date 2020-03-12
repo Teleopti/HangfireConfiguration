@@ -70,7 +70,8 @@ namespace Hangfire.Configuration.Test.Domain
                 AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
             }, null, null);
 
-            Assert.Equal(existing, system.Repository.Data.Single().ConnectionString);
+            var actual = system.Repository.Data.OrderBy(x => x.Id).First();
+            Assert.Equal(existing, actual.ConnectionString);
         }
 
         [Fact]
@@ -85,7 +86,8 @@ namespace Hangfire.Configuration.Test.Domain
                 AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
             }, null, null);
 
-            Assert.Equal(existing, system.Repository.Data.Single().ConnectionString);
+            var actual = system.Repository.Data.OrderBy(x => x.Id).First();
+            Assert.Equal(existing, actual.ConnectionString);
         }
 
         [Fact]
@@ -100,7 +102,23 @@ namespace Hangfire.Configuration.Test.Domain
                 AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
             }, null, null);
 
-            Assert.Equal(existing, system.Repository.Data.Single().ConnectionString);
+            var actual = system.Repository.Data.OrderBy(x => x.Id).First();
+            Assert.Equal(existing, actual.ConnectionString);
+        }
+
+        [Fact]
+        public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString()});
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
+            }, null, null);
+
+            var actual = system.Repository.Data.OrderBy(x => x.Id).Last();
+            Assert.Equal("autoupdated", new SqlConnectionStringBuilder(actual.ConnectionString).DataSource);
         }
 
         [Fact]
@@ -279,6 +297,33 @@ namespace Hangfire.Configuration.Test.Domain
 
             var dataSource = new SqlConnectionStringBuilder(system.Repository.Data.Single().ConnectionString).DataSource;
             Assert.Equal("SecondUpdate", dataSource);
+        }
+
+        [Fact]
+        public void ShouldAutoUpdateWithDefaultConfigurationName()
+        {
+            var system = new SystemUnderTest();
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+            }, null, null);
+
+            Assert.Equal("Hangfire", system.Repository.Data.Single().Name);
+        }
+
+        [Fact]
+        public void ShouldAutoUpdateWithDefaultConfigurationName2()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+            }, null, null);
+
+            Assert.Equal("Hangfire", system.Repository.Data.Single().Name);
         }
     }
 }
