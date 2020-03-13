@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 #else
 using Microsoft.Owin;
+
 #endif
 
 namespace Hangfire.Configuration.Web
@@ -91,12 +92,19 @@ namespace Hangfire.Configuration.Web
 
             if (context.Request.Path.Value.Equals("/activateServer"))
             {
-                processRequest(context, () =>
-                {
-                    var parsed = parseRequestBody(context.Request);
-                    var configurationId = parsed.SelectToken("configurationId").Value<int>();
-                    _configurationApi.ActivateServer(configurationId);
-                });
+                processRequest(context, () => { _configurationApi.ActivateServer(parseConfigurationId(context)); });
+                return;
+            }
+
+            if (context.Request.Path.Value.Equals("/inactivateServer"))
+            {
+                processRequest(context, () => { _configurationApi.InactivateServer(parseConfigurationId(context)); });
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(context.Request.Path.Value))
+            {
+                context.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return;
             }
 
@@ -108,6 +116,12 @@ namespace Hangfire.Configuration.Web
             });
         }
 
+#if NETSTANDARD2_0
+        private int parseConfigurationId(HttpContext context) =>
+#else
+        private int parseConfigurationId(IOwinContext context) =>
+#endif
+            parseRequestBody(context.Request).SelectToken("configurationId").Value<int>();
 
 #if NETSTANDARD2_0
         private void saveWorkerGoalCount(HttpContext context)

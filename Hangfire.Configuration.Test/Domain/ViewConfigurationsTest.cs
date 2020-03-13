@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("Server", result.ServerName);
             Assert.Equal("Test_Database", result.DatabaseName);
             Assert.Equal("schemaName", result.SchemaName);
-            Assert.Equal("Active", result.Active);
+            Assert.Equal(true, result.Active);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal("Server2", result.ServerName);
             Assert.Equal("Test_Database_2", result.DatabaseName);
             Assert.Equal("schemaName2", result.SchemaName);
-            Assert.Equal("Inactive", result.Active);
+            Assert.Equal(false, result.Active);
         }
 
         [Fact]

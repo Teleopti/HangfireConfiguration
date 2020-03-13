@@ -66,8 +66,8 @@ namespace Hangfire.Configuration.Web
             WriteLiteral(@"
                 <h3>Activate configuration</h3>
                  <p>
-                    When active configuration is changed, the jobs will eventually be put on queue for the active one.<br>
-                    The active configuration will be the one receiving the new jobs, but the inactive one will continue processing the old jobs already queued.
+                    When active configuration is changed, the jobs will eventually be put on queue for the active configuration.<br>
+                    An active configuration can receive new jobs, while inactive will continue processing the old jobs already queued.
                 </p>");
         }
         
@@ -89,9 +89,9 @@ namespace Hangfire.Configuration.Web
             var title = "Configuration";
             if (configuration.Name != null)
                 title = title + " - " + configuration.Name;
-            if (configuration.Active != null)
-                title = title + " - " + configuration.Active;
-            
+            if (configuration.Active.HasValue)
+                title = title + " - " + (configuration.Active.Value ? "Active" : "Inactive");
+
             WriteLiteral($@"
                 <div class='col'>
                     <fieldset>
@@ -116,13 +116,24 @@ namespace Hangfire.Configuration.Web
                     </form>
                 </div>");
 
-            if (configuration.Active == "Inactive")
+            if (configuration.Active == false)
             {
                 WriteLiteral($@"
                     <div>
                         <form class='form' id=""activateForm_{configuration.Id}"" action='activateServer' data-reload='true'>
                             <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                             <button class='button' type='button'>Activate configuration</button>
+                        </form>
+                    </div>");
+            }
+
+            if (_options.AllowMultipleActive && configuration.Active == true)
+            {
+                WriteLiteral($@"
+                    <div>
+                        <form class='form' id=""inactivateForm_{configuration.Id}"" action='inactivateServer' data-reload='true'>
+                            <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                            <button class='button' type='button'>Inactivate configuration</button>
                         </form>
                     </div>");
             }

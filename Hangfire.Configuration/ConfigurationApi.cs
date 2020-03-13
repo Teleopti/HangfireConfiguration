@@ -70,11 +70,29 @@ namespace Hangfire.Configuration
         public void ActivateServer(int configurationId)
         {
             var configurations = _repository.ReadConfigurations();
-            foreach (var configuration in configurations)
+
+            var activate = configurations.Single(x => x.Id == configurationId);
+            activate.Active = true;
+            _repository.WriteConfiguration(activate);
+
+            if (!_options.AllowMultipleActive)
             {
-                configuration.Active = configuration.Id == configurationId;
-                _repository.WriteConfiguration(configuration);
+                configurations
+                    .Where(x => x.Id != configurationId)
+                    .ForEach(inactivate =>
+                    {
+                        inactivate.Active = false;
+                        _repository.WriteConfiguration(inactivate);
+                    });
             }
+        }
+
+        public void InactivateServer(int configurationId)
+        {
+            var configurations = _repository.ReadConfigurations();
+            var inactivate = configurations.Single(x => x.Id == configurationId);
+            inactivate.Active = false;
+            _repository.WriteConfiguration(inactivate);
         }
 
         public IEnumerable<StoredConfiguration> ReadConfigurations() =>

@@ -30,7 +30,7 @@ namespace Hangfire.Configuration
                         ServerName = string.IsNullOrEmpty(connectionString.DataSource) ? null : connectionString.DataSource,
                         DatabaseName = string.IsNullOrEmpty(connectionString.InitialCatalog) ? null : connectionString.InitialCatalog,
                         SchemaName = schemaName,
-                        Active = x.Active != null ? (x.Active == true ? "Active" : "Inactive") : null,
+                        Active = x.Active,
                         Workers = x.GoalWorkerCount,
                     };
                 }).ToArray();

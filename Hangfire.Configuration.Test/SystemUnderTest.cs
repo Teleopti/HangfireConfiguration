@@ -17,9 +17,10 @@ namespace Hangfire.Configuration.Test
         private readonly ConfigurationOptions _options;
         private readonly Lazy<TestServer> _testServer;
 
-        public SystemUnderTest(ConfigurationOptions options = null)
+        public SystemUnderTest(ConfigurationOptions options = null, string urlPathMatch = null)
         {
             _options = options ?? new ConfigurationOptions();
+            urlPathMatch = urlPathMatch ?? "/config";
 #if !NET472
             ApplicationBuilder = new ApplicationBuilder(null);
 #else
@@ -33,7 +34,7 @@ namespace Hangfire.Configuration.Test
 #endif
                         {
                             app.Properties.Add("CompositionRoot", this);
-                            app.UseHangfireConfigurationUI("/config", _options);
+                            app.UseHangfireConfigurationUI(urlPathMatch, _options);
                         }))
 #if !NET472
                         )

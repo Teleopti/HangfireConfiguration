@@ -4,6 +4,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Hangfire.Configuration.Test.Web
 {
@@ -12,7 +13,7 @@ namespace Hangfire.Configuration.Test.Web
         [Fact]
         public void ShouldFindConfigurationInterface()
         {
-            var system = new SystemUnderTest();
+            var system = new SystemUnderTest(null, "/config");
             var response = system.TestClient.GetAsync("/config").Result;
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -20,7 +21,7 @@ namespace Hangfire.Configuration.Test.Web
         [Fact]
         public void ShouldNotFindConfigurationInterface()
         {
-            var system = new SystemUnderTest();
+            var system = new SystemUnderTest(null, "/config");
             var response = system.TestClient.GetAsync("/configIncorrect").Result;
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -39,7 +40,7 @@ namespace Hangfire.Configuration.Test.Web
                     "/config/saveWorkerGoalCount",
                     new StringContent(JsonConvert.SerializeObject(new
                     {
-                        configurationId = 1, 
+                        configurationId = 1,
                         workers = 10
                     })))
                 .Result;
@@ -51,7 +52,7 @@ namespace Hangfire.Configuration.Test.Web
         [Fact]
         public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions{MaximumGoalWorkerCount = 10});
+            var system = new SystemUnderTest(new ConfigurationOptions {MaximumGoalWorkerCount = 10});
             system.Repository.Has(new StoredConfiguration
             {
                 Id = 1,
@@ -62,7 +63,7 @@ namespace Hangfire.Configuration.Test.Web
                     "/config/saveWorkerGoalCount",
                     new StringContent(JsonConvert.SerializeObject(new
                     {
-                        configurationId = 1, 
+                        configurationId = 1,
                         workers = 11
                     })))
                 .Result;
@@ -157,5 +158,35 @@ namespace Hangfire.Configuration.Test.Web
 
             Assert.Equal("name", system.Repository.Data.Single().Name);
         }
+        
+        [Fact]
+        public void ShouldNotFindUnknownAction()
+        {
+            var system = new SystemUnderTest(null, "/config");
+            var response = system.TestClient.GetAsync("/config/unknownAction").Result;
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        
+        [Fact]
+        public void ShouldInactivateServer()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration
+            {
+                Id = 3,
+                Active = true
+            });
+
+            var response = system.TestClient.PostAsync(
+                    "/config/inactivateServer",
+                    new StringContent(JsonConvert.SerializeObject(new
+                    {
+                        configurationId = 3
+                    })))
+                .Result;
+
+            Assert.False(system.Repository.Data.Single().Active);
+        }
+        
     }
 }

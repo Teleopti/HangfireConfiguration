@@ -89,6 +89,7 @@ namespace ConsoleSample
             {
                 ConnectionString = configurationConnectionString,
                 AllowNewServerCreation = true,
+                AllowMultipleActive = true,
                 PrepareSchemaIfNecessary = true,
                 AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
                 AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
