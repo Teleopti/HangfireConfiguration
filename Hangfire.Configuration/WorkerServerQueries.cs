@@ -19,11 +19,7 @@ namespace Hangfire.Configuration
         {
             _stateMaintainer.Refresh(options, storageOptions);
             return _state.Configurations
-                .Select(x => new ConfigurationInfo
-                {
-                    ConfigurationId = x.Configuration.Id.Value,
-                    JobStorage = x.CreateJobStorage()
-                })
+                .Select(x => x.ToConfigurationInfo())
                 .ToArray();
         }
     }

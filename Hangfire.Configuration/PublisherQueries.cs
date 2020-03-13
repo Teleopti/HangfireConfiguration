@@ -18,15 +18,10 @@ namespace Hangfire.Configuration
         public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             _creator.Refresh(options, storageOptions);
-           return  _state.Configurations
+            return _state.Configurations
                 .Where(x => x.Configuration.Active.Value)
-                .Select(x => new ConfigurationInfo()
-                {
-                    ConfigurationId = x.Configuration.Id.Value,
-                    JobStorage = x.CreateJobStorage()
-                })
+                .Select(x => x.ToConfigurationInfo())
                 .ToArray();
         }
-
     }
 }

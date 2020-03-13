@@ -66,5 +66,16 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(3, workerServer.ConfigurationId);
         }
+
+        [Fact]
+        public void ShouldReturnConfigurationName()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.Has(new StoredConfiguration {Name = "name"});
+
+            var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Single();
+
+            Assert.Equal("name", workerServer.Name);
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,5 +32,16 @@ namespace Hangfire.Configuration
                 return _jobStorage;
             }
         }
+    }
+
+    internal static class ConfigurationAndStorageExtensions
+    {
+        internal static ConfigurationInfo ToConfigurationInfo(this ConfigurationAndStorage instance) =>
+            new ConfigurationInfo
+            {
+                ConfigurationId = instance.Configuration.Id.Value,
+                Name = instance.Configuration.Name,
+                JobStorage = instance.CreateJobStorage()
+            };
     }
 }
