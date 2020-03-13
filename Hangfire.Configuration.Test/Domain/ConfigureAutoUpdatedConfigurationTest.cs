@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class ConfigureAutoUpdatedServerTest
+    public class ConfigureAutoUpdatedConfigurationTest
     {
         [Fact]
         public void ShouldConfigureAutoUpdatedServer()
