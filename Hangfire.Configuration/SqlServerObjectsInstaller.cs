@@ -9,16 +9,26 @@ namespace Hangfire.Configuration
     public static class SqlServerObjectsInstaller
     {
         public const string SchemaName = "HangfireConfiguration";
+        public const int SchemaVersion = 3;
 
         public static readonly string SqlScript = GetStringResource(
             typeof(SqlServerObjectsInstaller).GetTypeInfo().Assembly,
             "Hangfire.Configuration.Install.sql");
 
-        public static void Install(DbConnection connection)
+        public static void Install(DbConnection connection) =>
+            Install(connection, SchemaVersion);
+
+        public static void Install(DbConnection connection, int schemaVersion)
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
-            var scriptWithSchema = SqlScript.Replace("$(HangfireConfigurationSchema)", SchemaName);
+            var scriptWithSchema = SqlScript
+                    .Replace("$(HangfireConfigurationSchema)", SchemaName)
+                    .Replace("$(HangfireConfigurationSchemaVersion)", schemaVersion.ToString())
+                ;
+            
+            Console.WriteLine(scriptWithSchema);
+            
             connection.Execute(scriptWithSchema, commandTimeout: 0);
         }
 

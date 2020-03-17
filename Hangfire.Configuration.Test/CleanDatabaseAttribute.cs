@@ -1,15 +1,24 @@
 using System;
 using System.Data.SqlClient;
 using System.Reflection;
-using System.Threading;
 using Dapper;
-using Hangfire.Configuration.Test.Infrastructure;
 using Xunit.Sdk;
 
 namespace Hangfire.Configuration.Test
 {
     public class CleanDatabaseAttribute : BeforeAfterTestAttribute
     {
+        private readonly int? _schemaVersion;
+
+        public CleanDatabaseAttribute()
+        {
+        }
+
+        public CleanDatabaseAttribute(int schemaVersion)
+        {
+            _schemaVersion = schemaVersion;
+        }
+
         public override void Before(MethodInfo methodUnderTest)
         {
             closeOpenConnections();
@@ -60,10 +69,18 @@ END";
             executeSql(createLoginSql);
         }
 
-        private static void initializeDb()
+        private void initializeDb()
         {
             using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString()))
-                SqlServerObjectsInstaller.Install(connection);
+            {
+                if (_schemaVersion.HasValue)
+                {
+                    if (_schemaVersion.Value > 0)
+                        SqlServerObjectsInstaller.Install(connection, _schemaVersion.Value);
+                }
+                else
+                    SqlServerObjectsInstaller.Install(connection);
+            }
         }
 
         private static void executeSql(string sql)
