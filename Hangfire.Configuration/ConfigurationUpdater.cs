@@ -25,7 +25,7 @@ namespace Hangfire.Configuration
 
             _state.ConfigurationUpdaterRan = true;
 
-            using (_distributedLock.Take(TimeSpan.FromSeconds(10)))
+            using (_distributedLock.Take("ConfigurationUpdater"))
             {
                 var configurations = _repository.ReadConfigurations();
 

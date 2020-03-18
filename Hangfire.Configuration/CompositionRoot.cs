@@ -45,6 +45,6 @@ namespace Hangfire.Configuration
             new ConfigurationRepository(connection);
 
         protected virtual IDistributedLock BuildDistributedLock(ConfigurationConnection connection) =>
-            new DistributedLock("HangfireConfigurationLock", connection.ConnectionString);
+            new DistributedLock(connection.ConnectionString);
     }
 }

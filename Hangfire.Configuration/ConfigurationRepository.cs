@@ -28,7 +28,7 @@ namespace Hangfire.Configuration
             _connectionFactory = () =>
             {
                 var conn = new SqlConnection(options.ConnectionString);
-                conn.Open();
+                conn.OpenWithRetry();
                 return conn;
             };
         }
@@ -36,7 +36,7 @@ namespace Hangfire.Configuration
         public IEnumerable<StoredConfiguration> ReadConfigurations()
         {
             using (var connection = _connectionFactory())
-                return connection.Query<StoredConfiguration>(
+                return connection.QueryWithRetry<StoredConfiguration>(
                     $@"
 SELECT 
     Id, 
@@ -63,7 +63,7 @@ FROM
 
         private static void insert(StoredConfiguration configuration, IDbConnection connection)
         {
-            connection.Execute(
+            connection.ExecuteWithRetry(
                 $@"
 INSERT INTO 
     [{SqlSetup.SchemaName}].Configuration 
@@ -84,7 +84,7 @@ INSERT INTO
 
         private static void update(StoredConfiguration configuration, IDbConnection connection)
         {
-            connection.Execute(
+            connection.ExecuteWithRetry(
                 $@"
 UPDATE 
     [{SqlSetup.SchemaName}].Configuration 

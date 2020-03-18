@@ -4,7 +4,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 {
     public class FakeDistributedLock : IDistributedLock, IDisposable
     {
-        public IDisposable Take(TimeSpan lockTimeout)
+        public IDisposable Take(string resource)
         {
             return this;
         }

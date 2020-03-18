@@ -1,84 +1,62 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Transactions;
-
+using System.Runtime.ExceptionServices;
+using Dapper;
 
 namespace Hangfire.Configuration
 {
     public interface IDistributedLock
     {
-        IDisposable Take(TimeSpan lockTimeout);
+        IDisposable Take(string resource);
     }
 
-    public class DistributedLock : IDisposable, IDistributedLock
+    public class DistributedLock : IDistributedLock
     {
-        private readonly string _uniqueId;
-        private readonly SqlConnection _sqlConnection;
-        private bool _isLockTaken;
- 
-        public DistributedLock(
-            string uniqueId,
-            string connectionString)
+        private readonly string _connectionString;
+
+        public DistributedLock(string connectionString)
         {
-            _uniqueId = uniqueId;
-            _sqlConnection = new SqlConnection(connectionString);
+            _connectionString = connectionString;
         }
- 
-        public IDisposable Take(TimeSpan lockTimeout)
+
+        public IDisposable Take(string resource)
         {
-            _sqlConnection.Open();
-            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Suppress))
+            var sqlConnection = new SqlConnection(_connectionString);
+            sqlConnection.OpenWithRetry();
+
+            try
             {
-                SqlCommand command = new SqlCommand("sp_getapplock", _sqlConnection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.CommandTimeout = (int)lockTimeout.TotalSeconds;
- 
-                command.Parameters.AddWithValue("Resource", _uniqueId);
-                command.Parameters.AddWithValue("LockOwner", "Session");
-                command.Parameters.AddWithValue("LockMode", "Exclusive");
-                command.Parameters.AddWithValue("LockTimeout", (int)lockTimeout.TotalMilliseconds);
- 
-                SqlParameter returnValue = command.Parameters.Add("ReturnValue", SqlDbType.Int);
-                returnValue.Direction = ParameterDirection.ReturnValue;
-                command.ExecuteNonQuery();
- 
-                if ((int)returnValue.Value < 0)
-                {
-                    throw new Exception($"sp_getapplock failed with errorCode '{returnValue.Value}'");
-                }
- 
-                _isLockTaken = true;
- 
-                scope.Complete();
+                var parameters = new DynamicParameters();
+                parameters.Add("@Resource", resource);
+                parameters.Add("@LockMode", "Exclusive");
+                parameters.Add("@LockOwner", "Session");
+                parameters.Add("@LockTimeout", (int) TimeSpan.FromSeconds(10).TotalMilliseconds);
+                parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                sqlConnection.ExecuteWithRetry(@"sp_getapplock", parameters, CommandType.StoredProcedure);
+
+                var lockResult = parameters.Get<int>("@Result");
+
+                if (lockResult < 0)
+                    throw new Exception($"sp_getapplock failed with errorCode '{lockResult}'");
             }
- 
-            return this;
-        }
- 
-        public void ReleaseLock()
-        {
-            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Suppress))
+            catch (Exception ex)
             {
-                SqlCommand command = new SqlCommand("sp_releaseapplock", _sqlConnection);
-                command.CommandType = CommandType.StoredProcedure;
- 
-                command.Parameters.AddWithValue("Resource", _uniqueId);
-                command.Parameters.AddWithValue("LockOwner", "Session");
- 
-                command.ExecuteNonQuery();
-                _isLockTaken = false;
-                scope.Complete();
+                sqlConnection.Close();
+                ExceptionDispatchInfo.Capture(ex).Throw();
             }
-        }
- 
-        public void Dispose()
-        {
-            if (_isLockTaken)
+
+            return new GenericDisposable(() =>
             {
-                ReleaseLock();
-            }
-            _sqlConnection.Close();
+                var parameters = new DynamicParameters();
+                parameters.Add("@Resource", resource);
+                parameters.Add("@LockOwner", "Session");
+
+                sqlConnection.ExecuteWithRetry(@"sp_releaseapplock", parameters, CommandType.StoredProcedure);
+
+                sqlConnection.Close();
+            });
         }
     }
 }
