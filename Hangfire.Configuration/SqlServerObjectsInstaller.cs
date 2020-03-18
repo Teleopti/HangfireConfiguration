@@ -26,9 +26,6 @@ namespace Hangfire.Configuration
                     .Replace("$(HangfireConfigurationSchema)", SchemaName)
                     .Replace("$(HangfireConfigurationSchemaVersion)", schemaVersion.ToString())
                 ;
-            
-            Console.WriteLine(scriptWithSchema);
-            
             connection.Execute(scriptWithSchema, commandTimeout: 0);
         }
 
