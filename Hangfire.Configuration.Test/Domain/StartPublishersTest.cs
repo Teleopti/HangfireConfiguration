@@ -3,11 +3,16 @@ using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.SqlServer;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class StartPublishersTest
+    public class StartPublishersTest : XunitContextBase
     {
+        public StartPublishersTest(ITestOutputHelper output) : base(output)
+        {
+        }
+
         [Fact]
         public void ShouldConfigureAndStartWithAutoUpdatedConnectionString()
         {

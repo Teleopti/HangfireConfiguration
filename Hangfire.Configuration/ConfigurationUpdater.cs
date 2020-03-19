@@ -20,69 +20,83 @@ namespace Hangfire.Configuration
 
         public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> configs)
         {
-            if (!shouldUpdate(options, configs))
+            if (_state.ConfigurationUpdaterRan && configs.Any())
                 return false;
 
             _state.ConfigurationUpdaterRan = true;
 
             using (_distributedLock.Take("ConfigurationUpdater"))
             {
-                var configurations = _repository.ReadConfigurations();
+                var @fixed = fixExistingConfigurations(configs);
+                var updated = runConfigurationUpdates(options);
+                return @fixed || updated;
+            }
+        }
 
-                var legacyConfiguration = configurations.SingleOrDefault(isLegacy);
-                if (legacyConfiguration != null)
-                {
+        private bool runConfigurationUpdates(ConfigurationOptions options)
+        {
+            if (!updateConfigurationsEnabled(options))
+                return false;
+
+            var configurations = _repository.ReadConfigurations();
+
+            var autoUpdate = new UpdateConfiguration
+            {
+                Name = DefaultConfigurationName.Name(),
+                ConnectionString = options.AutoUpdatedHangfireConnectionString,
+                SchemaName = options.AutoUpdatedHangfireSchemaName,
+            };
+            var updateConfigurations = new[] {autoUpdate}
+                .Concat(options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
+                .Where(x => x.ConnectionString != null)
+                .ToArray();
+
+            updateConfigurations.ForEach(update =>
+            {
+                var configuration = configurations.FirstOrDefault(c => c.Name == update.Name) ??
+                                    new StoredConfiguration
+                                    {
+                                        Name = update.Name,
+                                        Active = true
+                                    };
+                if (update.Name == DefaultConfigurationName.Name())
+                    configuration.ConnectionString = markConnectionString(update.ConnectionString);
+                else
+                    configuration.ConnectionString = update.ConnectionString;
+                configuration.SchemaName = update.SchemaName;
+                _repository.WriteConfiguration(configuration);
+            });
+
+            return true;
+        }
+
+        private bool fixExistingConfigurations(IEnumerable<StoredConfiguration> configurations)
+        {
+            var ordered = configurations.OrderBy(x => x.Id).ToArray();
+
+            var legacyConfiguration = ordered.FirstOrDefault(isLegacy);
+            if (legacyConfiguration != null)
+            {
+                if (legacyConfiguration.Name == null)
                     legacyConfiguration.Name = DefaultConfigurationName.Name();
+                if (legacyConfiguration.Active == null)
                     legacyConfiguration.Active = true;
-                }
-
-                var markedConfiguration = configurations.FirstOrDefault(isMarked);
-                if (markedConfiguration != null)
-                    markedConfiguration.Name = DefaultConfigurationName.Name();
-
-                var autoUpdate = new UpdateConfiguration
-                {
-                    Name = DefaultConfigurationName.Name(),
-                    ConnectionString = options.AutoUpdatedHangfireConnectionString,
-                    SchemaName = options.AutoUpdatedHangfireSchemaName,
-                };
-                var updateConfigurations = new[] {autoUpdate}
-                    .Concat(options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
-                    .Where(x => x.ConnectionString != null)
-                    .ToArray();
-
-                updateConfigurations.ForEach(update =>
-                {
-                    var configuration = configurations.FirstOrDefault(c => c.Name == update.Name) ??
-                                        new StoredConfiguration
-                                        {
-                                            Name = update.Name,
-                                            Active = true
-                                        };
-                    if (update.Name == DefaultConfigurationName.Name())
-                        configuration.ConnectionString = markConnectionString(update.ConnectionString);
-                    else
-                        configuration.ConnectionString = update.ConnectionString;
-                    configuration.SchemaName = update.SchemaName;
-                    _repository.WriteConfiguration(configuration);
-                });
+                _repository.WriteConfiguration(legacyConfiguration);
+                return true;
             }
 
-            return true;
-        }
-
-        private bool shouldUpdate(ConfigurationOptions options, IEnumerable<StoredConfiguration> configurations)
-        {
-            if (!updateEnabled(options))
-                return false;
-            if (configurations.IsEmpty())
+            var markedConfiguration = ordered.FirstOrDefault(isMarked);
+            if (markedConfiguration != null)
+            {
+                markedConfiguration.Name = DefaultConfigurationName.Name();
+                _repository.WriteConfiguration(markedConfiguration);
                 return true;
-            if (_state.ConfigurationUpdaterRan)
-                return false;
-            return true;
+            }
+
+            return false;
         }
 
-        private static bool updateEnabled(ConfigurationOptions options)
+        private static bool updateConfigurationsEnabled(ConfigurationOptions options)
         {
             if (options?.AutoUpdatedHangfireConnectionString != null)
                 return true;
@@ -94,10 +108,22 @@ namespace Hangfire.Configuration
         private static bool isLegacy(StoredConfiguration configuration) =>
             configuration.ConnectionString == null;
 
-        private static bool isMarked(StoredConfiguration configuration) =>
-            new SqlConnectionStringBuilder(configuration.ConnectionString)
+        private static bool isMarked(StoredConfiguration configuration)
+        {
+            SqlConnectionStringBuilder connectionString;
+            try
+            {
+                connectionString = new SqlConnectionStringBuilder(configuration.ConnectionString);
+            }
+            catch (ArgumentException e)
+            {
+                return false;
+            }
+
+            return connectionString
                 .ApplicationName
                 .EndsWith(".AutoUpdate");
+        }
 
         private static string markConnectionString(string connectionString)
         {
@@ -109,11 +135,9 @@ namespace Hangfire.Configuration
         }
 
         // because builder will return a app name even though the connection string does not have one
-        private static bool applicationNameIsNotSet(SqlConnectionStringBuilder builder)
-        {
-            return string.IsNullOrEmpty(builder.ApplicationName) ||
-                   builder.ApplicationName == ".Net SqlClient Data Provider" ||
-                   builder.ApplicationName == "Core .Net SqlClient Data Provider";
-        }
+        private static bool applicationNameIsNotSet(SqlConnectionStringBuilder builder) =>
+            string.IsNullOrEmpty(builder.ApplicationName) ||
+            builder.ApplicationName == ".Net SqlClient Data Provider" ||
+            builder.ApplicationName == "Core .Net SqlClient Data Provider";
     }
 }

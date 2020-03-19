@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using Dapper;
-using SqlSetup = Hangfire.Configuration.SqlServerObjectsInstaller;
 
 namespace Hangfire.Configuration
 {
@@ -46,7 +44,7 @@ SELECT
     GoalWorkerCount, 
     Active 
 FROM 
-    [{SqlSetup.SchemaName}].Configuration
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration
 ").ToArray();
         }
 
@@ -66,7 +64,7 @@ FROM
             connection.ExecuteWithRetry(
                 $@"
 INSERT INTO 
-    [{SqlSetup.SchemaName}].Configuration 
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 (
     Name,
     [ConnectionString], 
@@ -87,7 +85,7 @@ INSERT INTO
             connection.ExecuteWithRetry(
                 $@"
 UPDATE 
-    [{SqlSetup.SchemaName}].Configuration 
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 SET 
     ConnectionString = @ConnectionString, 
     SchemaName = @SchemaName, 

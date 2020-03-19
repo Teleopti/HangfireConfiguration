@@ -8,9 +8,9 @@ using Xunit.Abstractions;
 namespace Hangfire.Configuration.Test.Infrastructure
 {
     [Collection("NotParallel")]
-    public class DatabaseUpgradeTest : XunitContextBase
+    public class SqlSchemaInstallTest : XunitContextBase
     {
-        public DatabaseUpgradeTest(ITestOutputHelper output) : base(output)
+        public SqlSchemaInstallTest(ITestOutputHelper output) : base(output)
         {
         }
 
