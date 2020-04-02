@@ -87,6 +87,7 @@ INSERT INTO
 UPDATE 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 SET 
+    Name = @Name,
     ConnectionString = @ConnectionString, 
     SchemaName = @SchemaName, 
     GoalWorkerCount = @GoalWorkerCount, 

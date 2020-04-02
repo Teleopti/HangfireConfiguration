@@ -58,14 +58,14 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
             var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
             repository.WriteConfiguration(new StoredConfiguration());
-            
+
             var existing = repository.ReadConfigurations().Single();
             existing.ConnectionString = "connection";
             existing.SchemaName = "schema";
             existing.GoalWorkerCount = 23;
             existing.Active = true;
             repository.WriteConfiguration(existing);
-            
+
             var configuration = repository.ReadConfigurations().Single();
             Assert.Equal("connection", configuration.ConnectionString);
             Assert.Equal("schema", configuration.SchemaName);
@@ -82,6 +82,20 @@ namespace Hangfire.Configuration.Test.Infrastructure
             {
                 Name = "name",
             });
+
+            var configuration = repository.ReadConfigurations().Single();
+            Assert.Equal("name", configuration.Name);
+        }
+
+        [Fact, CleanDatabase]
+        public void ShouldUpdateName()
+        {
+            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            repository.WriteConfiguration(new StoredConfiguration());
+
+            var existing = repository.ReadConfigurations().Single();
+            existing.Name = "name";
+            repository.WriteConfiguration(existing);
 
             var configuration = repository.ReadConfigurations().Single();
             Assert.Equal("name", configuration.Name);
