@@ -47,7 +47,6 @@ namespace Hangfire.Configuration.Test
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
-            DistributedLock = new FakeDistributedLock();
 
             ConfigurationApi = BuildConfigurationApi(_options);
             WorkerServerStarter = BuildWorkerServerStarter(ApplicationBuilder, connection);
@@ -70,7 +69,6 @@ namespace Hangfire.Configuration.Test
         public FakeConfigurationRepository Repository { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfire Hangfire { get; }
-        public FakeDistributedLock DistributedLock { get; }
 
         public ConfigurationApi ConfigurationApi { get; }
         public WorkerDeterminer WorkerDeterminer { get; }
@@ -83,6 +81,5 @@ namespace Hangfire.Configuration.Test
         protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
-        protected override IDistributedLock BuildDistributedLock(ConfigurationConnection connection) => DistributedLock;
     }
 }

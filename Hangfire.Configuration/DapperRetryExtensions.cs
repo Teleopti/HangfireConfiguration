@@ -21,14 +21,14 @@ namespace Hangfire.Configuration
 
         public static void OpenWithRetry(this IDbConnection connection)
             => _connectionRetry.Execute(() => connection.Open());
-
-        public static void ExecuteWithRetry(this IDbConnection connection, string sql, object param)
-            => _commandRetry.Execute(() => connection.Execute(sql, param));
         
-        public static void ExecuteWithRetry(this IDbConnection connection, string sql, object param, CommandType? commandType)
-            => _commandRetry.Execute(() => connection.Execute(sql, param, commandType: commandType ));
-
-        public static IEnumerable<T> QueryWithRetry<T>(this IDbConnection connection, string sql)
-            => _commandRetry.Execute(() => connection.Query<T>(sql));
+        public static void ExecuteWithRetry(this IDbConnection connection, string sql, object param, IDbTransaction transaction = null)
+            => _commandRetry.Execute(() => connection.Execute(sql, param, transaction));
+        
+        public static void ExecuteWithRetry(this IDbConnection connection, string sql, IDbTransaction transaction)
+            => _commandRetry.Execute(() => connection.Execute(sql, null, transaction));
+        
+        public static IEnumerable<T> QueryWithRetry<T>(this IDbConnection connection, string sql, IDbTransaction transaction = null)
+            => _commandRetry.Execute(() => connection.Query<T>(sql, null, transaction));
     }
 }

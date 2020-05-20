@@ -31,7 +31,7 @@ namespace Hangfire.Configuration
             new StateMaintainer(BuildHangfire(appBuilder), BuildRepository(connection), buildConfigurationUpdater(connection), _state);
 
         private ConfigurationUpdater buildConfigurationUpdater(ConfigurationConnection connection) =>
-            new ConfigurationUpdater(BuildRepository(connection), BuildDistributedLock(connection), _state);
+            new ConfigurationUpdater(BuildRepository(connection), _state);
 
 
         // boundary
@@ -43,8 +43,5 @@ namespace Hangfire.Configuration
 
         protected virtual IConfigurationRepository BuildRepository(ConfigurationConnection connection) =>
             new ConfigurationRepository(connection);
-
-        protected virtual IDistributedLock BuildDistributedLock(ConfigurationConnection connection) =>
-            new DistributedLock(connection.ConnectionString);
     }
 }

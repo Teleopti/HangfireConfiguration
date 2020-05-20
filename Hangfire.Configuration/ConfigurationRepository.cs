@@ -1,40 +1,57 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 
 namespace Hangfire.Configuration
 {
     public interface IConfigurationRepository
     {
-        IEnumerable<StoredConfiguration> ReadConfigurations();
-        void WriteConfiguration(StoredConfiguration configuration);
+        IEnumerable<StoredConfiguration> ReadConfigurations(IConfigurationConnection connection = null);
+        void WriteConfiguration(StoredConfiguration configuration, IConfigurationConnection connection = null);
+
+        void UsingTransaction(Action<IConfigurationConnection> action);
+        void LockConfiguration(IConfigurationConnection connection);
     }
+
 
     public class ConfigurationRepository : IConfigurationRepository
     {
-        private readonly Func<IDbConnection> _connectionFactory;
+        private readonly ConfigurationConnection _connection;
 
-
-        public ConfigurationRepository(string connectionString) : this(new ConfigurationConnection {ConnectionString = connectionString})
+        public ConfigurationRepository(string connectionString) : this(new ConfigurationConnection
+            {ConnectionString = connectionString})
         {
         }
 
-        public ConfigurationRepository(ConfigurationConnection options)
+        public ConfigurationRepository(ConfigurationConnection connection)
         {
-            _connectionFactory = () =>
+            _connection = connection;
+        }
+
+        public void UsingTransaction(Action<IConfigurationConnection> action)
+        {
+            using (var transaction = new ConfigurationConnectionTransaction(_connection.ConnectionString))
             {
-                var conn = new SqlConnection(options.ConnectionString);
-                conn.OpenWithRetry();
-                return conn;
-            };
+                action.Invoke(transaction);
+                transaction.Commit();
+            }
         }
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations()
+        public void LockConfiguration(IConfigurationConnection connection)
         {
-            using (var connection = _connectionFactory())
-                return connection.QueryWithRetry<StoredConfiguration>(
+            connection.UseConnection(c =>
+            {
+                c.ExecuteWithRetry($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)", connection.Transaction());
+            });
+        }
+
+        public IEnumerable<StoredConfiguration> ReadConfigurations(IConfigurationConnection connection = null)
+        {
+            IEnumerable<StoredConfiguration> result = null;
+            (connection ?? _connection).UseConnection(c =>
+            {
+                result = c.QueryWithRetry<StoredConfiguration>(
                     $@"
 SELECT 
     Id, 
@@ -44,22 +61,25 @@ SELECT
     GoalWorkerCount, 
     Active 
 FROM 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration
-").ToArray();
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration",connection?.Transaction()).ToArray();
+            });
+            return result;
         }
 
-        public void WriteConfiguration(StoredConfiguration configuration)
+        public void WriteConfiguration(StoredConfiguration configuration, IConfigurationConnection connection = null)
         {
-            using (var connection = _connectionFactory())
+            var conn = connection ?? _connection;
+            conn.UseConnection(c =>
             {
                 if (configuration.Id != null)
-                    update(configuration, connection);
+                    update(configuration, c, conn.Transaction());
                 else
-                    insert(configuration, connection);
-            }
+                    insert(configuration, c, conn.Transaction());
+            });
         }
 
-        private static void insert(StoredConfiguration configuration, IDbConnection connection)
+        private static void insert(StoredConfiguration configuration, IDbConnection connection,
+            IDbTransaction transaction)
         {
             connection.ExecuteWithRetry(
                 $@"
@@ -77,10 +97,11 @@ INSERT INTO
     @SchemaName, 
     @GoalWorkerCount, 
     @Active
-);", configuration);
+);", configuration,transaction);
         }
 
-        private static void update(StoredConfiguration configuration, IDbConnection connection)
+        private static void update(StoredConfiguration configuration, IDbConnection connection,
+            IDbTransaction transaction)
         {
             connection.ExecuteWithRetry(
                 $@"
@@ -93,7 +114,7 @@ SET
     GoalWorkerCount = @GoalWorkerCount, 
     Active = @Active 
 WHERE 
-    Id = @Id;", configuration);
+    Id = @Id;", configuration, transaction);
         }
     }
 }
