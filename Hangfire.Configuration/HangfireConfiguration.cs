@@ -62,7 +62,7 @@ namespace Hangfire.Configuration
         public HangfireConfiguration StartPublishers(SqlServerStorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? _storageOptions;
-            _compositionRoot.BuildPublisherStarter(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+            _compositionRoot.BuildPublisherStarter(new UnitOfWork {ConnectionString = _options.ConnectionString})
                 .Start(_options, storageOptions);
             return this;
         }
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration
             _serverOptions = serverOptions ?? _serverOptions;
             _compositionRoot.BuildWorkerServerStarter(
                     _builder,
-                    new ConfigurationConnection {ConnectionString = _options.ConnectionString}
+                    new UnitOfWork {ConnectionString = _options.ConnectionString}
                 )
                 .Start(_options, serverOptions, storageOptions, additionalProcesses.ToArray());
             return this;
@@ -86,7 +86,7 @@ namespace Hangfire.Configuration
         public IEnumerable<ConfigurationInfo> QueryAllWorkerServers(SqlServerStorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? _storageOptions;
-            return _compositionRoot.BuildWorkerServersQuerier(new ConfigurationConnection {ConnectionString = _options.ConnectionString})
+            return _compositionRoot.BuildWorkerServersQuerier(new UnitOfWork {ConnectionString = _options.ConnectionString})
                 .QueryAllWorkerServers(_options, storageOptions);
         }
 
@@ -95,7 +95,7 @@ namespace Hangfire.Configuration
         public IEnumerable<ConfigurationInfo> QueryPublishers(SqlServerStorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? _storageOptions;
-            return _compositionRoot.BuildPublishersQuerier(new ConfigurationConnection {ConnectionString = _options?.ConnectionString})
+            return _compositionRoot.BuildPublishersQuerier(new UnitOfWork {ConnectionString = _options?.ConnectionString})
                 .QueryPublishers(_options, storageOptions);
         }
 
@@ -103,10 +103,10 @@ namespace Hangfire.Configuration
             _compositionRoot.BuildConfigurationApi(_options);
 
         internal ViewModelBuilder ViewModelBuilder() =>
-            _compositionRoot.BuildViewModelBuilder(new ConfigurationConnection {ConnectionString = _options.ConnectionString});
+            _compositionRoot.BuildViewModelBuilder(new UnitOfWork {ConnectionString = _options.ConnectionString});
 
         [Obsolete("Dont use directly, will be removed")]
         public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
-            new CompositionRoot().BuildWorkerDeterminer(new ConfigurationConnection {ConnectionString = connectionString});
+            new CompositionRoot().BuildWorkerDeterminer(new UnitOfWork {ConnectionString = connectionString});
     }
 }

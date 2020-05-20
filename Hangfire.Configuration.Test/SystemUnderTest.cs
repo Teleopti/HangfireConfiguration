@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test
 #endif
                 ;
 
-            var connection = new ConfigurationConnection();
+            var connection = new UnitOfWork();
 
             Repository = new FakeConfigurationRepository();
             SchemaCreator = new FakeHangfireSchemaCreator();
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test
         public WorkerServerQueries WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
 
-        protected override IConfigurationRepository BuildRepository(ConfigurationConnection connection) => Repository;
+        protected override IConfigurationRepository BuildRepository(UnitOfWork connection) => Repository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
     }

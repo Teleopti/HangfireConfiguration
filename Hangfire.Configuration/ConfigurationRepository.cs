@@ -1,57 +1,46 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace Hangfire.Configuration
 {
     public interface IConfigurationRepository
     {
-        IEnumerable<StoredConfiguration> ReadConfigurations(IConfigurationConnection connection = null);
-        void WriteConfiguration(StoredConfiguration configuration, IConfigurationConnection connection = null);
+        IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null);
+        void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null);
 
-        void UsingTransaction(Action<IConfigurationConnection> action);
-        void LockConfiguration(IConfigurationConnection connection);
+        void UnitOfWork(Action<IUnitOfWork> action);
+        void LockConfiguration(IUnitOfWork unitOfWork);
     }
-
 
     public class ConfigurationRepository : IConfigurationRepository
     {
-        private readonly ConfigurationConnection _connection;
+        private readonly UnitOfWork _unitOfWork;
 
-        public ConfigurationRepository(string connectionString) : this(new ConfigurationConnection
-            {ConnectionString = connectionString})
+        public ConfigurationRepository(string connectionString) : this(new UnitOfWork{ConnectionString = connectionString}){}
+
+        public ConfigurationRepository(UnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
         }
 
-        public ConfigurationRepository(ConfigurationConnection connection)
+        public void UnitOfWork(Action<IUnitOfWork> action)
         {
-            _connection = connection;
-        }
-
-        public void UsingTransaction(Action<IConfigurationConnection> action)
-        {
-            using (var transaction = new ConfigurationConnectionTransaction(_connection.ConnectionString))
+            using (var transaction = new UnitOfWorkTransaction(_unitOfWork.ConnectionString))
             {
                 action.Invoke(transaction);
                 transaction.Commit();
             }
         }
 
-        public void LockConfiguration(IConfigurationConnection connection)
+        public void LockConfiguration(IUnitOfWork unitOfWork)
         {
-            connection.UseConnection(c =>
-            {
-                c.ExecuteWithRetry($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)", connection.Transaction());
-            });
+            unitOfWork.Execute($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)");
         }
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations(IConfigurationConnection connection = null)
-        {
-            IEnumerable<StoredConfiguration> result = null;
-            (connection ?? _connection).UseConnection(c =>
-            {
-                result = c.QueryWithRetry<StoredConfiguration>(
+        public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null) =>
+            getUnitOfWork(unitOfWork)
+                .Query<StoredConfiguration>(
                     $@"
 SELECT 
     Id, 
@@ -61,27 +50,24 @@ SELECT
     GoalWorkerCount, 
     Active 
 FROM 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration",connection?.Transaction()).ToArray();
-            });
-            return result;
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration").ToArray();
+
+        public void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null)
+        {
+            if (configuration.Id != null)
+                update(configuration, getUnitOfWork(unitOfWork));
+            else
+                insert(configuration, getUnitOfWork(unitOfWork));
         }
 
-        public void WriteConfiguration(StoredConfiguration configuration, IConfigurationConnection connection = null)
+        private IUnitOfWork getUnitOfWork(IUnitOfWork unitOfWork)
         {
-            var conn = connection ?? _connection;
-            conn.UseConnection(c =>
-            {
-                if (configuration.Id != null)
-                    update(configuration, c, conn.Transaction());
-                else
-                    insert(configuration, c, conn.Transaction());
-            });
+            return (unitOfWork ?? _unitOfWork);
         }
 
-        private static void insert(StoredConfiguration configuration, IDbConnection connection,
-            IDbTransaction transaction)
+        private static void insert(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
-            connection.ExecuteWithRetry(
+            unitOfWork.Execute(
                 $@"
 INSERT INTO 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
@@ -97,13 +83,12 @@ INSERT INTO
     @SchemaName, 
     @GoalWorkerCount, 
     @Active
-);", configuration,transaction);
+);", configuration);
         }
 
-        private static void update(StoredConfiguration configuration, IDbConnection connection,
-            IDbTransaction transaction)
+        private static void update(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
-            connection.ExecuteWithRetry(
+            unitOfWork.Execute(
                 $@"
 UPDATE 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
@@ -114,7 +99,7 @@ SET
     GoalWorkerCount = @GoalWorkerCount, 
     Active = @Active 
 WHERE 
-    Id = @Id;", configuration, transaction);
+    Id = @Id;", configuration);
         }
     }
 }

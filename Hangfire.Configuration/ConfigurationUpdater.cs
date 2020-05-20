@@ -27,7 +27,7 @@ namespace Hangfire.Configuration
                 return false; 
 
             var isUpdated = false;
-            _repository.UsingTransaction(c =>
+            _repository.UnitOfWork(c =>
             {
                 _repository.LockConfiguration(c);
                 var @fixed = fixExistingConfigurations(c);
@@ -55,8 +55,7 @@ namespace Hangfire.Configuration
             return true;
         }
 
-        private bool runConfigurationUpdates(ConfigurationOptions options,
-            IConfigurationConnection connection)
+        private bool runConfigurationUpdates(ConfigurationOptions options, IUnitOfWork connection)
         {
             if (!updateConfigurationsEnabled(options))
                 return false;
@@ -84,7 +83,7 @@ namespace Hangfire.Configuration
             return true;
         }
 
-        private static UpdateConfiguration[] buildUpdateConfigurations(ConfigurationOptions options)
+        private static IEnumerable<UpdateConfiguration> buildUpdateConfigurations(ConfigurationOptions options)
         {
             var autoUpdate = new UpdateConfiguration
             {
@@ -99,7 +98,7 @@ namespace Hangfire.Configuration
                 .ToArray();
         }
 
-        private bool fixExistingConfigurations(IConfigurationConnection connection)
+        private bool fixExistingConfigurations(IUnitOfWork connection)
         {
             var configurations = _repository.ReadConfigurations(connection);
             

@@ -12,10 +12,10 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         private int _nextId = 1;
         private int NextId() => _nextId++;
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations(IConfigurationConnection connection = null) =>
+        public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null) =>
             Data.Select(x => x.Copy()).ToArray();
 
-        public void WriteConfiguration(StoredConfiguration configuration, IConfigurationConnection connection = null)
+        public void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null)
         {
             configuration = configuration.Copy();
             if (configuration.Id != null)
@@ -25,10 +25,10 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             Data = Data.Append(configuration).OrderBy(x => x.Id).ToArray();
         }
 
-        public void UsingTransaction(Action<IConfigurationConnection> action) => 
+        public void UnitOfWork(Action<IUnitOfWork> action) => 
             action.Invoke(null);
 
-        public void LockConfiguration(IConfigurationConnection connection){}
+        public void LockConfiguration(IUnitOfWork unitOfWork){}
 
         public void HasGoalWorkerCount(int goalWorkerCount) => Has(new StoredConfiguration {GoalWorkerCount = goalWorkerCount});
 
