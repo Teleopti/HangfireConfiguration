@@ -12,12 +12,12 @@ namespace Hangfire.Configuration
         private static readonly Policy _connectionRetry = Policy.Handle<TimeoutException>()
             .Or<SqlException>(DetectTransientSqlException.IsTransient)
             .OrInner<SqlException>(DetectTransientSqlException.IsTransient)
-            .WaitAndRetry(10, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
+            .WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
 
         private static readonly Policy _commandRetry = Policy.Handle<TimeoutException>()
             .Or<SqlException>(DetectTransientSqlException.IsTransient)
             .OrInner<SqlException>(DetectTransientSqlException.IsTransient)
-            .WaitAndRetry(10, i => TimeSpan.FromSeconds(i));
+            .WaitAndRetry(5, i => TimeSpan.FromSeconds(i));
 
         public static void OpenWithRetry(this IDbConnection connection)
             => _connectionRetry.Execute(() => connection.Open());
