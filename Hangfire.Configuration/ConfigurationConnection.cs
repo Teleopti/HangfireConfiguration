@@ -29,14 +29,14 @@ namespace Hangfire.Configuration
     
     public class ConfigurationConnectionTransaction : IConfigurationConnection, IDisposable
     {
-        private readonly SqlConnection _conn;
-        private readonly SqlTransaction _transaction;
+        private readonly IDbConnection _conn;
+        private readonly IDbTransaction _transaction;
 
         public ConfigurationConnectionTransaction(string connectionString)
         {
             _conn = new SqlConnection(connectionString);
             _conn.OpenWithRetry();
-            _transaction = _conn.BeginTransaction();
+            _transaction = _conn.BeginTransactionWithRetry();
         }
 
         public void UseConnection(Action<IDbConnection> action)
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration
 
         public void Commit()
         {
-            _transaction.Commit();
+            _transaction.CommitWithRetry();
         }
         
         public void Dispose()
