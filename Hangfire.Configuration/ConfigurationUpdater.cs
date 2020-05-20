@@ -23,6 +23,9 @@ namespace Hangfire.Configuration
 
             _state.ConfigurationUpdaterRan = true;
 
+            if (nothingToUpdate(options, configs))
+                return false; 
+
             var isUpdated = false;
             _repository.UsingTransaction(c =>
             {
@@ -34,6 +37,24 @@ namespace Hangfire.Configuration
             return isUpdated;
         }
 
+        private bool nothingToUpdate(ConfigurationOptions options, IEnumerable<StoredConfiguration> storedConfigs)
+        {
+            if (options == null)
+                return false;
+            
+            var configs = buildUpdateConfigurations(options);
+            
+            foreach (var config in configs)
+            {
+                if (!storedConfigs.Any(storedConfig => 
+                    storedConfig.Name == config.Name && 
+                    storedConfig.SchemaName == config.SchemaName && 
+                    config.ConnectionString?.Replace(".AutoUpdate", "") == storedConfig.ConnectionString?.Replace(".AutoUpdate", "")))
+                    return false;
+            }
+            return true;
+        }
+
         private bool runConfigurationUpdates(ConfigurationOptions options,
             IConfigurationConnection connection)
         {
@@ -42,16 +63,7 @@ namespace Hangfire.Configuration
 
             var configurations = _repository.ReadConfigurations(connection);
 
-            var autoUpdate = new UpdateConfiguration
-            {
-                Name = DefaultConfigurationName.Name(),
-                ConnectionString = options.AutoUpdatedHangfireConnectionString,
-                SchemaName = options.AutoUpdatedHangfireSchemaName,
-            };
-            var updateConfigurations = new[] {autoUpdate}
-                .Concat(options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
-                .Where(x => x.ConnectionString != null)
-                .ToArray();
+            var updateConfigurations = buildUpdateConfigurations(options);
 
             updateConfigurations.ForEach(update =>
             {
@@ -70,6 +82,21 @@ namespace Hangfire.Configuration
             });
 
             return true;
+        }
+
+        private static UpdateConfiguration[] buildUpdateConfigurations(ConfigurationOptions options)
+        {
+            var autoUpdate = new UpdateConfiguration
+            {
+                Name = DefaultConfigurationName.Name(),
+                ConnectionString = options?.AutoUpdatedHangfireConnectionString,
+                SchemaName = options?.AutoUpdatedHangfireSchemaName,
+            };
+            
+            return  new[] {autoUpdate}
+                .Concat(options?.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
+                .Where(x => x.ConnectionString != null)
+                .ToArray();
         }
 
         private bool fixExistingConfigurations(IConfigurationConnection connection)
