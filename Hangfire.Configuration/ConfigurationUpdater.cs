@@ -16,14 +16,16 @@ namespace Hangfire.Configuration
             _state = state;
         }
 
-        public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> configs)
+        public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> stored)
         {
-            if (_state.ConfigurationUpdaterRan && configs.Any())
+            if (_state.ConfigurationUpdaterRan && stored.Any())
                 return false;
 
             _state.ConfigurationUpdaterRan = true;
 
-            if (nothingToUpdate(options, configs))
+            var received = buildUpdateConfigurations(options);
+
+            if (alreadyUpToDate(received, stored))
                 return false; 
 
             var isUpdated = false;
@@ -31,58 +33,21 @@ namespace Hangfire.Configuration
             {
                 _repository.LockConfiguration(c);
                 var @fixed = fixExistingConfigurations(c);
-                var updated = runConfigurationUpdates(options,c);
-                isUpdated = @fixed || updated;
+                if (updateConfigurationsEnabled(options))
+                    isUpdated = runConfigurationUpdates(received, c);
+                isUpdated = @fixed || isUpdated;
             });
             return isUpdated;
         }
 
-        private bool nothingToUpdate(ConfigurationOptions options, IEnumerable<StoredConfiguration> storedConfigs)
+        private static bool alreadyUpToDate(IEnumerable<UpdateConfiguration> received, IEnumerable<StoredConfiguration> stored)
         {
-            if (options == null)
-                return false;
+            if (!received.Any())
+                return false; //always fix stored configurations if no configuration options received
             
-            var configs = buildUpdateConfigurations(options);
-            
-            foreach (var config in configs)
-            {
-                if (!storedConfigs.Any(storedConfig => 
-                    storedConfig.Name == config.Name && 
-                    storedConfig.SchemaName == config.SchemaName && 
-                    config.ConnectionString?.Replace(".AutoUpdate", "") == storedConfig.ConnectionString?.Replace(".AutoUpdate", "")))
-                    return false;
-            }
-            return true;
+            return !(received.Any(r => notStored(stored, r)));
         }
-
-        private bool runConfigurationUpdates(ConfigurationOptions options, IUnitOfWork connection)
-        {
-            if (!updateConfigurationsEnabled(options))
-                return false;
-
-            var configurations = _repository.ReadConfigurations(connection);
-
-            var updateConfigurations = buildUpdateConfigurations(options);
-
-            updateConfigurations.ForEach(update =>
-            {
-                var configuration = configurations.FirstOrDefault(c => c.Name == update.Name) ??
-                                    new StoredConfiguration
-                                    {
-                                        Name = update.Name,
-                                        Active = true
-                                    };
-                if (update.Name == DefaultConfigurationName.Name())
-                    configuration.ConnectionString = markConnectionString(update.ConnectionString);
-                else
-                    configuration.ConnectionString = update.ConnectionString;
-                configuration.SchemaName = update.SchemaName;
-                _repository.WriteConfiguration(configuration,connection);
-            });
-
-            return true;
-        }
-
+        
         private static IEnumerable<UpdateConfiguration> buildUpdateConfigurations(ConfigurationOptions options)
         {
             var autoUpdate = new UpdateConfiguration
@@ -96,13 +61,21 @@ namespace Hangfire.Configuration
                 .Concat(options?.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
                 .Where(x => x.ConnectionString != null)
                 .ToArray();
-        }
+        }        
+
+        private static bool notStored(IEnumerable<StoredConfiguration> stored, UpdateConfiguration received) => 
+            !stored.Any(s => sameConfiguration(received, s));
+
+        private static bool sameConfiguration( UpdateConfiguration received, StoredConfiguration stored) =>
+            stored.Name == received.Name && 
+            stored.SchemaName == received.SchemaName && 
+            received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
 
         private bool fixExistingConfigurations(IUnitOfWork connection)
         {
-            var configurations = _repository.ReadConfigurations(connection);
+            var stored = _repository.ReadConfigurations(connection);
             
-            var ordered = configurations.OrderBy(x => x.Id).ToArray();
+            var ordered = stored.OrderBy(x => x.Id).ToArray();
 
             var legacyConfiguration = ordered.FirstOrDefault(isLegacy);
             if (legacyConfiguration != null)
@@ -125,7 +98,30 @@ namespace Hangfire.Configuration
 
             return false;
         }
+        
+        private bool runConfigurationUpdates(IEnumerable<UpdateConfiguration> received, IUnitOfWork connection)
+        {
+            var stored = _repository.ReadConfigurations(connection);
+            
+            received.ForEach(update =>
+            {
+                var configuration = stored.FirstOrDefault(c => c.Name == update.Name) ??
+                                    new StoredConfiguration
+                                    {
+                                        Name = update.Name,
+                                        Active = true
+                                    };
+                if (update.Name == DefaultConfigurationName.Name())
+                    configuration.ConnectionString = markConnectionString(update.ConnectionString);
+                else
+                    configuration.ConnectionString = update.ConnectionString;
+                configuration.SchemaName = update.SchemaName;
+                _repository.WriteConfiguration(configuration,connection);
+            });
 
+            return true;
+        }
+        
         private static bool updateConfigurationsEnabled(ConfigurationOptions options)
         {
             if (options?.AutoUpdatedHangfireConnectionString != null)
