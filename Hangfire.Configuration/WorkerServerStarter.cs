@@ -39,7 +39,7 @@ namespace Hangfire.Configuration
                 .OrderBy(x => !(x.Configuration.Active ?? false))
                 .ForEach(x =>
                 {
-                    startWorkerServer(x, options, serverOptions, backgroundProcesses);
+                   startWorkerServer(x, options, serverOptions, backgroundProcesses);
                 });
         }
 

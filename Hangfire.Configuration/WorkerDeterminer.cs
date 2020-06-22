@@ -1,13 +1,19 @@
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Common;
 using Hangfire.Storage;
+using Polly;
 
 namespace Hangfire.Configuration
 {
 	public class WorkerDeterminer
 	{
 		private readonly IConfigurationRepository _repository;
+		
+		private static readonly Policy _retry = Policy.Handle<SqlException>(DetectTransientSqlException.IsTransient)
+			.OrInner<SqlException>(DetectTransientSqlException.IsTransient)
+			.WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
 
 		public WorkerDeterminer(IConfigurationRepository repository)
 		{
@@ -32,7 +38,7 @@ namespace Hangfire.Configuration
 			if (goal > options.MaximumGoalWorkerCount)
 				goal = options.MaximumGoalWorkerCount;
 
-			var serverCount = monitor.Servers().Count; 
+			var serverCount = _retry.Execute(() => monitor.Servers().Count); 
 			if (serverCount < options.MinimumServers)
 				serverCount = options.MinimumServers;
 			if (serverCount == 0)
