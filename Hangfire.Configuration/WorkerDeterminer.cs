@@ -39,8 +39,6 @@ namespace Hangfire.Configuration
 				goal = options.MaximumGoalWorkerCount;
 
 			var serverCount = _retry.Execute(() => monitor.Servers().Count); 
-			if (serverCount < options.MinimumServers)
-				serverCount = options.MinimumServers;
 			if (serverCount == 0)
 				serverCount = 1;
 				
