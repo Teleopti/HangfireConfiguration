@@ -34,45 +34,6 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
-        public void ShouldGetGoalOnRestartOfSingleServer()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.HasGoalWorkerCount(8);
-            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
-
-            system.WorkerServerStarter.Start(null, null, null);
-
-            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }
-
-        [Fact]
-        public void ShouldGetHalfOfGoalForSecondServerAfterRestart()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.HasGoalWorkerCount(8);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
-
-            system.WorkerServerStarter.Start(null, null, null);
-
-            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }
-
-        [Fact]
-        public void ShouldRoundWorkerCountUp()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.HasGoalWorkerCount(10);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
-            system.Monitor.AnnounceServer("server3", new ServerContext());
-
-            system.WorkerServerStarter.Start(null, null, null);
-
-            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }
-
-        [Fact]
         public void ShouldGetOneIfGoalIsZero()
         {
             var system = new SystemUnderTest();
@@ -105,19 +66,6 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(100, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
-        public void ShouldGetHalfOfMaxOneHundredWhenTwoServers()
-        {
-            var system = new SystemUnderTest();
-            system.Repository.HasGoalWorkerCount(101);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
-
-            system.WorkerServerStarter.Start(null, null, null);
-
-            Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }
-        
         [Fact]
         public void ShouldUseDefaultGoalWorkerCount()
         {
@@ -219,10 +167,6 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(52, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
-        
-        
-        
-        
         
         [Fact]
         public void ShouldGetHalfOfDefaultForFirstServer()

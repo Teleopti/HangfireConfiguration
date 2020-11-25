@@ -37,17 +37,19 @@ namespace Hangfire.Configuration
 			var goal = goalWorkerCount ?? options.DefaultGoalWorkerCount;
 			if (goal > options.MaximumGoalWorkerCount)
 				goal = options.MaximumGoalWorkerCount;
+			
+			var runningServerCount = _retry.Execute(() => monitor.Servers().Count);
 
-			var knownServerCount = _retry.Execute(() => monitor.Servers().Count);
+			var startingServer = 1;
+			var serverCount = runningServerCount + startingServer;
+
 			if (options.MinimumKnownWorkerServerCount.HasValue)
 			{
-				if (knownServerCount < options.MinimumKnownWorkerServerCount)
-					knownServerCount = options.MinimumKnownWorkerServerCount.Value;
+				if (serverCount < options.MinimumKnownWorkerServerCount)
+					serverCount = options.MinimumKnownWorkerServerCount.Value;
 			}
-			if (knownServerCount == 0)
-				knownServerCount = 1;
-				
-			var workerCount =  Convert.ToInt32(Math.Ceiling(goal / ((decimal)knownServerCount)));
+
+			var workerCount =  Convert.ToInt32(Math.Ceiling(goal / ((decimal)serverCount)));
 			if (workerCount < options.MinimumWorkerCount)
                 workerCount = options.MinimumWorkerCount;
 
