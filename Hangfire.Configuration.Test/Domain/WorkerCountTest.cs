@@ -117,8 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
-
-
+        
         [Fact]
         public void ShouldUseDefaultGoalWorkerCount()
         {
@@ -139,7 +138,10 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(0);
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions {MinimumWorkerCount = 2}, null, null);
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumWorkerCount = 2
+            }, null, null);
 
             Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -150,9 +152,57 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.HasGoalWorkerCount(202);
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions {MaximumGoalWorkerCount = 200}, null, null);
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MaximumGoalWorkerCount = 200
+            }, null, null);
 
             Assert.Equal(200, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldUseMinimumServerCount()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(15);
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumKnownWorkerServerCount = 3
+            }, null, null);
+
+            Assert.Equal(15 / 3, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldUseMinimumWorkerCountWithMinimumKnownServers()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(7);
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumKnownWorkerServerCount = 2,
+                MinimumWorkerCount = 6
+            }, null, null);
+
+            Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldGetGoalForFirstServerWhenMinimumKnownServersIsZero()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+
+            system.WorkerServerStarter.Start(
+                new ConfigurationOptions
+                {
+                    MinimumKnownWorkerServerCount = 0
+                },
+                null, null);
+
+            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
         [Fact]
@@ -169,5 +219,84 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(52, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
+        
+        
+        
+        
+        
+        [Fact]
+        public void ShouldGetHalfOfDefaultForFirstServer()
+        {
+            var system = new SystemUnderTest();
+
+            system.WorkerServerStarter.Start(
+                new ConfigurationOptions
+                {
+                    MinimumKnownWorkerServerCount = 2,
+                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(), 
+                },
+                null, null);
+
+            Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldGetHalfOfGoalForFirstServer()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumKnownWorkerServerCount = 2
+            }, null, null);
+
+            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldGetHalfOfGoalOnRestartOfSingleServer()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(8);
+            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumKnownWorkerServerCount = 2
+            }, null, null);
+
+            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+        
+        [Fact]
+        public void ShouldGetHalfOfMaxOneHundred()
+        {
+            var system = new SystemUnderTest();
+            system.Repository.HasGoalWorkerCount(101);
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                MinimumKnownWorkerServerCount = 2
+            }, null, null);
+
+            Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+
+        [Fact]
+        public void ShouldUseDefaultGoalWorkerCountWithMinimumKnownServers()
+        {
+            var system = new SystemUnderTest();
+
+            system.WorkerServerStarter.Start(new ConfigurationOptions
+            {
+                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
+                DefaultGoalWorkerCount = 12,
+                MinimumKnownWorkerServerCount = 2
+            }, null, null);
+
+            Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
+        }
+        
     }
 }

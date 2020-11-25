@@ -46,11 +46,16 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
             Assert.Equal(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
-            Assert.Equal(serverOptions.HeartbeatInterval, system.Hangfire.StartedServers.Single().options.HeartbeatInterval);
-            Assert.Equal(serverOptions.ShutdownTimeout, system.Hangfire.StartedServers.Single().options.ShutdownTimeout);
-            Assert.Equal(serverOptions.ServerCheckInterval, system.Hangfire.StartedServers.Single().options.ServerCheckInterval);
-            Assert.Equal(serverOptions.CancellationCheckInterval, system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
-            Assert.Equal(serverOptions.SchedulePollingInterval, system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
+            Assert.Equal(serverOptions.HeartbeatInterval,
+                system.Hangfire.StartedServers.Single().options.HeartbeatInterval);
+            Assert.Equal(serverOptions.ShutdownTimeout,
+                system.Hangfire.StartedServers.Single().options.ShutdownTimeout);
+            Assert.Equal(serverOptions.ServerCheckInterval,
+                system.Hangfire.StartedServers.Single().options.ServerCheckInterval);
+            Assert.Equal(serverOptions.CancellationCheckInterval,
+                system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
+            Assert.Equal(serverOptions.SchedulePollingInterval,
+                system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
             Assert.Equal(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
         }
 
@@ -141,7 +146,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.WorkerServerStarter.Start(null, null,
+                new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
 
             Assert.False((system.Hangfire.StartedServers.Single().storage).Options.PrepareSchemaIfNecessary);
         }
@@ -189,9 +195,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null);
 
-            Assert.Equal(DefaultSchemaName.Name(), (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+            Assert.Equal(DefaultSchemaName.Name(),
+                (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
-        
+
         [Fact]
         public void ShouldUseDefaultSchemaNameWhenEmpty()
         {
@@ -200,7 +207,8 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null);
 
-            Assert.Equal(DefaultSchemaName.Name(), (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
+            Assert.Equal(DefaultSchemaName.Name(),
+                (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 
         [Fact]
@@ -265,12 +273,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null, new Worker());
 
-            Assert.Empty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "inactive").backgroundProcesses);
-            Assert.NotEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "active").backgroundProcesses);
+            Assert.Empty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "inactive")
+                .backgroundProcesses);
+            Assert.NotEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == "active")
+                .backgroundProcesses);
         }
 
         [Fact]
-        public void ShouldGetWorkerCountForTwoServers()
+        public void ShouldGetGoalWorkerCountForTwoServers()
         {
             var system = new SystemUnderTest();
             system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 20});
