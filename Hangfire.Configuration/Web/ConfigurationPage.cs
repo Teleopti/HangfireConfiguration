@@ -112,7 +112,7 @@ namespace Hangfire.Configuration.Web
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
                         <button class='button' type='button'>Submit</button>
-                            (Default: {_options.DefaultGoalWorkerCount}, Max: {_options.MaximumGoalWorkerCount})
+                            (Default: {_options.WorkerDeterminerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerDeterminerOptions.MaximumGoalWorkerCount})
                     </form>
                 </div>");
 

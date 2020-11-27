@@ -26,5 +26,11 @@ namespace Hangfire.Configuration.Test
 
             return source;
         }
+        
+        internal static T[] AsArray<T>(this T g)
+        {
+            return new[] { g };
+        }
+
     }
 }

@@ -10,10 +10,10 @@ namespace Hangfire.Configuration
             new PublisherStarter(builderStateMaintainer(null, connection), _state);
 
         public WorkerDeterminer BuildWorkerDeterminer(UnitOfWork connection) =>
-            new WorkerDeterminer(BuildRepository(connection));
+            new WorkerDeterminer(BuildServerCountSampleRepository(connection));
 
         public ConfigurationApi BuildConfigurationApi(ConfigurationOptions options) =>
-            new ConfigurationApi(BuildRepository(new UnitOfWork() {ConnectionString = options.ConnectionString}), BuildHangfireSchemaCreator(), options);
+            new ConfigurationApi(BuildConfigurationRepository(new UnitOfWork() {ConnectionString = options.ConnectionString}), BuildHangfireSchemaCreator(), options);
 
         public PublisherQueries BuildPublishersQuerier(UnitOfWork connection) =>
             new PublisherQueries(_state, builderStateMaintainer(null, connection));
@@ -22,16 +22,16 @@ namespace Hangfire.Configuration
             new WorkerServerQueries(builderStateMaintainer(null, connection), _state);
 
         public ViewModelBuilder BuildViewModelBuilder(UnitOfWork connection) =>
-            new ViewModelBuilder(BuildRepository(connection));
+            new ViewModelBuilder(BuildConfigurationRepository(connection));
 
         // internal services
         private State _state = new State();
 
         private StateMaintainer builderStateMaintainer(object appBuilder, UnitOfWork connection) =>
-            new StateMaintainer(BuildHangfire(appBuilder), BuildRepository(connection), buildConfigurationUpdater(connection), _state);
+            new StateMaintainer(BuildHangfire(appBuilder), BuildConfigurationRepository(connection), buildConfigurationUpdater(connection), _state);
 
         private ConfigurationUpdater buildConfigurationUpdater(UnitOfWork connection) =>
-            new ConfigurationUpdater(BuildRepository(connection), _state);
+            new ConfigurationUpdater(BuildConfigurationRepository(connection), _state);
 
 
         // boundary
@@ -41,7 +41,10 @@ namespace Hangfire.Configuration
         protected virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() =>
             new HangfireSchemaCreator();
 
-        protected virtual IConfigurationRepository BuildRepository(UnitOfWork connection) =>
+        protected virtual IConfigurationRepository BuildConfigurationRepository(UnitOfWork connection) =>
             new ConfigurationRepository(connection);
+        
+        protected virtual IServerCountSampleRepository BuildServerCountSampleRepository(UnitOfWork connection) =>
+            new ServerCountSampleRepository();
     }
 }

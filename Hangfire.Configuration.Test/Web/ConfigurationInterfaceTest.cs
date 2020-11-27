@@ -1,6 +1,8 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Hangfire.Configuration.Test.Domain;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -30,7 +32,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldSaveWorkerGoalCount()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 3
@@ -45,15 +47,15 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.Equal(1, system.Repository.Data.Single().Id);
-            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
+            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
         }
         
         [Fact]
         public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions {MaximumGoalWorkerCount = 10});
-            system.Repository.Has(new StoredConfiguration
+            var system = new SystemUnderTest(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 3
@@ -87,15 +89,15 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.Equal(1, system.Repository.Data.Single().Id);
-            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
+            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
         }
 
         [Fact]
         public void ShouldActivateServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 2
             });
@@ -108,7 +110,7 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.True(system.Repository.Data.Single().Active);
+            Assert.True(system.ConfigurationRepository.Data.Single().Active);
         }
 
         [Fact]
@@ -131,8 +133,8 @@ namespace Hangfire.Configuration.Test.Web
                         })))
                 .Result;
 
-            Assert.Equal(1, system.Repository.Data.Single().Id);
-            Assert.Contains("database", system.Repository.Data.Single().ConnectionString);
+            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
+            Assert.Contains("database", system.ConfigurationRepository.Data.Single().ConnectionString);
         }
         
         [Fact]
@@ -156,7 +158,7 @@ namespace Hangfire.Configuration.Test.Web
                         })))
                 .Result;
 
-            Assert.Equal("name", system.Repository.Data.Single().Name);
+            Assert.Equal("name", system.ConfigurationRepository.Data.Single().Name);
         }
         
         [Fact]
@@ -171,7 +173,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldInactivateServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 3,
                 Active = true
@@ -185,7 +187,7 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
 
-            Assert.False(system.Repository.Data.Single().Active);
+            Assert.False(system.ConfigurationRepository.Data.Single().Active);
         }
         
     }

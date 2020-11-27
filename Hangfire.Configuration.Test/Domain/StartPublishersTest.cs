@@ -45,7 +45,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithExistingActiveConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = true});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true});
 
             system.PublisherStarter.Start(null, null);
 
@@ -56,8 +56,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration() {Active = true, SchemaName = "ActiveSchema"});
+            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration() {Active = true, SchemaName = "ActiveSchema"});
 
             system.PublisherStarter.Start(null, null);
 
@@ -68,7 +68,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = true});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true});
 
             system.PublisherStarter.Start(null, null);
 
@@ -89,7 +89,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = true});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true});
             var options = new SqlServerStorageOptions
             {
                 QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -121,7 +121,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName"});
 
             system.PublisherStarter.Start(null, null);
 
@@ -132,8 +132,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName1"});
-            system.Repository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName2"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName1"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName2"});
 
             system.PublisherStarter.Start(null, null);
 
@@ -146,9 +146,9 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotCreateInactiveStorages()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Active = false});
-            system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
-            system.Repository.Has(new StoredConfiguration {Active = false});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = false});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = false});
 
             system.PublisherStarter.Start(null, null);
 

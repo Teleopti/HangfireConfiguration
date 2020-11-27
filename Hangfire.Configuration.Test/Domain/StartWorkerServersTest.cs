@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassServerOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
             var serverOptions = new BackgroundJobServerOptions
             {
                 Queues = new[] {"queue1", "queue2"},
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassNullServerNameToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, new BackgroundJobServerOptions {ServerName = "server!"}, null);
 
@@ -74,7 +74,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassAppBuilderToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -85,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
             var backgroundProcess = new Worker();
 
             system.WorkerServerStarter.Start(null, null, null, backgroundProcess);
@@ -97,8 +97,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartTwoServers()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -109,8 +109,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToFirstServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null, new Worker());
 
@@ -122,7 +122,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructHangfireStorage()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -133,7 +133,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorage()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {ConnectionString = "connectionString"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {ConnectionString = "connectionString"});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -144,7 +144,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorageWithOptions()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null,
                 new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
@@ -156,7 +156,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
 
             system.WorkerServerStarter.Start(null, null, new SqlServerStorageOptions {SchemaName = "Ignored"});
 
@@ -167,7 +167,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration2()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = "SchemaName"});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -178,8 +178,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
-            system.Repository.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -191,7 +191,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseDefaultSchemaName()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = null});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = null});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -203,7 +203,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseDefaultSchemaNameWhenEmpty()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {SchemaName = ""});
+            system.ConfigurationRepository.Has(new StoredConfiguration {SchemaName = ""});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -215,7 +215,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             var options = new SqlServerStorageOptions
             {
@@ -247,7 +247,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration());
+            system.ConfigurationRepository.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -268,8 +268,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToActiveServer()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {ConnectionString = "inactive"});
-            system.Repository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {ConnectionString = "inactive"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
 
             system.WorkerServerStarter.Start(null, null, null, new Worker());
 
@@ -283,8 +283,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetGoalWorkerCountForTwoServers()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 20});
-            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 100});
+            system.ConfigurationRepository.Has(new StoredConfiguration {GoalWorkerCount = 20});
+            system.ConfigurationRepository.Has(new StoredConfiguration {GoalWorkerCount = 100});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions(), null, null);
 

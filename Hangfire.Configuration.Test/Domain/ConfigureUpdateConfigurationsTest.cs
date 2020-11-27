@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }
             }, null, null);
 
-            var configuration = system.Repository.Data.Single();
+            var configuration = system.ConfigurationRepository.Data.Single();
             Assert.Equal("name", configuration.Name);
             Assert.Equal(connectionString, configuration.ConnectionString);
             Assert.Equal("schema", configuration.SchemaName);
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }
             }, null, null);
 
-            Assert.True(system.Repository.Data.Single().Active);
+            Assert.True(system.ConfigurationRepository.Data.Single().Active);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var previous = new SqlConnectionStringBuilder {DataSource = "previous"}.ToString();
-            system.Repository.Has(new StoredConfiguration {Name = "name", ConnectionString = previous});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Name = "name", ConnectionString = previous});
 
             var newConnectionString = new SqlConnectionStringBuilder {DataSource = "new"}.ToString();
             system.WorkerServerStarter.Start(new ConfigurationOptions
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }
             }, null, null);
 
-            var configuration = system.Repository.Data.Single();
+            var configuration = system.ConfigurationRepository.Data.Single();
             Assert.Equal(newConnectionString, configuration.ConnectionString);
         }
 
@@ -102,7 +102,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }
             }, null, null);
 
-            var configuration = system.Repository.Data.OrderBy(x => x.Id);
+            var configuration = system.ConfigurationRepository.Data.OrderBy(x => x.Id);
             Assert.Equal("name1", configuration.ElementAt(0).Name);
             Assert.Equal(connectionString1, configuration.ElementAt(0).ConnectionString);
             Assert.Equal("schema1", configuration.ElementAt(0).SchemaName);

@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
             const int storageCount = 500;
             var system = new SystemUnderTest();
             Enumerable.Range(1, storageCount)
-                .ForEach(id => { system.Repository.Has(new StoredConfiguration {Id = id}); });
+                .ForEach(id => { system.ConfigurationRepository.Has(new StoredConfiguration {Id = id}); });
 
             var run = new ConcurrencyRunner();
             run.InParallel(() =>

@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "awesomeSchema"
             });
 
-            var storedConfiguration = system.Repository.Data.Last();
+            var storedConfiguration = system.ConfigurationRepository.Data.Last();
             Assert.Equal(false, storedConfiguration.Active);
         }
 
@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivate()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 1,
                 ConnectionString = "connectionString",
@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.ActivateServer(1);
 
-            var storedConfiguration = system.Repository.Data.Single();
+            var storedConfiguration = system.ConfigurationRepository.Data.Single();
             Assert.Equal(true, storedConfiguration.Active);
         }
 
@@ -47,14 +47,14 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldDeactivatePreviouslyActive()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(
+            system.ConfigurationRepository.Has(
                 new StoredConfiguration {Id = 1, Active = true, ConnectionString = "connectionString", SchemaName = "awesomeSchema"},
                 new StoredConfiguration {Id = 2, ConnectionString = "connectionString2", SchemaName = "awesomeSchema2"}
             );
 
             system.ConfigurationApi.ActivateServer(2);
 
-            Assert.Equal(false, system.Repository.Data.Single(x => x.Id == 1).Active);
+            Assert.Equal(false, system.ConfigurationRepository.Data.Single(x => x.Id == 1).Active);
         }
     }
 }

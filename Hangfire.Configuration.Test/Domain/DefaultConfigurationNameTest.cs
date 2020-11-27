@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateLegacyWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {GoalWorkerCount = 3});
+            system.ConfigurationRepository.Has(new StoredConfiguration {GoalWorkerCount = 3});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 
@@ -28,7 +28,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotUpdateNamed()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Name = "name"});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Name = "name"});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 
@@ -39,8 +39,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateFirstLegacyWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
-            system.Repository.Has(new StoredConfiguration {Id = 1, GoalWorkerCount = 1});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Id = 1, GoalWorkerCount = 1});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
+            system.ConfigurationRepository.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 
@@ -62,8 +62,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateLegacyOverAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration {Id = 1, ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
-            system.Repository.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Id = 1, ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
+            system.ConfigurationRepository.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 

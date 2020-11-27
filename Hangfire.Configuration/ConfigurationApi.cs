@@ -22,7 +22,7 @@ namespace Hangfire.Configuration
 
         public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
         {
-            if (command.Workers > _options.MaximumGoalWorkerCount)
+            if (command.Workers > _options.WorkerDeterminerOptions.MaximumGoalWorkerCount)
                 throw new Exception("Invalid goal worker count.");
 
             var configurations = _repository.ReadConfigurations();

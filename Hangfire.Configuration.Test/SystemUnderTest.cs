@@ -43,7 +43,8 @@ namespace Hangfire.Configuration.Test
 
             var connection = new UnitOfWork();
 
-            Repository = new FakeConfigurationRepository();
+            ConfigurationRepository = new FakeConfigurationRepository();
+            ServerCountSampleRepository = new FakeServerCountSampleRepository();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
@@ -66,7 +67,8 @@ namespace Hangfire.Configuration.Test
 #endif
 
 	    public FakeMonitoringApi Monitor { get; }
-        public FakeConfigurationRepository Repository { get; }
+        public FakeConfigurationRepository ConfigurationRepository { get; }
+        public FakeServerCountSampleRepository ServerCountSampleRepository { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfire Hangfire { get; }
 
@@ -78,7 +80,8 @@ namespace Hangfire.Configuration.Test
         public WorkerServerQueries WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
 
-        protected override IConfigurationRepository BuildRepository(UnitOfWork connection) => Repository;
+        protected override IConfigurationRepository BuildConfigurationRepository(UnitOfWork connection) => ConfigurationRepository;
+        protected override IServerCountSampleRepository BuildServerCountSampleRepository(UnitOfWork connection) => ServerCountSampleRepository;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
     }

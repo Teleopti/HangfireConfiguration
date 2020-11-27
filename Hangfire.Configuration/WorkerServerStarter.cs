@@ -55,7 +55,7 @@ namespace Hangfire.Configuration
                 serverOptions.WorkerCount = _workerDeterminer.DetermineWorkerCount(
                     configurationAndStorage.CreateJobStorage().GetMonitoringApi(),
                     configurationAndStorage.Configuration.GoalWorkerCount,
-                    options
+                    options.WorkerDeterminerOptions
                 );
             
             _hangfire.UseHangfireServer(

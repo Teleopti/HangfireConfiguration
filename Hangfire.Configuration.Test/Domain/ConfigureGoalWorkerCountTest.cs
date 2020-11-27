@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -15,28 +16,28 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
-            Assert.Equal(workers, system.Repository.Workers);
+            Assert.Equal(workers, system.ConfigurationRepository.Workers);
         }
 
         [Fact]
         public void ShouldWriteNullableGoalWorkerCount()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 GoalWorkerCount = 1
             });
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
 
-            Assert.Null(system.Repository.Workers);
+            Assert.Null(system.ConfigurationRepository.Workers);
         }
 
         [Fact]
         public void ShouldWriteGoalWorkerCountForSpecificConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 1
             }, new StoredConfiguration
@@ -50,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Workers = 5
             });
 
-            Assert.Equal(5, system.Repository.Data.Single(x => x.Id == 2).GoalWorkerCount);
+            Assert.Equal(5, system.ConfigurationRepository.Data.Single(x => x.Id == 2).GoalWorkerCount);
         }
 
         [Fact]
@@ -66,7 +67,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotWriteIfGoalWorkerCountHigherThan100()
         {
             var system = new SystemUnderTest();
-            system.Repository.Has(new StoredConfiguration
+            system.ConfigurationRepository.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 10
@@ -80,13 +81,13 @@ namespace Hangfire.Configuration.Test.Domain
             {
             }
 
-            Assert.Equal(10, system.Repository.Data.Single().GoalWorkerCount);
+            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
         }
 
         [Fact]
         public void ShouldThrowIfGoalWorkerCountHigherThanOptions()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions {MaximumGoalWorkerCount = 5});
+            var system = new SystemUnderTest(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 5});
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 6}));
         }
