@@ -56,6 +56,7 @@ namespace Hangfire.Configuration.Test
             PublisherQueries = BuildPublishersQuerier(connection);
             WorkerServerQueries = BuildWorkerServersQuerier(connection);
             ViewModelBuilder = BuildViewModelBuilder(connection);
+            ServerCountSampleRecorder = BuildServerCountSampleRecorder(connection);
         }
 
 #if !NET472
@@ -79,6 +80,7 @@ namespace Hangfire.Configuration.Test
         public PublisherQueries PublisherQueries { get;}
         public WorkerServerQueries WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
+        public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
         protected override IConfigurationRepository BuildConfigurationRepository(UnitOfWork connection) => ConfigurationRepository;
         protected override IServerCountSampleRepository BuildServerCountSampleRepository(UnitOfWork connection) => ServerCountSampleRepository;

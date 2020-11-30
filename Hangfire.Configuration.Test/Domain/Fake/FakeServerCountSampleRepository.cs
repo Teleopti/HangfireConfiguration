@@ -14,5 +14,10 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
         public IEnumerable<ServerCountSample> Samples() => 
             Data;
+
+        public void Write(ServerCountSample sample)
+        {
+            Data = Data.Append(sample).ToArray();
+        }
     }
 }

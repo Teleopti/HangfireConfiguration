@@ -1,10 +1,12 @@
+using Hangfire.Storage;
+
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
     {
         // outer services
         public WorkerServerStarter BuildWorkerServerStarter(object appBuilder, UnitOfWork connection) =>
-            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), builderStateMaintainer(appBuilder, connection), _state);
+            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), builderStateMaintainer(appBuilder, connection), _state, BuildServerCountSampleRecorder(connection));
 
         public PublisherStarter BuildPublisherStarter(UnitOfWork connection) =>
             new PublisherStarter(builderStateMaintainer(null, connection), _state);
@@ -23,6 +25,9 @@ namespace Hangfire.Configuration
 
         public ViewModelBuilder BuildViewModelBuilder(UnitOfWork connection) =>
             new ViewModelBuilder(BuildConfigurationRepository(connection));
+        
+        protected ServerCountSampleRecorder BuildServerCountSampleRecorder(UnitOfWork connection) =>
+            new ServerCountSampleRecorder(BuildServerCountSampleRepository(connection), _state, builderStateMaintainer(null, connection));
 
         // internal services
         private State _state = new State();
@@ -45,6 +50,6 @@ namespace Hangfire.Configuration
             new ConfigurationRepository(connection);
         
         protected virtual IServerCountSampleRepository BuildServerCountSampleRepository(UnitOfWork connection) =>
-            new ServerCountSampleRepository();
+            new ServerCountSampleRepository(connection);
     }
 }

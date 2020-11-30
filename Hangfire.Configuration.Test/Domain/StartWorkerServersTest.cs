@@ -90,7 +90,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, null, backgroundProcess);
 
-            Assert.Same(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses.Single());
+            Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
         }
 
         [Fact]

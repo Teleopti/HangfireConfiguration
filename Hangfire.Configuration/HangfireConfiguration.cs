@@ -83,6 +83,7 @@ namespace Hangfire.Configuration
 
         public IEnumerable<ConfigurationInfo> QueryAllWorkerServers() => QueryAllWorkerServers(_storageOptions);
 
+        [Obsolete("Will be removed")]
         public IEnumerable<ConfigurationInfo> QueryAllWorkerServers(SqlServerStorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? _storageOptions;
@@ -92,6 +93,7 @@ namespace Hangfire.Configuration
 
         public IEnumerable<ConfigurationInfo> QueryPublishers() => QueryPublishers(_storageOptions);
 
+        [Obsolete("Will be removed")]
         public IEnumerable<ConfigurationInfo> QueryPublishers(SqlServerStorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? _storageOptions;
@@ -104,9 +106,5 @@ namespace Hangfire.Configuration
 
         internal ViewModelBuilder ViewModelBuilder() =>
             _compositionRoot.BuildViewModelBuilder(new UnitOfWork {ConnectionString = _options.ConnectionString});
-
-        [Obsolete("Dont use directly, will be removed")]
-        public static WorkerDeterminer GetWorkerDeterminer(string connectionString) =>
-            new CompositionRoot().BuildWorkerDeterminer(new UnitOfWork {ConnectionString = connectionString});
     }
 }
