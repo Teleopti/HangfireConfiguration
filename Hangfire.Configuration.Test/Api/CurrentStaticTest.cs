@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Api
         {
             var system = new SystemUnderTest();
             HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
-            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
             system.PublisherStarter.Start(null, null);
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;
@@ -26,7 +26,7 @@ namespace Hangfire.Configuration.Test.Api
         {
             var system = new SystemUnderTest();
             HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
-            system.ConfigurationRepository.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
             system.WorkerServerStarter.Start(null, null, null);
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;

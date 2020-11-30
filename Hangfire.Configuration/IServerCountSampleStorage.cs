@@ -2,7 +2,7 @@
 
 namespace Hangfire.Configuration
 {
-    public interface IServerCountSampleRepository
+    public interface IServerCountSampleStorage
     {
         IEnumerable<ServerCountSample> Samples();
         void Write(ServerCountSample sample);

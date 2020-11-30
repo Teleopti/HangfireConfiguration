@@ -7,15 +7,15 @@ namespace Hangfire.Configuration
     public class StateMaintainer
     {
         private readonly IHangfire _hangfire;
-        private readonly IConfigurationRepository _repository;
+        private readonly IConfigurationStorage _storage;
         private readonly ConfigurationUpdater _configurationUpdater;
         private readonly State _state;
         private readonly object _lock = new object();
 
-        internal StateMaintainer(IHangfire hangfire, IConfigurationRepository repository, ConfigurationUpdater configurationUpdater, State state)
+        internal StateMaintainer(IHangfire hangfire, IConfigurationStorage storage, ConfigurationUpdater configurationUpdater, State state)
         {
             _hangfire = hangfire;
-            _repository = repository;
+            _storage = storage;
             _configurationUpdater = configurationUpdater;
             _state = state;
         }
@@ -23,10 +23,10 @@ namespace Hangfire.Configuration
         public void Refresh(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             // maybe not reload all the time
-            var configurations = _repository.ReadConfigurations();
+            var configurations = _storage.ReadConfigurations();
             var configurationChanged = _configurationUpdater.Update(options, configurations);
             if (configurationChanged)
-                configurations = _repository.ReadConfigurations();
+                configurations = _storage.ReadConfigurations();
 
             lock (_lock)
             {

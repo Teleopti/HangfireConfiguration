@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public class ServerCountSampleRepository : IServerCountSampleRepository
+    public class ServerCountSampleStorage : IServerCountSampleStorage
     {
         private readonly UnitOfWork _connection;
 
-        public ServerCountSampleRepository(UnitOfWork connection)
+        public ServerCountSampleStorage(UnitOfWork connection)
         {
             _connection = connection;
         }

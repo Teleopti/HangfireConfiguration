@@ -7,16 +7,16 @@ namespace Hangfire.Configuration
 {
     public class ViewModelBuilder
     {
-        private readonly IConfigurationRepository _repository;
+        private readonly IConfigurationStorage _storage;
 
-        public ViewModelBuilder(IConfigurationRepository repository)
+        public ViewModelBuilder(IConfigurationStorage storage)
         {
-            _repository = repository;
+            _storage = storage;
         }
 
         public IEnumerable<ViewModel> BuildServerConfigurations()
         {
-            return _repository.ReadConfigurations()
+            return _storage.ReadConfigurations()
                 .Select((x, i) =>
                 {
                     var connectionString = new SqlConnectionStringBuilder(x.ConnectionString);

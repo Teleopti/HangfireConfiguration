@@ -11,7 +11,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryWorkerServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
 
             var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(null, null);
 
@@ -22,7 +22,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnWorkerServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Single();
 
@@ -33,7 +33,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldAutoUpdate()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
 
             var workerServers = system.WorkerServerQueries
                 .QueryAllWorkerServers(
@@ -42,14 +42,14 @@ namespace Hangfire.Configuration.Test.Domain
                         AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
                     }, null);
 
-            Assert.Contains("Hangfire", system.ConfigurationRepository.Data.Single().ConnectionString);
+            Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);
         }
 
         [Fact]
         public void ShouldQueryWorkerServersWithDefaultSqlStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
 
             var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
 
@@ -60,7 +60,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnStorageConfigurationId()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration {Id = 3});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 3});
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Single();
 
@@ -71,7 +71,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnConfigurationName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration {Name = "name"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name"});
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Single();
 

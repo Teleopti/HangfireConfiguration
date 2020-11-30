@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldSaveWorkerGoalCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 3
@@ -47,15 +47,15 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
-            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
+            Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
         }
         
         [Fact]
         public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
         {
             var system = new SystemUnderTest(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 3
@@ -89,15 +89,15 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
-            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
+            Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
         }
 
         [Fact]
         public void ShouldActivateServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 2
             });
@@ -110,7 +110,7 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
             
-            Assert.True(system.ConfigurationRepository.Data.Single().Active);
+            Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
         [Fact]
@@ -133,8 +133,8 @@ namespace Hangfire.Configuration.Test.Web
                         })))
                 .Result;
 
-            Assert.Equal(1, system.ConfigurationRepository.Data.Single().Id);
-            Assert.Contains("database", system.ConfigurationRepository.Data.Single().ConnectionString);
+            Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+            Assert.Contains("database", system.ConfigurationStorage.Data.Single().ConnectionString);
         }
         
         [Fact]
@@ -158,7 +158,7 @@ namespace Hangfire.Configuration.Test.Web
                         })))
                 .Result;
 
-            Assert.Equal("name", system.ConfigurationRepository.Data.Single().Name);
+            Assert.Equal("name", system.ConfigurationStorage.Data.Single().Name);
         }
         
         [Fact]
@@ -173,7 +173,7 @@ namespace Hangfire.Configuration.Test.Web
         public void ShouldInactivateServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 3,
                 Active = true
@@ -187,7 +187,7 @@ namespace Hangfire.Configuration.Test.Web
                     })))
                 .Result;
 
-            Assert.False(system.ConfigurationRepository.Data.Single().Active);
+            Assert.False(system.ConfigurationStorage.Data.Single().Active);
         }
         
     }

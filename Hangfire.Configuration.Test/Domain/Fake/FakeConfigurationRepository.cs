@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
-    public class FakeConfigurationRepository : IConfigurationRepository
+    public class FakeConfigurationStorage : IConfigurationStorage
     {
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;

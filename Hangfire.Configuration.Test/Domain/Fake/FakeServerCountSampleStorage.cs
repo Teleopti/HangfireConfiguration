@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
-    public class FakeServerCountSampleRepository : IServerCountSampleRepository
+    public class FakeServerCountSampleStorage : IServerCountSampleStorage
     {
         public IEnumerable<ServerCountSample> Data = Enumerable.Empty<ServerCountSample>();
         

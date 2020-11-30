@@ -43,8 +43,8 @@ namespace Hangfire.Configuration.Test
 
             var connection = new UnitOfWork();
 
-            ConfigurationRepository = new FakeConfigurationRepository();
-            ServerCountSampleRepository = new FakeServerCountSampleRepository();
+            ConfigurationStorage = new FakeConfigurationStorage();
+            ServerCountSampleStorage = new FakeServerCountSampleStorage();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
@@ -68,8 +68,8 @@ namespace Hangfire.Configuration.Test
 #endif
 
 	    public FakeMonitoringApi Monitor { get; }
-        public FakeConfigurationRepository ConfigurationRepository { get; }
-        public FakeServerCountSampleRepository ServerCountSampleRepository { get; }
+        public FakeConfigurationStorage ConfigurationStorage { get; }
+        public FakeServerCountSampleStorage ServerCountSampleStorage { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfire Hangfire { get; }
 
@@ -82,8 +82,8 @@ namespace Hangfire.Configuration.Test
         public ViewModelBuilder ViewModelBuilder { get; }
         public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
-        protected override IConfigurationRepository BuildConfigurationRepository(UnitOfWork connection) => ConfigurationRepository;
-        protected override IServerCountSampleRepository BuildServerCountSampleRepository(UnitOfWork connection) => ServerCountSampleRepository;
+        protected override IConfigurationStorage BuildConfigurationStorage(UnitOfWork connection) => ConfigurationStorage;
+        protected override IServerCountSampleStorage BuildServerCountSampleStorage(UnitOfWork connection) => ServerCountSampleStorage;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
     }

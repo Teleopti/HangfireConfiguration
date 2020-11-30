@@ -7,12 +7,12 @@ namespace Hangfire.Configuration
 {
     public class ConfigurationUpdater
     {
-        private readonly IConfigurationRepository _repository;
+        private readonly IConfigurationStorage _storage;
         private readonly State _state;
 
-        internal ConfigurationUpdater(IConfigurationRepository repository,  State state)
+        internal ConfigurationUpdater(IConfigurationStorage storage,  State state)
         {
-            _repository = repository;
+            _storage = storage;
             _state = state;
         }
 
@@ -29,9 +29,9 @@ namespace Hangfire.Configuration
                 return false; 
 
             var isUpdated = false;
-            _repository.UnitOfWork(c =>
+            _storage.UnitOfWork(c =>
             {
-                _repository.LockConfiguration(c);
+                _storage.LockConfiguration(c);
                 var @fixed = fixExistingConfigurations(c);
                 if (updateConfigurationsEnabled(options))
                     isUpdated = runConfigurationUpdates(received, c);
@@ -73,7 +73,7 @@ namespace Hangfire.Configuration
 
         private bool fixExistingConfigurations(IUnitOfWork connection)
         {
-            var stored = _repository.ReadConfigurations(connection);
+            var stored = _storage.ReadConfigurations(connection);
             
             var ordered = stored.OrderBy(x => x.Id).ToArray();
 
@@ -84,7 +84,7 @@ namespace Hangfire.Configuration
                     legacyConfiguration.Name = DefaultConfigurationName.Name();
                 if (legacyConfiguration.Active == null)
                     legacyConfiguration.Active = true;
-                _repository.WriteConfiguration(legacyConfiguration, connection);
+                _storage.WriteConfiguration(legacyConfiguration, connection);
                 return true;
             }
 
@@ -92,7 +92,7 @@ namespace Hangfire.Configuration
             if (markedConfiguration != null)
             {
                 markedConfiguration.Name = DefaultConfigurationName.Name();
-                _repository.WriteConfiguration(markedConfiguration, connection);
+                _storage.WriteConfiguration(markedConfiguration, connection);
                 return true;
             }
 
@@ -101,7 +101,7 @@ namespace Hangfire.Configuration
         
         private bool runConfigurationUpdates(IEnumerable<UpdateConfiguration> received, IUnitOfWork connection)
         {
-            var stored = _repository.ReadConfigurations(connection);
+            var stored = _storage.ReadConfigurations(connection);
             
             received.ForEach(update =>
             {
@@ -116,7 +116,7 @@ namespace Hangfire.Configuration
                 else
                     configuration.ConnectionString = update.ConnectionString;
                 configuration.SchemaName = update.SchemaName;
-                _repository.WriteConfiguration(configuration,connection);
+                _storage.WriteConfiguration(configuration,connection);
             });
 
             return true;

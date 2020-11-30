@@ -11,8 +11,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldDetermineWorkersFromSample()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 2});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -23,8 +23,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldDetermineWorkersFromSample2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 5});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 5});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldDetermineWorkersWithoutSample()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -46,8 +46,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldApplyMinimumServerCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 1});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 1});
 
             system.WorkerServerStarter.Start(
                 new ConfigurationOptionsForTest
@@ -63,8 +63,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldDisableServerCountSampling()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 10});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 10});
             system.Monitor.AnnounceServer("server", null);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
@@ -79,10 +79,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateWithoutServerCountFromServerRecycling()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 3});
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 2});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 3});
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -93,10 +93,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateWithoutServerCountFromServerRecycling_2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(10);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 3});
+            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 3});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -107,13 +107,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateWithEarliestSample()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(8);
-            system.ServerCountSampleRepository.Has(new ServerCountSample
+            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.ServerCountSampleStorage.Has(new ServerCountSample
             {
                 Count = 2,
                 Timestamp = DateTime.Parse("2020-11-27 09:00")
             });
-            system.ServerCountSampleRepository.Has(new ServerCountSample
+            system.ServerCountSampleStorage.Has(new ServerCountSample
             {
                 Count = 4,
                 Timestamp = DateTime.Parse("2020-11-27 08:00")
@@ -128,8 +128,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldIgnoreSampleWhenServerCountIsZero()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.HasGoalWorkerCount(8);
-            system.ServerCountSampleRepository.Has(new ServerCountSample {Count = 0});
+            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 0});
 
             system.WorkerServerStarter.Start(null, null, null);
 

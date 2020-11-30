@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 ConnectionString = "Data Source=Server;Integrated Security=SSPI;Initial Catalog=Test_Database;Application Name=Test",
@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 2,
                 ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithNullValues()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 ConnectionString = null,
@@ -76,7 +76,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildForMultipleConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
                 {
                     Id = 1,
                     ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
@@ -100,7 +100,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithWorkers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration {GoalWorkerCount = 10});
+            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 10});
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -111,7 +111,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithDefaultSchemaName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 ConnectionString = new SqlConnectionStringBuilder {DataSource = "."}.ToString(),
                 SchemaName = null
@@ -126,7 +126,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithConfigurationName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Name = "name"
             });

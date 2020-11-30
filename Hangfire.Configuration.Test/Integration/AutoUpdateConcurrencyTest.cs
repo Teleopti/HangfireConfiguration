@@ -34,7 +34,7 @@ namespace Hangfire.Configuration.Test.Integration
 #endif
             });
 
-            Assert.Single(new ConfigurationRepository(ConnectionUtils.GetConnectionString()).ReadConfigurations());
+            Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
         }
     }
 }

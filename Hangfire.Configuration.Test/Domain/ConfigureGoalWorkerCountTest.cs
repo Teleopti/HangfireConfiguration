@@ -16,28 +16,28 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
-            Assert.Equal(workers, system.ConfigurationRepository.Workers);
+            Assert.Equal(workers, system.ConfigurationStorage.Workers);
         }
 
         [Fact]
         public void ShouldWriteNullableGoalWorkerCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 GoalWorkerCount = 1
             });
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
 
-            Assert.Null(system.ConfigurationRepository.Workers);
+            Assert.Null(system.ConfigurationStorage.Workers);
         }
 
         [Fact]
         public void ShouldWriteGoalWorkerCountForSpecificConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1
             }, new StoredConfiguration
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Workers = 5
             });
 
-            Assert.Equal(5, system.ConfigurationRepository.Data.Single(x => x.Id == 2).GoalWorkerCount);
+            Assert.Equal(5, system.ConfigurationStorage.Data.Single(x => x.Id == 2).GoalWorkerCount);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotWriteIfGoalWorkerCountHigherThan100()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 GoalWorkerCount = 10
@@ -81,7 +81,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
             }
 
-            Assert.Equal(10, system.ConfigurationRepository.Data.Single().GoalWorkerCount);
+            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
         }
 
         [Fact]

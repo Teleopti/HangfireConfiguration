@@ -4,29 +4,29 @@ using Xunit;
 namespace Hangfire.Configuration.Test.Infrastructure
 {
     [Collection("NotParallel")]
-    public class ConfigurationRepositoryTest
+    public class ConfigurationStorageTest
     {
         [Fact, CleanDatabase]
         public void ShouldReadEmptyConfiguration()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
-            Assert.Empty(repository.ReadConfigurations());
+            Assert.Empty(storage.ReadConfigurations());
         }
 
         [Fact, CleanDatabase]
         public void ShouldWrite()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
-            repository.WriteConfiguration(new StoredConfiguration
+            storage.WriteConfiguration(new StoredConfiguration
             {
                 ConnectionString = "connection string",
                 SchemaName = "schema name",
                 Active = false
             });
 
-            var configuration = repository.ReadConfigurations().Single();
+            var configuration = storage.ReadConfigurations().Single();
             Assert.Equal("connection string", configuration.ConnectionString);
             Assert.Equal("schema name", configuration.SchemaName);
             Assert.Equal(false, configuration.Active);
@@ -35,8 +35,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldRead()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteConfiguration(new StoredConfiguration
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            storage.WriteConfiguration(new StoredConfiguration
             {
                 ConnectionString = "connectionString",
                 SchemaName = "schemaName",
@@ -44,7 +44,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
                 Active = true
             });
 
-            var result = repository.ReadConfigurations().Single();
+            var result = storage.ReadConfigurations().Single();
 
             Assert.Equal(1, result.Id);
             Assert.Equal("connectionString", result.ConnectionString);
@@ -56,17 +56,17 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldUpdate()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteConfiguration(new StoredConfiguration());
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            storage.WriteConfiguration(new StoredConfiguration());
 
-            var existing = repository.ReadConfigurations().Single();
+            var existing = storage.ReadConfigurations().Single();
             existing.ConnectionString = "connection";
             existing.SchemaName = "schema";
             existing.GoalWorkerCount = 23;
             existing.Active = true;
-            repository.WriteConfiguration(existing);
+            storage.WriteConfiguration(existing);
 
-            var configuration = repository.ReadConfigurations().Single();
+            var configuration = storage.ReadConfigurations().Single();
             Assert.Equal("connection", configuration.ConnectionString);
             Assert.Equal("schema", configuration.SchemaName);
             Assert.Equal(23, configuration.GoalWorkerCount);
@@ -76,28 +76,28 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Fact, CleanDatabase]
         public void ShouldWriteName()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
-            repository.WriteConfiguration(new StoredConfiguration
+            storage.WriteConfiguration(new StoredConfiguration
             {
                 Name = "name",
             });
 
-            var configuration = repository.ReadConfigurations().Single();
+            var configuration = storage.ReadConfigurations().Single();
             Assert.Equal("name", configuration.Name);
         }
 
         [Fact, CleanDatabase]
         public void ShouldUpdateName()
         {
-            var repository = new ConfigurationRepository(ConnectionUtils.GetConnectionString());
-            repository.WriteConfiguration(new StoredConfiguration());
+            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            storage.WriteConfiguration(new StoredConfiguration());
 
-            var existing = repository.ReadConfigurations().Single();
+            var existing = storage.ReadConfigurations().Single();
             existing.Name = "name";
-            repository.WriteConfiguration(existing);
+            storage.WriteConfiguration(existing);
 
-            var configuration = repository.ReadConfigurations().Single();
+            var configuration = storage.ReadConfigurations().Single();
             Assert.Equal("name", configuration.Name);
         }
     }

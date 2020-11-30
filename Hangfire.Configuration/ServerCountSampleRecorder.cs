@@ -7,16 +7,16 @@ namespace Hangfire.Configuration
 {
     public class ServerCountSampleRecorder : IBackgroundProcess
     {
-        private readonly IServerCountSampleRepository _repository;
+        private readonly IServerCountSampleStorage _storage;
         private readonly State _state;
         private readonly StateMaintainer _stateMaintainer;
 
         internal ServerCountSampleRecorder(
-            IServerCountSampleRepository repository, 
+            IServerCountSampleStorage storage, 
             State state,
             StateMaintainer stateMaintainer)
         {
-            _repository = repository;
+            _storage = storage;
             _state = state;
             _stateMaintainer = stateMaintainer;
         }
@@ -31,7 +31,7 @@ namespace Hangfire.Configuration
         {
             _stateMaintainer.Refresh(null, null);
             var serverCount = _state.Configurations.Single().CreateJobStorage().GetMonitoringApi().Servers().Count;
-            _repository.Write(new ServerCountSample {Count = serverCount});
+            _storage.Write(new ServerCountSample {Count = serverCount});
         }
     }
 }

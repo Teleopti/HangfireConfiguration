@@ -8,9 +8,9 @@ namespace Hangfire.Configuration
     {
         private readonly ServerCountDeterminer _serverCountDeterminer;
 
-        public WorkerDeterminer(IServerCountSampleRepository serverCountSampleRepository)
+        public WorkerDeterminer(IServerCountSampleStorage serverCountSampleStorage)
         {
-            _serverCountDeterminer = new ServerCountDeterminer(serverCountSampleRepository);
+            _serverCountDeterminer = new ServerCountDeterminer(serverCountSampleStorage);
         }
 
         internal int DetermineWorkerCount(

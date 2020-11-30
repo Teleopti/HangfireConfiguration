@@ -12,12 +12,12 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 AllowMultipleActive = true
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 Active = false
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 2,
                 Active = false
@@ -26,7 +26,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.ActivateServer(1);
             system.ConfigurationApi.ActivateServer(2);
 
-            var configurations = system.ConfigurationRepository.Data;
+            var configurations = system.ConfigurationStorage.Data;
             Assert.Equal(true, configurations.ElementAt(0).Active);
             Assert.Equal(true, configurations.ElementAt(1).Active);
         }
@@ -38,12 +38,12 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 AllowMultipleActive = true
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 Active = false
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 2,
                 Active = false
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.ActivateServer(2);
 
-            var configurations = system.ConfigurationRepository.Data;
+            var configurations = system.ConfigurationStorage.Data;
             Assert.Equal(false, configurations.Single(x => x.Id == 1).Active);
             Assert.Equal(true, configurations.Single(x => x.Id == 2).Active);
         }
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 AllowMultipleActive = true
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 Active = true
@@ -71,7 +71,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.InactivateServer(1);
 
-            var configuration = system.ConfigurationRepository.Data.Single();
+            var configuration = system.ConfigurationStorage.Data.Single();
             Assert.Equal(false, configuration.Active);
         }
 
@@ -83,12 +83,12 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 AllowMultipleActive = true
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
                 Active = true
             });
-            system.ConfigurationRepository.Has(new StoredConfiguration
+            system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 2,
                 Active = true
@@ -96,7 +96,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.InactivateServer(2);
 
-            var configurations = system.ConfigurationRepository.Data;
+            var configurations = system.ConfigurationStorage.Data;
             Assert.Equal(true, configurations.Single(x => x.Id == 1).Active);
             Assert.Equal(false, configurations.Single(x => x.Id == 2).Active);
         }

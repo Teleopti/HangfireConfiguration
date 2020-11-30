@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "awesomeSchema"
             });
 
-            var storedConfiguration = system.ConfigurationRepository.Data.Last();
+            var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.Equal("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
             Assert.Equal("awesomeSchema", storedConfiguration.SchemaName);
         }
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
 
-            var config = system.ConfigurationRepository.ReadConfigurations();
+            var config = system.ConfigurationStorage.ReadConfigurations();
             Assert.Equal(10, config.First().GoalWorkerCount);
         }
 
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "newSchemaName"
             });
 
-            var configurations = system.ConfigurationRepository.ReadConfigurations();
+            var configurations = system.ConfigurationStorage.ReadConfigurations();
 
             Assert.Equal(2, configurations.Count());
         }
@@ -161,7 +161,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "schema"
             });
 
-            var storedConfiguration = system.ConfigurationRepository.Data.Last();
+            var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.Equal("creator", system.SchemaCreator.Schemas.Last().ConnectionString);
             Assert.Equal("storage", storedConfiguration.ConnectionString);
             Assert.Equal("schema", storedConfiguration.SchemaName);
@@ -233,7 +233,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "schema"
             });
 
-            var storedConfiguration = system.ConfigurationRepository.Data.Last();
+            var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.Equal("namedConfiguration", storedConfiguration.Name);
         }
     }

@@ -6,16 +6,16 @@ namespace Hangfire.Configuration
 {
     public class ConfigurationApi
     {
-        private readonly IConfigurationRepository _repository;
+        private readonly IConfigurationStorage _storage;
         private readonly IHangfireSchemaCreator _creator;
         private readonly ConfigurationOptions _options;
 
         public ConfigurationApi(
-            IConfigurationRepository repository,
+            IConfigurationStorage storage,
             IHangfireSchemaCreator creator,
             ConfigurationOptions options)
         {
-            _repository = repository;
+            _storage = storage;
             _creator = creator;
             _options = options;
         }
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration
             if (command.Workers > _options.WorkerDeterminerOptions.MaximumGoalWorkerCount)
                 throw new Exception("Invalid goal worker count.");
 
-            var configurations = _repository.ReadConfigurations();
+            var configurations = _storage.ReadConfigurations();
             var configuration = new StoredConfiguration();
             if (configurations.Any())
             {
@@ -40,7 +40,7 @@ namespace Hangfire.Configuration
 
             configuration.GoalWorkerCount = command.Workers;
 
-            _repository.WriteConfiguration(configuration);
+            _storage.WriteConfiguration(configuration);
         }
 
         public void CreateServerConfiguration(CreateServerConfiguration config)
@@ -58,7 +58,7 @@ namespace Hangfire.Configuration
 
             _creator.CreateHangfireSchema(config.SchemaName, creatorConnectionString);
 
-            _repository.WriteConfiguration(new StoredConfiguration
+            _storage.WriteConfiguration(new StoredConfiguration
             {
                 Name = config.Name,
                 ConnectionString = storageConnectionString,
@@ -69,11 +69,11 @@ namespace Hangfire.Configuration
 
         public void ActivateServer(int configurationId)
         {
-            var configurations = _repository.ReadConfigurations();
+            var configurations = _storage.ReadConfigurations();
 
             var activate = configurations.Single(x => x.Id == configurationId);
             activate.Active = true;
-            _repository.WriteConfiguration(activate);
+            _storage.WriteConfiguration(activate);
 
             if (!_options.AllowMultipleActive)
             {
@@ -82,23 +82,23 @@ namespace Hangfire.Configuration
                     .ForEach(inactivate =>
                     {
                         inactivate.Active = false;
-                        _repository.WriteConfiguration(inactivate);
+                        _storage.WriteConfiguration(inactivate);
                     });
             }
         }
 
         public void InactivateServer(int configurationId)
         {
-            var configurations = _repository.ReadConfigurations();
+            var configurations = _storage.ReadConfigurations();
             var inactivate = configurations.Single(x => x.Id == configurationId);
             inactivate.Active = false;
-            _repository.WriteConfiguration(inactivate);
+            _storage.WriteConfiguration(inactivate);
         }
 
         public IEnumerable<StoredConfiguration> ReadConfigurations() =>
-            _repository.ReadConfigurations();
+            _storage.ReadConfigurations();
 
         public void WriteConfiguration(StoredConfiguration configuration) =>
-            _repository.WriteConfiguration(configuration);
+            _storage.WriteConfiguration(configuration);
     }
 }

@@ -11,7 +11,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartRecorder()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -23,25 +23,25 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldRecord()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
             system.Monitor.AnnounceServer("runningServer", null);
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(1, system.ServerCountSampleRepository.Samples().Single().Count);
+            Assert.Equal(1, system.ServerCountSampleStorage.Samples().Single().Count);
         }
 
         [Fact]
         public void ShouldRecordBoth()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationRepository.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration());
             system.Monitor.AnnounceServer("runningServer1", null);
             system.Monitor.AnnounceServer("runningServer2", null);
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.ServerCountSampleRepository.Samples().Single().Count);
+            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
         }
     }
 }

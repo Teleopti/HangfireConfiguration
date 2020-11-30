@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public interface IConfigurationRepository
+    public interface IConfigurationStorage
     {
         IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null);
         void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null);
@@ -13,13 +13,13 @@ namespace Hangfire.Configuration
         void LockConfiguration(IUnitOfWork unitOfWork);
     }
 
-    public class ConfigurationRepository : IConfigurationRepository
+    public class ConfigurationStorage : IConfigurationStorage
     {
         private readonly UnitOfWork _unitOfWork;
 
-        public ConfigurationRepository(string connectionString) : this(new UnitOfWork{ConnectionString = connectionString}){}
+        public ConfigurationStorage(string connectionString) : this(new UnitOfWork{ConnectionString = connectionString}){}
 
-        public ConfigurationRepository(UnitOfWork unitOfWork)
+        public ConfigurationStorage(UnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
