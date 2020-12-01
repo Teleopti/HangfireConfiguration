@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
     {
         private readonly UnitOfWork _connection;
 
-        public ServerCountSampleStorage(UnitOfWork connection)
+        internal ServerCountSampleStorage(UnitOfWork connection)
         {
             _connection = connection;
         }

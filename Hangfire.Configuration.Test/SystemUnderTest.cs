@@ -24,24 +24,20 @@ namespace Hangfire.Configuration.Test
             ApplicationBuilder = new AppBuilder();
 #endif
 
-            var connection = new UnitOfWork();
-
             ConfigurationStorage = new FakeConfigurationStorage();
             ServerCountSampleStorage = new FakeServerCountSampleStorage();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
 
-            Options = BuildOptionator();
+            Options = BuildOptions();
             ConfigurationApi = BuildConfigurationApi();
-            WorkerServerStarter =
-                new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder, connection), Options);
-            WorkerDeterminer = BuildWorkerDeterminer(null);
-            PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(connection), Options);
-            PublisherQueries = new PublisherQueriesUnderTest(BuildPublishersQuerier(connection), Options);
-            WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(connection), Options);
-            ViewModelBuilder = BuildViewModelBuilder(connection);
-            ServerCountSampleRecorder = BuildServerCountSampleRecorder(connection);
+            WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder), Options);
+            PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
+            PublisherQueries = new PublisherQueriesUnderTest(BuildPublishersQuerier(), Options);
+            WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(), Options);
+            ViewModelBuilder = BuildViewModelBuilder();
+            ServerCountSampleRecorder = buildServerCountSampleRecorder();
 
             _testServer = testServer(urlPathMatch);
         }
@@ -81,20 +77,15 @@ namespace Hangfire.Configuration.Test
 
         public Options Options { get; }
         public ConfigurationApi ConfigurationApi { get; }
-        public WorkerDeterminer WorkerDeterminer { get; }
         public WorkerServerStarterUnderTest WorkerServerStarter { get; }
         public PublisherStarterUnderTest PublisherStarter { get; }
         public PublisherQueriesUnderTest PublisherQueries { get; }
         public WorkerServerQueriesUnderTest WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
         public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
-
-        protected override IConfigurationStorage BuildConfigurationStorage(UnitOfWork connection) =>
-            ConfigurationStorage;
-
-        protected override IServerCountSampleStorage BuildServerCountSampleStorage(UnitOfWork connection) =>
-            ServerCountSampleStorage;
-
+        
+        protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
+        protected override IServerCountSampleStorage BuildServerCountSampleStorage() => ServerCountSampleStorage;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
     }

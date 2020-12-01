@@ -5,44 +5,52 @@ namespace Hangfire.Configuration
         // internal services
         internal State _state = new State();
 
+        private StateMaintainer builderStateMaintainer(object appBuilder) =>
+            new StateMaintainer(BuildHangfire(appBuilder), BuildConfigurationStorage(),
+                buildConfigurationUpdater(), _state);
 
+        private ConfigurationUpdater buildConfigurationUpdater() =>
+            new ConfigurationUpdater(BuildConfigurationStorage(), _state);
+
+        private UnitOfWork buildUnitOfWork() =>
+            new UnitOfWork {ConnectionString = _state.ReadOptions().ConnectionString};
+
+        private WorkerDeterminer buildWorkerDeterminer() =>
+            new WorkerDeterminer(BuildServerCountSampleStorage());
+        
+        protected ServerCountSampleRecorder buildServerCountSampleRecorder()
+        {
+            return new ServerCountSampleRecorder(
+                BuildServerCountSampleStorage(), 
+                _state,
+                builderStateMaintainer(null));
+        }
+        
+        
         // outer services
-        public Options BuildOptionator() =>
+        public Options BuildOptions() =>
             new Options(_state);
 
-        public WorkerServerStarter BuildWorkerServerStarter(object appBuilder, UnitOfWork connection) =>
-            new WorkerServerStarter(BuildHangfire(appBuilder), BuildWorkerDeterminer(connection), builderStateMaintainer(appBuilder, connection), _state, BuildServerCountSampleRecorder(connection));
+        public WorkerServerStarter BuildWorkerServerStarter(object appBuilder) =>
+            new WorkerServerStarter(BuildHangfire(appBuilder), buildWorkerDeterminer(),
+                builderStateMaintainer(appBuilder), _state, buildServerCountSampleRecorder());
 
-        public PublisherStarter BuildPublisherStarter(UnitOfWork connection) =>
-            new PublisherStarter(builderStateMaintainer(null, connection), _state);
-
-        public WorkerDeterminer BuildWorkerDeterminer(UnitOfWork connection) =>
-            new WorkerDeterminer(BuildServerCountSampleStorage(connection));
+        public PublisherStarter BuildPublisherStarter() =>
+            new PublisherStarter(builderStateMaintainer(null), _state);
 
         public ConfigurationApi BuildConfigurationApi() =>
             new ConfigurationApi(
-                BuildConfigurationStorage(new UnitOfWork {ConnectionString = _state.ReadOptions().ConnectionString}),
+                BuildConfigurationStorage(),
                 BuildHangfireSchemaCreator(), _state);
 
-        public PublisherQueries BuildPublishersQuerier(UnitOfWork connection) =>
-            new PublisherQueries(_state, builderStateMaintainer(null, connection));
+        public PublisherQueries BuildPublishersQuerier() =>
+            new PublisherQueries(_state, builderStateMaintainer(null));
 
-        public WorkerServerQueries BuildWorkerServersQuerier(UnitOfWork connection) =>
-            new WorkerServerQueries(builderStateMaintainer(null, connection), _state);
+        public WorkerServerQueries BuildWorkerServersQuerier() =>
+            new WorkerServerQueries(builderStateMaintainer(null), _state);
 
-        public ViewModelBuilder BuildViewModelBuilder(UnitOfWork connection) =>
-            new ViewModelBuilder(BuildConfigurationStorage(connection));
-
-        protected ServerCountSampleRecorder BuildServerCountSampleRecorder(UnitOfWork connection) =>
-            new ServerCountSampleRecorder(BuildServerCountSampleStorage(connection), _state,
-                builderStateMaintainer(null, connection));
-
-        private StateMaintainer builderStateMaintainer(object appBuilder, UnitOfWork connection) =>
-            new StateMaintainer(BuildHangfire(appBuilder), BuildConfigurationStorage(connection),
-                buildConfigurationUpdater(connection), _state);
-
-        private ConfigurationUpdater buildConfigurationUpdater(UnitOfWork connection) =>
-            new ConfigurationUpdater(BuildConfigurationStorage(connection), _state);
+        public ViewModelBuilder BuildViewModelBuilder() =>
+            new ViewModelBuilder(BuildConfigurationStorage());
 
 
         // boundary
@@ -52,10 +60,10 @@ namespace Hangfire.Configuration
         protected virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() =>
             new HangfireSchemaCreator();
 
-        protected virtual IConfigurationStorage BuildConfigurationStorage(UnitOfWork connection) =>
-            new ConfigurationStorage(connection);
+        protected virtual IConfigurationStorage BuildConfigurationStorage() =>
+            new ConfigurationStorage(buildUnitOfWork());
 
-        protected virtual IServerCountSampleStorage BuildServerCountSampleStorage(UnitOfWork connection) =>
-            new ServerCountSampleStorage(connection);
+        protected virtual IServerCountSampleStorage BuildServerCountSampleStorage() =>
+            new ServerCountSampleStorage(buildUnitOfWork());
     }
 }

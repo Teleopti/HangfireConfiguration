@@ -14,7 +14,7 @@ namespace Hangfire.Configuration
         IEnumerable<T> Query<T>(string sql);
     }
 
-    public abstract class UnitOfWorkBase : IUnitOfWork
+    internal abstract class UnitOfWorkBase : IUnitOfWork
     {
         protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration
         }
     }
 
-    public class UnitOfWork : UnitOfWorkBase
+    internal class UnitOfWork : UnitOfWorkBase
     {
         public string ConnectionString { get; set; }
 
@@ -60,7 +60,7 @@ namespace Hangfire.Configuration
         }
     }
 
-    public class UnitOfWorkTransaction : UnitOfWorkBase, IDisposable
+    internal class UnitOfWorkTransaction : UnitOfWorkBase, IDisposable
     {
         private readonly IDbConnection _connection;
         private readonly IDbTransaction _transaction;

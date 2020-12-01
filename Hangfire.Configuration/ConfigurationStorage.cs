@@ -19,7 +19,7 @@ namespace Hangfire.Configuration
 
         public ConfigurationStorage(string connectionString) : this(new UnitOfWork{ConnectionString = connectionString}){}
 
-        public ConfigurationStorage(UnitOfWork unitOfWork)
+        internal ConfigurationStorage(UnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

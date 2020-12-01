@@ -141,7 +141,7 @@ namespace Hangfire.Configuration
             {
                 connectionString = new SqlConnectionStringBuilder(configuration.ConnectionString);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 return false;
             }
