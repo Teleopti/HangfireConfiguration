@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -30,6 +31,11 @@ namespace Hangfire.Configuration.Test
         internal static T[] AsArray<T>(this T g)
         {
             return new[] { g };
+        }
+        
+        public static DateTime Utc(this string dateTimeString)
+        {
+            return DateTime.SpecifyKind(DateTime.Parse(dateTimeString, CultureInfo.GetCultureInfo("sv-SE")), DateTimeKind.Utc);
         }
 
     }

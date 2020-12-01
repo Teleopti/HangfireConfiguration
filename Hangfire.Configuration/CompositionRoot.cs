@@ -1,3 +1,5 @@
+using System;
+
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
@@ -23,7 +25,8 @@ namespace Hangfire.Configuration
             return new ServerCountSampleRecorder(
                 BuildServerCountSampleStorage(), 
                 _state,
-                builderStateMaintainer(null));
+                builderStateMaintainer(null), 
+                BuildNow());
         }
         
         
@@ -65,5 +68,17 @@ namespace Hangfire.Configuration
 
         protected virtual IServerCountSampleStorage BuildServerCountSampleStorage() =>
             new ServerCountSampleStorage(buildUnitOfWork());
+
+        protected virtual INow BuildNow() => new Now();
+    }
+
+    public class Now : INow
+    {
+        public DateTime UtcDateTime() => DateTime.UtcNow;
+    }
+
+    public interface INow
+    {
+        DateTime UtcDateTime();
     }
 }

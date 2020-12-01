@@ -7,6 +7,8 @@ using Microsoft.Owin.Testing;
 using Microsoft.Owin.Builder;
 #endif
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Hangfire.Configuration.Test.Domain.Fake;
 
@@ -29,10 +31,12 @@ namespace Hangfire.Configuration.Test
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
+            _now = new FakeNow {Time = "2020-12-01 09:00".Utc()};
 
             Options = BuildOptions();
             ConfigurationApi = BuildConfigurationApi();
-            WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder), Options);
+            WorkerServerStarter =
+                new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder), Options);
             PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
             PublisherQueries = new PublisherQueriesUnderTest(BuildPublishersQuerier(), Options);
             WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(), Options);
@@ -46,17 +50,17 @@ namespace Hangfire.Configuration.Test
         {
             return new Lazy<TestServer>(() =>
 #if !NET472
-                    new TestServer(new WebHostBuilder().Configure(app =>
+                        new TestServer(new WebHostBuilder().Configure(app =>
 #else
                     TestServer.Create(app =>
 #endif
-                    {
-                        var url = urlPathMatch ?? "/config";
-                        app.Properties.Add("CompositionRoot", this);
-                        app.UseHangfireConfigurationUI(url, Options.ConfigurationOptions());
-                    }))
+                        {
+                            var url = urlPathMatch ?? "/config";
+                            app.Properties.Add("CompositionRoot", this);
+                            app.UseHangfireConfigurationUI(url, Options.ConfigurationOptions());
+                        }))
 #if !NET472
-                    )
+                )
 #endif
                 ;
         }
@@ -74,6 +78,7 @@ namespace Hangfire.Configuration.Test
         public FakeServerCountSampleStorage ServerCountSampleStorage { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfire Hangfire { get; }
+        private FakeNow _now;
 
         public Options Options { get; }
         public ConfigurationApi ConfigurationApi { get; }
@@ -83,10 +88,41 @@ namespace Hangfire.Configuration.Test
         public WorkerServerQueriesUnderTest WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
         public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
-        
+
         protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
         protected override IServerCountSampleStorage BuildServerCountSampleStorage() => ServerCountSampleStorage;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
+        protected override INow BuildNow() => _now;
+
+        public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
+        {
+            ConfigurationStorage.Has(configurations);
+            return this;
+        }
+
+        public SystemUnderTest WithAnnouncedServer(string serverId)
+        {
+            Monitor.AnnounceServer(serverId, null);
+            return this;
+        }
+
+        public class FakeNow : INow
+        {
+            public DateTime Time;
+            public DateTime UtcDateTime() => Time;
+        }
+
+        public SystemUnderTest Now(string time)
+        {
+            _now.Time = DateTime.Parse(time);
+            return this;
+        }
+
+        public SystemUnderTest WithServerCountSample(ServerCountSample sample)
+        {
+            ServerCountSampleStorage.Has(sample);
+            return this;
+        }
     }
 }

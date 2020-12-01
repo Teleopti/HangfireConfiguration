@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
-using Hangfire.Common;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -42,6 +42,77 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerCountSampleRecorder.Record();
 
             Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+        }
+
+        [Fact]
+        public void ShouldNotBoomWithoutConfigurations()
+        {
+            var system = new SystemUnderTest();
+
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Empty(system.ServerCountSampleStorage.Samples());
+        }
+
+        [Fact]
+        public void ShouldNotBoomWith2Configurations()
+        {
+            var system = new SystemUnderTest();
+            system
+                .WithConfiguration(new StoredConfiguration())
+                .WithConfiguration(new StoredConfiguration())
+                .WithAnnouncedServer("runningServer1")
+                .WithAnnouncedServer("runningServer2")
+                ;
+
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+        }
+
+        [Fact]
+        public void ShouldRecordWithTimestamp()
+        {
+            var system = new SystemUnderTest();
+            system
+                .WithConfiguration(new StoredConfiguration())
+                .WithAnnouncedServer("runningServer");
+
+            system.Now("2020-12-01 12:00");
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Equal("2020-12-01 12:00".Utc(), system.ServerCountSampleStorage.Samples().Single().Timestamp);
+        }
+
+        [Fact]
+        public void ShouldNotRecordDuplicateSample()
+        {
+            var system = new SystemUnderTest();
+            system
+                .WithConfiguration(new StoredConfiguration())
+                .WithServerCountSample(new ServerCountSample {Timestamp = "2020-12-01 12:00".Utc(), Count = 2})
+                .WithAnnouncedServer("runningServer");
+
+            system.Now("2020-12-01 12:00");
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+        }
+        
+        [Fact]
+        public void ShouldRecordNewSampleAfter10Minutes()
+        {
+            var system = new SystemUnderTest();
+            system
+                .WithConfiguration(new StoredConfiguration())
+                .WithServerCountSample(new ServerCountSample {Timestamp = "2020-12-01 12:00".Utc(), Count = 2})
+                .WithAnnouncedServer("runningServer");
+
+            system.Now("2020-12-01 12:10");
+            system.ServerCountSampleRecorder.Record();
+
+            var actual = system.ServerCountSampleStorage.Samples().Single(x => x.Timestamp == "2020-12-01 12:10".Utc());
+            Assert.Equal(1, actual.Count);
         }
     }
 }
