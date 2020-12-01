@@ -20,8 +20,10 @@ namespace Hangfire.Configuration
             _state = state;
         }
 
-        public void Refresh(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public void Refresh()
         {
+            var options = _state.ReadOptions();
+            
             // maybe not reload all the time
             var configurations = _storage.ReadConfigurations();
             var configurationChanged = _configurationUpdater.Update(options, configurations);
@@ -40,7 +42,7 @@ namespace Hangfire.Configuration
                             return existing;
                         }
 
-                        return makeJobStorage(c, storageOptions);
+                        return makeJobStorage(c, _state.StorageOptions);
                     }).ToArray();
             }
         }

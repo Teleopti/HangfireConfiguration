@@ -53,12 +53,12 @@ namespace Hangfire.Configuration
             var autoUpdate = new UpdateConfiguration
             {
                 Name = DefaultConfigurationName.Name(),
-                ConnectionString = options?.AutoUpdatedHangfireConnectionString,
-                SchemaName = options?.AutoUpdatedHangfireSchemaName,
+                ConnectionString = options.AutoUpdatedHangfireConnectionString,
+                SchemaName = options.AutoUpdatedHangfireSchemaName,
             };
             
-            return  new[] {autoUpdate}
-                .Concat(options?.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
+            return new[] {autoUpdate}
+                .Concat(options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
                 .Where(x => x.ConnectionString != null)
                 .ToArray();
         }        
@@ -124,9 +124,9 @@ namespace Hangfire.Configuration
         
         private static bool updateConfigurationsEnabled(ConfigurationOptions options)
         {
-            if (options?.AutoUpdatedHangfireConnectionString != null)
+            if (options.AutoUpdatedHangfireConnectionString != null)
                 return true;
-            if (options?.UpdateConfigurations?.Any() ?? false)
+            if (options.UpdateConfigurations?.Any() ?? false)
                 return true;
             return false;
         }

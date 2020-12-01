@@ -87,8 +87,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldThrowIfGoalWorkerCountHigherThanOptions()
         {
-            var system = new SystemUnderTest(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 5});
-
+            var system = new SystemUnderTest();
+            system.Options.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 5});
             Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 6}));
         }
     }

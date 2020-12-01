@@ -49,12 +49,11 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(10);
             system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 1});
 
-            system.WorkerServerStarter.Start(
-                new ConfigurationOptionsForTest
-                {
-                    MinimumServerCount = 2
-                },
-                null, null);
+            system.Options.UseOptions(new ConfigurationOptionsForTest
+            {
+                MinimumServerCount = 2
+            });
+            system.WorkerServerStarter.Start();
 
             Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }

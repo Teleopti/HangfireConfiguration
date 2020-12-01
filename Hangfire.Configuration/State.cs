@@ -1,13 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {
     internal class State
     {
+        public ConfigurationOptions Options { private get; set; }
+        public SqlServerStorageOptions StorageOptions { get; set; }
+        public BackgroundJobServerOptions ServerOptions { get; set; }
+
         public IEnumerable<ConfigurationAndStorage> Configurations = Enumerable.Empty<ConfigurationAndStorage>();
         public bool ConfigurationUpdaterRan { get; set; }
+
+        public ConfigurationOptions ReadOptions() => 
+            Options ?? new ConfigurationOptions();
     }
 
     internal class ConfigurationAndStorage

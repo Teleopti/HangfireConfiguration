@@ -11,6 +11,7 @@ using Hangfire.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+
 #else
 using Owin;
 
@@ -60,7 +61,8 @@ namespace ConsoleSample
             app.Use((context, next) =>
             {
                 // simulate a hosting site with content security policy
-                context.Response.Headers.Append("Content-Security-Policy", "script-src 'self'; frame-ancestors 'self';");
+                context.Response.Headers.Append("Content-Security-Policy",
+                    "script-src 'self'; frame-ancestors 'self';");
 
                 // simulate a hosting site with a static file handler
                 if (context.Request.Path.Value.Split('/').Last().Contains("."))
@@ -110,18 +112,18 @@ namespace ConsoleSample
                 .ForEach(s =>
                 {
                     Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
-                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(), s.configurationInfo.JobStorage);
+                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(),
+                        s.configurationInfo.JobStorage);
                 });
 
-            hangfireConfiguration.StartPublishers(storageOptions)
-                .StartWorkerServers(
-                    storageOptions,
-                    new BackgroundJobServerOptions
-                    {
-                        Queues = new[] {"critical", "default"},
-                    },
-                    new[] {new CustomBackgroundProcess()}
-                );
+            hangfireConfiguration
+                .UseStorageOptions(storageOptions) //Needed???? already set above
+                .UseServerOptions(new BackgroundJobServerOptions
+                {
+                    Queues = new[] {"critical", "default"},
+                })
+                .StartPublishers()
+                .StartWorkerServers(new[] {new CustomBackgroundProcess()});
         }
     }
 }

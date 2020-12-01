@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Server;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {
@@ -27,24 +26,19 @@ namespace Hangfire.Configuration
             _recorder = recorder;
         }
 
-        public void Start(
-            ConfigurationOptions options,
-            BackgroundJobServerOptions serverOptions,
-            SqlServerStorageOptions storageOptions,
-            params IBackgroundProcess[] additionalProcesses)
+        public void Start(IBackgroundProcess[] additionalProcesses)
         {
-            options = options ?? new ConfigurationOptions();
-            var backgroundProcesses = new List<IBackgroundProcess>(additionalProcesses);
+            var options = _state.ReadOptions();
+            var backgroundProcesses = new List<IBackgroundProcess>();
+            if (additionalProcesses != null)
+                backgroundProcesses.AddRange(additionalProcesses);
             backgroundProcesses.Add(_recorder);
-            serverOptions = serverOptions ?? new BackgroundJobServerOptions();
+            var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
 
-            _stateMaintainer.Refresh(options, storageOptions);
+            _stateMaintainer.Refresh();
             _state.Configurations
                 .OrderBy(x => !(x.Configuration.Active ?? false))
-                .ForEach(x =>
-                {
-                    startWorkerServer(x, options, serverOptions, backgroundProcesses);
-                });
+                .ForEach(x => { startWorkerServer(x, options, serverOptions, backgroundProcesses); });
         }
 
         private void startWorkerServer(

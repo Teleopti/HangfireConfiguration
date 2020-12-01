@@ -29,7 +29,7 @@ namespace Hangfire.Configuration
 
         public void Record()
         {
-            _stateMaintainer.Refresh(null, null);
+            _stateMaintainer.Refresh();
             var serverCount = _state.Configurations.Single().CreateJobStorage().GetMonitoringApi().Servers().Count;
             _storage.Write(new ServerCountSample {Count = serverCount});
         }

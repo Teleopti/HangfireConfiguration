@@ -8,21 +8,21 @@ namespace Hangfire.Configuration
     {
         private readonly IConfigurationStorage _storage;
         private readonly IHangfireSchemaCreator _creator;
-        private readonly ConfigurationOptions _options;
+        private readonly State _state;
 
-        public ConfigurationApi(
+        internal ConfigurationApi(
             IConfigurationStorage storage,
             IHangfireSchemaCreator creator,
-            ConfigurationOptions options)
+            State state)
         {
             _storage = storage;
             _creator = creator;
-            _options = options;
+            _state = state;
         }
 
         public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
         {
-            if (command.Workers > _options.WorkerDeterminerOptions.MaximumGoalWorkerCount)
+            if (command.Workers > _state.ReadOptions().WorkerDeterminerOptions.MaximumGoalWorkerCount)
                 throw new Exception("Invalid goal worker count.");
 
             var configurations = _storage.ReadConfigurations();
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration
             activate.Active = true;
             _storage.WriteConfiguration(activate);
 
-            if (!_options.AllowMultipleActive)
+            if (!_state.ReadOptions().AllowMultipleActive)
             {
                 configurations
                     .Where(x => x.Id != configurationId)

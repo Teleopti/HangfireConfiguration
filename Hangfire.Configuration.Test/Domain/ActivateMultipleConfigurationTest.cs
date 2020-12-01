@@ -8,7 +8,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldActivateMultipleConfigurations()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions
+            var system = new SystemUnderTest();
+            system.Options.UseOptions(new ConfigurationOptions
             {
                 AllowMultipleActive = true
             });
@@ -34,7 +35,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldActivateConfiguration()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions
+            var system = new SystemUnderTest();
+            system.Options.UseOptions(new ConfigurationOptions
             {
                 AllowMultipleActive = true
             });
@@ -59,7 +61,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldInactivateConfiguration()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions
+            var system = new SystemUnderTest();
+            system.Options.UseOptions(new ConfigurationOptions
             {
                 AllowMultipleActive = true
             });
@@ -79,7 +82,8 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldInactivateGivenConfiguration()
         {
-            var system = new SystemUnderTest(new ConfigurationOptions
+            var system = new SystemUnderTest();
+            system.Options.UseOptions(new ConfigurationOptions
             {
                 AllowMultipleActive = true
             });

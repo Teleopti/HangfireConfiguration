@@ -1,5 +1,4 @@
 using System.Linq;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {
@@ -14,9 +13,9 @@ namespace Hangfire.Configuration
             _state = state;
         }
 
-        public void Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public void Start()
         {
-            _stateMaintainer.Refresh(options, storageOptions);
+            _stateMaintainer.Refresh();
             _state.Configurations.Where(x => x.Configuration.Active.GetValueOrDefault())
                 .ForEach(x => { x.CreateJobStorage(); });
         }

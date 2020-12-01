@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             Assert.Null(system.Hangfire.LastCreatedStorage);
         }
@@ -47,7 +47,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
@@ -59,7 +59,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             system.ConfigurationStorage.Has(new StoredConfiguration() {Active = true, SchemaName = "ActiveSchema"});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.Options.SchemaName);
         }
@@ -70,7 +70,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             var options = new SqlServerStorageOptions();
             var storage = system.Hangfire.CreatedStorages.Single();
@@ -123,7 +123,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName"});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().Options.SchemaName);
         }
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName1"});
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName2"});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             var storages = system.Hangfire.CreatedStorages;
             Assert.Equal("SchemaName1", storages.First().Options.SchemaName);
@@ -150,7 +150,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
 
-            system.PublisherStarter.Start(null, null);
+            system.PublisherStarter.Start();
 
             Assert.Equal("active", system.Hangfire.CreatedStorages.Single().ConnectionString);
         }

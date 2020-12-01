@@ -15,9 +15,9 @@ namespace Hangfire.Configuration
             _state = state;
         }
 
-        public IEnumerable<ConfigurationInfo> QueryAllWorkerServers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
+        public IEnumerable<ConfigurationInfo> QueryAllWorkerServers()
         {
-            _stateMaintainer.Refresh(options, storageOptions);
+            _stateMaintainer.Refresh();
             return _state.Configurations
                 .Select(x => x.ToConfigurationInfo())
                 .ToArray();

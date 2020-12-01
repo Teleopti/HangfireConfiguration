@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Integration
                     AutoUpdatedHangfireConnectionString = ConnectionUtils.GetConnectionString(),
                     UseWorkerDeterminer = true
                 })
-                .StartWorkerServers(null, null, new IBackgroundProcess[] { })
+                .StartWorkerServers( new IBackgroundProcess[] { })
                 ;
         }
     }
