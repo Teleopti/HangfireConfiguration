@@ -18,6 +18,11 @@ namespace Hangfire.Configuration.Test
             Enumerable.Range(0, times).ForEach(i => action());
         }
         
+        public static void Times(this int times, Action<int> action)
+        {
+            Enumerable.Range(0, times).ForEach(action);
+        }
+
         internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
         {
             foreach (T item in source)

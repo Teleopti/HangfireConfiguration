@@ -11,7 +11,8 @@ namespace Hangfire.Configuration
         private readonly State _state;
         private readonly StateMaintainer _stateMaintainer;
         private readonly INow _now;
-        private TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
+        private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
+        private readonly int _keepSamples = 6;
 
         internal ServerCountSampleRecorder(
             IServerCountSampleStorage storage,
@@ -27,7 +28,6 @@ namespace Hangfire.Configuration
 
         public void Execute(BackgroundProcessContext context)
         {
-            // TakeFoo();
             context.StoppingToken.Wait(TimeSpan.FromMinutes(10));
         }
 
@@ -43,10 +43,15 @@ namespace Hangfire.Configuration
                 return sample.Timestamp > recentFrom;
             }
 
-            var noRecentSample = _storage.Samples().Count(isRecent) == 0;
+            var samples = _storage.Samples().ToArray();
+            
+            var noRecentSample = samples.Count(isRecent) == 0;
 
             if (noRecentSample)
-            {
+            { 
+                if (samples.Count() == _keepSamples )
+                    _storage.Remove(samples.OrderBy(x => x.Timestamp).First());
+
                 var serverCount = _state.Configurations.First().CreateJobStorage().GetMonitoringApi().Servers().Count;
                 _storage.Write(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount});
             }

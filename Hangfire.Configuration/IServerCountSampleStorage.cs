@@ -6,5 +6,6 @@ namespace Hangfire.Configuration
     {
         IEnumerable<ServerCountSample> Samples();
         void Write(ServerCountSample sample);
+        void Remove(ServerCountSample sample);
     }
 }

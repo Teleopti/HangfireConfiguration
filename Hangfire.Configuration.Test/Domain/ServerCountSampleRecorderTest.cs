@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -98,7 +96,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
         }
-        
+
         [Fact]
         public void ShouldRecordNewSampleAfter10Minutes()
         {
@@ -113,6 +111,60 @@ namespace Hangfire.Configuration.Test.Domain
 
             var actual = system.ServerCountSampleStorage.Samples().Single(x => x.Timestamp == "2020-12-01 12:10".Utc());
             Assert.Equal(1, actual.Count);
+        }
+
+        [Fact]
+        public void ShouldKeep6Samples()
+        {
+            var system = new SystemUnderTest();
+            system.WithConfiguration(new StoredConfiguration());
+
+            7.Times(x =>
+            {
+                var minute = x * 10;
+                var time = "2020-12-01 12:00".Utc().AddMinutes(minute);
+                system.Now(time);
+                system.ServerCountSampleRecorder.Record();
+            });
+
+            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
+        }
+        
+        [Fact]
+        public void ShouldRemoveOldestAndAddLatest()
+        {
+            var system = new SystemUnderTest();
+            system.WithConfiguration(new StoredConfiguration());
+
+            7.Times(x =>
+            {
+                var minute = x * 10;
+                var time = "2020-12-01 12:00".Utc().AddMinutes(minute);
+                system.Now(time);
+                system.ServerCountSampleRecorder.Record();
+            });
+
+            Assert.Contains(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 13:00".Utc());
+            Assert.DoesNotContain(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc() );
+        }
+        
+        [Fact]
+        public void ShouldNotRemoveWhenNotRecordable()
+        {
+            var system = new SystemUnderTest();
+            system.WithConfiguration(new StoredConfiguration());
+            6.Times(x =>
+            {
+                var minute = x * 10;
+                var time = "2020-12-01 12:00".Utc().AddMinutes(minute);
+                system.Now(time);
+                system.ServerCountSampleRecorder.Record();
+            });
+            
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
+            Assert.Contains(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc() );
         }
     }
 }

@@ -19,5 +19,10 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             Data = Data.Append(sample).ToArray();
         }
+
+        public void Remove(ServerCountSample sample)
+        {
+            Data = Data.Where(x => x.Timestamp != sample.Timestamp).ToArray();
+        }
     }
 }

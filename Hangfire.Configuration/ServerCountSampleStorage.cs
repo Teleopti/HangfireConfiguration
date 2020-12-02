@@ -19,5 +19,10 @@ namespace Hangfire.Configuration
         {
             
         }
+
+        public void Remove(ServerCountSample sample)
+        {
+            
+        }
     }
 }

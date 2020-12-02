@@ -113,9 +113,11 @@ namespace Hangfire.Configuration.Test
             public DateTime UtcDateTime() => Time;
         }
 
-        public SystemUnderTest Now(string time)
+        public SystemUnderTest Now(string time) => Now(time.Utc());
+
+        public SystemUnderTest Now(DateTime time)
         {
-            _now.Time = DateTime.Parse(time);
+            _now.Time = time;
             return this;
         }
 
