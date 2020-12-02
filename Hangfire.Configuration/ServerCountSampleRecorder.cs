@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Common;
 using Hangfire.Server;
@@ -12,7 +13,7 @@ namespace Hangfire.Configuration
         private readonly StateMaintainer _stateMaintainer;
         private readonly INow _now;
         private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
-        private readonly int _keepSamples = 6;
+        private readonly int _sampleLimit = 6;
 
         internal ServerCountSampleRecorder(
             IServerCountSampleStorage storage,
@@ -36,25 +37,33 @@ namespace Hangfire.Configuration
             _stateMaintainer.Refresh();
             if (!_state.Configurations.Any())
                 return;
-
-            bool isRecent(ServerCountSample sample)
-            {
-                var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
-                return sample.Timestamp > recentFrom;
-            }
-
-            var samples = _storage.Samples().ToArray();
             
+            var samples = _storage.Samples().ToArray();
             var noRecentSample = samples.Count(isRecent) == 0;
 
             if (noRecentSample)
-            { 
-                if (samples.Count() == _keepSamples )
-                    _storage.Remove(samples.OrderBy(x => x.Timestamp).First());
+            {
+                var makeRoomForRecent = 1;
+                var keepSamples = samples
+                    .OrderByDescending(x => x.Timestamp)
+                    .Take(_sampleLimit - makeRoomForRecent);
 
+                samples
+                    .Where(sample => isRemovable(sample, keepSamples))
+                    .ForEach(sample => _storage.Remove(sample));
+                
                 var serverCount = _state.Configurations.First().CreateJobStorage().GetMonitoringApi().Servers().Count;
                 _storage.Write(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount});
             }
         }
+
+        private bool isRecent(ServerCountSample sample)
+        {
+            var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
+            return sample.Timestamp > recentFrom;
+        }
+        
+        private static bool isRemovable(ServerCountSample sample, IEnumerable<ServerCountSample> keepSamples) 
+            => keepSamples.All(keepSample => sample.Timestamp != keepSample.Timestamp);
     }
 }

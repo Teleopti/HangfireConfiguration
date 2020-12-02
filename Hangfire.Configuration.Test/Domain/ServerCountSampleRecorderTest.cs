@@ -166,5 +166,28 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
             Assert.Contains(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc() );
         }
+        
+        [Fact]
+        public void ShouldKeep6Samples2()
+        {
+            var system = new SystemUnderTest();
+            system.WithConfiguration(new StoredConfiguration());
+
+            7.Times(x =>
+            {
+                var minute = x * 10;
+                var time = "2020-12-01 12:00".Utc().AddMinutes(minute);
+                system.Now(time);
+                system.WithServerCountSample(new ServerCountSample
+                {
+                    Timestamp = time
+                });
+            });
+            
+            system.Now("2020-12-01 13:00".Utc().AddMinutes(10));
+            system.ServerCountSampleRecorder.Record();
+
+            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
+        }
     }
 }
