@@ -32,7 +32,8 @@ namespace Hangfire.Configuration
             var backgroundProcesses = new List<IBackgroundProcess>();
             if (additionalProcesses != null)
                 backgroundProcesses.AddRange(additionalProcesses);
-            backgroundProcesses.Add(_recorder);
+            if (_state.ReadOptions().WorkerDeterminerOptions.UseServerCountSampling)
+				backgroundProcesses.Add(_recorder);
             var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
 
             _stateMaintainer.Refresh();

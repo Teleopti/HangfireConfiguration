@@ -24,6 +24,23 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Fact]
+        public void ShouldNotStartRecorder()
+        {
+	        var options = new ConfigurationOptions();
+	        options.WorkerDeterminerOptions.UseServerCountSampling = false;
+	        var system = new SystemUnderTest();
+	        system
+		        .WithOptions(options)
+		        .WithConfiguration(new StoredConfiguration())
+		        ;
+
+	        system.WorkerServerStarter.Start(null, null, null);
+
+	        Assert.Empty(system.Hangfire.StartedServers.Single().backgroundProcesses
+		        .OfType<ServerCountSampleRecorder>());
+        }
+        
+        [Fact]
         public void ShouldRecord()
         {
             var system = new SystemUnderTest();
