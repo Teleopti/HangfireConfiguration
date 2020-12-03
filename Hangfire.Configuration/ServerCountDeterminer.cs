@@ -53,7 +53,8 @@ namespace Hangfire.Configuration
         private int? serverCountFromSamples()
         {
             var samples = _serverCountSampleStorage
-                .Samples()
+                .Read()
+                .Samples
                 .Where(s => s.Count != 0)
                 .ToArray();
             if (samples.Any())

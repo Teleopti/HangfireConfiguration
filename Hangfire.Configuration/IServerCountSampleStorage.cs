@@ -1,11 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Hangfire.Configuration
 {
     public interface IServerCountSampleStorage
     {
-        IEnumerable<ServerCountSample> Samples();
-        void Write(ServerCountSample sample);
-        void Remove(ServerCountSample sample);
+        ServerCountSamples Read();
+        void Write(ServerCountSamples samples);
+    }
+
+    public class ServerCountSamples
+    {
+        public IEnumerable<ServerCountSample> Samples { get; set; } = 
+            Enumerable.Empty<ServerCountSample>();
     }
 }

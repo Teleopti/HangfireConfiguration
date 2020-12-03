@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Common;
 using Hangfire.Server;
@@ -37,23 +36,23 @@ namespace Hangfire.Configuration
             _stateMaintainer.Refresh();
             if (!_state.Configurations.Any())
                 return;
-            
-            var samples = _storage.Samples().ToArray();
-            var noRecentSample = samples.Count(isRecent) == 0;
+
+            var samples = _storage.Read();
+            var noRecentSample = samples.Samples.Count(isRecent) == 0;
 
             if (noRecentSample)
             {
-                var makeRoomForRecent = 1;
-                var keepSamples = samples
-                    .OrderByDescending(x => x.Timestamp)
-                    .Take(_sampleLimit - makeRoomForRecent);
-
-                samples
-                    .Where(sample => isRemovable(sample, keepSamples))
-                    .ForEach(sample => _storage.Remove(sample));
-                
                 var serverCount = _state.Configurations.First().CreateJobStorage().GetMonitoringApi().Servers().Count;
-                _storage.Write(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount});
+
+                samples.Samples = samples
+                    .Samples
+                    .OrderByDescending(x => x.Timestamp)
+                    .Take(_sampleLimit - 1)
+                    .OrderBy(x => x.Timestamp)
+                    .Append(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount})
+                    .ToArray();
+
+                _storage.Write(samples);
             }
         }
 
@@ -62,8 +61,5 @@ namespace Hangfire.Configuration
             var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
             return sample.Timestamp > recentFrom;
         }
-        
-        private static bool isRemovable(ServerCountSample sample, IEnumerable<ServerCountSample> keepSamples) 
-            => keepSamples.All(keepSample => sample.Timestamp != keepSample.Timestamp);
     }
 }
