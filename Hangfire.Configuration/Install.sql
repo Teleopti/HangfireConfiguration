@@ -107,6 +107,22 @@ BEGIN
 SET @CURRENT_SCHEMA_VERSION = 3;
 END
 
+IF @CURRENT_SCHEMA_VERSION < 4 AND @TARGET_SCHEMA_VERSION >= 4
+BEGIN
+    
+    PRINT 'Installing HangfireConfiguration schema version 4';
+    
+   CREATE TABLE [$(HangfireConfigurationSchema)].[KeyValueStore] (
+        [Key] [nvarchar] (100) NOT NULL,
+		[Value] [nvarchar](max),
+		CONSTRAINT [PK_HangfireConfiguration_KeyValueStore] PRIMARY KEY CLUSTERED ([Key])
+	);
+	
+	PRINT 'Created table [$(HangfireConfigurationSchema)].[KeyValueStore]';
+    
+SET @CURRENT_SCHEMA_VERSION = 4;
+END
+
 
 
 UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA_VERSION

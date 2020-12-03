@@ -9,8 +9,8 @@ namespace Hangfire.Configuration
 {
     public interface IUnitOfWork
     {
-        void Execute(string sql);
-        void Execute(string sql, object param);
+        int Execute(string sql);
+        int Execute(string sql, object param);
         IEnumerable<T> Query<T>(string sql);
     }
 
@@ -23,14 +23,18 @@ namespace Hangfire.Configuration
             .OrInner<SqlException>(DetectTransientSqlException.IsTransient)
             .WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
         
-        public void Execute(string sql)
+        public int Execute(string sql)
         {
+            var result = default(int);
             operation((c, t) => { c.Execute(sql, null, t); });
+            return result;
         }
 
-        public void Execute(string sql, object param)
+        public int Execute(string sql, object param)
         {
-            operation((c, t) => { c.Execute(sql, param, t); });
+            var result = default(int);
+            operation((c, t) => { result = c.Execute(sql, param, t); });
+            return result;
         }
 
         public IEnumerable<T> Query<T>(string sql)
