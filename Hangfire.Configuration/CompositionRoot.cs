@@ -18,12 +18,12 @@ namespace Hangfire.Configuration
             new UnitOfWork {ConnectionString = _state.ReadOptions().ConnectionString};
 
         private WorkerDeterminer buildWorkerDeterminer() =>
-            new WorkerDeterminer(BuildServerCountSampleStorage());
+            new WorkerDeterminer(BuildKeyValueStore());
         
         protected ServerCountSampleRecorder buildServerCountSampleRecorder()
         {
             return new ServerCountSampleRecorder(
-                BuildServerCountSampleStorage(), 
+                BuildKeyValueStore(), 
                 _state,
                 builderStateMaintainer(null), 
                 BuildNow());
@@ -66,8 +66,8 @@ namespace Hangfire.Configuration
         protected virtual IConfigurationStorage BuildConfigurationStorage() =>
             new ConfigurationStorage(buildUnitOfWork());
 
-        protected virtual IServerCountSampleStorage BuildServerCountSampleStorage() =>
-            new ServerCountSampleStorage(buildUnitOfWork());
+        protected virtual IKeyValueStore BuildKeyValueStore() =>
+            new KeyValueStore(buildUnitOfWork());
 
         protected virtual INow BuildNow() => new Now();
     }

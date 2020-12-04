@@ -13,10 +13,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
             system.BuildOptions().UseOptions(new ConfigurationOptions
                 {ConnectionString = ConnectionUtils.GetConnectionString()});
 
-            system.ServerCountSampleStorage.Write(new ServerCountSamples
+            system.KeyValueStore.Write(new ServerCountSamples
             {Samples = new[] {new ServerCountSample {Timestamp = "2020-12-02 12:00".Utc(), Count = 1}}});
 
-            var sample = system.ServerCountSampleStorage.Read().Samples.Single();
+            var sample = system.KeyValueStore.Read().Samples.Single();
             Assert.Equal("2020-12-02 12:00".Utc(), sample.Timestamp);
             Assert.Equal(1, sample.Count);
         }
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var system = new SystemUnderInfraTest();
             system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
 
-            var sample = system.ServerCountSampleStorage.Read();
+            var sample = system.KeyValueStore.Read();
 
             Assert.Empty(sample.Samples);
         }
@@ -38,12 +38,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var system = new SystemUnderInfraTest();
             system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
 
-            system.ServerCountSampleStorage.Write(new ServerCountSamples
+            system.KeyValueStore.Write(new ServerCountSamples
             { Samples = new[] {new ServerCountSample {Count = 1} }});
-            system.ServerCountSampleStorage.Write(new ServerCountSamples
+            system.KeyValueStore.Write(new ServerCountSamples
             { Samples = new[] {new ServerCountSample {Count = 2} }});
 
-            var sample = system.ServerCountSampleStorage.Read().Samples.Single();
+            var sample = system.KeyValueStore.Read().Samples.Single();
             Assert.Equal(2, sample.Count);
         }
     }

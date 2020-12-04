@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(1, system.ServerCountSampleStorage.Samples().Single().Count);
+            Assert.Equal(1, system.KeyValueStore.Samples().Single().Count);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Empty(system.ServerCountSampleStorage.Samples());
+            Assert.Empty(system.KeyValueStore.Samples());
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal("2020-12-01 12:00".Utc(), system.ServerCountSampleStorage.Samples().Single().Timestamp);
+            Assert.Equal("2020-12-01 12:00".Utc(), system.KeyValueStore.Samples().Single().Timestamp);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.ServerCountSampleStorage.Samples().Single().Count);
+            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:10");
             system.ServerCountSampleRecorder.Record();
 
-            var actual = system.ServerCountSampleStorage.Samples().Single(x => x.Timestamp == "2020-12-01 12:10".Utc());
+            var actual = system.KeyValueStore.Samples().Single(x => x.Timestamp == "2020-12-01 12:10".Utc());
             Assert.Equal(1, actual.Count);
         }
 
@@ -133,7 +133,7 @@ namespace Hangfire.Configuration.Test.Domain
                 system.ServerCountSampleRecorder.Record();
             });
 
-            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
+            Assert.Equal(6, system.KeyValueStore.Samples().Count());
         }
 
         [Fact]
@@ -153,8 +153,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Contains(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 13:00".Utc());
-            Assert.DoesNotContain(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
+            Assert.Contains(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 13:00".Utc());
+            Assert.DoesNotContain(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
         }
 
         [Fact]
@@ -174,8 +174,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:50");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
-            Assert.Contains(system.ServerCountSampleStorage.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
+            Assert.Equal(6, system.KeyValueStore.Samples().Count());
+            Assert.Contains(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
         }
 
         [Fact]
@@ -196,7 +196,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:10".Utc());
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(6, system.ServerCountSampleStorage.Samples().Count());
+            Assert.Equal(6, system.KeyValueStore.Samples().Count());
         }
         
         [Fact]
@@ -218,7 +218,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:10");
             system.ServerCountSampleRecorder.Record();
             
-            var actual = system.ServerCountSampleStorage.Data.Samples
+            var actual = system.KeyValueStore
+	            .Samples()
                 .Select(x => x.Timestamp)
                 .ToArray();
             Assert.Equal(new[] {
@@ -250,7 +251,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:10");
             system.ServerCountSampleRecorder.Record();
             
-            var actual = system.ServerCountSampleStorage.Data.Samples
+            var actual = system.KeyValueStore
+	            .Samples()
                 .Select(x => x.Timestamp)
                 .ToArray();
             Assert.Equal(new[] {

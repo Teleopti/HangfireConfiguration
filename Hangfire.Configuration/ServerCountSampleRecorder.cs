@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
 {
     public class ServerCountSampleRecorder : IBackgroundProcess
     {
-        private readonly IServerCountSampleStorage _storage;
+        private readonly IKeyValueStore _storage;
         private readonly State _state;
         private readonly StateMaintainer _stateMaintainer;
         private readonly INow _now;
@@ -15,7 +15,7 @@ namespace Hangfire.Configuration
         private readonly int _sampleLimit = 6;
 
         internal ServerCountSampleRecorder(
-            IServerCountSampleStorage storage,
+            IKeyValueStore storage,
             State state,
             StateMaintainer stateMaintainer,
             INow now)

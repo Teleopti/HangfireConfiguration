@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Hangfire.Storage;
 
 namespace Hangfire.Configuration
@@ -8,9 +7,9 @@ namespace Hangfire.Configuration
     {
         private readonly ServerCountDeterminer _serverCountDeterminer;
 
-        public WorkerDeterminer(IServerCountSampleStorage serverCountSampleStorage)
+        public WorkerDeterminer(IKeyValueStore keyValueStore)
         {
-            _serverCountDeterminer = new ServerCountDeterminer(serverCountSampleStorage);
+            _serverCountDeterminer = new ServerCountDeterminer(keyValueStore);
         }
 
         internal int DetermineWorkerCount(

@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test
 #endif
 
             ConfigurationStorage = new FakeConfigurationStorage();
-            ServerCountSampleStorage = new FakeServerCountSampleStorage();
+            KeyValueStore = new FakeKeyValueStore();
             SchemaCreator = new FakeHangfireSchemaCreator();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration.Test
 
         public FakeMonitoringApi Monitor { get; }
         public FakeConfigurationStorage ConfigurationStorage { get; }
-        public FakeServerCountSampleStorage ServerCountSampleStorage { get; }
+        public FakeKeyValueStore KeyValueStore { get; }
         public FakeHangfireSchemaCreator SchemaCreator { get; }
         public FakeHangfire Hangfire { get; }
         private FakeNow _now;
@@ -90,7 +90,7 @@ namespace Hangfire.Configuration.Test
         public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
         protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
-        protected override IServerCountSampleStorage BuildServerCountSampleStorage() => ServerCountSampleStorage;
+        protected override IKeyValueStore BuildKeyValueStore() => KeyValueStore;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
         protected override INow BuildNow() => _now;
@@ -123,7 +123,7 @@ namespace Hangfire.Configuration.Test
 
         public SystemUnderTest WithServerCountSample(ServerCountSample sample)
         {
-            ServerCountSampleStorage.Has(sample);
+            KeyValueStore.Has(sample);
             return this;
         }
     }

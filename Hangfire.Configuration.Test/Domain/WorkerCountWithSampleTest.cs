@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 5});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 5});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -47,7 +47,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 1});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 1});
 
             system.Options.UseOptions(new ConfigurationOptionsForTest
             {
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 10});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 10});
             system.Monitor.AnnounceServer("server", null);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
@@ -79,9 +79,9 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 3});
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 3});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 2});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -93,9 +93,9 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 2});
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 3});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 2});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 2});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 3});
 
             system.WorkerServerStarter.Start(null, null, null);
 
@@ -107,12 +107,12 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
-            system.ServerCountSampleStorage.Has(new ServerCountSample
+            system.KeyValueStore.Has(new ServerCountSample
             {
                 Count = 2,
                 Timestamp = DateTime.Parse("2020-11-27 09:00")
             });
-            system.ServerCountSampleStorage.Has(new ServerCountSample
+            system.KeyValueStore.Has(new ServerCountSample
             {
                 Count = 4,
                 Timestamp = DateTime.Parse("2020-11-27 08:00")
@@ -128,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
-            system.ServerCountSampleStorage.Has(new ServerCountSample {Count = 0});
+            system.KeyValueStore.Has(new ServerCountSample {Count = 0});
 
             system.WorkerServerStarter.Start(null, null, null);
 

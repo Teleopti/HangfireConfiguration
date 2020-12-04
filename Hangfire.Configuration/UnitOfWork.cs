@@ -12,6 +12,7 @@ namespace Hangfire.Configuration
         int Execute(string sql);
         int Execute(string sql, object param);
         IEnumerable<T> Query<T>(string sql);
+        IEnumerable<T> Query<T>(string sql, object param);
     }
 
     internal abstract class UnitOfWorkBase : IUnitOfWork
@@ -36,11 +37,18 @@ namespace Hangfire.Configuration
             operation((c, t) => { result = c.Execute(sql, param, t); });
             return result;
         }
-
+        
         public IEnumerable<T> Query<T>(string sql)
         {
+	        var result = default(IEnumerable<T>);
+	        operation((c, t) => { result = c.Query<T>(sql, null, t); });
+	        return result;
+        }
+        
+        public IEnumerable<T> Query<T>(string sql, object param)
+        {
             var result = default(IEnumerable<T>);
-            operation((c, t) => { result = c.Query<T>(sql, null, t); });
+            operation((c, t) => { result = c.Query<T>(sql, param, t); });
             return result;
         }
 

@@ -2,7 +2,7 @@
 {
     public class SystemUnderInfraTest : CompositionRoot
     {
-        public IServerCountSampleStorage ServerCountSampleStorage => base.BuildServerCountSampleStorage();
+        public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
 
         public void WithOptions(ConfigurationOptions configurationOptions)
         {

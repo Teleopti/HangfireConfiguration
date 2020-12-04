@@ -8,15 +8,15 @@ namespace Hangfire.Configuration
 {
     internal class ServerCountDeterminer
     {
-        private readonly IServerCountSampleStorage _serverCountSampleStorage;
+        private readonly IKeyValueStore _keyValueStore;
         
         private static readonly Policy _retry = Policy.Handle<SqlException>(DetectTransientSqlException.IsTransient)
             .OrInner<SqlException>(DetectTransientSqlException.IsTransient)
             .WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
 
-        public ServerCountDeterminer(IServerCountSampleStorage serverCountSampleStorage)
+        public ServerCountDeterminer(IKeyValueStore keyValueStore)
         {
-            _serverCountSampleStorage = serverCountSampleStorage;
+            _keyValueStore = keyValueStore;
         }
         
         public int DetermineServerCount(IMonitoringApi monitor, WorkerDeterminerOptions options)
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration
 
         private int? serverCountFromSamples()
         {
-            var samples = _serverCountSampleStorage
+            var samples = _keyValueStore
                 .Read()
                 .Samples
                 .Where(s => s.Count != 0)
