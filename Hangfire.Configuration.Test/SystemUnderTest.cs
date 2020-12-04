@@ -126,5 +126,11 @@ namespace Hangfire.Configuration.Test
             KeyValueStore.Has(sample);
             return this;
         }
+
+        public SystemUnderTest WithOptions(ConfigurationOptions options)
+        {
+	        Options.UseOptions(options);
+	        return this;
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace Hangfire.Configuration
 
         public void Execute(BackgroundProcessContext context)
         {
+	        Record();
             context.StoppingToken.Wait(TimeSpan.FromMinutes(10));
         }
 
