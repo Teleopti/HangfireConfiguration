@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
 {
     public class ServerCountSampleRecorder : IBackgroundProcess
     {
-        private readonly IKeyValueStore _storage;
+        private readonly IKeyValueStore _store;
         private readonly State _state;
         private readonly StateMaintainer _stateMaintainer;
         private readonly INow _now;
@@ -15,12 +15,12 @@ namespace Hangfire.Configuration
         private readonly int _sampleLimit = 6;
 
         internal ServerCountSampleRecorder(
-            IKeyValueStore storage,
+            IKeyValueStore store,
             State state,
             StateMaintainer stateMaintainer,
             INow now)
         {
-            _storage = storage;
+            _store = store;
             _state = state;
             _stateMaintainer = stateMaintainer;
             _now = now;
@@ -38,7 +38,7 @@ namespace Hangfire.Configuration
             if (!_state.Configurations.Any())
                 return;
 
-            var samples = _storage.Read();
+            var samples = _store.ServerCountSamples();
             var noRecentSample = samples.Samples.Count(isRecent) == 0;
 
             if (noRecentSample)
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration
                     .Append(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount})
                     .ToArray();
 
-                _storage.Write(samples);
+                _store.ServerCountSamples(samples);
             }
         }
 
