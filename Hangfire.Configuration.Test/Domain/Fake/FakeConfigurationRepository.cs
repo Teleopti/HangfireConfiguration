@@ -8,6 +8,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
     {
         public IEnumerable<StoredConfiguration> Data = Enumerable.Empty<StoredConfiguration>();
         public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
+        public int? MaxWorkersPerServer => Data.FirstOrDefault()?.MaxWorkersPerServer;
 
         private int _nextId = 1;
         private int NextId() => _nextId++;

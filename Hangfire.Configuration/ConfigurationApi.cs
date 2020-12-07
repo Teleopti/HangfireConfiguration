@@ -25,22 +25,38 @@ namespace Hangfire.Configuration
             if (command.Workers > _state.ReadOptions().WorkerDeterminerOptions.MaximumGoalWorkerCount)
                 throw new Exception("Invalid goal worker count.");
 
-            var configurations = _storage.ReadConfigurations();
-            var configuration = new StoredConfiguration();
-            if (configurations.Any())
-            {
-                if (command.ConfigurationId != null)
-                    configuration = configurations.FirstOrDefault(x => x.Id == command.ConfigurationId);
-                else
-                    configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
-
-                if (configuration == null)
-                    configuration = configurations.First();
-            }
-
+            var configuration = matchingConfiguration(command.ConfigurationId);
+            
             configuration.GoalWorkerCount = command.Workers;
 
             _storage.WriteConfiguration(configuration);
+        }
+        
+        public void WriteMaxWorkersPerServer(MaxWorkersPerServer command)
+        {
+	        var configuration = matchingConfiguration(command.ConfigurationId);
+
+	        configuration.MaxWorkersPerServer = command.MaxWorkers;
+	        
+	        _storage.WriteConfiguration(configuration);
+        }
+
+        private StoredConfiguration matchingConfiguration(int? configurationId)
+        {
+	        var configurations = _storage.ReadConfigurations();
+	        var configuration = new StoredConfiguration();
+	        if (configurations.Any())
+	        {
+		        if (configurationId != null)
+			        configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
+		        else
+			        configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
+
+		        if (configuration == null)
+			        configuration = configurations.First();
+	        }
+
+	        return configuration;
         }
 
         public void CreateServerConfiguration(CreateServerConfiguration config)
