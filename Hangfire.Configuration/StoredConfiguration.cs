@@ -10,5 +10,6 @@ namespace Hangfire.Configuration
         public string SchemaName { get; set; }
         public int? GoalWorkerCount { get; set; }
         public bool? Active { get; set; }
+        public int? MaxWorkersPerServer { get; set; }
     }
 }
