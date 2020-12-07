@@ -107,8 +107,8 @@ namespace Hangfire.Configuration.Web
 
             WriteLiteral($@"
                 <div>
-                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
-                        <label for='workers'>Worker goal count: </label>
+                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount' style='margin-bottom: 3px'>
+                        <label for='workers' style='width: 126px'>Worker goal count: </label>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
                         <button class='button' type='button'>Submit</button>
@@ -116,6 +116,18 @@ namespace Hangfire.Configuration.Web
                     </form>
                 </div>");
 
+            WriteLiteral($@"
+                <div>
+                    <form class='form' id=""maxWorkersPerServerForm_{configuration.Id}"" action='saveMaxWorkersPerServer'>
+                        <label for='maxWorkers' style='width: 126px'>Max workers per server: </label>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' id='maxWorkers' name='maxWorkers' style='margin-right: 6px; width:60px'>
+                        <button class='button' type='button'>Submit</button>
+                    </form>
+                </div>");
+            
+            
+            
             if (configuration.Active == false)
             {
                 WriteLiteral($@"
