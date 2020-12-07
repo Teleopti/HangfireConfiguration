@@ -83,6 +83,12 @@ namespace Hangfire.Configuration.Web
                 processRequest(context, () => saveWorkerGoalCount(context));
                 return;
             }
+            
+            if (context.Request.Path.Value.Equals("/saveMaxWorkersPerServer"))
+            {
+	            processRequest(context, () => saveMaxWorkersPerServer(context));
+	            return;
+            }
 
             if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
             {
@@ -136,6 +142,21 @@ namespace Hangfire.Configuration.Web
                 Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
             });
             context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
+        }
+        
+#if NETSTANDARD2_0
+        private void saveMaxWorkersPerServer(HttpContext context)
+#else
+        private void saveMaxWorkersPerServer(IOwinContext context)
+#endif
+        {
+	        var parsed = parseRequestBody(context.Request);
+	        _configurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
+	        {
+		        ConfigurationId = parsed.SelectToken("configurationId").Value<int>(),
+		        MaxWorkers = tryParseNullable(parsed.SelectToken("maxWorkers").Value<string>())
+	        });
+	        context.Response.WriteAsync("Max workers per server was saved successfully!").Wait();
         }
 
 #if NETSTANDARD2_0

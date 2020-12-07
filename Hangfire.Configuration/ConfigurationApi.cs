@@ -32,7 +32,7 @@ namespace Hangfire.Configuration
             _storage.WriteConfiguration(configuration);
         }
         
-        public void WriteMaxWorkersPerServer(MaxWorkersPerServer command)
+        public void WriteMaxWorkersPerServer(WriteMaxWorkersPerServer command)
         {
 	        var configuration = matchingConfiguration(command.ConfigurationId);
 

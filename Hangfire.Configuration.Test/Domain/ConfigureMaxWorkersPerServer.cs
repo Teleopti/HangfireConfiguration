@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.WriteMaxWorkersPerServer(new MaxWorkersPerServer {MaxWorkers = expected});
+            system.ConfigurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer {MaxWorkers = expected});
 
 	        Assert.Equal(expected, system.ConfigurationStorage.MaxWorkersPerServer);
         }
@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        Id = 2
 	        });
 
-	        system.ConfigurationApi.WriteMaxWorkersPerServer(new MaxWorkersPerServer
+	        system.ConfigurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
 	        {
 		        ConfigurationId = 2,
 		        MaxWorkers = 7
