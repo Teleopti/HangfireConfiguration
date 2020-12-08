@@ -121,6 +121,11 @@ namespace Hangfire.Configuration.Test
             return this;
         }
 
+        public void StartWorkerServer()
+        {
+	        WorkerServerStarter.Start(null, null, null);
+        }
+
         public SystemUnderTest WithServerCountSample(ServerCountSample sample)
         {
             KeyValueStore.Has(sample);
@@ -131,6 +136,30 @@ namespace Hangfire.Configuration.Test
         {
 	        Options.UseOptions(options);
 	        return this;
+        }
+
+        public SystemUnderTest WithGoalWorkerCount(int goal)
+        {
+	        configuration.GoalWorkerCount = goal;
+	        return this;
+        }
+        
+        public SystemUnderTest WithMaxWorkersPerServer(int maxWorkers)
+        {
+	        configuration.MaxWorkersPerServer = maxWorkers;
+	        return this;
+        }
+
+        private StoredConfiguration configuration
+        {
+	        get
+	        {
+		        if (!ConfigurationStorage.Data.Any())
+			        ConfigurationStorage.Has(new StoredConfiguration());
+
+		        return ConfigurationStorage.Data.First();
+		        
+	        }
         }
     }
 }
