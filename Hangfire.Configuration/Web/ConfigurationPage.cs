@@ -33,13 +33,13 @@ namespace Hangfire.Configuration.Web
             WriteLiteral("<body>");
             WriteLiteral("<h2>Hangfire configuration</h2>");
 
-            WriteInformationHeader();
+            writeInformationHeader();
 
             configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
             
             WriteLiteral("<div class='flex-grid'>");
             foreach (var configuration in configurations)
-                WriteConfiguration(configuration);
+                writeConfiguration(configuration);
             WriteLiteral("</div>");
 
             if (_options.AllowNewServerCreation)
@@ -49,19 +49,20 @@ namespace Hangfire.Configuration.Web
             WriteLiteral("</body>");
             WriteLiteral("</html>");
         }
-
-        private void WriteInformationHeader()
+        
+        private void writeInformationHeader()
         {
             WriteLiteral(@"
                 <fieldset>
                     <legend>Information</legend>");
             if (_options.AllowNewServerCreation)
-                WriteStorageActivationInformation();
-            WriteWorkerGoalCountInformation();
+                writeStorageActivationInformation();
+            writeWorkerGoalCountInformation();
+            writeMaxWorkersPerServerInformation();
             WriteLiteral(@"</fieldset>");
         }
-
-        private void WriteStorageActivationInformation()
+        
+        private void writeStorageActivationInformation()
         {
             WriteLiteral(@"
                 <h3>Activate configuration</h3>
@@ -71,7 +72,7 @@ namespace Hangfire.Configuration.Web
                 </p>");
         }
         
-        private void WriteWorkerGoalCountInformation()
+        private void writeWorkerGoalCountInformation()
         {
             WriteLiteral(@"
                 <h3>Worker goal count</h3>
@@ -83,8 +84,18 @@ namespace Hangfire.Configuration.Web
                     met.<br>Default goal is 10 if no value is specified
                  </p>");
         }
+        
+        private void writeMaxWorkersPerServerInformation()
+        {
+	        WriteLiteral(@"
+                <h3>Max workers per server</h3>
+                <p>
+                    Configuration value to set maximum number of workers for each Hangfire server.
+                    <br>When a value is configured the number of workers on each server will not exceed the set value 
+                </p>");
+        }
 
-        private void WriteConfiguration(ViewModel configuration)
+        private void writeConfiguration(ViewModel configuration)
         {
             var title = "Configuration";
             if (configuration.Name != null)
