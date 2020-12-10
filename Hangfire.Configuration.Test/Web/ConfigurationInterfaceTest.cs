@@ -187,48 +187,5 @@ namespace Hangfire.Configuration.Test.Web
 
             Assert.False(system.ConfigurationStorage.Data.Single().Active);
         }
-        
-        [Fact]
-        public void ShouldSaveMaxWorkersPerServer()
-        {
-            var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
-            {
-                Id = 1,
-            });
-
-            var response = system.TestClient.PostAsync(
-                    "/config/saveMaxWorkersPerServer",
-                    new StringContent(JsonConvert.SerializeObject(new
-                    {
-                        configurationId = 1,
-                        maxWorkers = 5
-                    })))
-                .Result;
-
-            Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
-        }
-        
-        [Fact]
-        public void ShouldSaveEmptyMaxWorkersPerServer()
-        {
-	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
-	        {
-		        Id = 1,
-		        MaxWorkersPerServer = 4
-	        });
-
-	        var response = system.TestClient.PostAsync(
-			        "/config/saveMaxWorkersPerServer",
-			        new StringContent(JsonConvert.SerializeObject(new
-			        {
-				        configurationId = 1,
-				        maxWorkers = ""
-			        })))
-		        .Result;
-
-	        Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
-        }
     }
 }
