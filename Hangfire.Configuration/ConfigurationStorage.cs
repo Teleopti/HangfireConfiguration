@@ -48,7 +48,8 @@ SELECT
     ConnectionString, 
     SchemaName, 
     GoalWorkerCount, 
-    Active 
+    Active,
+	MaxWorkersPerServer
 FROM 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration").ToArray();
 
@@ -76,13 +77,15 @@ INSERT INTO
     [ConnectionString], 
     [SchemaName], 
     GoalWorkerCount, 
-    Active
+    Active,
+	MaxWorkersPerServer
 ) VALUES (
     @Name,
     @ConnectionString, 
     @SchemaName, 
     @GoalWorkerCount, 
-    @Active
+    @Active,
+    @MaxWorkersPerServer
 );", configuration);
         }
 
@@ -97,7 +100,8 @@ SET
     ConnectionString = @ConnectionString, 
     SchemaName = @SchemaName, 
     GoalWorkerCount = @GoalWorkerCount, 
-    Active = @Active 
+    Active = @Active,
+    MaxWorkersPerServer = @MaxWorkersPerServer    
 WHERE 
     Id = @Id;", configuration);
         }
