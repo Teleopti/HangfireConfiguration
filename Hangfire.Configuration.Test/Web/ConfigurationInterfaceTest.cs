@@ -18,7 +18,7 @@ namespace Hangfire.Configuration.Test.Web
 			{
 				TestLog.WriteLine("ShouldFindConfigurationInterface/1");
 
-				using (var s = new ServerUnderTest(new SystemUnderTest(),  "ShouldFindConfigurationInterface", "/config"))
+				using (var s = new ServerUnderTest(new SystemUnderTest(),  "/config", "ShouldFindConfigurationInterface"))
 				{
 					TestLog.WriteLine("ShouldFindConfigurationInterface/2");
 					var response = s.TestClient.GetAsync("/config").Result;
