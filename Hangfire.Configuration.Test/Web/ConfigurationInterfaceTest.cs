@@ -194,6 +194,8 @@ namespace Hangfire.Configuration.Test.Web
 		[Fact]
 		public void ShouldInactivateServer()
 		{
+			TestLog.WriteLine("ShouldInactivateServer/1");
+			
 			var system = new SystemUnderTest();
 			system.ConfigurationStorage.Has(new StoredConfiguration
 			{
@@ -201,8 +203,11 @@ namespace Hangfire.Configuration.Test.Web
 				Active = true
 			});
 
-			using (var s = new ServerUnderTest(system))
+			TestLog.WriteLine("ShouldInactivateServer/2");
+
+			using (var s = new ServerUnderTest(system, null, "ShouldInactivateServer"))
 			{
+				TestLog.WriteLine("ShouldInactivateServer/3");
 				var response = s.TestClient.PostAsync(
 						"/config/inactivateServer",
 						new StringContent(JsonConvert.SerializeObject(new
@@ -211,6 +216,7 @@ namespace Hangfire.Configuration.Test.Web
 						})))
 					.Result;
 
+				TestLog.WriteLine("ShouldInactivateServer/4");
 				Assert.False(system.ConfigurationStorage.Data.Single().Active);
 			}
 		}

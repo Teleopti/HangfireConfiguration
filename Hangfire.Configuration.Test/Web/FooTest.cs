@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
-	public class MaxWorkersPerServerTest
+	public class FooTest
 	{
 		[Fact]
 		public void ShouldSave()
