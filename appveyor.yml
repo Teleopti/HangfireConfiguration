@@ -21,6 +21,8 @@ build:
 artifacts:
 - path: '**\*.nupkg'
   name: NuGet packages
+- path: '**\testlog.log'
+  name: TestLog
 deploy:
 - provider: NuGet
   api_key:
