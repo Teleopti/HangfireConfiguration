@@ -35,6 +35,8 @@ namespace Hangfire.Configuration.Test.Web
 					Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
 				}
 			});
+			
+			test.Wait(TimeSpan.FromSeconds(15));
 		}
 
 		[Fact]
