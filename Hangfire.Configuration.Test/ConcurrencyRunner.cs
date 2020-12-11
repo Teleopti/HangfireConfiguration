@@ -72,6 +72,19 @@ namespace Hangfire.Configuration.Test
                 throw new AggregateException(exceptions);
         }
 
+        public void Wait(TimeSpan timeout)
+        {
+	        var finished = _tasks.All(t => t.Thread.Join(timeout));
+	        if (!finished)
+		        throw new TimeoutException("BLIP");
+	        var exceptions = _tasks
+		        .Where(t => t.Exception != null)
+		        .Select(t => t.Exception)
+		        .ToArray();
+	        if (exceptions.Any())
+		        throw new AggregateException(exceptions);
+        }
+        
 //
 //        public void WaitForException<T>() where T : Exception
 //        {

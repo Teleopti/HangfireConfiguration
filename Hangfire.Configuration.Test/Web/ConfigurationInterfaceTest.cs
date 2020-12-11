@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -194,31 +195,38 @@ namespace Hangfire.Configuration.Test.Web
 		[Fact]
 		public void ShouldInactivateServer()
 		{
-			TestLog.WriteLine("ShouldInactivateServer/1");
-			
-			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			var test = new ConcurrencyRunner();
+			test.InParallel(() =>
 			{
-				Id = 3,
-				Active = true
+
+				TestLog.WriteLine("ShouldInactivateServer/1");
+			
+				var system = new SystemUnderTest();
+				system.ConfigurationStorage.Has(new StoredConfiguration
+				{
+					Id = 3,
+					Active = true
+				});
+
+				TestLog.WriteLine("ShouldInactivateServer/2");
+
+				using (var s = new ServerUnderTest(system, null, "ShouldInactivateServer"))
+				{
+					TestLog.WriteLine("ShouldInactivateServer/3");
+					var response = s.TestClient.PostAsync(
+							"/config/inactivateServer",
+							new StringContent(JsonConvert.SerializeObject(new
+							{
+								configurationId = 3
+							})))
+						.Result;
+
+					TestLog.WriteLine("ShouldInactivateServer/4");
+					Assert.False(system.ConfigurationStorage.Data.Single().Active);
+				}
 			});
 
-			TestLog.WriteLine("ShouldInactivateServer/2");
-
-			using (var s = new ServerUnderTest(system, null, "ShouldInactivateServer"))
-			{
-				TestLog.WriteLine("ShouldInactivateServer/3");
-				var response = s.TestClient.PostAsync(
-						"/config/inactivateServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 3
-						})))
-					.Result;
-
-				TestLog.WriteLine("ShouldInactivateServer/4");
-				Assert.False(system.ConfigurationStorage.Data.Single().Active);
-			}
+			test.Wait(TimeSpan.FromSeconds(15));
 		}
 	}
 }
