@@ -16,10 +16,13 @@ namespace Hangfire.Configuration.Test
 {
     public class SystemUnderTest : CompositionRoot
     {
-        private readonly Lazy<TestServer> _testServer;
+	    private readonly string _urlPathMatch;
 
+	    // private readonly Lazy<TestServer> _testServer;
+        //
         public SystemUnderTest(string urlPathMatch = null)
         {
+	        _urlPathMatch = urlPathMatch;
 #if !NET472
             ApplicationBuilder = new ApplicationBuilder(null);
 #else
@@ -42,35 +45,61 @@ namespace Hangfire.Configuration.Test
             WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(), Options);
             ViewModelBuilder = BuildViewModelBuilder();
             ServerCountSampleRecorder = buildServerCountSampleRecorder();
-
-            _testServer = testServer(urlPathMatch);
+            //
+            // _testServer = testServer(urlPathMatch);
         }
 
-        private Lazy<TestServer> testServer(string urlPathMatch)
+        public class Things : IDisposable
         {
-            return new Lazy<TestServer>(() =>
+	        private readonly TestServer _server;
+	        private readonly HttpClient _client;
+
+	        public Things(TestServer server)
+	        {
+		        _server = server;
+#if !NET472
+		        _client = server.CreateClient();
+#else
+		        _client = server.HttpClient;
+#endif
+	        }
+
+	        public HttpClient TestClient => _client;
+	        
+	        public void Dispose()
+	        {
+		        _client.Dispose();
+		        _server.Dispose();
+	        }
+        }
+        
+        public Things Serveror() // (string urlPathMatch)
+        {
+            return new Things(
 #if !NET472
                         new TestServer(new WebHostBuilder().Configure(app =>
 #else
                     TestServer.Create(app =>
 #endif
                         {
-                            var url = urlPathMatch ?? "/config";
+                            var url = _urlPathMatch ?? "/config";
                             app.Properties.Add("CompositionRoot", this);
                             app.UseHangfireConfigurationUI(url, Options.ConfigurationOptions());
-                        }))
+                        })
+                    //)
 #if !NET472
                 )
 #endif
+	            )
                 ;
         }
 
 #if !NET472
         public ApplicationBuilder ApplicationBuilder { get; }
-        public HttpClient TestClient => _testServer.Value.CreateClient();
+        // public HttpClient TestClient => _testServer.Value.CreateClient();
 #else
         public AppBuilder ApplicationBuilder { get; }
-        public HttpClient TestClient => _testServer.Value.HttpClient;
+        // public HttpClient TestClient => _testServer.Value.HttpClient;
 #endif
 
         public FakeMonitoringApi Monitor { get; }

@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
-	[Collection("TryThis")]
 	public class MaxWorkersPerServerTest
 	{
 		[Fact]
@@ -17,18 +16,21 @@ namespace Hangfire.Configuration.Test.Web
 				Id = 1,
 			});
 
-			var response = system.TestClient.PostAsync(
-					"/config/saveMaxWorkersPerServer",
-					new StringContent(JsonConvert.SerializeObject(new
-					{
-						configurationId = 1,
-						maxWorkers = 5
-					})))
-				.Result;
+			using (var s = system.Serveror())
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/saveMaxWorkersPerServer",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 1,
+							maxWorkers = 5
+						})))
+					.Result;
 
-			Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+				Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+			}
 		}
-        
+
 		[Fact]
 		public void ShouldSaveEmpty()
 		{
@@ -39,17 +41,19 @@ namespace Hangfire.Configuration.Test.Web
 				MaxWorkersPerServer = 4
 			});
 
-			var response = system.TestClient.PostAsync(
-					"/config/saveMaxWorkersPerServer",
-					new StringContent(JsonConvert.SerializeObject(new
-					{
-						configurationId = 1,
-						maxWorkers = ""
-					})))
-				.Result;
+			using (var s = system.Serveror())
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/saveMaxWorkersPerServer",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 1,
+							maxWorkers = ""
+						})))
+					.Result;
 
-			Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+				Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+			}
 		}
-
 	}
 }
