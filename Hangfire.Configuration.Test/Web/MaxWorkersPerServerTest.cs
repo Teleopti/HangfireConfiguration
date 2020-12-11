@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test.Web
 				Id = 1,
 			});
 
-			using (var s = system.Serveror())
+			using (var s = new ServerUnderTest(system))
 			{
 				var response = s.TestClient.PostAsync(
 						"/config/saveMaxWorkersPerServer",
@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Web
 				MaxWorkersPerServer = 4
 			});
 
-			using (var s = system.Serveror())
+			using (var s = new ServerUnderTest(system))
 			{
 				var response = s.TestClient.PostAsync(
 						"/config/saveMaxWorkersPerServer",

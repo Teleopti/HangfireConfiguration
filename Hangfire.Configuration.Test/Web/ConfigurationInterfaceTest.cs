@@ -7,216 +7,212 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
-    public class ConfigurationInterfaceTest
-    {
-        [Fact]
-        public void ShouldFindConfigurationInterface()
-        {
-            var system = new SystemUnderTest("/config");
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.GetAsync("/config").Result;
-	            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-        }
+	public class ConfigurationInterfaceTest
+	{
+		[Fact]
+		public void ShouldFindConfigurationInterface()
+		{
+			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
+			{
+				var response = s.TestClient.GetAsync("/config").Result;
+				Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+			}
+		}
 
-        [Fact]
-        public void ShouldNotFindConfigurationInterface()
-        {
-            var system = new SystemUnderTest("/config");
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.GetAsync("/configIncorrect").Result;
-	            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            }
-        }
+		[Fact]
+		public void ShouldNotFindConfigurationInterface()
+		{
+			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
+			{
+				var response = s.TestClient.GetAsync("/configIncorrect").Result;
+				Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+			}
+		}
 
-        [Fact]
-        public void ShouldSaveWorkerGoalCount()
-        {
-            var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
-            {
-                Id = 1,
-                GoalWorkerCount = 3
-            });
+		[Fact]
+		public void ShouldSaveWorkerGoalCount()
+		{
+			var system = new SystemUnderTest();
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
+				Id = 1,
+				GoalWorkerCount = 3
+			});
 
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.PostAsync(
-			            "/config/saveWorkerGoalCount",
-			            new StringContent(JsonConvert.SerializeObject(new
-			            {
-				            configurationId = 1,
-				            workers = 10
-			            })))
-		            .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/saveWorkerGoalCount",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 1,
+							workers = 10
+						})))
+					.Result;
 
-	            Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-	            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-            }
-        }
+				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+				Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+			}
+		}
 
-        [Fact]
-        public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
-        {
-            var system = new SystemUnderTest();
-            system.Options.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
-            system.ConfigurationStorage.Has(new StoredConfiguration
-            {
-                Id = 1,
-                GoalWorkerCount = 3
-            });
+		[Fact]
+		public void ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
+		{
+			var system = new SystemUnderTest();
+			system.Options.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
+				Id = 1,
+				GoalWorkerCount = 3
+			});
 
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.PostAsync(
-			            "/config/saveWorkerGoalCount",
-			            new StringContent(JsonConvert.SerializeObject(new
-			            {
-				            configurationId = 1,
-				            workers = 11
-			            })))
-		            .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/saveWorkerGoalCount",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 1,
+							workers = 11
+						})))
+					.Result;
 
-	            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-	            var message = response.Content.ReadAsStringAsync().Result;
-	            Assert.NotEmpty(message);
-	            Assert.DoesNotContain("<", message);
-            }
-        }
+				Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+				var message = response.Content.ReadAsStringAsync().Result;
+				Assert.NotEmpty(message);
+				Assert.DoesNotContain("<", message);
+			}
+		}
 
-        [Fact]
-        public void ShouldSaveWorkerGoalCountWithEmptyDatabase()
-        {
-            var system = new SystemUnderTest();
+		[Fact]
+		public void ShouldSaveWorkerGoalCountWithEmptyDatabase()
+		{
+			var system = new SystemUnderTest();
 
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.PostAsync(
-			            "/config/saveWorkerGoalCount",
-			            new StringContent(JsonConvert.SerializeObject(new
-			            {
-				            workers = 10
-			            })))
-		            .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/saveWorkerGoalCount",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							workers = 10
+						})))
+					.Result;
 
-	            Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-	            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-            }
-        }
+				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+				Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+			}
+		}
 
-        [Fact]
-        public void ShouldActivateServer()
-        {
-            var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
-            {
-                Id = 2
-            });
+		[Fact]
+		public void ShouldActivateServer()
+		{
+			var system = new SystemUnderTest();
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
+				Id = 2
+			});
 
-            using (var s = system.Serveror())
-            {
-	            var response = s.TestClient.PostAsync(
-			            "/config/activateServer",
-			            new StringContent(JsonConvert.SerializeObject(new
-			            {
-				            configurationId = 2
-			            })))
-		            .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/activateServer",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 2
+						})))
+					.Result;
 
-	            Assert.True(system.ConfigurationStorage.Data.Single().Active);
-            }
-        }
+				Assert.True(system.ConfigurationStorage.Data.Single().Active);
+			}
+		}
 
-        [Fact]
-        public void ShouldCreateNewServerConfiguration()
-        {
-	        var system = new SystemUnderTest();
+		[Fact]
+		public void ShouldCreateNewServerConfiguration()
+		{
+			var system = new SystemUnderTest();
 
-	        using (var s = system.Serveror())
-	        {
-		        var response = s.TestClient.PostAsync(
-				        "/config/createNewServerConfiguration",
-				        new StringContent(JsonConvert.SerializeObject(
-					        new
-					        {
-						        server = ".",
-						        database = "database",
-						        user = "user",
-						        password = "password",
-						        schemaName = "TestSchema",
-						        schemaCreatorUser = "schemaCreatorUser",
-						        schemaCreatorPassword = "schemaCreatorPassword"
-					        })))
-			        .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/createNewServerConfiguration",
+						new StringContent(JsonConvert.SerializeObject(
+							new
+							{
+								server = ".",
+								database = "database",
+								user = "user",
+								password = "password",
+								schemaName = "TestSchema",
+								schemaCreatorUser = "schemaCreatorUser",
+								schemaCreatorPassword = "schemaCreatorPassword"
+							})))
+					.Result;
 
-		        Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-		        Assert.Contains("database", system.ConfigurationStorage.Data.Single().ConnectionString);
-	        }
-        }
+				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
+				Assert.Contains("database", system.ConfigurationStorage.Data.Single().ConnectionString);
+			}
+		}
 
-        [Fact]
-        public void ShouldCreateNewServerConfigurationWithName()
-        {
-	        var system = new SystemUnderTest();
+		[Fact]
+		public void ShouldCreateNewServerConfigurationWithName()
+		{
+			var system = new SystemUnderTest();
 
-	        using (var s = system.Serveror())
-	        {
-		        var response = s.TestClient.PostAsync(
-				        "/config/createNewServerConfiguration",
-				        new StringContent(JsonConvert.SerializeObject(
-					        new
-					        {
-						        server = ".",
-						        name = "name",
-						        database = "database",
-						        user = "user",
-						        password = "password",
-						        schemaName = "TestSchema",
-						        schemaCreatorUser = "schemaCreatorUser",
-						        schemaCreatorPassword = "schemaCreatorPassword"
-					        })))
-			        .Result;
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/createNewServerConfiguration",
+						new StringContent(JsonConvert.SerializeObject(
+							new
+							{
+								server = ".",
+								name = "name",
+								database = "database",
+								user = "user",
+								password = "password",
+								schemaName = "TestSchema",
+								schemaCreatorUser = "schemaCreatorUser",
+								schemaCreatorPassword = "schemaCreatorPassword"
+							})))
+					.Result;
 
-		        Assert.Equal("name", system.ConfigurationStorage.Data.Single().Name);
-	        }
-        }
+				Assert.Equal("name", system.ConfigurationStorage.Data.Single().Name);
+			}
+		}
 
-        [Fact]
-        public void ShouldNotFindUnknownAction()
-        {
-	        var system = new SystemUnderTest("/config");
+		[Fact]
+		public void ShouldNotFindUnknownAction()
+		{
+			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
+			{
+				var response = s.TestClient.GetAsync("/config/unknownAction").Result;
+				Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+			}
+		}
 
-	        using (var s = system.Serveror())
-	        {
-		        var response = s.TestClient.GetAsync("/config/unknownAction").Result;
-		        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-	        }
-        }
+		[Fact]
+		public void ShouldInactivateServer()
+		{
+			var system = new SystemUnderTest();
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
+				Id = 3,
+				Active = true
+			});
 
-        [Fact]
-        public void ShouldInactivateServer()
-        {
-	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
-	        {
-		        Id = 3,
-		        Active = true
-	        });
+			using (var s = new ServerUnderTest(system))
+			{
+				var response = s.TestClient.PostAsync(
+						"/config/inactivateServer",
+						new StringContent(JsonConvert.SerializeObject(new
+						{
+							configurationId = 3
+						})))
+					.Result;
 
-	        using (var s = system.Serveror())
-	        {
-		        var response = s.TestClient.PostAsync(
-				        "/config/inactivateServer",
-				        new StringContent(JsonConvert.SerializeObject(new
-				        {
-					        configurationId = 3
-				        })))
-			        .Result;
-
-		        Assert.False(system.ConfigurationStorage.Data.Single().Active);
-	        }
-        }
-    }
+				Assert.False(system.ConfigurationStorage.Data.Single().Active);
+			}
+		}
+	}
 }
