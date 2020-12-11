@@ -123,6 +123,19 @@ BEGIN
 SET @CURRENT_SCHEMA_VERSION = 4;
 END
 
+IF @CURRENT_SCHEMA_VERSION < 5 AND @TARGET_SCHEMA_VERSION >= 5
+BEGIN
+    
+    PRINT 'Installing HangfireConfiguration schema version 5';
+    
+    ALTER TABLE [$(HangfireConfigurationSchema)].[Configuration]
+    ADD MaxWorkersPerServer [INT] NULL
+	
+	PRINT 'Added MaxWorkersPerServer column in [$(HangfireConfigurationSchema)].[Configuration]';
+    
+SET @CURRENT_SCHEMA_VERSION = 5;
+END
+
 
 
 UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA_VERSION
