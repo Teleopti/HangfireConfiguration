@@ -3,37 +3,36 @@ using Hangfire.Storage;
 
 namespace Hangfire.Configuration
 {
-	public class WorkerDeterminer
-	{
-		private readonly ServerCountDeterminer _serverCountDeterminer;
+    public class WorkerDeterminer
+    {
+        private readonly ServerCountDeterminer _serverCountDeterminer;
 
-		public WorkerDeterminer(IKeyValueStore store)
-		{
-			_serverCountDeterminer = new ServerCountDeterminer(store);
-		}
+        public WorkerDeterminer(IKeyValueStore store)
+        {
+            _serverCountDeterminer = new ServerCountDeterminer(store);
+        }
 
-		internal int DetermineWorkerCount(IMonitoringApi monitor,
-			StoredConfiguration configuration,
-			WorkerDeterminerOptions options)
-		{
-			var goal = configuration.GoalWorkerCount ?? options.DefaultGoalWorkerCount;
-			if (goal > options.MaximumGoalWorkerCount)
-				goal = options.MaximumGoalWorkerCount;
+        internal int DetermineWorkerCount(IMonitoringApi monitor,
+	        StoredConfiguration configuration,
+	        WorkerDeterminerOptions options)
+        {
+            var goal = configuration.GoalWorkerCount ?? options.DefaultGoalWorkerCount;
+            if (goal > options.MaximumGoalWorkerCount)
+                goal = options.MaximumGoalWorkerCount;
 
-			var serverCount = _serverCountDeterminer.DetermineServerCount(monitor, options);
+            var serverCount = _serverCountDeterminer.DetermineServerCount(monitor, options);
+            
+            var workerCount = Convert.ToInt32(Math.Ceiling(goal / ((decimal) serverCount)));
+            
+            var maxWorkers = configuration.MaxWorkersPerServer;
+            if (maxWorkers.HasValue && workerCount > maxWorkers)
+	            workerCount = maxWorkers.Value;
+            
+            if (workerCount < options.MinimumWorkerCount)
+                workerCount = options.MinimumWorkerCount;
 
-			var workerCount = Convert.ToInt32(Math.Ceiling(goal / ((decimal) serverCount)));
+            return workerCount;
+        }
 
-			if (configuration.MaxWorkersPerServer.HasValue)
-			{
-				if (workerCount > configuration.MaxWorkersPerServer.Value)
-					workerCount = configuration.MaxWorkersPerServer.Value;
-			}
-
-			if (workerCount < options.MinimumWorkerCount)
-				workerCount = options.MinimumWorkerCount;
-
-			return workerCount;
-		}
-	}
+    }
 }

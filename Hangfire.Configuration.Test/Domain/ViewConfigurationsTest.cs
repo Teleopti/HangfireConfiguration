@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
@@ -141,7 +140,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithMaxWorkersPerServer()
         {
             var system = new SystemUnderTest();
-            system.WithMaxWorkersPerServer(5);
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            MaxWorkersPerServer = 5
+            });
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
