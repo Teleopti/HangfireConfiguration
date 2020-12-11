@@ -12,25 +12,29 @@ namespace Hangfire.Configuration.Test.Web
 		[Fact]
 		public void ShouldSave()
 		{
-			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			var test = new ConcurrencyRunner();
+			test.InParallel(() =>
 			{
-				Id = 1,
+				var system = new SystemUnderTest();
+				system.ConfigurationStorage.Has(new StoredConfiguration
+				{
+					Id = 1,
+				});
+
+				using (var s = new ServerUnderTest(system))
+				{
+					var response = s.TestClient.PostAsync(
+							"/config/saveMaxWorkersPerServer",
+							new StringContent(JsonConvert.SerializeObject(new
+							{
+								configurationId = 1,
+								maxWorkers = 5
+							})))
+						.Result;
+
+					Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+				}
 			});
-
-			using (var s = new ServerUnderTest(system))
-			{
-				var response = s.TestClient.PostAsync(
-						"/config/saveMaxWorkersPerServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 1,
-							maxWorkers = 5
-						})))
-					.Result;
-
-				Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
-			}
 		}
 
 		[Fact]
