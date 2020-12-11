@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
+	[Collection("TryThis")]
 	public class MaxWorkersPerServerTest
 	{
 		[Fact]
