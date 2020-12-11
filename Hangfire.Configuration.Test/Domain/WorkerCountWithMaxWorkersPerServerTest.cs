@@ -1,4 +1,5 @@
 using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain
