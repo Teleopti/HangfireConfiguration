@@ -22,9 +22,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0"/>
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="System.Transactions"/>
-	</ItemGroup>
-	<ItemGroup>
 		<None Remove="Install.sql"/>
 		<EmbeddedResource Include="Install.sql"/>
 		<None Remove="Pages\script.js"/>
