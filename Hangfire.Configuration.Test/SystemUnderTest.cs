@@ -1,7 +1,5 @@
 #if !NET472
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder.Internal;
+using Microsoft.AspNetCore.Builder;
 #else
 using Microsoft.Owin.Testing;
 using Microsoft.Owin.Builder;

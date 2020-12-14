@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ConsoleSample</RootNamespace>
-		<TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
+		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.csproj"/>
@@ -10,7 +10,7 @@
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
 		<PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1"/>
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0"/>
 		<PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0"/>
 	</ItemGroup>

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 #else
 using Microsoft.Owin;
 
@@ -56,10 +57,16 @@ namespace Hangfire.Configuration.Web
 
 #if NETSTANDARD2_0
         private void handleRequest(HttpContext context)
+        {
+	        var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
+	        if (syncIoFeature != null)
+		        syncIoFeature.AllowSynchronousIO = true;
+	        
 #else
         private void handleRequest(IOwinContext context)
-#endif
         {
+#endif
+	        
             if (context.Request.Path.Value.Equals("/script"))
             {
                 context.Response.StatusCode = (int) HttpStatusCode.OK;

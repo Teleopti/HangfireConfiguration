@@ -1,55 +1,74 @@
 ﻿using System;
 using System.Net.Http;
-using Hangfire.Configuration.Test.Web;
+using Xunit;
 #if !NET472
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder.Internal;
-
 #else
 using Microsoft.Owin.Testing;
 using Microsoft.Owin.Builder;
+
 #endif
 
 namespace Hangfire.Configuration.Test
 {
 	public class ServerUnderTest : IDisposable
 	{
-		private readonly TestServer _server;
+		private readonly IDisposable _server;
 		private readonly HttpClient _client;
 
 		public ServerUnderTest(CompositionRoot compositionRoot, string urlPathMatch = null)
 		{
-			_server =
+			var (server, client) = createServer(compositionRoot, urlPathMatch);
+
+			_server = server;
+			_client = client;
+		}
+
 #if !NET472
-				new TestServer(new WebHostBuilder().Configure(app =>
-#else
-				TestServer.Create(app =>
-#endif
+		private static (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot, string urlPathMatch)
+		{
+			var server = new HostBuilder()
+				.ConfigureWebHost(webHost =>
+				{
+					webHost.UseTestServer();
+					webHost.Configure(app =>
 					{
 						var url = urlPathMatch ?? "/config";
 						app.Properties.Add("CompositionRoot", compositionRoot);
 						app.UseHangfireConfigurationUI(url, compositionRoot.BuildOptions().ConfigurationOptions());
-					})
-#if !NET472
-				);
-#else
-				;
-#endif
+					});
+				})
+				.StartAsync()
+				.Result;
 
-#if !NET472
-			_client = _server.CreateClient();
-#else
-		    _client = _server.HttpClient;
-#endif
+			return (server, server.GetTestClient());
 		}
+
+#else
+		private static (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot, string urlPathMatch)
+		{
+			var server = TestServer.Create(app =>
+			{
+				var url = urlPathMatch ?? "/config";
+				app.Properties.Add("CompositionRoot", compositionRoot);
+				app.UseHangfireConfigurationUI(url, compositionRoot.BuildOptions().ConfigurationOptions());
+			});
+
+			return (server, server.HttpClient);
+		}
+
+#endif
 
 		public HttpClient TestClient => _client;
 
 		public void Dispose()
 		{
-			_client.Dispose();
-			_server.Dispose();
+			_client?.Dispose();
+			_server?.Dispose();
 		}
 	}
 }

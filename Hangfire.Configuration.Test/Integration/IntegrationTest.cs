@@ -4,7 +4,6 @@ using Xunit;
 #if !NET472
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Builder.Internal;
 #else
 using Microsoft.Owin.Testing;
 #endif
