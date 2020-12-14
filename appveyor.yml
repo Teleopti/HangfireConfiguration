@@ -18,6 +18,9 @@ before_build:
 - cmd: nuget restore
 build:
   verbosity: minimal
+test:
+  assemblies:
+    - Hangfire.Configuration.Test
 artifacts:
 - path: '**\*.nupkg'
   name: NuGet packages
