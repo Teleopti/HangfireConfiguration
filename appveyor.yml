@@ -24,9 +24,9 @@ artifacts:
 - path: '**\testlog.log'
   name: TestLog
 deploy:
-- provider: NuGet
-  api_key:
-    secure:  9C1VMdj5xt4bgCaMPxWCrjCZX/g6HLA1GPNcbSXCqoZ696eM6OYNi5EsetdXWVDk
+#- provider: NuGet
+#  api_key:
+#    secure:  9C1VMdj5xt4bgCaMPxWCrjCZX/g6HLA1GPNcbSXCqoZ696eM6OYNi5EsetdXWVDk
 # after build failure or success
 #on_finish:
 #- ps: Get-ChildItem .\**\testlog.log | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
