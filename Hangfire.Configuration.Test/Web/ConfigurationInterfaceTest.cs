@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +7,7 @@ using Xunit;
 
 namespace Hangfire.Configuration.Test.Web
 {
+	[Collection("NotParallel")]
 	public class ConfigurationInterfaceTest
 	{
 		[Fact]
