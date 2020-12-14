@@ -17,14 +17,11 @@ namespace Hangfire.Configuration.Test.Integration
         [Fact(Skip = "Sus"), CleanDatabase]
         public void ShouldNotInsertMultiple()
         {
-            new HangfireSchemaCreator().CreateHangfireSchema(null, ConnectionUtils.GetConnectionString());
             Parallel.ForEach(Enumerable.Range(1, 10), (item) =>
             {
-#if !NET472
-                new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
-#else
-                TestServer.Create<TestStartup>();
-#endif
+	            using (new HangfireServerUnderTest())
+	            {
+	            }
             });
 
             Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
