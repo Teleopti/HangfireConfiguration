@@ -19,17 +19,20 @@ namespace Hangfire.Configuration.Test
 	{
 		private readonly IDisposable _server;
 		private readonly HttpClient _client;
+		private readonly string _urlPathMatch;
 
 		public ServerUnderTest(CompositionRoot compositionRoot, string urlPathMatch = null)
 		{
-			var (server, client) = createServer(compositionRoot, urlPathMatch);
+			_urlPathMatch = urlPathMatch ?? "/config";
+			
+			var (server, client) = createServer(compositionRoot);
 
 			_server = server;
 			_client = client;
 		}
 
 #if !NET472
-		private static (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot, string urlPathMatch)
+		private (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot)
 		{
 			var server = new HostBuilder()
 				.ConfigureWebHost(webHost =>
@@ -37,9 +40,8 @@ namespace Hangfire.Configuration.Test
 					webHost.UseTestServer();
 					webHost.Configure(app =>
 					{
-						var url = urlPathMatch ?? "/config";
 						app.Properties.Add("CompositionRoot", compositionRoot);
-						app.UseHangfireConfigurationUI(url, compositionRoot.BuildOptions().ConfigurationOptions());
+						app.UseHangfireConfigurationUI(_urlPathMatch, compositionRoot.BuildOptions().ConfigurationOptions());
 					});
 				})
 				.StartAsync()
@@ -49,13 +51,12 @@ namespace Hangfire.Configuration.Test
 		}
 
 #else
-		private static (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot, string urlPathMatch)
+		private (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot)
 		{
 			var server = TestServer.Create(app =>
 			{
-				var url = urlPathMatch ?? "/config";
 				app.Properties.Add("CompositionRoot", compositionRoot);
-				app.UseHangfireConfigurationUI(url, compositionRoot.BuildOptions().ConfigurationOptions());
+				app.UseHangfireConfigurationUI(_urlPathMatch, compositionRoot.BuildOptions().ConfigurationOptions());
 			});
 
 			return (server, server.HttpClient);
