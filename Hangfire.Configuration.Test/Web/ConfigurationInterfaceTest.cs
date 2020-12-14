@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Web
 		[Fact]
 		public void ShouldFindConfigurationInterface()
 		{
-			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config", "ShouldFindConfigurationInterface"))
+			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
 			{
 				var response = s.TestClient.GetAsync("/config").Result;
 				Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -202,7 +202,7 @@ namespace Hangfire.Configuration.Test.Web
 				Active = true
 			});
 
-			using (var s = new ServerUnderTest(system, null, "ShouldInactivateServer"))
+			using (var s = new ServerUnderTest(system, null))
 			{
 				var response = s.TestClient.PostAsync(
 						"/config/inactivateServer",

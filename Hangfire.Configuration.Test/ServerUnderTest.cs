@@ -15,14 +15,11 @@ namespace Hangfire.Configuration.Test
 {
 	public class ServerUnderTest : IDisposable
 	{
-		private readonly string _test;
 		private readonly TestServer _server;
 		private readonly HttpClient _client;
 
-		public ServerUnderTest(CompositionRoot compositionRoot, string urlPathMatch = null, string test = null)
+		public ServerUnderTest(CompositionRoot compositionRoot, string urlPathMatch = null)
 		{
-			_test = test;
-
 			_server =
 #if !NET472
 				new TestServer(new WebHostBuilder().Configure(app =>
