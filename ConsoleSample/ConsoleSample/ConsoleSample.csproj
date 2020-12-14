@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>ConsoleSample</RootNamespace>
-    <TargetFrameworks>net472;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-    <PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' or '$(TargetFramework)'=='netcoreapp2.1'">
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<RootNamespace>ConsoleSample</RootNamespace>
+		<TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.csproj"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+		<PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0"/>
+	</ItemGroup>
 </Project>

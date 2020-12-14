@@ -1,34 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <RootNamespace>Hangfire.Configuration</RootNamespace>
-        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>0</Version>
-        <RepositoryUrl>https://github.com/Teleopti/HangfireConfiguration.git</RepositoryUrl>
-        <RepositoryType>git</RepositoryType> 
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="Dapper" Version="1.60.6" />
-        <PackageReference Include="Hangfire.Core" Version="1.7.10" />
-        <PackageReference Include="Hangfire.SqlServer" Version="1.7.10" />
-        <PackageReference Include="Polly" Version="7.2.0" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-        <PackageReference Include="Microsoft.Owin" Version="4.0.1" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-        <PackageReference Include="Hangfire.AspNetCore" Version="1.7.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
-    </ItemGroup>
-    <ItemGroup>
-        <Reference Include="System.Transactions" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Remove="Install.sql" />
-        <EmbeddedResource Include="Install.sql" />
-        <None Remove="Pages\script.js" />
-        <EmbeddedResource Include="Web\script.js" />
-        <None Remove="Pages\styles.css" />
-        <EmbeddedResource Include="Web\styles.css" />
-    </ItemGroup>
+	<PropertyGroup>
+		<RootNamespace>Hangfire.Configuration</RootNamespace>
+		<TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>0</Version>
+		<RepositoryUrl>https://github.com/Teleopti/HangfireConfiguration.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="1.60.6"/>
+		<PackageReference Include="Hangfire.Core" Version="1.7.10"/>
+		<PackageReference Include="Hangfire.SqlServer" Version="1.7.10"/>
+		<PackageReference Include="Polly" Version="7.2.0"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+		<PackageReference Include="Microsoft.Owin" Version="4.0.1"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.10"/>
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0"/>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Transactions"/>
+	</ItemGroup>
+	<ItemGroup>
+		<None Remove="Install.sql"/>
+		<EmbeddedResource Include="Install.sql"/>
+		<None Remove="Pages\script.js"/>
+		<EmbeddedResource Include="Web\script.js"/>
+		<None Remove="Pages\styles.css"/>
+		<EmbeddedResource Include="Web\styles.css"/>
+	</ItemGroup>
 </Project>
