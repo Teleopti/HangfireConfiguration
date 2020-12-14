@@ -7,19 +7,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 #else
 using Microsoft.Owin.Testing;
-
 #endif
-
 
 namespace Hangfire.Configuration.Test.Integration
 {
     [Collection("NotParallel")]
-    public class AutoUpdateConcurrencyTest : XunitContextBase
+    public class AutoUpdateConcurrencyTest
     {
-        public AutoUpdateConcurrencyTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
         [Fact, CleanDatabase]
         public void ShouldNotInsertMultiple()
         {
