@@ -1,30 +1,29 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
-#if !NET472
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-#else
-using Microsoft.Owin.Testing;
-#endif
 
 namespace Hangfire.Configuration.Test.Integration
 {
-    [Collection("NotParallel")]
-    public class AutoUpdateConcurrencyTest
-    {
-        [Fact(Skip = "Sus"), CleanDatabase]
-        public void ShouldNotInsertMultiple()
-        {
-            Parallel.ForEach(Enumerable.Range(1, 10), (item) =>
-            {
-	            using (new HangfireServerUnderTest())
-	            {
-	            }
-            });
+	[Collection("NotParallel")]
+	public class AutoUpdateConcurrencyTest
+	{
+		[Fact, CleanDatabase]
+		public void ShouldNotInsertMultiple()
+		{
+			Parallel.ForEach(Enumerable.Range(1, 10), (item) =>
+			{
+				var system = new SystemUnderInfraTest();
+				system.WithOptions(new ConfigurationOptions
+				{
+					ConnectionString = ConnectionUtils.GetConnectionString(),
+					AutoUpdatedHangfireConnectionString = ConnectionUtils.GetConnectionString()
+				});
+				system
+					.BuildWorkerServerStarter(null)
+					.Start(null);
+			});
 
-            Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
-        }
-    }
+			Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
+		}
+	}
 }
