@@ -20,7 +20,7 @@ build:
   verbosity: minimal
 test:
   assemblies:
-    - Hangfire.Configuration.Test
+    - Hangfire.Configuration.Test.dll
 artifacts:
 - path: '**\*.nupkg'
   name: NuGet packages
