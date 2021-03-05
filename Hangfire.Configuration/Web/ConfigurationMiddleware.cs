@@ -46,33 +46,32 @@ namespace Hangfire.Configuration.Web
         }
 
 #if NETSTANDARD2_0
-        public Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context)
 #else
-        public override Task Invoke(IOwinContext context)
+        public override async Task Invoke(IOwinContext context)
 #endif
-        {
-            handleRequest(context);
-            return Task.CompletedTask;
+		{
+			await handleRequest(context);
         }
 
 #if NETSTANDARD2_0
-        private void handleRequest(HttpContext context)
+        private async Task handleRequest(HttpContext context)
         {
 	        var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
 	        if (syncIoFeature != null)
 		        syncIoFeature.AllowSynchronousIO = true;
-	        
+
 #else
-        private void handleRequest(IOwinContext context)
+        private async Task handleRequest(IOwinContext context)
         {
 #endif
-	        
-            if (context.Request.Path.Value.Equals("/script"))
+
+			if (context.Request.Path.Value.Equals("/script"))
             {
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
                 context.Response.ContentType = "application/javascript";
                 using (var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.script.js"))
-                    stream.CopyTo(context.Response.Body);
+                    await stream.CopyToAsync(context.Response.Body);
                 return;
             }
 
@@ -81,37 +80,44 @@ namespace Hangfire.Configuration.Web
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
                 context.Response.ContentType = "text/css";
                 using (var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css"))
-                    stream.CopyTo(context.Response.Body);
+                    await stream.CopyToAsync(context.Response.Body);
                 return;
             }
 
-            if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
+            var authorized = _options.Authorization?.Authorize(context);
+            if (authorized.HasValue && !authorized.Value)
             {
-                processRequest(context, () => saveWorkerGoalCount(context));
+	            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+				return;
+            }
+
+			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
+            {
+                await processRequest(context, async () => await saveWorkerGoalCount(context));
                 return;
             }
             
             if (context.Request.Path.Value.Equals("/saveMaxWorkersPerServer"))
             {
-	            processRequest(context, () => saveMaxWorkersPerServer(context));
+	            await processRequest(context, async () => await saveMaxWorkersPerServer(context));
 	            return;
             }
 
             if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
             {
-                processRequest(context, () => createNewServerConfiguration(context));
+                await processRequest(context, async () => await createNewServerConfiguration(context));
                 return;
             }
 
             if (context.Request.Path.Value.Equals("/activateServer"))
             {
-                processRequest(context, () => { _configurationApi.ActivateServer(parseConfigurationId(context)); });
+                await processRequest(context, async () => { _configurationApi.ActivateServer(await parseConfigurationId(context)); });
                 return;
             }
 
             if (context.Request.Path.Value.Equals("/inactivateServer"))
             {
-                processRequest(context, () => { _configurationApi.InactivateServer(parseConfigurationId(context)); });
+                await processRequest(context, async () => { _configurationApi.InactivateServer(await parseConfigurationId(context)); });
                 return;
             }
 
@@ -121,28 +127,28 @@ namespace Hangfire.Configuration.Web
                 return;
             }
 
-            processRequest(context, () =>
+            await processRequest(context, async () =>
             {
-                var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
-                var html = page.ToString();
-                context.Response.WriteAsync(html).Wait();
+	            var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
+	            var html = page.ToString();
+	            await context.Response.WriteAsync(html);
             });
         }
 
 #if NETSTANDARD2_0
-        private int parseConfigurationId(HttpContext context) =>
+        private async Task<int> parseConfigurationId(HttpContext context) =>
 #else
-        private int parseConfigurationId(IOwinContext context) =>
+        private async Task<int> parseConfigurationId(IOwinContext context) =>
 #endif
-            parseRequestBody(context.Request).SelectToken("configurationId").Value<int>();
+			(await parseRequestBody(context.Request)).SelectToken("configurationId").Value<int>();
 
 #if NETSTANDARD2_0
-        private void saveWorkerGoalCount(HttpContext context)
+        private async Task saveWorkerGoalCount(HttpContext context)
 #else
-        private void saveWorkerGoalCount(IOwinContext context)
+        private async Task saveWorkerGoalCount(IOwinContext context)
 #endif
-        {
-            var parsed = parseRequestBody(context.Request);
+		{
+			var parsed = await parseRequestBody(context.Request);
             _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
             {
                 ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
@@ -152,12 +158,12 @@ namespace Hangfire.Configuration.Web
         }
         
 #if NETSTANDARD2_0
-        private void saveMaxWorkersPerServer(HttpContext context)
+        private async Task saveMaxWorkersPerServer(HttpContext context)
 #else
-        private void saveMaxWorkersPerServer(IOwinContext context)
+        private async Task saveMaxWorkersPerServer(IOwinContext context)
 #endif
-        {
-	        var parsed = parseRequestBody(context.Request);
+		{
+			var parsed = await parseRequestBody(context.Request);
 	        _configurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
 	        {
 		        ConfigurationId = parsed.SelectToken("configurationId").Value<int>(),
@@ -167,12 +173,12 @@ namespace Hangfire.Configuration.Web
         }
 
 #if NETSTANDARD2_0
-        private void createNewServerConfiguration(HttpContext context)
+        private async Task createNewServerConfiguration(HttpContext context)
 #else
-        private void createNewServerConfiguration(IOwinContext context)
+        private async Task createNewServerConfiguration(IOwinContext context)
 #endif
-        {
-            var parsed = parseRequestBody(context.Request);
+		{
+			var parsed = await parseRequestBody(context.Request);
             var configuration = new CreateServerConfiguration
             {
                 Name = parsed.SelectToken("name")?.Value<string>(),
@@ -188,14 +194,16 @@ namespace Hangfire.Configuration.Web
         }
 
 #if NETSTANDARD2_0
-        private JObject parseRequestBody(HttpRequest request)
+        private async Task<JObject> parseRequestBody(HttpRequest request)
 #else
-        private JObject parseRequestBody(IOwinRequest request)
+        private async Task<JObject> parseRequestBody(IOwinRequest request)
 #endif
         {
             string text;
             using (var reader = new StreamReader(request.Body))
-                text = reader.ReadToEnd();
+                text = await reader.ReadToEndAsync();
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Request empty", nameof(request));
+
             var parsed = JObject.Parse(text);
             return parsed;
         }
@@ -204,21 +212,21 @@ namespace Hangfire.Configuration.Web
             int.TryParse(value, out var outValue) ? (int?) outValue : null;
 
 #if NETSTANDARD2_0
-        private void processRequest(HttpContext context, Action action)
+        private async Task processRequest(HttpContext context, Func<Task> action)
 #else
-        private void processRequest(IOwinContext context, Action action)
+        private async Task processRequest(IOwinContext context, Func<Task> action)
 #endif
-        {
-            try
+		{
+			try
             {
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
                 context.Response.ContentType = "text/html";
-                action.Invoke();
+                await action.Invoke();
             }
             catch (Exception ex)
             {
                 context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                context.Response.WriteAsync(ex.Message).Wait();
+                await context.Response.WriteAsync(ex.Message);
             }
         }
     }

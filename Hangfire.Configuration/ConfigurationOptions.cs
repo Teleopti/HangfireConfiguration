@@ -1,4 +1,9 @@
 using System.Collections.Generic;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.Http;
+#else
+using Microsoft.Owin;
+#endif
 
 namespace Hangfire.Configuration
 {
@@ -16,7 +21,18 @@ namespace Hangfire.Configuration
 
         public bool UseWorkerDeterminer { get; set; } = true;
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new WorkerDeterminerOptions();
+
+        public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
     }
+
+    public interface IHangfireConfigurationAuthorizationFilter
+    {
+#if NETSTANDARD2_0
+		bool Authorize(HttpContext context);
+#else
+	    bool Authorize(IOwinContext context);
+#endif
+	}
 
     public class WorkerDeterminerOptions
     {
