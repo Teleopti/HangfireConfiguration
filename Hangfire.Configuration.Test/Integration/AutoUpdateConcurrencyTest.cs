@@ -10,8 +10,8 @@ namespace Hangfire.Configuration.Test.Integration
 		[Fact, CleanDatabase]
 		public void ShouldNotInsertMultiple()
 		{
-			//Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
-			//{
+			Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
+			{
 			var system = new SystemUnderInfraTest();
 			system.WithOptions(new ConfigurationOptions
 			{
@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Integration
 			system
 				.BuildWorkerServerStarter(null)
 				.Start(null);
-			//});
+			});
 
 			Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
 		}
