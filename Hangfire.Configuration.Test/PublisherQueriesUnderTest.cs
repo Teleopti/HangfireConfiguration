@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
@@ -15,7 +16,7 @@ namespace Hangfire.Configuration.Test
         }
 
         public IEnumerable<ConfigurationInfo> QueryPublishers()
-            => QueryPublishers(null, null);
+            => _instance.QueryPublishers();
         
         public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
@@ -25,5 +26,14 @@ namespace Hangfire.Configuration.Test
                 _options.UseStorageOptions(storageOptions);
             return _instance.QueryPublishers();
         }
-    }
+
+        public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, PostgreSqlStorageOptions storageOptions)
+        {
+	        if (options != null)
+		        _options.UseOptions(options);
+	        if (storageOptions != null)
+		        _options.UseStorageOptions(storageOptions);
+	        return _instance.QueryPublishers();
+        }
+	}
 }

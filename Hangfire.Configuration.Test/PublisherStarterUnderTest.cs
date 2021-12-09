@@ -1,4 +1,5 @@
-﻿using Hangfire.SqlServer;
+using Hangfire.PostgreSql;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
@@ -13,7 +14,13 @@ namespace Hangfire.Configuration.Test
             _options = options;
         }
 
-        public void Start() => Start(null, null);
+        public void Start()
+        {
+			new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString())
+				.SelectDialectVoid(
+					() => Start(null, (SqlServerStorageOptions)null), 
+					() => Start(null, (PostgreSqlStorageOptions)null));
+        }
 
         public void Start(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
@@ -23,5 +30,14 @@ namespace Hangfire.Configuration.Test
                 _options.UseStorageOptions(storageOptions);
             _instance.Start();
         }
-    }
+
+        public void Start(ConfigurationOptions options, PostgreSqlStorageOptions storageOptions)
+        {
+	        if (options != null)
+		        _options.UseOptions(options);
+	        if (storageOptions != null)
+		        _options.UseStorageOptions(storageOptions);
+	        _instance.Start();
+        }
+	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using Npgsql;
 
 namespace Hangfire.Configuration
 {
@@ -19,22 +20,46 @@ namespace Hangfire.Configuration
             return _storage.ReadConfigurations()
                 .Select((x, i) =>
                 {
-                    var connectionString = new SqlConnectionStringBuilder(x.ConnectionString);
-                    var schemaName = x.SchemaName;
-                    if (x.ConnectionString != null)
-                        schemaName = schemaName ?? DefaultSchemaName.Name();
-                    return new ViewModel
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        ServerName = string.IsNullOrEmpty(connectionString.DataSource) ? null : connectionString.DataSource,
-                        DatabaseName = string.IsNullOrEmpty(connectionString.InitialCatalog) ? null : connectionString.InitialCatalog,
-                        SchemaName = schemaName,
-                        Active = x.Active,
-                        Workers = x.GoalWorkerCount,
-                        MaxWorkersPerServer = x.MaxWorkersPerServer
-                    };
+	                var schemaName = x.SchemaName;
+	                if (x.ConnectionString != null)
+		                schemaName = schemaName ?? DefaultSchemaName.Name(x.ConnectionString);
+	                
+	                if (string.IsNullOrEmpty(x.ConnectionString))
+	                {
+		                return GetViewModel(x, null, null, schemaName);
+	                }
+					
+
+	                return new ConnectionStringDialectSelector(x.ConnectionString)
+		                .SelectDialect(
+			                () =>
+			                {
+				                var builder = new SqlConnectionStringBuilder(x.ConnectionString);
+				                return GetViewModel(x, builder.DataSource, builder.InitialCatalog, schemaName);
+			                },
+			                () =>
+			                {
+				                var builder = new NpgsqlConnectionStringBuilder(x.ConnectionString);
+				                return GetViewModel(x, builder.Host, builder.Database, schemaName);
+							});
+
+					
                 }).ToArray();
+        }
+
+        private static ViewModel GetViewModel(StoredConfiguration configuration, string serverName, string databaseName, string schemaName)
+        {
+	        return new ViewModel
+	        {
+		        Id = configuration.Id,
+		        Name = configuration.Name,
+		        ServerName = string.IsNullOrEmpty(serverName) ? null : serverName,
+		        DatabaseName = string.IsNullOrEmpty(databaseName) ? null : databaseName,
+		        SchemaName = schemaName,
+		        Active = configuration.Active,
+		        Workers = configuration.GoalWorkerCount,
+		        MaxWorkersPerServer = configuration.MaxWorkersPerServer
+	        };
         }
     }
 }

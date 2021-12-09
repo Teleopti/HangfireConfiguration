@@ -184,8 +184,13 @@ namespace Hangfire.Configuration.Web
 -->
         <div class='flex-grid'>
             <fieldset>
-                <h3>SQL storage</h3>
-                <label for='server'>Server: </label><br>
+                <h3>Storage</h3>
+                <label for='databaseProvider'>Database provider: </label><br>
+                <select id='databaseProvider' name='databaseProvider'>
+					<option value='SqlServer' selected='true'>SQL Server</option>
+					<option value='PostgreSql'>PostgreSql</option>
+				</select><br>
+				<label for='server'>Server: </label><br>
                 <input type='text' id='server' name='server'><br>
                 <label for='database'>Database (existing): </label><br>
                 <input type='text' id='database' name='database'><br>

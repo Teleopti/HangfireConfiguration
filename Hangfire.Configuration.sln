@@ -1,15 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration", "Hangfire.Configuration\Hangfire.Configuration.csproj", "{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31829.152
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration", "Hangfire.Configuration\Hangfire.Configuration.csproj", "{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample\ConsoleSample.csproj", "{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSample", "ConsoleSample\ConsoleSample\ConsoleSample.csproj", "{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B84BF3DC-7824-40CE-8EE3-CE68B22B532E}"
-ProjectSection(SolutionItems) = preProject
-	appveyor.yml = appveyor.yml
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.PostgreSql.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.PostgreSql.Test.csproj", "{D76A2487-864E-42CD-9F7C-A17A72EEC757}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +34,15 @@ Global
 		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A9DD76E-4670-4A12-9EBC-1DAB93E82EFC}
 	EndGlobalSection
 EndGlobal

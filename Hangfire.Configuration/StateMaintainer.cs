@@ -1,4 +1,6 @@
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using Newtonsoft.Json;
 
@@ -42,29 +44,57 @@ namespace Hangfire.Configuration
                             return existing;
                         }
 
-                        return makeJobStorage(c, _state.StorageOptions);
-                    }).ToArray();
+
+                        var connectionString = c.ConnectionString ?? options.ConnectionString;
+                        return new ConnectionStringDialectSelector(connectionString)
+						 .SelectDialect(
+						  () => makeJobStorage(c, _state.StorageOptionsSqlServer, connectionString),
+						  () => makeJobStorage(c, _state.StorageOptionsPostgreSql, connectionString));
+					}).ToArray();
             }
         }
 
-        private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+        private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions, string connectionString)
         {
             var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
             if (string.IsNullOrEmpty(configuration.SchemaName))
-                options.SchemaName = DefaultSchemaName.Name();
+                options.SchemaName = DefaultSchemaName.Name(connectionString);
             else
                 options.SchemaName = configuration.SchemaName;
 
+
             return new ConfigurationAndStorage
             {
-                JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
+                JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString, options),
                 Configuration = configuration
             };
         }
 
-        private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
+        private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, PostgreSqlStorageOptions storageOptions, string connectionString)
+        {
+	        var options = copyOptions(storageOptions ?? new PostgreSqlStorageOptions());
+	        if (string.IsNullOrEmpty(configuration.SchemaName))
+		        options.SchemaName = DefaultSchemaName.Name(connectionString);
+	        else
+		        options.SchemaName = configuration.SchemaName;
+
+
+	        return new ConfigurationAndStorage
+	        {
+		        JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString, options),
+		        Configuration = configuration
+	        };
+        }
+
+		private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
             JsonConvert.DeserializeObject<SqlServerStorageOptions>(
                 JsonConvert.SerializeObject(storageOptions)
             );
-    }
+
+
+        private static PostgreSqlStorageOptions copyOptions(PostgreSqlStorageOptions storageOptions) =>
+	        JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(
+		        JsonConvert.SerializeObject(storageOptions)
+	        );
+	}
 }

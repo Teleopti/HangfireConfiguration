@@ -10,18 +10,18 @@ namespace Hangfire.Configuration.Test.Integration
 		[Fact, CleanDatabase]
 		public void ShouldNotInsertMultiple()
 		{
-			Parallel.ForEach(Enumerable.Range(1, 10), (item) =>
+			//Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
+			//{
+			var system = new SystemUnderInfraTest();
+			system.WithOptions(new ConfigurationOptions
 			{
-				var system = new SystemUnderInfraTest();
-				system.WithOptions(new ConfigurationOptions
-				{
-					ConnectionString = ConnectionUtils.GetConnectionString(),
-					AutoUpdatedHangfireConnectionString = ConnectionUtils.GetConnectionString()
-				});
-				system
-					.BuildWorkerServerStarter(null)
-					.Start(null);
+				ConnectionString = ConnectionUtils.GetConnectionString(),
+				AutoUpdatedHangfireConnectionString = ConnectionUtils.GetConnectionString()
 			});
+			system
+				.BuildWorkerServerStarter(null)
+				.Start(null);
+			//});
 
 			Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
 		}

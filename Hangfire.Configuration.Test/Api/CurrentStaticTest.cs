@@ -13,12 +13,12 @@ namespace Hangfire.Configuration.Test.Api
         {
             var system = new SystemUnderTest();
             HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString()});
             system.PublisherStarter.Start();
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("active", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetFakeConnectionString(), storage.ConnectionString);
         }
         
         [Fact]
@@ -26,12 +26,12 @@ namespace Hangfire.Configuration.Test.Api
         {
             var system = new SystemUnderTest();
             HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString() });
             system.WorkerServerStarter.Start();
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("active", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetFakeConnectionString(), storage.ConnectionString);
         }
     }
 }

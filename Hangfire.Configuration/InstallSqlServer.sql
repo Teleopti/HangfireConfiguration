@@ -1,4 +1,4 @@
-﻿
+
 SET NOCOUNT ON
 SET XACT_ABORT ON
 DECLARE @TARGET_SCHEMA_VERSION INT;
@@ -6,7 +6,7 @@ SET @TARGET_SCHEMA_VERSION = $(HangfireConfigurationSchemaVersion);
 
 PRINT 'Installing HangfireConfiguration SQL objects...';
 
-BEGIN TRANSACTION;
+BEGIN TRANSACTION; 
 
 -- Acquire exclusive lock to prevent deadlocks caused by schema creation / version update
 DECLARE @SchemaLockResult INT;

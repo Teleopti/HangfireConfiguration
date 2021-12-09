@@ -7,6 +7,7 @@ using Microsoft.Owin.Builder;
 using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
@@ -19,7 +20,7 @@ namespace Hangfire.Configuration.Test
 #else
             ApplicationBuilder = new AppBuilder();
 #endif
-
+			
             ConfigurationStorage = new FakeConfigurationStorage();
             KeyValueStore = new FakeKeyValueStore();
             SchemaCreator = new FakeHangfireSchemaCreator();
@@ -28,7 +29,11 @@ namespace Hangfire.Configuration.Test
             _now = new FakeNow {Time = "2020-12-01 09:00".Utc()};
 
             Options = BuildOptions();
-            ConfigurationApi = BuildConfigurationApi();
+            Options.UseOptions(new ConfigurationOptions
+            {
+	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+            });
+			ConfigurationApi = BuildConfigurationApi();
             WorkerServerStarter =
                 new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder), Options);
             PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
@@ -94,7 +99,7 @@ namespace Hangfire.Configuration.Test
 
         public void StartWorkerServer()
         {
-	        WorkerServerStarter.Start(null, null, null);
+	        WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
         }
 
         public SystemUnderTest WithServerCountSample(ServerCountSample sample)

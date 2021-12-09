@@ -112,15 +112,17 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldBuildWithDefaultSchemaName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            var storedConfiguration = new StoredConfiguration
             {
-                ConnectionString = new SqlConnectionStringBuilder {DataSource = "."}.ToString(),
-                SchemaName = null
-            });
+	            ConnectionString = new SqlConnectionStringBuilder { DataSource = "." }.ToString(),
+	            SchemaName = null
+            };
+
+			system.ConfigurationStorage.Has(storedConfiguration);
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(DefaultSchemaName.Name(), result.Single().SchemaName);
+            Assert.Equal(DefaultSchemaName.Name(storedConfiguration.ConnectionString), result.Single().SchemaName);
         }
         
         [Fact]

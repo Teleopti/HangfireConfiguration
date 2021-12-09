@@ -1,4 +1,5 @@
-﻿using Hangfire.SqlServer;
+using Hangfire.PostgreSql;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {
@@ -15,9 +16,12 @@ namespace Hangfire.Configuration
             _state.Options = options;
 
         public void UseStorageOptions(SqlServerStorageOptions storageOptions) =>
-            _state.StorageOptions = storageOptions;
+            _state.StorageOptionsSqlServer = storageOptions;
 
-        public void UseServerOptions(BackgroundJobServerOptions serverOptions) =>
+        public void UseStorageOptions(PostgreSqlStorageOptions storageOptions) =>
+	        _state.StorageOptionsPostgreSql = storageOptions;
+
+		public void UseServerOptions(BackgroundJobServerOptions serverOptions) =>
             _state.ServerOptions = serverOptions;
 
         public ConfigurationOptions ConfigurationOptions() =>

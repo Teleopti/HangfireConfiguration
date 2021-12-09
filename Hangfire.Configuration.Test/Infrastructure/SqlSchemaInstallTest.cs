@@ -14,19 +14,19 @@ namespace Hangfire.Configuration.Test.Infrastructure
         {
         }
 
-        [Fact, CleanDatabase(schemaVersion: 1)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 1)]
         public void ShouldInstallSchemaVersion1()
         {
             Assert.Equal(1, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 2)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldInstallSchemaVersion2()
         {
             Assert.Equal(2, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 3)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 3)]
         public void ShouldInstallSchemaVersion3()
         {
             Assert.Equal(3, version());
@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 1)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 1)]
         public void ShouldUpgradeFrom1ToLatest()
         {
             using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 2)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldUpgradeFrom2ToLatest()
         {
             Assert.Equal(2, version());
@@ -69,7 +69,7 @@ INSERT INTO
             Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 2)]
+        [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldUpgradeFrom2To3()
         {
             Assert.Equal(2, version());
@@ -87,7 +87,7 @@ INSERT INTO
 
         private void install(int? schemaVersion = null)
         {
-            using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
+            using (var c = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString()).GetConnection())
             {
                 if (schemaVersion.HasValue)
                     SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
@@ -98,14 +98,18 @@ INSERT INTO
 
         private IEnumerable<values> read()
         {
-            using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
-                return c.Query<values>("SELECT * FROM  HangfireConfiguration.Configuration");
+			using (var c = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString()).GetConnection())
+				return c.Query<values>("SELECT * FROM hangfireconfiguration.configuration");
         }
 
         private int version()
         {
-            using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
-                return c.Query<int>("SELECT Version FROM HangfireConfiguration.[Schema]").Single();
+	        var sqlDialectSelector = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString());
+
+			using (var c = sqlDialectSelector.GetConnection())
+				return sqlDialectSelector.SelectDialect(
+					() => c.Query<int>("SELECT Version FROM HangfireConfiguration.[Schema]").Single(), 
+					() => c.Query<int>("SELECT version FROM hangfireconfiguration.schema").Single());
         }
 
         private class values

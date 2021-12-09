@@ -23,7 +23,9 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var options = new ConfigurationOptions();
-            options.WorkerDeterminerOptions.MinimumWorkerCount = 2;
+            options.ConnectionString = ConnectionUtils.GetFakeConnectionString();
+
+			options.WorkerDeterminerOptions.MinimumWorkerCount = 2;
             system
 	            .WithGoalWorkerCount(10)
 	            .WithOptions(options)

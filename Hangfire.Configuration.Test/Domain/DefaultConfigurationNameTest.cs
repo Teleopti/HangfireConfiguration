@@ -28,7 +28,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotUpdateNamed()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", ConnectionString = ConnectionUtils.GetFakeConnectionString()});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
@@ -39,8 +39,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateFirstLegacyWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, GoalWorkerCount = 1});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3 });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, GoalWorkerCount = 1 });
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
@@ -62,10 +62,18 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateLegacyOverAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Id = 1, 
+	            ConnectionString = ConnectionUtils.GetFakeConnectionStringWithApplicationName("ApplicationName.AutoUpdate")
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Id = 2, 
+	            GoalWorkerCount = 3
+            });
 
-            var result = system.WorkerServerQueries.QueryAllWorkerServers();
+			var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
             Assert.Equal(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 2).Name);
             Assert.Null(result.Single(x => x.ConfigurationId == 1).Name);

@@ -1,5 +1,6 @@
-﻿using System.Linq;
+using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
+using Hangfire.SqlServer;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,7 +18,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, null);
+            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
             Assert.Single(system.Hangfire.StartedServers.Single().backgroundProcesses
                 .OfType<ServerCountSampleRecorder>());
@@ -31,10 +32,10 @@ namespace Hangfire.Configuration.Test.Domain
 	        var system = new SystemUnderTest();
 	        system
 		        .WithOptions(options)
-		        .WithConfiguration(new StoredConfiguration())
+		        .WithConfiguration(new StoredConfiguration() {ConnectionString = ConnectionUtils.GetFakeConnectionString()})
 		        ;
 
-	        system.WorkerServerStarter.Start(null, null, null);
+	        system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
 	        Assert.Empty(system.Hangfire.StartedServers.Single().backgroundProcesses
 		        .OfType<ServerCountSampleRecorder>());

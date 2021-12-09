@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using Dapper;
+using Npgsql;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Infrastructure
@@ -17,27 +18,57 @@ namespace Hangfire.Configuration.Test.Infrastructure
         }
 
         [Fact]
-        public void ShouldThrowSqlExceptionWhenNoDatabase()
+        public void ShouldThrowSqlExceptionWhenNoDatabaseSqlServer()
         {
             var creator = new HangfireSchemaCreator();
             
             Assert.ThrowsAny<SqlException>(() => creator.TryConnect(@"Server=.\;Database=DoesNotExist;Trusted_Connection=True;"));
         }
-        
-        [Fact, CleanDatabase]
+
+        [Fact]
+        public void ShouldThrowSqlExceptionWhenNoDatabasePostgreSql()
+        {
+	        var creator = new HangfireSchemaCreator();
+
+	        Assert.ThrowsAny<PostgresException>(() => creator.TryConnect(@"User ID=postgres;Password=postgres;Host=localhost;Database=""DoesNotExist"";CommandTimeout=30;Pooling=false;"));
+        }
+
+		[Fact, CleanDatabase]
         public void ShouldCreateSchema()
         {
             var creator = new HangfireSchemaCreator();
             
-            creator.CreateHangfireSchema("HangfireTestSchema", ConnectionUtils.GetConnectionString());
+            creator.CreateHangfireSchema("hangfiretestschema", ConnectionUtils.GetConnectionString());
 
-            using (var conn = new SqlConnection(ConnectionUtils.GetConnectionString()))
+            var dialectSelector = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString());
+            using (var conn = dialectSelector.GetConnection())
             {
-                Assert.Equal("HangfireTestSchema", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'HangfireTestSchema'"));
+	            Assert.Equal("hangfiretestschema", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'hangfiretestschema'"));
             }
         }
-        
+
         [Fact, CleanDatabase]
+        public void ShouldCreateSchemaWithDefaultSchema()
+        {
+	        var creator = new HangfireSchemaCreator();
+
+	        creator.CreateHangfireSchema("", ConnectionUtils.GetConnectionString());
+
+	        var dialectSelector = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString());
+	        using (var conn = dialectSelector.GetConnection())
+	        {
+		        if (dialectSelector.IsPostgreSql())
+		        {
+			        Assert.Equal("hangfire", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'hangfire'"));
+				}
+		        else
+		        {
+			        Assert.Equal("HangFire", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'HangFire'"));
+				}
+	        }
+        }
+
+		[Fact, CleanDatabase]
         public void ShouldThrowOnCreateWhenInvalidConnectionString()
         {
             var creator = new HangfireSchemaCreator();

@@ -1,6 +1,7 @@
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
+using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using Xunit;
 
@@ -24,13 +25,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnStorageWithCorrectConnectionString()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ";"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetConnectionString() });
             system.PublisherStarter.Start();
 
             var storage = system.PublisherQueries.QueryPublishers()
                 .Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal(";", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetConnectionString(), storage.ConnectionString);
         }
 
         [Fact]
@@ -50,13 +51,13 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "active"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetConnectionString() });
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
             system.PublisherStarter.Start();
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("active", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetConnectionString(), storage.ConnectionString);
         }
 
         [Fact]
@@ -64,27 +65,27 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "string"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetConnectionString() });
             system.WorkerServerStarter.Start();
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("string", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetConnectionString(), storage.ConnectionString);
         }
 
         [Fact]
         public void ShouldReturnTheChangedActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "one"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "two"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString( "one") });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = ConnectionUtils.GetFakeConnectionString("two") });
             system.PublisherStarter.Start();
             var configurationId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
             system.ConfigurationApi.ActivateServer(configurationId);
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("two", storage.ConnectionString);
+            Assert.Equal(ConnectionUtils.GetFakeConnectionString("two"), storage.ConnectionString);
         }
 
         [Fact]
@@ -98,35 +99,43 @@ namespace Hangfire.Configuration.Test.Domain
                     new ConfigurationOptions
                     {
                         AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
-                    }, null);
+                    }, new SqlServerStorageOptions());
 
             Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);
         }
 
         [Fact]
-        public void ShouldQueryPublishersWithDefaultSqlStorageOptions()
+        public void ShouldQueryPublishersWithDefaultStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true,
+				ConnectionString = ConnectionUtils.GetFakeConnectionString()
+            });
 
-            system.PublisherQueries.QueryPublishers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+			new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString())
+				.SelectDialectVoid(
+					() => system.PublisherQueries.QueryPublishers(null, new SqlServerStorageOptions { PrepareSchemaIfNecessary = false }),
+					() => system.PublisherQueries.QueryPublishers(null, new PostgreSqlStorageOptions() { PrepareSchemaIfNecessary = false }));
 
-            Assert.False(system.Hangfire.CreatedStorages.Single().Options.PrepareSchemaIfNecessary);
+			Assert.False(system.Hangfire.CreatedStorages.Single().Options.PrepareSchemaIfNecessary);
         }
+
         
         [Fact]
         public void ShouldReturnTheChangedActiveStorageWhenInactiveWasDeleted()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "one"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "two"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString("1") });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = ConnectionUtils.GetFakeConnectionString("2") });
             system.PublisherQueries.QueryPublishers();
             system.ConfigurationStorage.Data = system.ConfigurationStorage.Data.Where(x => x.Id == 2).ToArray();
             system.ConfigurationApi.ActivateServer(2);
             
             var storage = system.PublisherQueries.QueryPublishers();
             
-            Assert.Equal("two", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
+            Assert.Equal(ConnectionUtils.GetFakeConnectionString("2"), (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
         }
         
         [Fact]

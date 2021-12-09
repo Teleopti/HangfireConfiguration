@@ -61,15 +61,22 @@ namespace Hangfire.Configuration
 
         public void CreateServerConfiguration(CreateServerConfiguration config)
         {
-            var storageConnectionString = config.StorageConnectionString ??
-                                          $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.User};Password={config.Password}";
-            _creator.TryConnect(storageConnectionString);
+			var storageConnectionString = config.StorageConnectionString ?? $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.User};Password={config.Password}";
+			var creatorConnectionString = config.SchemaCreatorConnectionString ??
+			                              $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword}";
+			
+			if (!string.IsNullOrEmpty(config.DatabaseProvider) && config.DatabaseProvider == "PostgreSql")
+			{
+				storageConnectionString = config.StorageConnectionString ?? $@"Host={config.Server};Database=""{config.Database}"";User ID={config.User};Password={config.Password};";
+				creatorConnectionString = config.SchemaCreatorConnectionString ??
+				                              $@"Host={config.Server};Database=""{config.Database}"";User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword};";
+			}
 
-            var creatorConnectionString = config.SchemaCreatorConnectionString ??
-                                          $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword}";
+			_creator.TryConnect(storageConnectionString);
+            
             _creator.TryConnect(creatorConnectionString);
 
-            if (_creator.SchemaExists(config.SchemaName ?? DefaultSchemaName.Name(), creatorConnectionString))
+            if (_creator.SchemaExists(config.SchemaName ?? DefaultSchemaName.Name(creatorConnectionString), creatorConnectionString))
                 throw new Exception("Schema already exists.");
 
             _creator.CreateHangfireSchema(config.SchemaName, creatorConnectionString);

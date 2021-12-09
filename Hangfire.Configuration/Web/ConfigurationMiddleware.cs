@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Web
             _configuration = HangfireConfiguration.UseHangfireConfiguration(null, _options, properties);
             _configurationApi = _configuration.ConfigurationApi();
             if (_options.PrepareSchemaIfNecessary)
-                using (var c = new SqlConnection(_options.ConnectionString))
+				using (var c = new ConnectionStringDialectSelector(_options.ConnectionString).GetConnection())
                     SqlServerObjectsInstaller.Install(c);
         }
 
@@ -188,8 +188,9 @@ namespace Hangfire.Configuration.Web
                 Password = parsed.SelectToken("password").Value<string>(),
                 SchemaName = parsed.SelectToken("schemaName").Value<string>(),
                 SchemaCreatorUser = parsed.SelectToken("schemaCreatorUser").Value<string>(),
-                SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>()
-            };
+                SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>(),
+                DatabaseProvider = parsed.SelectToken("databaseProvider")?.Value<string>()
+};
             _configurationApi.CreateServerConfiguration(configuration);
         }
 

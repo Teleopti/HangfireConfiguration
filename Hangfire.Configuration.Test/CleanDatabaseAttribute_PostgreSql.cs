@@ -2,6 +2,7 @@ using System;
 using System.Data.SqlClient;
 using System.Reflection;
 using Dapper;
+using Npgsql;
 using Xunit.Sdk;
 
 namespace Hangfire.Configuration.Test
@@ -30,18 +31,17 @@ namespace Hangfire.Configuration.Test
 
         private static void closeOpenConnections()
         {
-            var closeExistingConnSql = String.Format(
-                @"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
-                ConnectionUtils.GetDatabaseName());
+            //var closeExistingConnSql = String.Format(
+            //    @"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
+            //    ConnectionUtils.GetDatabaseName());
 
-            executeSql(closeExistingConnSql);
+            //executeSql(closeExistingConnSql);
         }
 
         private static void dropDb()
         {
-            var dropDatabaseSql = String.Format(
-                @"if db_id('{0}') is not null drop database [{0}]",
-                ConnectionUtils.GetDatabaseName());
+            var dropDatabaseSql = 
+				$"DROP DATABASE IF EXISTS \"{ ConnectionUtils.GetDatabaseName()}\" WITH (FORCE);";
 
             executeSql(dropDatabaseSql);
         }
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Test
         private static void createDb()
         {
             var createDatabaseSql = String.Format(
-                @"if db_id('{0}') is null create database [{0}] COLLATE SQL_Latin1_General_CP1_CS_AS",
+				@"CREATE DATABASE ""{0}""",
                 ConnectionUtils.GetDatabaseName());
 
             executeSql(createDatabaseSql);
@@ -57,21 +57,21 @@ namespace Hangfire.Configuration.Test
 
         private void createAdminLogin()
         {
-            var login = ConnectionUtils.GetLoginUser();
-            var createLoginSql = $@"
-IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = N'{login}')
-BEGIN
-	CREATE LOGIN {login} WITH PASSWORD=N'{ConnectionUtils.GetLoginUserPassword()}', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF	
-	ALTER SERVER ROLE [sysadmin] ADD MEMBER {login}	
-	ALTER LOGIN {login} ENABLE
-END";
+//            var login = ConnectionUtils.GetLoginUser();
+//            var createLoginSql = $@"
+//IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = N'{login}')
+//BEGIN
+//	CREATE LOGIN {login} WITH PASSWORD=N'{ConnectionUtils.GetLoginUserPassword()}', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF	
+//	ALTER SERVER ROLE [sysadmin] ADD MEMBER {login}	
+//	ALTER LOGIN {login} ENABLE
+//END";
 
-            executeSql(createLoginSql);
+//            executeSql(createLoginSql);
         }
 
         private void initializeDb()
         {
-            using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString()))
+            using (var connection = new NpgsqlConnection(ConnectionUtils.GetConnectionString()))
             {
                 if (_schemaVersion.HasValue)
                 {
@@ -85,7 +85,7 @@ END";
 
         private static void executeSql(string sql)
         {
-            using (var connection = new SqlConnection(ConnectionUtils.GetMasterConnectionString()))
+            using (var connection = new NpgsqlConnection(ConnectionUtils.GetMasterConnectionString()))
                 connection.Execute(sql);
         }
     }

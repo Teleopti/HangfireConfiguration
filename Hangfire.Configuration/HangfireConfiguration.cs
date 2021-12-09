@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.PostgreSql;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if NETSTANDARD2_0
@@ -57,7 +58,13 @@ namespace Hangfire.Configuration
             return this;
         }
 
-        public HangfireConfiguration UseServerOptions(BackgroundJobServerOptions serverOptions)
+        public HangfireConfiguration UseStorageOptions(PostgreSqlStorageOptions storageOptions)
+        {
+	        _compositionRoot.BuildOptions().UseStorageOptions(storageOptions);
+	        return this;
+        }
+
+		public HangfireConfiguration UseServerOptions(BackgroundJobServerOptions serverOptions)
         {
             _compositionRoot.BuildOptions().UseServerOptions(serverOptions);
             return this;

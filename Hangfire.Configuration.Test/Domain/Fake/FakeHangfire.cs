@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.PostgreSql;
 using Hangfire.Server;
 using Hangfire.SqlServer;
-using Hangfire.Storage;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
@@ -37,26 +37,12 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             CreatedStorages = CreatedStorages.Append(storage).ToArray();
             return storage;
         }
-    }
 
-    public class FakeJobStorage : JobStorage
-    {
-        public string ConnectionString { get; }
-        public SqlServerStorageOptions Options { get; }
-        private readonly IMonitoringApi _monitoringApi;
-
-        public FakeJobStorage(string connectionString, SqlServerStorageOptions options, FakeMonitoringApi monitoringApi)
+        public JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options)
         {
-            ConnectionString = connectionString;
-            Options = options;
-            _monitoringApi = monitoringApi;
-        }
-
-        public override IMonitoringApi GetMonitoringApi() => _monitoringApi;
-
-        public override IStorageConnection GetConnection()
-        {
-            throw new System.NotImplementedException();
-        }
+			var storage = new FakeJobStorage(connectionString, options, _monitoringApi);
+			CreatedStorages = CreatedStorages.Append(storage).ToArray();
+			return storage;
+		}
     }
 }

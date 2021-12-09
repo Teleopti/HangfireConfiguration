@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Configuration;
+using Hangfire.PostgreSql;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if !NET472
@@ -54,9 +55,11 @@ namespace ConsoleSample
             app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
 #endif
 
-            var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
-            var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
-            var defaultHangfireSchema = "HangFireCustomSchemaName";
+			//var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
+			//var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
+			var configurationConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
+			var defaultHangfireConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
+			var defaultHangfireSchema = "hangfirecustomschemaname";
 
             app.Use((context, next) =>
             {
@@ -74,20 +77,28 @@ namespace ConsoleSample
                 return next.Invoke();
             });
 
-            var storageOptions = new SqlServerStorageOptions
+            //var storageOptions = new SqlServerStorageOptions
+            //{
+            //    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+            //    QueuePollInterval = TimeSpan.Zero,
+            //    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
+            //    UseRecommendedIsolationLevel = true,
+            //    UsePageLocksOnDequeue = true,
+            //    DisableGlobalLocks = true,
+            //    EnableHeavyMigrations = true,
+            //    PrepareSchemaIfNecessary = true,
+            //    SchemaName = "NotUsedSchemaName"
+            //};
+
+            var storageOptions = new PostgreSqlStorageOptions()
             {
-                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                QueuePollInterval = TimeSpan.Zero,
-                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
-                UseRecommendedIsolationLevel = true,
-                UsePageLocksOnDequeue = true,
-                DisableGlobalLocks = true,
-                EnableHeavyMigrations = true,
-                PrepareSchemaIfNecessary = true,
-                SchemaName = "NotUsedSchemaName"
+	            QueuePollInterval = TimeSpan.FromSeconds(2),
+	            PrepareSchemaIfNecessary = true,
+	            SchemaName = "NotUsedSchemaName"
             };
 
-            var options = new ConfigurationOptions
+
+			var options = new ConfigurationOptions
             {
                 ConnectionString = configurationConnectionString,
                 AllowNewServerCreation = true,

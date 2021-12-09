@@ -35,13 +35,19 @@ namespace Hangfire.Configuration
 
         public void LockConfiguration(IUnitOfWork unitOfWork)
         {
-            unitOfWork.Execute($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)");
-        }
+	        if (new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql())
+	        {
+		        unitOfWork.Execute($@"SELECT * FROM {SqlServerObjectsInstaller.SchemaName}.configuration");
+			}
+			else
+	        {
+				unitOfWork.Execute($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)");
+			}
+		}
 
-        public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null) =>
-            getUnitOfWork(unitOfWork)
-                .Query<StoredConfiguration>(
-                    $@"
+        public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null)
+        {
+	        var sqlServer = $@"
 SELECT 
     Id, 
     Name, 
@@ -51,7 +57,30 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration").ToArray();
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration";
+	        var postgreSql = $@"
+SELECT 
+    Id, 
+    Name, 
+    ConnectionString, 
+    SchemaName, 
+    GoalWorkerCount, 
+    Active,
+	MaxWorkersPerServer
+FROM 
+    {SqlServerObjectsInstaller.SchemaName}.configuration 
+ORDER BY Id";
+	        unitOfWork = getUnitOfWork(unitOfWork);
+			if (new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql())
+			{
+				return unitOfWork
+					.Query<StoredConfiguration>(postgreSql).ToArray();
+			}
+
+			return unitOfWork
+			.Query<StoredConfiguration>(sqlServer).ToArray();
+
+        }
 
         public void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null)
         {
@@ -68,8 +97,27 @@ FROM
 
         private static void insert(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
-            unitOfWork.Execute(
-                $@"
+	        unitOfWork.Execute(
+		        new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql()
+			        ? $@"
+INSERT INTO 
+    {SqlServerObjectsInstaller.SchemaName}.Configuration 
+(
+    Name,
+    ConnectionString, 
+    SchemaName, 
+    GoalWorkerCount, 
+    Active,
+	MaxWorkersPerServer
+) VALUES (
+    @Name,
+    @ConnectionString, 
+    @SchemaName, 
+    @GoalWorkerCount, 
+    @Active,
+    @MaxWorkersPerServer
+);"
+			        : $@"
 INSERT INTO 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 (
@@ -92,7 +140,21 @@ INSERT INTO
         private static void update(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
             unitOfWork.Execute(
-                $@"
+	            new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql()
+		            ?
+		            $@"
+UPDATE 
+    {SqlServerObjectsInstaller.SchemaName}.Configuration 
+SET 
+    Name = @Name,
+    ConnectionString = @ConnectionString, 
+    SchemaName = @SchemaName, 
+    GoalWorkerCount = @GoalWorkerCount, 
+    Active = @Active,
+    MaxWorkersPerServer = @MaxWorkersPerServer    
+WHERE 
+    Id = @Id;"  :
+				$@"
 UPDATE 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 SET 

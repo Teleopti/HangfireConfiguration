@@ -8,17 +8,27 @@ namespace Hangfire.Configuration.Test
 		private const string ConnectionStringTemplateVariable 
 			= "Hangfire_Configuration_SqlServer_ConnectionStringTemplate";
 
-		private const string MasterDatabaseName = "master";
-		private const string DefaultDatabaseName = @"Hangfire.Configuration.SqlServer.Tests";
+		private const string MasterDatabaseName = "postgres";
+		private const string DefaultDatabaseName = "Hangfire.Configuration.Tests";
 
 		private const string LoginUser = "HangfireTest";
 		private const string LoginUserPassword = "test";
 		
 		
 		private const string DefaultConnectionStringTemplate
-			//= @"Server=.\sqlexpress;Database={0};Trusted_Connection=True;";
-			= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
-		
+			//= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
+			= @"User ID=postgres;Password=postgres;Host=localhost;Database=""{0}"";CommandTimeout=30;Pooling=false;";
+
+		public static string GetFakeConnectionString(string dbName = "fakeDB")
+		{
+			return string.Format(DefaultConnectionStringTemplate, dbName);
+		}
+
+		public static string GetFakeConnectionStringWithApplicationName(string applicationName)
+		{
+			return $"{GetFakeConnectionString()}Application Name={applicationName};"; // is this really right application name ??
+		}
+
 		public static string GetDatabaseName()
 		{
 			return Environment.GetEnvironmentVariable(DatabaseVariable) ?? DefaultDatabaseName;

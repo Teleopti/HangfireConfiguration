@@ -15,5 +15,6 @@ namespace Hangfire.Configuration
         public string SchemaCreatorPassword { get; set; }
         
         public string SchemaName { get; set; }
+        public string DatabaseProvider { get; set; }
     }
 }

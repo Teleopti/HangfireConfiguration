@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 
 namespace Hangfire.Configuration
 {
@@ -15,19 +15,42 @@ namespace Hangfire.Configuration
 
         public void Write(string key, string value)
         {
-	        var updated = _unitOfWork.Execute(
-		        $@"UPDATE [{schema}].KeyValueStore SET [Value] = @Value WHERE [Key] = @Key",
+	        var updateSqlQuery = "";
+	        var insertSqlQuery = "";
+	        if (new ConnectionStringDialectSelector(_unitOfWork.ConnectionString).IsPostgreSql())
+	        {
+				updateSqlQuery = $@"UPDATE {schema}.KeyValueStore SET Value = @Value WHERE Key = @Key";
+				insertSqlQuery = $@"INSERT INTO {schema}.KeyValueStore (Key, Value) VALUES (@Key, @Value)";
+			}
+	        else
+	        {
+				updateSqlQuery = $@"UPDATE [{schema}].KeyValueStore SET [Value] = @Value WHERE [Key] = @Key";
+				insertSqlQuery = $@"INSERT INTO [{schema}].KeyValueStore ([Key], [Value]) VALUES (@Key, @Value)";
+			}
+			var updated = _unitOfWork.Execute(
+		        updateSqlQuery,
 		        new {Key = key, Value = value});
 
 	        if (updated == 0)
 		        _unitOfWork.Execute(
-			        $@"INSERT INTO [{schema}].KeyValueStore ([Key], [Value]) VALUES (@Key, @Value)",
+			        insertSqlQuery,
 			        new {Key = key, Value = value});
         }
 
-        public string Read(string key) =>
-	        _unitOfWork
-		        .Query<string>($@"SELECT [Value] FROM [{schema}].KeyValueStore WHERE [Key] = @Key", new {Key = key})
+        public string Read(string key)
+        {
+	        var sqlQuery = "";
+			if(new ConnectionStringDialectSelector(_unitOfWork.ConnectionString).IsPostgreSql())
+			{
+				sqlQuery = $@"SELECT Value FROM {schema}.KeyValueStore WHERE Key = @Key";
+			}
+			else
+			{
+				sqlQuery = $@"SELECT [Value] FROM [{schema}].KeyValueStore WHERE [Key] = @Key";
+			}
+			return _unitOfWork
+		        .Query<string>(sqlQuery, new { Key = key })
 		        .SingleOrDefault();
+        }
     }
 }
