@@ -23,6 +23,7 @@ build:
 test:
   assemblies:
     - Hangfire.Configuration.Test.dll
+    - Hangfire.Configuration.PostgreSql.Test.dll
 artifacts:
 - path: '**\*.nupkg'
   name: NuGet packages
