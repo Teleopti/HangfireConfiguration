@@ -10,7 +10,9 @@ dotnet_csproj:
   assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
-services: mssql2017
+services: 
+- mssql2017
+- postgresql13
 nuget:
   account_feed: true
   project_feed: true
