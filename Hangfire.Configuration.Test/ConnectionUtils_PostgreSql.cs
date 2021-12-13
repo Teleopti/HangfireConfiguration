@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test
 		
 		private const string DefaultConnectionStringTemplate
 			//= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
-			= @"Integrated Security=true;Host=localhost;Database=""{0}"";CommandTimeout=30;Pooling=false;";
+			= @"User ID=postgres;Password=Password12!;Host=localhost;Database=""{0}"";CommandTimeout=30;Pooling=false;";
 
 		public static string GetFakeConnectionString(string dbName = "fakeDB")
 		{
