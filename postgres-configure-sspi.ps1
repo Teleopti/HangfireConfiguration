@@ -1,7 +1,12 @@
 # Requires PowerShell 6+
 # Run in your PostgreSQL data directory
 # The pg_ctl reload command may require running it with Administrator rights
-write-host 'Start powershell script'
+$password = $args[0]
+if($password -eq $null)
+{
+	$password =  Read-Host 'Give the password for the user postgres on your postgreSql database'
+}
+
 $env:Path += ";c:\program files\PostgreSQL\13\bin"
 
 Set-location -Path 'c:\program files\PostgreSQL\13\data\'
@@ -24,9 +29,9 @@ Set-location -Path 'c:\program files\PostgreSQL\13\data\'
 
 # The following commands will fail if the PostgreSQL bin directory is not in your PATH
 # Reload the configuration so that the changes above are in effect
-pg_ctl reload -D .
+# pg_ctl reload -D .
 
-$env:PGPASSWORD='Password12!';
+$env:PGPASSWORD=$password;
 
 # Create a database user for the current Windows user who is a cluster admin with all rights
 createuser -dilrs --replication -U postgres

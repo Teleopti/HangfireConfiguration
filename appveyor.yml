@@ -18,7 +18,7 @@ nuget:
   project_feed: true
 before_test:
   - ps: Write-Host 'This is PowerShell'
-  - ps: .\postgres-configure-sspi.ps1
+  - ps: .\postgres-configure-sspi.ps1 Password12!
 before_build:
 - cmd: nuget restore
 build:
