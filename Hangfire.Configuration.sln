@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31829.152
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration", "Hangfire.Configuration\Hangfire.Configuration.csproj", "{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}"
 EndProject
@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B84BF3DC-7824-40CE-8EE3-CE68B22B532E}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		postgres-configure-sspi.ps1 = postgres-configure-sspi.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.PostgreSql.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.PostgreSql.Test.csproj", "{D76A2487-864E-42CD-9F7C-A17A72EEC757}"
