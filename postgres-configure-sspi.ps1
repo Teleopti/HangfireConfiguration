@@ -31,7 +31,5 @@ Set-location -Path 'c:\program files\PostgreSQL\13\data\'
 # Reload the configuration so that the changes above are in effect
 pg_ctl reload -D .
 
-
-
 # Create a database user for the current Windows user who is a cluster admin with all rights
 createuser -dilrs --replication -U postgres
