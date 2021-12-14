@@ -16,7 +16,7 @@ services:
 nuget:
   account_feed: true
   project_feed: true
-install:
+before_test:
   - ps: Write-Host 'This is PowerShell'
   - ps: .\postgres-configure-sspi.ps1
 before_build:
