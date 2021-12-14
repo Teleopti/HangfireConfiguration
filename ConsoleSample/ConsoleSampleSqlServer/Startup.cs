@@ -55,10 +55,8 @@ namespace ConsoleSample
             app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
 #endif
 
-			//var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
-			//var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
-			var configurationConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
-			var defaultHangfireConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
+			var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
+			var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
 			var defaultHangfireSchema = "hangfirecustomschemaname";
 
             app.Use((context, next) =>
@@ -77,26 +75,18 @@ namespace ConsoleSample
                 return next.Invoke();
             });
 
-            //var storageOptions = new SqlServerStorageOptions
-            //{
-            //    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            //    QueuePollInterval = TimeSpan.Zero,
-            //    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
-            //    UseRecommendedIsolationLevel = true,
-            //    UsePageLocksOnDequeue = true,
-            //    DisableGlobalLocks = true,
-            //    EnableHeavyMigrations = true,
-            //    PrepareSchemaIfNecessary = true,
-            //    SchemaName = "NotUsedSchemaName"
-            //};
-
-            var storageOptions = new PostgreSqlStorageOptions()
-            {
-	            QueuePollInterval = TimeSpan.FromSeconds(2),
-	            PrepareSchemaIfNecessary = true,
-	            SchemaName = "NotUsedSchemaName"
-            };
-
+			var storageOptions = new SqlServerStorageOptions
+			{
+				CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+				QueuePollInterval = TimeSpan.Zero,
+				SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
+				UseRecommendedIsolationLevel = true,
+				UsePageLocksOnDequeue = true,
+				DisableGlobalLocks = true,
+				EnableHeavyMigrations = true,
+				PrepareSchemaIfNecessary = true,
+				SchemaName = "NotUsedSchemaName"
+			};
 
 			var options = new ConfigurationOptions
             {

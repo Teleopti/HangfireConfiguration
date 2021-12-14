@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration", "H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSample", "ConsoleSample\ConsoleSample\ConsoleSample.csproj", "{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B84BF3DC-7824-40CE-8EE3-CE68B22B532E}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
@@ -16,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B8
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.PostgreSql.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.PostgreSql.Test.csproj", "{D76A2487-864E-42CD-9F7C-A17A72EEC757}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSamplePostgreSql", "ConsoleSample\ConsoleSamplePostgreSql\ConsoleSamplePostgreSql.csproj", "{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSampleSqlServer.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +33,18 @@ Global
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8CA3442C-64E9-4EA6-B3CA-221CBC9D43E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
