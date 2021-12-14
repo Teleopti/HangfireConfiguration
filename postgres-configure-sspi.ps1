@@ -1,7 +1,7 @@
 # Requires PowerShell 6+
 # Run in your PostgreSQL data directory
 # The pg_ctl reload command may require running it with Administrator rights
-
+write-host 'Start powershell script'
 $env:Path += ";c:\program files\PostgreSQL\13\bin"
 Set-location -Path 'c:\program files\PostgreSQL\13\data\'
 
