@@ -29,7 +29,8 @@ Set-location -Path 'c:\program files\PostgreSQL\13\data\'
 
 # The following commands will fail if the PostgreSQL bin directory is not in your PATH
 # Reload the configuration so that the changes above are in effect
-# pg_ctl reload -D .
+pg_ctl reload -D .
+Write-Host 'Password: ' $password
 
 $env:PGPASSWORD=$password;
 
