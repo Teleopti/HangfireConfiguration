@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.Post
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSampleSqlServer.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSamplePostgreSql", "ConsoleSample\ConsoleSamplePostgreSql\ConsoleSamplePostgreSql.csproj", "{BAE6AED1-5414-4314-8556-E2439C531791}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
