@@ -15,9 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.PostgreSql.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.PostgreSql.Test.csproj", "{D76A2487-864E-42CD-9F7C-A17A72EEC757}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleXPostgreSql", "ConsoleSample\ConsoleSamplePostgreSql\ConsoleSampleXPostgreSql.csproj", "{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSampleSqlServer.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSample", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSample.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D76A2487-864E-42CD-9F7C-A17A72EEC757}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AA684F8-EA2A-4A55-B1E7-8AF392F5D10B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.ActiveCfg = Release|Any CPU
