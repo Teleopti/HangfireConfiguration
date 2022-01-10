@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace Hangfire.Configuration
 {
-	public class ConnectionStringDialectSelector
+	internal class ConnectionStringDialectSelector
 	{
 		private readonly string _connectionString;
 
