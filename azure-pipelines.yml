@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: twfm-devops
+  name: twfm-devops
 
 steps:
 - task: DotNetCoreCLI@2
