@@ -1,11 +1,6 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
-
+name: 1.$(Date:yMM).$(Date:%d).$(Rev:r)
 pool:
   name: twfm-devops-vmss
 
@@ -14,8 +9,16 @@ steps:
     Set-Service postgresql-x64-14 -StartupType manual
     Start-Service -Name postgresql-x64-14
 - task: DotNetCoreCLI@2
-  displayName: Build
+  displayName: Build & test
   inputs:
     command: test
     projects: hangfire.configuration.sln
-    arguments: '--configuration release'
+    arguments: '--configuration release -p:Version=$(Build.BuildNumber) -p:PackageVersion=$(Build.BuildNumber)'
+- task: NuGetCommand@2
+  displayName: Publish
+  inputs:
+      command: 'push'
+      packagesToPush: 'Hangfire.Configuration/bin/release/*.nupkg'
+      feedsToUse: 'select'
+      vstsFeed: 'TWFM/twfm'
+      publishVstsFeed: 'TWFM/twfm'
