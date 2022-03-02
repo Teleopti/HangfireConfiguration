@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  name: twfm-devops
+  name: twfm-devops-vmss
 
 steps:
 - pwsh: |
