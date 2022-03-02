@@ -7,13 +7,12 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: twfm-devops
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: hangfire.configuration.sln
+    arguments: '--configuration release'
