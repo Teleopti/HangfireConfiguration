@@ -13,6 +13,6 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
-    command: build
+    command: test
     projects: hangfire.configuration.sln
     arguments: '--configuration release'
