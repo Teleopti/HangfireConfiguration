@@ -7,12 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration", "H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppVeyor", "AppVeyor", "{B84BF3DC-7824-40CE-8EE3-CE68B22B532E}"
-	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
-		postgres-configure-sspi.ps1 = postgres-configure-sspi.ps1
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.PostgreSql.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.PostgreSql.Test.csproj", "{D76A2487-864E-42CD-9F7C-A17A72EEC757}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSampleSqlServer.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
