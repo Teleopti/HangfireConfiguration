@@ -40,7 +40,14 @@ namespace Hangfire.Configuration.Test.Domain
                 .QueryAllWorkerServers(
                     new ConfigurationOptions
                     {
-                        AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
+	                    UpdateConfigurations = new []
+	                    {
+		                    new UpdateConfiguration
+		                    {
+			                    ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			                    Name = DefaultConfigurationName.Name()
+		                    }
+	                    }
                     }, (SqlServerStorageOptions)null);
 
             Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);

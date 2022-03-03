@@ -13,10 +13,8 @@ namespace Hangfire.Configuration
 
         public bool PrepareSchemaIfNecessary { get; set; }
         public bool AllowNewServerCreation { get; set; }
-        public bool AllowMultipleActive { get; set; } = false;
-
-        public string AutoUpdatedHangfireConnectionString { get; set; }
-        public string AutoUpdatedHangfireSchemaName { get; set; }
+        public bool AllowMultipleActive { get; set; }
+        
         public IEnumerable<UpdateConfiguration> UpdateConfigurations { get; set; }
 
         public bool UseWorkerDeterminer { get; set; } = true;

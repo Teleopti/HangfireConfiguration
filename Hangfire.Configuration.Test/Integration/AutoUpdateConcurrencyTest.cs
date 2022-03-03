@@ -16,7 +16,14 @@ namespace Hangfire.Configuration.Test.Integration
 			system.WithOptions(new ConfigurationOptions
 			{
 				ConnectionString = ConnectionUtils.GetConnectionString(),
-				AutoUpdatedHangfireConnectionString = ConnectionUtils.GetConnectionString()
+				UpdateConfigurations = new []
+				{
+					new UpdateConfiguration
+					{
+						ConnectionString = ConnectionUtils.GetConnectionString(),
+						Name = DefaultConfigurationName.Name()
+					}
+				}
 			});
 			system
 				.BuildWorkerServerStarter(null)

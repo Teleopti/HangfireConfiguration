@@ -21,10 +21,14 @@ namespace Hangfire.Configuration.Test.Domain
             system.PublisherStarter.Start(
                 new ConfigurationOptions
                 {
-                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder
-                    {
-                        DataSource = "Hangfire"
-                    }.ToString()
+	                UpdateConfigurations = new []
+	                {
+		                new UpdateConfiguration
+		                {
+			                ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			                Name = DefaultConfigurationName.Name()
+		                }
+	                }
                 }, (SqlServerStorageOptions)null);
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);

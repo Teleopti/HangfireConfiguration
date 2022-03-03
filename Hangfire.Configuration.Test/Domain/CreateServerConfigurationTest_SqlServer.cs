@@ -36,8 +36,15 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
-                AutoUpdatedHangfireSchemaName = "defaultSchemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "defaultSchemaName"
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
@@ -62,8 +69,15 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
-                AutoUpdatedHangfireSchemaName = "defaultSchemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "defaultSchemaName"
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {

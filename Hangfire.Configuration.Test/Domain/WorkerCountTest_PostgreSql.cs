@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.PostgreSql;
@@ -18,7 +17,14 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(
                 new ConfigurationOptions
                 {
-                    AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() { Host = "Hangfire"}.ToString(), 
+	                UpdateConfigurations = new []
+	                {
+		                new UpdateConfiguration
+		                {
+			                ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
+			                Name = DefaultConfigurationName.Name()
+		                }
+	                }
                 },
                 null, (PostgreSqlStorageOptions)null);
 
@@ -76,8 +82,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
-                AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() { Host = "Hangfire"}.ToString(),
-                DefaultGoalWorkerCount = 12
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            },
+	            DefaultGoalWorkerCount = 12
             }, null, (PostgreSqlStorageOptions)null);
 
             Assert.Equal(12, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -185,7 +198,14 @@ namespace Hangfire.Configuration.Test.Domain
                 new ConfigurationOptionsForTest
                 {
                     MinimumServerCount = 2,
-                    AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() { Host = "Hangfire"}.ToString(), 
+                    UpdateConfigurations = new []
+                    {
+	                    new UpdateConfiguration
+	                    {
+		                    ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
+		                    Name = DefaultConfigurationName.Name()
+	                    }
+                    }
                 },
                 null, (PostgreSqlStorageOptions)null);
 
@@ -246,7 +266,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
-                AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() { Host = "Hangfire"}.ToString(),
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            },
                 DefaultGoalWorkerCount = 12,
                 MinimumServerCount = 2
             }, null, (PostgreSqlStorageOptions)null);

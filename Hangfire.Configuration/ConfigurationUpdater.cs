@@ -51,15 +51,7 @@ namespace Hangfire.Configuration
 
 		private static IEnumerable<UpdateConfiguration> buildUpdateConfigurations(ConfigurationOptions options)
 		{
-			var autoUpdate = new UpdateConfiguration
-			{
-				Name = DefaultConfigurationName.Name(),
-				ConnectionString = options.AutoUpdatedHangfireConnectionString,
-				SchemaName = options.AutoUpdatedHangfireSchemaName,
-			};
-
-			return new[] { autoUpdate }
-				.Concat(options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>())
+			return options.UpdateConfigurations ?? Enumerable.Empty<UpdateConfiguration>()
 				.Where(x => x.ConnectionString != null)
 				.ToArray();
 		}
@@ -128,8 +120,6 @@ namespace Hangfire.Configuration
 
 		private static bool updateConfigurationsEnabled(ConfigurationOptions options)
 		{
-			if (options.AutoUpdatedHangfireConnectionString != null)
-				return true;
 			if (options.UpdateConfigurations?.Any() ?? false)
 				return true;
 			return false;

@@ -14,7 +14,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
@@ -38,7 +45,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var applicationName = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
@@ -52,7 +66,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var applicationName = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
@@ -68,7 +89,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
@@ -84,7 +112,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
@@ -100,7 +135,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
@@ -115,7 +157,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).Last();
@@ -131,8 +180,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString()
-            }, null, (SqlServerStorageOptions)null);
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
+           }, null, (SqlServerStorageOptions)null);
 
             var updatedConnectionString = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString);
             Assert.Equal("newDataSource", updatedConnectionString.DataSource);
@@ -147,7 +203,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "dataSource", ApplicationName = "applicationName"}.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
@@ -166,7 +229,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             var expected = new SqlConnectionStringBuilder {DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
@@ -180,7 +250,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
@@ -194,7 +271,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
@@ -212,7 +296,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
@@ -227,7 +318,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.False(system.ConfigurationStorage.Data.First().Active);
@@ -241,8 +339,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString(),
-                AutoUpdatedHangfireSchemaName = "schemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "schemaName"
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
@@ -256,8 +361,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString(),
-                AutoUpdatedHangfireSchemaName = "schemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "schemaName"
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
@@ -269,12 +381,26 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             system.PublisherQueries.QueryPublishers(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, new SqlServerStorageOptions());
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
@@ -287,13 +413,27 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
             system.ConfigurationStorage.Data = Enumerable.Empty<StoredConfiguration>();
             
             system.PublisherQueries.QueryPublishers(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, new SqlServerStorageOptions());
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
@@ -307,7 +447,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);
@@ -321,7 +468,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString()
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
             }, null, (SqlServerStorageOptions)null);
 
             Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);

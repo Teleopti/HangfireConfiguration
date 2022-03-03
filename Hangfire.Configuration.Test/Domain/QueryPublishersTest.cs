@@ -98,7 +98,14 @@ namespace Hangfire.Configuration.Test.Domain
                 .QueryPublishers(
                     new ConfigurationOptions
                     {
-                        AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString()
+	                    UpdateConfigurations = new []
+	                    {
+		                    new UpdateConfiguration
+		                    {
+			                    ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			                    Name = DefaultConfigurationName.Name()
+		                    }
+	                    }
                     }, new SqlServerStorageOptions());
 
             Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);

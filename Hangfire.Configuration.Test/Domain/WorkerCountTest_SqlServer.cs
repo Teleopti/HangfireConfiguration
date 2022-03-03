@@ -17,7 +17,14 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(
                 new ConfigurationOptions
                 {
-                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(), 
+	                UpdateConfigurations = new []
+	                {
+		                new UpdateConfiguration
+		                {
+			                ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			                Name = DefaultConfigurationName.Name()
+		                }
+	                }
                 },
                 null, (SqlServerStorageOptions)null);
 
@@ -75,8 +82,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
-                DefaultGoalWorkerCount = 12
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            },
+	            DefaultGoalWorkerCount = 12
             }, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(12, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -184,7 +198,14 @@ namespace Hangfire.Configuration.Test.Domain
                 new ConfigurationOptionsForTest
                 {
                     MinimumServerCount = 2,
-                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(), 
+                    UpdateConfigurations = new []
+                    {
+	                    new UpdateConfiguration
+	                    {
+		                    ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+		                    Name = DefaultConfigurationName.Name()
+	                    }
+                    }
                 },
                 null, (SqlServerStorageOptions)null);
 
@@ -244,8 +265,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
-                AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
-                DefaultGoalWorkerCount = 12,
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            },
+	            DefaultGoalWorkerCount = 12,
                 MinimumServerCount = 2
             }, null, (SqlServerStorageOptions)null);
 

@@ -4,7 +4,6 @@ using System.Linq;
 using Hangfire.PostgreSql;
 using Npgsql;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -38,8 +37,15 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() {Host = "DataSource"}.ToString(),
-                AutoUpdatedHangfireSchemaName = "defaultSchemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "defaultSchemaName"
+		            }
+	            }
             }, null, (PostgreSqlStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
@@ -65,8 +71,15 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
-                AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() { Host = "DataSource" }.ToString(),
-				AutoUpdatedHangfireSchemaName = "defaultSchemaName"
+	            UpdateConfigurations = new []
+	            {
+		            new UpdateConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+			            Name = DefaultConfigurationName.Name(),
+			            SchemaName = "defaultSchemaName"
+		            }
+	            }
             }, null, (PostgreSqlStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {

@@ -1,8 +1,6 @@
-using System;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.PostgreSql;
-using Hangfire.SqlServer;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -22,10 +20,17 @@ namespace Hangfire.Configuration.Test.Domain
             system.PublisherStarter.Start(
                 new ConfigurationOptions
                 {
-                    AutoUpdatedHangfireConnectionString = new SqlConnectionStringBuilder
-                    {
-                        DataSource = "Hangfire"
-                    }.ToString()
+	                UpdateConfigurations = new []
+	                {
+		                new UpdateConfiguration
+		                {
+			                ConnectionString = new SqlConnectionStringBuilder
+			                {
+				                DataSource = "Hangfire"
+			                }.ToString(),
+			                Name = DefaultConfigurationName.Name()
+		                }
+	                }
                 }, (PostgreSqlStorageOptions)null);
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);

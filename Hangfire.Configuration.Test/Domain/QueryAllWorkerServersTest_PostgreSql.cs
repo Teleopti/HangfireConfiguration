@@ -1,7 +1,5 @@
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.PostgreSql;
-using Hangfire.SqlServer;
 using Npgsql;
 using Xunit;
 
@@ -41,7 +39,14 @@ namespace Hangfire.Configuration.Test.Domain
                 .QueryAllWorkerServers(
                     new ConfigurationOptions
                     {
-                        AutoUpdatedHangfireConnectionString = new NpgsqlConnectionStringBuilder() {Host = "Hangfire"}.ToString()
+	                    UpdateConfigurations = new []
+	                    {
+		                    new UpdateConfiguration
+		                    {
+			                    ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
+			                    Name = DefaultConfigurationName.Name()
+		                    }
+	                    }
                     }, (PostgreSqlStorageOptions)null);
 
             Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);

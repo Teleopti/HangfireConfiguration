@@ -88,8 +88,15 @@ namespace ConsoleSample
 				AllowNewServerCreation = true,
 				AllowMultipleActive = true,
 				PrepareSchemaIfNecessary = true,
-				AutoUpdatedHangfireConnectionString = defaultHangfireConnectionString,
-				AutoUpdatedHangfireSchemaName = defaultHangfireSchema,
+				UpdateConfigurations = new []
+				{
+					new UpdateConfiguration
+					{
+						ConnectionString =defaultHangfireConnectionString,
+						Name = DefaultConfigurationName.Name(),
+						SchemaName = defaultHangfireSchema
+					}
+				}
 			};
 
 			Console.WriteLine();
