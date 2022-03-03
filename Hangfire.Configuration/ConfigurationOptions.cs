@@ -1,9 +1,4 @@
 using System.Collections.Generic;
-#if NETSTANDARD2_0
-using Microsoft.AspNetCore.Http;
-#else
-using Microsoft.Owin;
-#endif
 
 namespace Hangfire.Configuration
 {
@@ -21,31 +16,5 @@ namespace Hangfire.Configuration
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new WorkerDeterminerOptions();
 
         public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
-    }
-
-    public interface IHangfireConfigurationAuthorizationFilter
-    {
-#if NETSTANDARD2_0
-		bool Authorize(HttpContext context);
-#else
-	    bool Authorize(IOwinContext context);
-#endif
-	}
-
-    public class WorkerDeterminerOptions
-    {
-        public int DefaultGoalWorkerCount { get; set; } = 10;
-        public int MaximumGoalWorkerCount { get; set; } = 100;
-        public int MinimumWorkerCount { get; set; } = 1;
-
-        public int? MinimumServerCount { get; set; }
-        public bool UseServerCountSampling { get; set; } = true;
-    }
-
-    public class UpdateStorage
-    {
-        public string Name { get; set; }
-        public string ConnectionString { get; set; }
-        public string SchemaName { get; set; }
     }
 }
