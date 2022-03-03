@@ -196,7 +196,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal(DefaultSchemaName.Name(ConnectionUtils.GetFakeConnectionString()),
+            Assert.Equal(ConnectionUtils.DefaultSchemaName(),
                 (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 
@@ -208,7 +208,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal(DefaultSchemaName.Name(ConnectionUtils.GetFakeConnectionString()),
+            Assert.Equal(ConnectionUtils.DefaultSchemaName(),
                 (system.Hangfire.StartedServers.Single().storage).Options.SchemaName);
         }
 

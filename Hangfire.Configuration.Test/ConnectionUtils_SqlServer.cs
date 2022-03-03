@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
@@ -14,7 +16,11 @@ namespace Hangfire.Configuration.Test
 		private const string LoginUser = "HangfireTest";
 		private const string LoginUserPassword = "test";
 		
-		
+		// tests shouldnt have to do this I think
+		public static string DefaultSchemaName() =>
+			typeof(SqlServerStorageOptions).Assembly.GetType("Hangfire.SqlServer.Constants")
+				.GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null) as string;
+
 		private const string DefaultConnectionStringTemplate
 			//= @"Server=.\sqlexpress;Database={0};Trusted_Connection=True;";
 			= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";

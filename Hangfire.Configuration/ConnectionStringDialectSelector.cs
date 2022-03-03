@@ -1,5 +1,4 @@
 using System;
-using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Npgsql;
@@ -13,8 +12,6 @@ namespace Hangfire.Configuration
 		public ConnectionStringDialectSelector(string connectionString)
 		{
 			_connectionString = connectionString;
-			if (_connectionString == null)
-				throw new ArgumentException("Connectionstring is null");
 		}
 
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
@@ -23,9 +20,10 @@ namespace Hangfire.Configuration
 				return sqlServer();
 			if (IsPostgreSql())
 				return postgres();
-			throw new Exception("Invalid connectionstring");
+			return default;
 		}
 
+		// should be made extension. no throwing
 		public void SelectDialectVoid(Action sqlServer, Action postgres)
 		{
 			if (isSqlServer())
@@ -42,6 +40,7 @@ namespace Hangfire.Configuration
 			throw new Exception("Invalid connectionstring");
 		}
 
+		// should be made extension. no throwing
 		public DbConnection GetConnection()
 		{
 			if (isSqlServer())
@@ -64,6 +63,7 @@ namespace Hangfire.Configuration
 			}
 		}
 
+		// should be private
 		public bool IsPostgreSql()
 		{
 			try

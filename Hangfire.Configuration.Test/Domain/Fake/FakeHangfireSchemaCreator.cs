@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         public void CreateHangfireSchema(string schemaName, string connectionString)
         {
             Schemas = Schemas
-                .Append((schemaName ?? DefaultSchemaName.Name(connectionString), connectionString))
+                .Append((schemaName ?? ConnectionUtils.DefaultSchemaName(), connectionString))
                 .ToArray();
         }
 

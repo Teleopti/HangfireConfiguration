@@ -122,7 +122,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(DefaultSchemaName.Name(storedConfiguration.ConnectionString), result.Single().SchemaName);
+            Assert.Equal(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
         }
         
         [Fact]

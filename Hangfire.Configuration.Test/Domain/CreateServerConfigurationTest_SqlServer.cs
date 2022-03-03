@@ -208,7 +208,8 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var connection = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "existingDatabase"}.ToString();
-            system.SchemaCreator.Has(DefaultSchemaName.Name(connection), connection);
+            
+            system.SchemaCreator.Has(ConnectionUtils.DefaultSchemaName(), connection);
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration

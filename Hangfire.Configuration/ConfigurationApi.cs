@@ -76,7 +76,10 @@ namespace Hangfire.Configuration
             
             _creator.TryConnect(creatorConnectionString);
 
-            if (_creator.SchemaExists(config.SchemaName ?? DefaultSchemaName.Name(creatorConnectionString), creatorConnectionString))
+            config.SchemaName ??= new ConnectionStringDialectSelector(creatorConnectionString)
+	            .SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
+            
+            if (_creator.SchemaExists(config.SchemaName, creatorConnectionString))
                 throw new Exception("Schema already exists.");
 
             _creator.CreateHangfireSchema(config.SchemaName, creatorConnectionString);

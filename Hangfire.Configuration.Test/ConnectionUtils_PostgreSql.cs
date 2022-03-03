@@ -1,4 +1,5 @@
 using System;
+using Hangfire.PostgreSql;
 
 namespace Hangfire.Configuration.Test
 {
@@ -14,7 +15,9 @@ namespace Hangfire.Configuration.Test
 		private const string LoginUser = "HangfireTest";
 		private const string LoginUserPassword = "test";
 		
-		
+		// tests shouldnt have to do this I think
+		public static string DefaultSchemaName() => new PostgreSqlStorageOptions().SchemaName;
+
 		private const string DefaultConnectionStringTemplate
 			//= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
 			= @"Integrated Security=true;Host=localhost;Database=""{0}"";CommandTimeout=30;Pooling=false;";
