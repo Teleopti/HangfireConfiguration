@@ -7,6 +7,7 @@
 		<Version>0</Version>
 		<RepositoryUrl>https://github.com/Teleopti/HangfireConfiguration.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
+		<PackageId>Calabrio.Hangfire.Configuration</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
