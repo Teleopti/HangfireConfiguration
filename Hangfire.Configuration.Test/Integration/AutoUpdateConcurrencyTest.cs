@@ -18,7 +18,7 @@ namespace Hangfire.Configuration.Test.Integration
 				ConnectionString = ConnectionUtils.GetConnectionString(),
 				UpdateConfigurations = new []
 				{
-					new UpdateStorage
+					new UpdateStorageConfiguration
 					{
 						ConnectionString = ConnectionUtils.GetConnectionString(),
 						Name = DefaultConfigurationName.Name()

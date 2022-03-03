@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -47,7 +47,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -68,7 +68,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -91,7 +91,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -114,7 +114,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -137,7 +137,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -159,7 +159,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -182,7 +182,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -205,7 +205,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "dataSource", ApplicationName = "applicationName"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -231,7 +231,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -252,7 +252,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -273,7 +273,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -298,7 +298,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -320,7 +320,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -341,7 +341,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),
@@ -363,7 +363,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),
@@ -383,7 +383,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -395,7 +395,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -415,7 +415,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -428,7 +428,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -449,7 +449,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -470,7 +470,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name()

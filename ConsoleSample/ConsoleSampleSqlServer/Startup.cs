@@ -96,7 +96,7 @@ namespace ConsoleSample
                 PrepareSchemaIfNecessary = true,
                 UpdateConfigurations = new []
                 {
-	                new UpdateStorage
+	                new UpdateStorageConfiguration
 	                {
 		                ConnectionString =defaultHangfireConnectionString,
 		                Name = DefaultConfigurationName.Name(),

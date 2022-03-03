@@ -41,7 +41,7 @@ namespace Hangfire.Configuration
 			return isUpdated;
 		}
 
-		private static bool alreadyUpToDate(IEnumerable<UpdateStorage> received, IEnumerable<StoredConfiguration> stored)
+		private static bool alreadyUpToDate(IEnumerable<UpdateStorageConfiguration> received, IEnumerable<StoredConfiguration> stored)
 		{
 			if (!received.Any())
 				return false; //always fix stored configurations if no configuration options received
@@ -49,17 +49,17 @@ namespace Hangfire.Configuration
 			return !(received.Any(r => notStored(stored, r)));
 		}
 
-		private static IEnumerable<UpdateStorage> buildUpdateConfigurations(ConfigurationOptions options)
+		private static IEnumerable<UpdateStorageConfiguration> buildUpdateConfigurations(ConfigurationOptions options)
 		{
-			return options.UpdateConfigurations ?? Enumerable.Empty<UpdateStorage>()
+			return options.UpdateConfigurations ?? Enumerable.Empty<UpdateStorageConfiguration>()
 				.Where(x => x.ConnectionString != null)
 				.ToArray();
 		}
 
-		private static bool notStored(IEnumerable<StoredConfiguration> stored, UpdateStorage received) =>
+		private static bool notStored(IEnumerable<StoredConfiguration> stored, UpdateStorageConfiguration received) =>
 			!stored.Any(s => sameConfiguration(received, s));
 
-		private static bool sameConfiguration(UpdateStorage received, StoredConfiguration stored) =>
+		private static bool sameConfiguration(UpdateStorageConfiguration received, StoredConfiguration stored) =>
 			stored.Name == received.Name &&
 			stored.SchemaName == received.SchemaName &&
 			received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
@@ -92,7 +92,7 @@ namespace Hangfire.Configuration
 			return false;
 		}
 
-		private bool runConfigurationUpdates(IEnumerable<UpdateStorage> received, IUnitOfWork connection)
+		private bool runConfigurationUpdates(IEnumerable<UpdateStorageConfiguration> received, IUnitOfWork connection)
 		{
 			var stored = _storage.ReadConfigurations(connection);
 

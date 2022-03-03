@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 UpdateConfigurations = new[]
                 {
-                    new UpdateStorage
+                    new UpdateStorageConfiguration
                     {
                         Name = "name",
                         ConnectionString = connectionString,
@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 UpdateConfigurations = new[]
                 {
-                    new UpdateStorage
+                    new UpdateStorageConfiguration
                     {
                         Name = "name",
                         ConnectionString = connectionString
@@ -65,7 +65,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 UpdateConfigurations = new[]
                 {
-                    new UpdateStorage
+                    new UpdateStorageConfiguration
                     {
                         Name = "name",
                         ConnectionString = newConnectionString
@@ -88,13 +88,13 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 UpdateConfigurations = new[]
                 {
-                    new UpdateStorage
+                    new UpdateStorageConfiguration
                     {
                         Name = "name1",
                         ConnectionString = connectionString1,
                         SchemaName = "schema1"
                     },
-                    new UpdateStorage
+                    new UpdateStorageConfiguration
                     {
                         Name = "name2",
                         ConnectionString = connectionString2,

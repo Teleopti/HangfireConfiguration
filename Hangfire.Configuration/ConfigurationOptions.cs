@@ -10,7 +10,7 @@ namespace Hangfire.Configuration
         public bool AllowNewServerCreation { get; set; }
         public bool AllowMultipleActive { get; set; }
         
-        public IEnumerable<UpdateStorage> UpdateConfigurations { get; set; }
+        public IEnumerable<UpdateStorageConfiguration> UpdateConfigurations { get; set; }
 
         public bool UseWorkerDeterminer { get; set; } = true;
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new WorkerDeterminerOptions();

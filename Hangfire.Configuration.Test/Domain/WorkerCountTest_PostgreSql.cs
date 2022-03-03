@@ -19,7 +19,7 @@ namespace Hangfire.Configuration.Test.Domain
                 {
 	                UpdateConfigurations = new []
 	                {
-		                new UpdateStorage
+		                new UpdateStorageConfiguration
 		                {
 			                ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
 			                Name = DefaultConfigurationName.Name()
@@ -84,7 +84,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
@@ -200,7 +200,7 @@ namespace Hangfire.Configuration.Test.Domain
                     MinimumServerCount = 2,
                     UpdateConfigurations = new []
                     {
-	                    new UpdateStorage
+	                    new UpdateStorageConfiguration
 	                    {
 		                    ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
 		                    Name = DefaultConfigurationName.Name()
@@ -268,7 +268,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateStorage
+		            new UpdateStorageConfiguration
 		            {
 			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
