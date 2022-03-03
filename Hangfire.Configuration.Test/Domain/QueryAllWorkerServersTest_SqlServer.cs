@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Test.Domain
                     {
 	                    UpdateConfigurations = new []
 	                    {
-		                    new UpdateConfiguration
+		                    new UpdateStorage
 		                    {
 			                    ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
 			                    Name = DefaultConfigurationName.Name()

@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateConfiguration
+		            new UpdateStorage
 		            {
 			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),
@@ -73,7 +73,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            UpdateConfigurations = new []
 	            {
-		            new UpdateConfiguration
+		            new UpdateStorage
 		            {
 			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),

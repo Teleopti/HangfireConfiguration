@@ -15,7 +15,7 @@ namespace Hangfire.Configuration
         public bool AllowNewServerCreation { get; set; }
         public bool AllowMultipleActive { get; set; }
         
-        public IEnumerable<UpdateConfiguration> UpdateConfigurations { get; set; }
+        public IEnumerable<UpdateStorage> UpdateConfigurations { get; set; }
 
         public bool UseWorkerDeterminer { get; set; } = true;
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new WorkerDeterminerOptions();
@@ -42,7 +42,7 @@ namespace Hangfire.Configuration
         public bool UseServerCountSampling { get; set; } = true;
     }
 
-    public class UpdateConfiguration
+    public class UpdateStorage
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }
