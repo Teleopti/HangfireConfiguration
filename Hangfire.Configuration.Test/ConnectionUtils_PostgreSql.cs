@@ -6,21 +6,16 @@ namespace Hangfire.Configuration.Test
 	public static class ConnectionUtils
 	{
 		private const string DatabaseVariable = "Hangfire_Configuration_SqlServer_DatabaseName";
-		private const string ConnectionStringTemplateVariable 
-			= "Hangfire_Configuration_SqlServer_ConnectionStringTemplate";
 
 		private const string MasterDatabaseName = "postgres";
 		private const string DefaultDatabaseName = "Hangfire.Configuration.Tests";
 
-		private const string LoginUser = "HangfireTest";
-		private const string LoginUserPassword = "test";
-		
 		// tests shouldnt have to do this I think
 		public static string DefaultSchemaName() => new PostgreSqlStorageOptions().SchemaName;
 
+		// pooling needs to be off for some reason?
 		private const string DefaultConnectionStringTemplate
-			//= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
-			= @"Integrated Security=true;Host=localhost;Database=""{0}"";CommandTimeout=30;Pooling=false;";
+			= @"User ID=postgres;Password=root;Host=localhost;Database=""{0}"";Pooling=false;";
 
 		public static string GetFakeConnectionString(string dbName = "fakeDB")
 		{
@@ -39,28 +34,12 @@ namespace Hangfire.Configuration.Test
 
 		public static string GetMasterConnectionString()
 		{
-			return String.Format(getConnectionStringTemplate(), MasterDatabaseName);
+			return String.Format(DefaultConnectionStringTemplate, MasterDatabaseName);
 		}
 
 		public static string GetConnectionString()
 		{
-			return String.Format(getConnectionStringTemplate(), GetDatabaseName());
-		}
-
-		public static string GetLoginUser()
-		{
-			return LoginUser;
-		}
-
-		public static string GetLoginUserPassword()
-		{
-			return LoginUserPassword;
-		}
-
-		private static string getConnectionStringTemplate()
-		{
-			return Environment.GetEnvironmentVariable(ConnectionStringTemplateVariable)
-				   ?? DefaultConnectionStringTemplate;
+			return String.Format(DefaultConnectionStringTemplate, GetDatabaseName());
 		}
 	}
 }

@@ -7,8 +7,6 @@ namespace Hangfire.Configuration.Test
 	public static class ConnectionUtils
 	{
 		private const string DatabaseVariable = "Hangfire_Configuration_SqlServer_DatabaseName";
-		private const string ConnectionStringTemplateVariable 
-			= "Hangfire_Configuration_SqlServer_ConnectionStringTemplate";
 
 		private const string MasterDatabaseName = "master";
 		private const string DefaultDatabaseName = @"Hangfire.Configuration.SqlServer.Tests";
@@ -22,8 +20,7 @@ namespace Hangfire.Configuration.Test
 				.GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null) as string;
 
 		private const string DefaultConnectionStringTemplate
-			//= @"Server=.\sqlexpress;Database={0};Trusted_Connection=True;";
-			= @"Data Source=.;Integrated Security=SSPI;Initial Catalog={0};";
+			= @"Data Source=.;Integrated Security=True;Initial Catalog={0};";
 		
 		public static string GetFakeConnectionString(string dbName = "fakeDB")
 		{
@@ -42,12 +39,12 @@ namespace Hangfire.Configuration.Test
 
 		public static string GetMasterConnectionString()
 		{
-			return String.Format(getConnectionStringTemplate(), MasterDatabaseName);
+			return String.Format(DefaultConnectionStringTemplate, MasterDatabaseName);
 		}
 
 		public static string GetConnectionString()
 		{
-			return String.Format(getConnectionStringTemplate(), GetDatabaseName());
+			return String.Format(DefaultConnectionStringTemplate, GetDatabaseName());
 		}
 
 		public static string GetLoginUser()
@@ -58,12 +55,6 @@ namespace Hangfire.Configuration.Test
 		public static string GetLoginUserPassword()
 		{
 			return LoginUserPassword;
-		}
-
-		private static string getConnectionStringTemplate()
-		{
-			return Environment.GetEnvironmentVariable(ConnectionStringTemplateVariable)
-				   ?? DefaultConnectionStringTemplate;
 		}
 	}
 }
