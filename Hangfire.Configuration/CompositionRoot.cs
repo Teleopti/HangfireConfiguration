@@ -5,20 +5,17 @@ namespace Hangfire.Configuration
     public class CompositionRoot
     {
         // internal services
-        internal State _state = new State();
+        private readonly State _state = new();
 
         private StateMaintainer builderStateMaintainer(object appBuilder) =>
-            new StateMaintainer(BuildHangfire(appBuilder), BuildConfigurationStorage(),
+            new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
                 buildConfigurationUpdater(), _state);
 
-        private ConfigurationUpdater buildConfigurationUpdater() =>
-            new ConfigurationUpdater(BuildConfigurationStorage(), _state);
+        private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
 
-        private UnitOfWork buildUnitOfWork() =>
-            new UnitOfWork {ConnectionString = _state.ReadOptions().ConnectionString};
+        private UnitOfWork buildUnitOfWork() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
 
-        private WorkerDeterminer buildWorkerDeterminer() =>
-            new WorkerDeterminer(BuildKeyValueStore());
+        private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
         
         protected ServerCountSampleRecorder buildServerCountSampleRecorder()
         {
@@ -31,30 +28,23 @@ namespace Hangfire.Configuration
         
         
         // outer services
-        public Options BuildOptions() =>
-            new Options(_state);
+        public Options BuildOptions() => new(_state);
 
         public WorkerServerStarter BuildWorkerServerStarter(object appBuilder) =>
-            new WorkerServerStarter(BuildHangfire(appBuilder), buildWorkerDeterminer(),
+            new(BuildHangfire(appBuilder), buildWorkerDeterminer(),
                 builderStateMaintainer(appBuilder), _state, buildServerCountSampleRecorder());
 
-        public PublisherStarter BuildPublisherStarter() =>
-            new PublisherStarter(builderStateMaintainer(null), _state);
+        public PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
 
         public ConfigurationApi BuildConfigurationApi() =>
-            new ConfigurationApi(
-                BuildConfigurationStorage(),
+            new(BuildConfigurationStorage(),
                 BuildHangfireSchemaCreator(), _state);
 
-        public PublisherQueries BuildPublishersQuerier() =>
-            new PublisherQueries(_state, builderStateMaintainer(null));
+        public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
 
-        public WorkerServerQueries BuildWorkerServersQuerier() =>
-            new WorkerServerQueries(builderStateMaintainer(null), _state);
+        public WorkerServerQueries BuildWorkerServersQuerier() => new(builderStateMaintainer(null), _state);
 
-        public ViewModelBuilder BuildViewModelBuilder() =>
-            new ViewModelBuilder(BuildConfigurationStorage());
-
+        public ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
 
         // boundary
         protected virtual IHangfire BuildHangfire(object appBuilder) =>
