@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Net.Http;
-using Xunit;
 #if !NET472
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
 #else
 using Microsoft.Owin.Testing;
-using Microsoft.Owin.Builder;
-
 #endif
 
 namespace Hangfire.Configuration.Test

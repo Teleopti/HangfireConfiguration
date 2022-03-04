@@ -1,5 +1,4 @@
 using System;
-using System.Data.SqlClient;
 using System.Reflection;
 using Dapper;
 using Npgsql;

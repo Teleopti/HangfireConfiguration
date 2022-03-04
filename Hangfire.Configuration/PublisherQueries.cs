@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
 {

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Data.SqlClient;
 using System.Linq;
 using Xunit;

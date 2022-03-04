@@ -1,7 +1,6 @@
 #if !NET472
 using Microsoft.AspNetCore.Builder;
 #else
-using Microsoft.Owin.Testing;
 using Microsoft.Owin.Builder;
 #endif
 using System;

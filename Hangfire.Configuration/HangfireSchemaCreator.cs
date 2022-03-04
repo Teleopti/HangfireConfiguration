@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using Dapper;
 using Npgsql;
 

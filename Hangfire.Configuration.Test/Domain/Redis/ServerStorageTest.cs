@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Hangfire.Pro.Redis;
-using Xunit;
+﻿using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain.Redis
 {

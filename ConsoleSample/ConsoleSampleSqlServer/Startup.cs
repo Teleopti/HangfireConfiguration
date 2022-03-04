@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Configuration;
-using Hangfire.PostgreSql;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if !NET472
