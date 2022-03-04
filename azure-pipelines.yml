@@ -3,14 +3,19 @@ trigger:
 name: 1.$(Date:yMM).$(Date:%d).$(Rev:r)
 pool:
   name: twfm-devops-vmss
-
 steps:
 - pwsh: |
     Set-Service postgresql-x64-14 -StartupType manual
     Start-Service -Name postgresql-x64-14
 - task: NuGetAuthenticate@0
   inputs:
-      nuGetServiceConnections: HangfirePro
+    nuGetServiceConnections: 'HangfirePro'
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'config'
+    externalFeedCredentials: 'HangfirePro'
 - task: UseDotNet@2
   displayName: Install .NET 6 SDK
   inputs:
