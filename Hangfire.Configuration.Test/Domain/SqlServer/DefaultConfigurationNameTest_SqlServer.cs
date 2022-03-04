@@ -1,11 +1,9 @@
 using System.Data.SqlClient;
 using System.Linq;
-using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.SqlServer;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class DefaultConfigurationNameTest : XunitContextBase
     {
@@ -27,12 +25,12 @@ namespace Hangfire.Configuration.Test.Domain
         [Fact]
         public void ShouldNotUpdateNamed()
         {
-            var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", ConnectionString = ConnectionUtils.GetFakeConnectionString()});
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name"});
 
-            var result = system.WorkerServerQueries.QueryAllWorkerServers();
+	        var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-            Assert.Equal("name", result.Single().Name);
+	        Assert.Equal("name", result.Single().Name);
         }
 
         [Fact]
@@ -65,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
 	            Id = 1, 
-	            ConnectionString = ConnectionUtils.GetFakeConnectionStringWithApplicationName("ApplicationName.AutoUpdate")
+	            ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()
             });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {

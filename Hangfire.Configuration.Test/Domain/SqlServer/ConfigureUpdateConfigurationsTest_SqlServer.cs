@@ -1,10 +1,9 @@
 using System.Data.SqlClient;
 using System.Linq;
-using Hangfire.PostgreSql;
-using Npgsql;
+using Hangfire.SqlServer;
 using Xunit;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class ConfigureUpdateConfigurationsTest
     {
@@ -12,7 +11,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConfigureUpdatedConfiguration()
         {
             var system = new SystemUnderTest();
-            var connectionString = new NpgsqlConnectionStringBuilder() {Host = "host"}.ToString();
+            var connectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString();
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -25,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
                         SchemaName = "schema"
                     }
                 }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.Single();
             Assert.Equal("name", configuration.Name);
@@ -37,7 +36,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateOnFirstUpdate()
         {
             var system = new SystemUnderTest();
-            var connectionString = new NpgsqlConnectionStringBuilder() { Host = "host" }.ToString();
+            var connectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString();
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -49,7 +48,7 @@ namespace Hangfire.Configuration.Test.Domain
                         ConnectionString = connectionString
                     }
                 }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
@@ -58,10 +57,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateConfiguration()
         {
             var system = new SystemUnderTest();
-            var previous = new NpgsqlConnectionStringBuilder() { Host = "previous" }.ToString();
+            var previous = new SqlConnectionStringBuilder {DataSource = "previous"}.ToString();
             system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", ConnectionString = previous});
 
-            var newConnectionString = new NpgsqlConnectionStringBuilder() {Host = "new"}.ToString();
+            var newConnectionString = new SqlConnectionStringBuilder {DataSource = "new"}.ToString();
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
                 UpdateConfigurations = new[]
@@ -72,7 +71,7 @@ namespace Hangfire.Configuration.Test.Domain
                         ConnectionString = newConnectionString
                     }
                 }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.Single();
             Assert.Equal(newConnectionString, configuration.ConnectionString);
@@ -82,8 +81,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConfigureUpdatedConfigurations()
         {
             var system = new SystemUnderTest();
-            var connectionString1 = new NpgsqlConnectionStringBuilder() { Host = "host1" }.ToString();
-            var connectionString2 = new NpgsqlConnectionStringBuilder() { Host = "host2" }.ToString();
+            var connectionString1 = new SqlConnectionStringBuilder {DataSource = "DataSource1"}.ToString();
+            var connectionString2 = new SqlConnectionStringBuilder {DataSource = "DataSource2"}.ToString();
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -102,7 +101,7 @@ namespace Hangfire.Configuration.Test.Domain
                         SchemaName = "schema2"
                     }
                 }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.OrderBy(x => x.Id);
             Assert.Equal("name1", configuration.ElementAt(0).Name);

@@ -3,7 +3,7 @@ using Hangfire.PostgreSql;
 using Npgsql;
 using Xunit;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class QueryAllWorkerServersTest
     {
@@ -56,11 +56,11 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryWorkerServersWithDefaultSqlStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration{ConnectionString = ConnectionUtils.GetFakeConnectionString()});
+            system.ConfigurationStorage.Has(new StoredConfiguration{ConnectionString = @"Host=localhost;Database=fakedb;"});
 
             var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(null, new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
 
-            Assert.False(system.Hangfire.CreatedStorages.Single().Options.PrepareSchemaIfNecessary);
+            Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
         }
 
         [Fact]

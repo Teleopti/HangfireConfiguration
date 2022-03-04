@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.SqlServer;
+using Hangfire.PostgreSql;
 using Xunit;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class WorkerCountWithSampleTest
     {
@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(10);
             system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
 
             Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(10);
             system.KeyValueStore.Has(new ServerCountSample {Count = 5});
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(10 / 5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -38,7 +38,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Options.UseOptions(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 2,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Host=localhost;Database=fakedb;"
 			});
             system.WorkerServerStarter.Start();
 
@@ -71,8 +71,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 UseServerCountSampling = false,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
-			}, null, (SqlServerStorageOptions)null);
+                ConnectionString = @"Host=localhost;Database=fakedb;"
+			}, null, (PostgreSqlStorageOptions)null);
 
             Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -86,7 +86,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.KeyValueStore.Has(new ServerCountSample {Count = 2});
             system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -100,7 +100,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.KeyValueStore.Has(new ServerCountSample {Count = 2});
             system.KeyValueStore.Has(new ServerCountSample {Count = 3});
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -121,7 +121,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Timestamp = DateTime.Parse("2020-11-27 08:00")
             });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(8 / 4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -133,7 +133,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(8);
             system.KeyValueStore.Has(new ServerCountSample {Count = 0});
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
             Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }

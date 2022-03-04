@@ -4,7 +4,7 @@ using Hangfire.PostgreSql;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class StartPublishersTest : XunitContextBase
     {
@@ -62,39 +62,39 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = ConnectionUtils.GetFakeConnectionString() });
+            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "ActiveSchema", 
-	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
             });
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.Options.SchemaName);
+            Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.PostgresOptions.SchemaName);
         }
 
 		[Fact]
 		public void ShouldPassDefaultStorageOptionsToHangfire()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString("active") });
+			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true, ConnectionString = @"Host=localhost;Database=active;" });
 
 			system.PublisherStarter.Start();
 
 			var options = new PostgreSqlStorageOptions();
 			var storage = system.Hangfire.CreatedStorages.Single();
-			Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
-			Assert.Equal(options.DeleteExpiredBatchSize, storage.Options.DeleteExpiredBatchSize);
-			Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
-			Assert.Equal(options.DistributedLockTimeout, storage.Options.DistributedLockTimeout);
-			Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
-			Assert.Equal(options.EnableTransactionScopeEnlistment, storage.Options.EnableTransactionScopeEnlistment);
-			Assert.Equal(options.InvisibilityTimeout, storage.Options.InvisibilityTimeout);
-			Assert.Equal(options.SchemaName, storage.Options.SchemaName);
-			Assert.Equal(options.TransactionSynchronisationTimeout, storage.Options.TransactionSynchronisationTimeout);
-			Assert.Equal(options.UseNativeDatabaseTransactions, storage.Options.UseNativeDatabaseTransactions);
+			Assert.Equal(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
+			Assert.Equal(options.DeleteExpiredBatchSize, storage.PostgresOptions.DeleteExpiredBatchSize);
+			Assert.Equal(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
+			Assert.Equal(options.DistributedLockTimeout, storage.PostgresOptions.DistributedLockTimeout);
+			Assert.Equal(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
+			Assert.Equal(options.EnableTransactionScopeEnlistment, storage.PostgresOptions.EnableTransactionScopeEnlistment);
+			Assert.Equal(options.InvisibilityTimeout, storage.PostgresOptions.InvisibilityTimeout);
+			Assert.Equal(options.SchemaName, storage.PostgresOptions.SchemaName);
+			Assert.Equal(options.TransactionSynchronisationTimeout, storage.PostgresOptions.TransactionSynchronisationTimeout);
+			Assert.Equal(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
 		}
 
 		//[Fact]
@@ -137,12 +137,12 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            Active = true, 
 	            SchemaName = "SchemaName",
-	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
 			});
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().Options.SchemaName);
+            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().PostgresOptions.SchemaName);
         }
 
         [Fact]
@@ -153,33 +153,33 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            Active = true, 
 	            SchemaName = "SchemaName1",
-	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
 			});
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName2",
-	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
 			});
 
             system.PublisherStarter.Start();
 
             var storages = system.Hangfire.CreatedStorages;
-            Assert.Equal("SchemaName1", storages.First().Options.SchemaName);
-            Assert.Equal("SchemaName2", storages.Last().Options.SchemaName);
+            Assert.Equal("SchemaName1", storages.First().PostgresOptions.SchemaName);
+            Assert.Equal("SchemaName2", storages.Last().PostgresOptions.SchemaName);
         }
 
         [Fact]
         public void ShouldNotCreateInactiveStorages()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = ConnectionUtils.GetFakeConnectionString() });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = ConnectionUtils.GetFakeConnectionString("active") });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = ConnectionUtils.GetFakeConnectionString() });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
 
             system.PublisherStarter.Start();
 
-            Assert.Equal(ConnectionUtils.GetFakeConnectionString("active"), system.Hangfire.CreatedStorages.Single().ConnectionString);
+            Assert.Equal(@"Host=localhost;Database=active;", system.Hangfire.CreatedStorages.Single().ConnectionString);
         }
     }
 }

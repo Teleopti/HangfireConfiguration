@@ -28,6 +28,7 @@ namespace Hangfire.Configuration.Test
 	        BackgroundJobServerOptions serverOptions,
 	        PostgreSqlStorageOptions storageOptions) =>
 	        Start(options, serverOptions, storageOptions, null);
+        
 		public void Start(
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,

@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
 	        var system = new SystemUnderTest();
 	        system
 		        .WithOptions(options)
-		        .WithConfiguration(new StoredConfiguration() {ConnectionString = ConnectionUtils.GetFakeConnectionString()})
+		        .WithConfiguration(new StoredConfiguration())
 		        ;
 
 	        system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);

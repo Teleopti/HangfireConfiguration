@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test
             Options = BuildOptions();
             Options.UseOptions(new ConfigurationOptions
             {
-	            ConnectionString = ConnectionUtils.GetFakeConnectionString()
+	            ConnectionString = "unknown-storage"
             });
 			ConfigurationApi = BuildConfigurationApi();
             WorkerServerStarter =

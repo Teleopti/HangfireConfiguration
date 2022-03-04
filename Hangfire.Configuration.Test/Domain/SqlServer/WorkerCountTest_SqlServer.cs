@@ -5,7 +5,7 @@ using Hangfire.Server;
 using Hangfire.SqlServer;
 using Xunit;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class WorkerCountTest
     {
@@ -105,7 +105,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MinimumWorkerCount = 2,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -120,7 +120,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MaximumGoalWorkerCount = 200,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(200, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 3,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(15 / 3, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -151,7 +151,7 @@ namespace Hangfire.Configuration.Test.Domain
             {
                 MinimumServerCount = 2,
                 MinimumWorkerCount = 6,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -167,7 +167,7 @@ namespace Hangfire.Configuration.Test.Domain
                 new ConfigurationOptionsForTest
                 {
                     MinimumServerCount = 0,
-					ConnectionString = ConnectionUtils.GetFakeConnectionString()
+					ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
                 },
                 null, (SqlServerStorageOptions)null);
 
@@ -181,7 +181,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(8);
 
             system.WorkerServerStarter.Start(
-                new ConfigurationOptions {UseWorkerDeterminer = false, ConnectionString = ConnectionUtils.GetFakeConnectionString()},
+                new ConfigurationOptions {UseWorkerDeterminer = false, ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"},
                 new BackgroundJobServerOptions {WorkerCount = 52},
                 (SqlServerStorageOptions)null
             );
@@ -221,7 +221,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 2,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -237,7 +237,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 2,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -252,7 +252,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 2,
-                ConnectionString = ConnectionUtils.GetFakeConnectionString()
+                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
             Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);

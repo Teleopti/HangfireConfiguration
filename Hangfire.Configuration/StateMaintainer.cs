@@ -24,7 +24,7 @@ public class StateMaintainer
 	public void Refresh()
 	{
 		var options = _state.ReadOptions();
-            
+
 		// maybe not reload all the time
 		var configurations = _storage.ReadConfigurations();
 		var configurationChanged = _configurationUpdater.Update(options, configurations);
@@ -43,46 +43,48 @@ public class StateMaintainer
 						return existing;
 					}
 
-
+					// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
+					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
 					var connectionString = c.ConnectionString ?? options.ConnectionString;
-					return new ConnectionStringDialectSelector(connectionString)
+					var result = new ConnectionStringDialectSelector(connectionString)
 						.SelectDialect(
-							() => makeJobStorage(c, _state.StorageOptionsSqlServer, connectionString),
-							() => makeJobStorage(c, _state.StorageOptionsPostgreSql, connectionString));
+							() => makeJobStorage(c, _state.StorageOptionsSqlServer),
+							() => makeJobStorage(c, _state.StorageOptionsPostgreSql));
+					if (result == null)
+						return makeJobStorage(c, _state.StorageOptionsSqlServer);
+					return result;
+					
 				}).ToArray();
 		}
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions, string connectionString)
+	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
 	{
 		var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
 
 		if (string.IsNullOrEmpty(configuration.SchemaName))
-			options.SchemaName = new ConnectionStringDialectSelector(connectionString)
-				.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
+			options.SchemaName = DefaultSchemaName.SqlServer();
 		else
 			options.SchemaName = configuration.SchemaName;
-            
+
 		return new ConfigurationAndStorage
 		{
-			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString, options),
+			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
 			Configuration = configuration
 		};
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, PostgreSqlStorageOptions storageOptions, string connectionString)
+	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, PostgreSqlStorageOptions storageOptions)
 	{
 		var options = copyOptions(storageOptions ?? new PostgreSqlStorageOptions());
 		if (string.IsNullOrEmpty(configuration.SchemaName))
-			options.SchemaName = new ConnectionStringDialectSelector(connectionString)
-				.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
+			options.SchemaName = DefaultSchemaName.Postgres();
 		else
 			options.SchemaName = configuration.SchemaName;
 
-
 		return new ConfigurationAndStorage
 		{
-			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString, options),
+			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
 			Configuration = configuration
 		};
 	}
@@ -91,7 +93,6 @@ public class StateMaintainer
 		JsonConvert.DeserializeObject<SqlServerStorageOptions>(
 			JsonConvert.SerializeObject(storageOptions)
 		);
-
 
 	private static PostgreSqlStorageOptions copyOptions(PostgreSqlStorageOptions storageOptions) =>
 		JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(

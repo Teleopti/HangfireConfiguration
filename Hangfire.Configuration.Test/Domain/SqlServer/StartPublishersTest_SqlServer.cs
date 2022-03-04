@@ -5,7 +5,7 @@ using Hangfire.SqlServer;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class StartPublishersTest : XunitContextBase
     {
@@ -65,7 +65,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.Options.SchemaName);
+            Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.SqlServerOptions.SchemaName);
         }
 
 		[Fact]
@@ -78,15 +78,15 @@ namespace Hangfire.Configuration.Test.Domain
 
 			var options = new SqlServerStorageOptions();
 			var storage = system.Hangfire.CreatedStorages.Single();
-			Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
-			Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
-			Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
-			Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
-			Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
-			Assert.Equal(options.DashboardJobListLimit, storage.Options.DashboardJobListLimit);
-			Assert.Equal(options.TransactionTimeout, storage.Options.TransactionTimeout);
-			Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
-			Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
+			Assert.Equal(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
+			Assert.Equal(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
+			Assert.Equal(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
+			Assert.Equal(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
+			Assert.Equal(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
+			Assert.Equal(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
+			Assert.Equal(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
+			Assert.Equal(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
+			Assert.Equal(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
 		[Fact]
@@ -110,15 +110,15 @@ namespace Hangfire.Configuration.Test.Domain
 			system.PublisherStarter.Start(null, options);
 
 			var storage = system.Hangfire.CreatedStorages.Single();
-			Assert.Equal(options.QueuePollInterval, storage.Options.QueuePollInterval);
-			Assert.Equal(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
-			Assert.Equal(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
-			Assert.Equal(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
-			Assert.Equal(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
-			Assert.Equal(options.DashboardJobListLimit, storage.Options.DashboardJobListLimit);
-			Assert.Equal(options.TransactionTimeout, storage.Options.TransactionTimeout);
-			Assert.Equal(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
-			Assert.Equal(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
+			Assert.Equal(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
+			Assert.Equal(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
+			Assert.Equal(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
+			Assert.Equal(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
+			Assert.Equal(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
+			Assert.Equal(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
+			Assert.Equal(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
+			Assert.Equal(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
+			Assert.Equal(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
 		[Fact]
@@ -129,7 +129,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().Options.SchemaName);
+            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().SqlServerOptions.SchemaName);
         }
 
         [Fact]
@@ -142,8 +142,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.PublisherStarter.Start();
 
             var storages = system.Hangfire.CreatedStorages;
-            Assert.Equal("SchemaName1", storages.First().Options.SchemaName);
-            Assert.Equal("SchemaName2", storages.Last().Options.SchemaName);
+            Assert.Equal("SchemaName1", storages.First().SqlServerOptions.SchemaName);
+            Assert.Equal("SchemaName2", storages.Last().SqlServerOptions.SchemaName);
         }
 
         [Fact]

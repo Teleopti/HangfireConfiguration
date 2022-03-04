@@ -1,5 +1,4 @@
 using System;
-using Hangfire.PostgreSql;
 
 namespace Hangfire.Configuration.Test
 {
@@ -10,22 +9,9 @@ namespace Hangfire.Configuration.Test
 		private const string MasterDatabaseName = "postgres";
 		private const string DefaultDatabaseName = "Hangfire.Configuration.Tests";
 
-		// tests shouldnt have to do this I think
-		public static string DefaultSchemaName() => new PostgreSqlStorageOptions().SchemaName;
-
 		// pooling needs to be off for some reason?
 		private const string DefaultConnectionStringTemplate
 			= @"User ID=postgres;Password=root;Host=localhost;Database=""{0}"";Pooling=false;";
-
-		public static string GetFakeConnectionString(string dbName = "fakeDB")
-		{
-			return string.Format(DefaultConnectionStringTemplate, dbName);
-		}
-
-		public static string GetFakeConnectionStringWithApplicationName(string applicationName)
-		{
-			return $"{GetFakeConnectionString()}Application Name={applicationName};"; // is this really right application name ??
-		}
 
 		public static string GetDatabaseName()
 		{
