@@ -8,6 +8,7 @@ steps:
 - pwsh: |
     Set-Service postgresql-x64-14 -StartupType manual
     Start-Service -Name postgresql-x64-14
+- task: NuGetAuthenticate@0
 - task: UseDotNet@2
   displayName: Install .NET 6 SDK
   inputs:
