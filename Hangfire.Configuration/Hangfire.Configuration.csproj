@@ -12,7 +12,7 @@
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.24" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.8.6" />
-		<PackageReference Include="Hangfire.Pro.Redis" Version="2.8.13" PrivateAssets="All"/>
+		<PackageReference Include="Hangfire.Pro.Redis" Version="2.8.13" />
 		<PackageReference Include="Hangfire.SqlServer" Version="1.7.24" />
 		<PackageReference Include="Polly" Version="7.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
