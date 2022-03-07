@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.Monitor.AnnounceServer("runningServer", null);
+            system.Monitor.AnnounceServer("runningServer");
 
             system.ServerCountSampleRecorder.Record();
 
@@ -58,8 +58,8 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.Monitor.AnnounceServer("runningServer1", null);
-            system.Monitor.AnnounceServer("runningServer2", null);
+            system.Monitor.AnnounceServer("runningServer1");
+            system.Monitor.AnnounceServer("runningServer2");
 
             system.ServerCountSampleRecorder.Record();
 

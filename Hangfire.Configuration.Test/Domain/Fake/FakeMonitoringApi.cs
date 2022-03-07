@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Hangfire.Server;
 using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
 
@@ -10,7 +9,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
     {
         private readonly IList<ServerDto> _servers = new List<ServerDto>();
         
-        public void AnnounceServer(string serverId, ServerContext serverContext) => _servers.Add(new ServerDto{Name = serverId});
+        public void AnnounceServer(string serverId) => _servers.Add(new ServerDto{Name = serverId});
         
         
         public IList<QueueWithTopEnqueuedJobsDto> Queues()

@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test
 
         public SystemUnderTest WithAnnouncedServer(string serverId)
         {
-            Monitor.AnnounceServer(serverId, null);
+            Monitor.AnnounceServer(serverId);
             return this;
         }
 

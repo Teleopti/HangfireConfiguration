@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
-            system.Monitor.AnnounceServer("runningServer", new ServerContext());
+            system.Monitor.AnnounceServer("runningServer");
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
@@ -25,8 +25,8 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(9);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
+            system.Monitor.AnnounceServer("server1");
+            system.Monitor.AnnounceServer("server2");
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
@@ -38,9 +38,9 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
-            system.Monitor.AnnounceServer("server3", new ServerContext());
+            system.Monitor.AnnounceServer("server1");
+            system.Monitor.AnnounceServer("server2");
+            system.Monitor.AnnounceServer("server3");
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
@@ -52,9 +52,9 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(200);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
-            system.Monitor.AnnounceServer("server3", new ServerContext());
+            system.Monitor.AnnounceServer("server1");
+            system.Monitor.AnnounceServer("server2");
+            system.Monitor.AnnounceServer("server3");
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
@@ -66,8 +66,8 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(100);
-            system.Monitor.AnnounceServer("server1", new ServerContext());
-            system.Monitor.AnnounceServer("server2", new ServerContext());
+            system.Monitor.AnnounceServer("server1");
+            system.Monitor.AnnounceServer("server2");
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {

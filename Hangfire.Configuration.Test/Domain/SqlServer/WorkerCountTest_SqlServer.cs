@@ -232,7 +232,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
-            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
+            system.Monitor.AnnounceServer("restartedServer");
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {

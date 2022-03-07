@@ -1,7 +1,6 @@
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.PostgreSql;
-using Hangfire.Server;
 using Npgsql;
 using Xunit;
 
@@ -232,7 +231,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
-            system.Monitor.AnnounceServer("restartedServer", new ServerContext());
+            system.Monitor.AnnounceServer("restartedServer");
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {

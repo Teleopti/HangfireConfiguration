@@ -66,7 +66,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(10);
             system.KeyValueStore.Has(new ServerCountSample {Count = 10});
-            system.Monitor.AnnounceServer("server", null);
+            system.Monitor.AnnounceServer("server");
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
