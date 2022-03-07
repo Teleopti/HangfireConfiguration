@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            var workerServers = system.WorkerServerQueries
+            system.WorkerServerQueries
                 .QueryAllWorkerServers(
                     new ConfigurationOptions
                     {
@@ -58,7 +58,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration{ ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
-            var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.WorkerServerQueries.QueryAllWorkerServers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
 
             Assert.False(system.Hangfire.CreatedStorages.Single().SqlServerOptions.PrepareSchemaIfNecessary);
         }

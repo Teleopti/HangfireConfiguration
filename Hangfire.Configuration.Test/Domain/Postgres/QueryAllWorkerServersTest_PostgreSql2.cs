@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            var workerServers = system.WorkerServerQueries
+            system.WorkerServerQueries
                 .QueryAllWorkerServers(
                     new ConfigurationOptions
                     {
@@ -58,7 +58,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration{ConnectionString = @"Host=localhost;Database=fakedb;"});
 
-            var workerServers = system.WorkerServerQueries.QueryAllWorkerServers(null, new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
+            system.WorkerServerQueries.QueryAllWorkerServers(null, new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
 
             Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
         }

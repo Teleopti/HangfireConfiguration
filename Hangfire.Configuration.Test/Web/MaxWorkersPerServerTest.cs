@@ -19,7 +19,7 @@ namespace Hangfire.Configuration.Test.Web
 
 			using (var s = new ServerUnderTest(system))
 			{
-				var response = s.TestClient.PostAsync(
+				_ = s.TestClient.PostAsync(
 						"/config/saveMaxWorkersPerServer",
 						new StringContent(JsonConvert.SerializeObject(new
 						{
@@ -44,7 +44,7 @@ namespace Hangfire.Configuration.Test.Web
 
 			using (var s = new ServerUnderTest(system))
 			{
-				var response = s.TestClient.PostAsync(
+				_ = s.TestClient.PostAsync(
 						"/config/saveMaxWorkersPerServer",
 						new StringContent(JsonConvert.SerializeObject(new
 						{
