@@ -10,19 +10,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Hangfire.Configuration
 {
-    public interface IHangfire
-    {
-        void UseHangfireServer(
-            JobStorage storage,
-            BackgroundJobServerOptions options,
-            params IBackgroundProcess[] additionalProcesses);
-
-        JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options);
-        JobStorage MakeSqlJobStorage(string connectionString, RedisStorageOptions options);
-        JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options);
-    }
-
-    public class RealHangfire : IHangfire
+	public class RealHangfire : IHangfire
     {
         private readonly object _applicationBuilder;
 
