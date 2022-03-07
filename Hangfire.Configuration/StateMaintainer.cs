@@ -1,5 +1,6 @@
 using System.Linq;
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 using Newtonsoft.Json;
 
@@ -43,6 +44,15 @@ public class StateMaintainer
 						return existing;
 					}
 
+					if (c.ConnectionString != null && c.ConnectionString.StartsWith("redis$$"))
+					{
+						return new ConfigurationAndStorage
+						{
+							JobStorageCreator = () => _hangfire.MakeSqlJobStorage(c.ConnectionString, new RedisStorageOptions()),
+							Configuration = c
+						};
+					}
+					
 					// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
 					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
 					var connectionString = c.ConnectionString ?? options.ConnectionString;
@@ -53,7 +63,6 @@ public class StateMaintainer
 					if (result == null)
 						return makeJobStorage(c, _state.StorageOptionsSqlServer);
 					return result;
-					
 				}).ToArray();
 		}
 	}

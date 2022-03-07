@@ -1,4 +1,5 @@
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if NET472
@@ -17,6 +18,7 @@ namespace Hangfire.Configuration
             params IBackgroundProcess[] additionalProcesses);
 
         JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options);
+        JobStorage MakeSqlJobStorage(string connectionString, RedisStorageOptions options);
         JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options);
     }
 
@@ -43,6 +45,11 @@ namespace Hangfire.Configuration
 
         public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options) =>
             new SqlServerStorage(connectionString, options);
+
+        public JobStorage MakeSqlJobStorage(string connectionString, RedisStorageOptions options)
+        {
+	        throw new System.NotImplementedException();
+        }
 
         public JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options) =>
 	        new PostgreSqlStorage(connectionString, options);

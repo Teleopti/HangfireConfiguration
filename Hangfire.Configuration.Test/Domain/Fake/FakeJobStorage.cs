@@ -1,4 +1,5 @@
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 using Hangfire.Storage;
 
@@ -9,6 +10,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 		public string ConnectionString { get; }
 		public SqlServerStorageOptions SqlServerOptions { get; }
 		public PostgreSqlStorageOptions PostgresOptions { get; }
+		public RedisStorageOptions RedisOptions { get; }
 		private readonly IMonitoringApi _monitoringApi;
 
 		public FakeJobStorage(string connectionString, object options, FakeMonitoringApi monitoringApi)
@@ -18,6 +20,8 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 				SqlServerOptions = sqlServer;
 			if (options is PostgreSqlStorageOptions postgres)
 				PostgresOptions = postgres;
+			if (options is RedisStorageOptions redis)
+				RedisOptions = redis;
 			_monitoringApi = monitoringApi;
 		}
 
