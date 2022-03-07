@@ -13,14 +13,6 @@ namespace Hangfire.Configuration.Test
             _instance = instance;
             _options = options;
         }
-   //
-   //      public void Start()
-   //      {
-			// new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString())
-			// 	.SelectDialectVoid(
-			// 		() => Start(null, (SqlServerStorageOptions)null), 
-			// 		() => Start(null, (PostgreSqlStorageOptions)null));
-   //      }
 
         public void Start()
         {

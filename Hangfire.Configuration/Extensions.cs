@@ -6,12 +6,7 @@ namespace Hangfire.Configuration
 {
     internal static class Extensions
     {
-        internal static bool IsEmpty<T>(this IEnumerable<T> source)
-        {
-            return !source.Any();
-        }
-        
-        internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
+	    internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
         {
             foreach (T item in source)
             {

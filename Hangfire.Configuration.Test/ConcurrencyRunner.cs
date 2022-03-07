@@ -17,14 +17,6 @@ namespace Hangfire.Configuration.Test
         private Action _lastSyncAction;
         private Action _lastAsyncAction;
 
-        public ConcurrencyRunner InSync(Action action)
-        {
-            _lastSyncAction = action;
-            _lastAsyncAction = null;
-            action.Invoke();
-            return this;
-        }
-
         public ConcurrencyRunner InParallel(Action action)
         {
             _lastSyncAction = null;
@@ -70,34 +62,5 @@ namespace Hangfire.Configuration.Test
             if (exceptions.Any())
                 throw new AggregateException(exceptions);
         }
-
-        public void Wait(TimeSpan timeout)
-        {
-	        var finished = _tasks.All(t => t.Thread.Join(timeout));
-	        if (!finished)
-		        throw new TimeoutException("BLIP");
-	        var exceptions = _tasks
-		        .Where(t => t.Exception != null)
-		        .Select(t => t.Exception)
-		        .ToArray();
-	        if (exceptions.Any())
-		        throw new AggregateException(exceptions);
-        }
-        
-//
-//        public void WaitForException<T>() where T : Exception
-//        {
-//            try
-//            {
-//                Wait();
-//            }
-//            catch (Exception e)
-//            {
-//                var matched = e.AllExceptions().OfType<T>().FirstOrDefault();
-//                if (matched != null)
-//                    throw matched;
-//                throw;
-//            }
-//        }
     }
 }

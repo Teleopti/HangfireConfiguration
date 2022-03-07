@@ -102,7 +102,7 @@ INSERT INTO
 				return c.Query<values>("SELECT * FROM hangfireconfiguration.configuration");
         }
 
-        private int version()
+        private static int version()
         {
 	        var sqlDialectSelector = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString());
 
