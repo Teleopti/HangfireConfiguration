@@ -6,6 +6,7 @@
 	<PropertyGroup>
 		<RootNamespace>Hangfire.Configuration.Test</RootNamespace>
 		<TargetFrameworks>net6.0;net472</TargetFrameworks>
+		<LangVersion>10</LangVersion>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	</PropertyGroup>
