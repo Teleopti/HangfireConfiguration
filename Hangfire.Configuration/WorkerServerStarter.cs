@@ -67,7 +67,7 @@ namespace Hangfire.Configuration
         }
 
         private static BackgroundJobServerOptions copyOptions(BackgroundJobServerOptions serverOptions) =>
-            new BackgroundJobServerOptions
+            new()
             {
                 Queues = serverOptions.Queues,
                 HeartbeatInterval = serverOptions.HeartbeatInterval,
