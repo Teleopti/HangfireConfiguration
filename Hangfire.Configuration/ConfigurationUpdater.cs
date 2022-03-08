@@ -105,17 +105,24 @@ namespace Hangfire.Configuration
 										Active = true
 									};
 				
-				if (!update.ConnectionString.StartsWith("redis$$") && update.Name == DefaultConfigurationName.Name())
-				{
-					configuration.ConnectionString = new ConnectionStringDialectSelector(update.ConnectionString)
-						.SelectDialect(
-							() => markConnectionStringSqlServer(update.ConnectionString), 
-							() => markConnectionStringPostgreSql(update.ConnectionString));
-				}
-				else
-				{
-					configuration.ConnectionString = update.ConnectionString;
-				}
+				update.ConnectionString.Run(
+					_ =>
+					{
+						configuration.ConnectionString = update.ConnectionString;
+					}, () =>
+					{
+						if (update.Name == DefaultConfigurationName.Name())
+						{
+							configuration.ConnectionString = new ConnectionStringDialectSelector(update.ConnectionString)
+								.SelectDialect(
+									() => markConnectionStringSqlServer(update.ConnectionString), 
+									() => markConnectionStringPostgreSql(update.ConnectionString));
+						}
+						else
+						{
+							configuration.ConnectionString = update.ConnectionString;
+						}
+					});
 
 				configuration.SchemaName = update.SchemaName;
 				_storage.WriteConfiguration(configuration, connection);
