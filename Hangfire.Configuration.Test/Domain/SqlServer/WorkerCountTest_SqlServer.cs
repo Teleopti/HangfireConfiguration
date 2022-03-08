@@ -1,7 +1,6 @@
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.Server;
 using Hangfire.SqlServer;
 using Xunit;
 
