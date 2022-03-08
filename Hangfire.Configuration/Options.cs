@@ -1,4 +1,5 @@
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration
@@ -20,6 +21,9 @@ namespace Hangfire.Configuration
 
         public void UseStorageOptions(PostgreSqlStorageOptions storageOptions) =>
 	        _state.StorageOptionsPostgreSql = storageOptions;
+        
+        public void UseStorageOptions(RedisStorageOptions storageOptions) =>
+	        _state.StorageOptionsRedis = storageOptions;
 
 		public void UseServerOptions(BackgroundJobServerOptions serverOptions) =>
             _state.ServerOptions = serverOptions;

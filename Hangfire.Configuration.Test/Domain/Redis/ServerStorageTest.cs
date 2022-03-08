@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Hangfire.Pro.Redis;
 using Xunit;
 
 namespace Hangfire.Configuration.Test.Domain.Redis
@@ -23,6 +24,18 @@ namespace Hangfire.Configuration.Test.Domain.Redis
 			system.WorkerServerStarter.Start();
 			
 			Assert.Equal("connstring", system.Hangfire.StartedServers.Single().storage.ConnectionString);
+		}
+
+		[Fact]
+		public void ShouldUseProvidedRedisOptions()
+		{
+			var options = new RedisStorageOptions();
+			var system = new SystemUnderTest();
+			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis$$Foo"});
+			system.Options.UseStorageOptions(options);
+			system.WorkerServerStarter.Start();
+			
+			Assert.Same(options, system.Hangfire.StartedServers.Single().storage.RedisOptions);
 		}
 	}
 }

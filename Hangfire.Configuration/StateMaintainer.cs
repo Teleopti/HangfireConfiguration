@@ -47,9 +47,10 @@ public class StateMaintainer
 					const string redisStart = "redis$$";
 					if (c.ConnectionString != null && c.ConnectionString.StartsWith(redisStart))
 					{
+						var options = _state.StorageOptionsRedis ?? new RedisStorageOptions();
 						return new ConfigurationAndStorage
 						{
-							JobStorageCreator = () => _hangfire.MakeSqlJobStorage(c.ConnectionString.Substring(redisStart.Length), new RedisStorageOptions()),
+							JobStorageCreator = () => _hangfire.MakeSqlJobStorage(c.ConnectionString.Substring(redisStart.Length), options),
 							Configuration = c
 						};
 					}
