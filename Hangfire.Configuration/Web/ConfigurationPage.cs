@@ -189,6 +189,7 @@ namespace Hangfire.Configuration.Web
 					<input type='text' id='schemaName' name='schemaName'>
 				</div>
              </fieldset>
+			<div id='applicationUser'>
              <fieldset>
                 <h3>Application user</h3>
                 <label for='user'>SQL User Name:</label><br>
@@ -196,6 +197,7 @@ namespace Hangfire.Configuration.Web
                 <label for='password'>SQL Password: </label><br>
                 <input type='password' id='password' name='password'>
             </fieldset>
+			</div>
             <fieldset>
 				<div id='patchuser'>
 					<h3>Patch user (with create permissions)</h3>
