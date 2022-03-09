@@ -1,13 +1,13 @@
 using System.Linq;
 using Hangfire.PostgreSql;
 using Npgsql;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class ConfigureUpdateConfigurationsTest
     {
-        [Fact]
+        [Test]
         public void ShouldConfigureUpdatedConfiguration()
         {
             var system = new SystemUnderTest();
@@ -27,12 +27,12 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.Single();
-            Assert.Equal("name", configuration.Name);
-            Assert.Equal(connectionString, configuration.ConnectionString);
-            Assert.Equal("schema", configuration.SchemaName);
+            Assert.AreEqual("name", configuration.Name);
+            Assert.AreEqual(connectionString, configuration.ConnectionString);
+            Assert.AreEqual("schema", configuration.SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateOnFirstUpdate()
         {
             var system = new SystemUnderTest();
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateConfiguration()
         {
             var system = new SystemUnderTest();
@@ -74,10 +74,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.Single();
-            Assert.Equal(newConnectionString, configuration.ConnectionString);
+            Assert.AreEqual(newConnectionString, configuration.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldConfigureUpdatedConfigurations()
         {
             var system = new SystemUnderTest();
@@ -104,12 +104,12 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var configuration = system.ConfigurationStorage.Data.OrderBy(x => x.Id);
-            Assert.Equal("name1", configuration.ElementAt(0).Name);
-            Assert.Equal(connectionString1, configuration.ElementAt(0).ConnectionString);
-            Assert.Equal("schema1", configuration.ElementAt(0).SchemaName);
-            Assert.Equal("name2", configuration.ElementAt(1).Name);
-            Assert.Equal(connectionString2, configuration.ElementAt(1).ConnectionString);
-            Assert.Equal("schema2", configuration.ElementAt(1).SchemaName);
+            Assert.AreEqual("name1", configuration.ElementAt(0).Name);
+            Assert.AreEqual(connectionString1, configuration.ElementAt(0).ConnectionString);
+            Assert.AreEqual("schema1", configuration.ElementAt(0).SchemaName);
+            Assert.AreEqual("name2", configuration.ElementAt(1).Name);
+            Assert.AreEqual(connectionString2, configuration.ElementAt(1).ConnectionString);
+            Assert.AreEqual("schema2", configuration.ElementAt(1).SchemaName);
         }
     }
 }

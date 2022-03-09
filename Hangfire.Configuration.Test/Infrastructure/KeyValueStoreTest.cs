@@ -1,11 +1,12 @@
-﻿using Xunit;
+﻿using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
+	[CleanDatabase]
 	public class KeyValueStoreTest
 	{
-		[Fact, CleanDatabase]
+		[Test]
 		public void ShouldReadValueMatchingKey()
 		{
 			var system = new SystemUnderInfraTest();
@@ -16,8 +17,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			var value1 = system.KeyValueStore.Read("firstKey");
 			var value2 = system.KeyValueStore.Read("secondKey");
 
-			Assert.Equal("1", value1);
-			Assert.Equal("2", value2);
+			Assert.AreEqual("1", value1);
+			Assert.AreEqual("2", value2);
 		}
 	}
 }

@@ -1,30 +1,31 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("NotParallel")]
+    [Parallelizable(ParallelScope.None)]
+    [CleanDatabase]
     public class ConfigurationStorageGoalWorkerCountTest
     {
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldReadEmptyGoalWorkerCount()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
-            Assert.Empty(storage.ReadConfigurations());
+            Assert.IsEmpty(storage.ReadConfigurations());
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldWriteGoalWorkerCount()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
             storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            Assert.Equal(1, storage.ReadConfigurations().Single().GoalWorkerCount);
+            Assert.AreEqual(1, storage.ReadConfigurations().Single().GoalWorkerCount);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldReadGoalWorkerCount()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -32,10 +33,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             var actual = storage.ReadConfigurations();
             
-            Assert.Equal(1, actual.Single().GoalWorkerCount);
+            Assert.AreEqual(1, actual.Single().GoalWorkerCount);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldWriteNullGoalWorkerCount()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());

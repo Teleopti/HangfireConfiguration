@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ActivateServerConfigurationTest
     {
-        [Fact]
+        [Test]
         public void ShouldBeInactiveWhenCreated()
         {
             var system = new SystemUnderTest();
@@ -22,10 +22,10 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
-            Assert.Equal(false, storedConfiguration.Active);
+            Assert.AreEqual(false, storedConfiguration.Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivate()
         {
             var system = new SystemUnderTest();
@@ -40,10 +40,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.ActivateServer(1);
 
             var storedConfiguration = system.ConfigurationStorage.Data.Single();
-            Assert.Equal(true, storedConfiguration.Active);
+            Assert.AreEqual(true, storedConfiguration.Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldDeactivatePreviouslyActive()
         {
             var system = new SystemUnderTest();
@@ -54,7 +54,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi.ActivateServer(2);
 
-            Assert.Equal(false, system.ConfigurationStorage.Data.Single(x => x.Id == 1).Active);
+            Assert.AreEqual(false, system.ConfigurationStorage.Data.Single(x => x.Id == 1).Active);
         }
     }
 }

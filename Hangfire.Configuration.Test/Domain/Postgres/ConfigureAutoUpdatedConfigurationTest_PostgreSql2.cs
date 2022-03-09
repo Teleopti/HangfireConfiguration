@@ -3,13 +3,13 @@ using System.Linq;
 using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using Npgsql;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class ConfigureAutoUpdatedConfigurationTest
     {
-        [Fact]
+        [Test]
         public void ShouldConfigureAutoUpdatedServer()
         {
             var system = new SystemUnderTest();
@@ -27,20 +27,20 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
-            Assert.Equal("host", host);
+            Assert.AreEqual("host", host);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotConfigureAutoUpdatedServerIfNoneGiven()
         {
             var system = new SystemUnderTest();
 
             system.WorkerServerStarter.Start(new ConfigurationOptions(), null, (PostgreSqlStorageOptions)null);
 
-            Assert.Empty(system.ConfigurationStorage.Data);
+            Assert.IsEmpty(system.ConfigurationStorage.Data);
         }
 
-        [Fact]
+        [Test]
         public void ShouldMarkAutoUpdatedConnectionString()
         {
             var system = new SystemUnderTest();
@@ -58,10 +58,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
-            Assert.Equal("ApplicationName.AutoUpdate", applicationName);
+            Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldMarkAutoUpdatedConnectionStringWhenNoApplicationName()
         {
             var system = new SystemUnderTest();
@@ -79,10 +79,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
-            Assert.Equal("Hangfire.AutoUpdate", applicationName);
+            Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
         {
             var system = new SystemUnderTest();
@@ -102,10 +102,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked2()
         {
             var system = new SystemUnderTest();
@@ -125,10 +125,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
         {
             var system = new SystemUnderTest();
@@ -148,10 +148,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
         {
             var system = new SystemUnderTest();
@@ -170,10 +170,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).Last();
-            Assert.Equal("autoupdated", new NpgsqlConnectionStringBuilder(actual.ConnectionString).Host);
+            Assert.AreEqual("autoupdated", new NpgsqlConnectionStringBuilder(actual.ConnectionString).Host);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdate()
         {
             var system = new SystemUnderTest();
@@ -193,11 +193,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var updatedConnectionString = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString);
-            Assert.Equal("newDataSource", updatedConnectionString.Host);
-            Assert.Equal("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
+            Assert.AreEqual("newDataSource", updatedConnectionString.Host);
+            Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateLegacyConfiguration()
         {
             var system = new SystemUnderTest();
@@ -216,11 +216,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
-            Assert.Equal(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-            Assert.Equal(expected, system.ConfigurationStorage.Data.Single().ConnectionString);
+            Assert.AreEqual(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Single().ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateOneOfTwo()
         {
             var system = new SystemUnderTest();
@@ -242,10 +242,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, null, (PostgreSqlStorageOptions)null);
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
-            Assert.Equal(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
+            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateOnFirstUpdate()
         {
             var system = new SystemUnderTest();
@@ -265,7 +265,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
         {
             var system = new SystemUnderTest();
@@ -286,7 +286,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBeActiveOnUpdateIfActiveBefore()
         {
             var system = new SystemUnderTest();
@@ -311,7 +311,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotActivateWhenUpdating()
         {
             var system = new SystemUnderTest();
@@ -334,7 +334,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.True(system.ConfigurationStorage.Data.Last().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldSaveSchemaName()
         {
             var system = new SystemUnderTest();
@@ -352,10 +352,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            }
             }, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
             var system = new SystemUnderTest();
@@ -374,10 +374,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            }
             }, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldOnlyAutoUpdateOnce()
         {
             var system = new SystemUnderTest();
@@ -406,10 +406,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, new SqlServerStorageOptions());
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
-            Assert.Equal("FirstUpdate", host);
+            Assert.AreEqual("FirstUpdate", host);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
         {
             var system = new SystemUnderTest();
@@ -439,10 +439,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             }, new SqlServerStorageOptions());
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
-            Assert.Equal("SecondUpdate", host);
+            Assert.AreEqual("SecondUpdate", host);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateWithDefaultConfigurationName()
         {
             var system = new SystemUnderTest();
@@ -459,10 +459,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            }
             }, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateWithDefaultConfigurationName2()
         {
             var system = new SystemUnderTest();
@@ -480,7 +480,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            }
             }, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }
     }
 }

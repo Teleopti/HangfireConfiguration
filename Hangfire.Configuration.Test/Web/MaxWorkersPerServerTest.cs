@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 using System.Net.Http;
 using Newtonsoft.Json;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Web
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
 	public class MaxWorkersPerServerTest
 	{
-		[Fact]
+		[Test]
 		public void ShouldSave()
 		{
 			var system = new SystemUnderTest();
@@ -28,11 +28,11 @@ namespace Hangfire.Configuration.Test.Web
 						})))
 					.Result;
 
-				Assert.Equal(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+				Assert.AreEqual(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public void ShouldSaveEmpty()
 		{
 			var system = new SystemUnderTest();

@@ -1,11 +1,11 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ReadConfigurationsTest
     {
-        [Fact]
+        [Test]
         public void ShouldRead()
         {
             var system = new SystemUnderTest();
@@ -20,14 +20,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ConfigurationApi.ReadConfigurations() as StoredConfiguration[];
 
-            Assert.Equal(13, result.Single().Id);
-            Assert.Equal("connection", result.Single().ConnectionString);
-            Assert.Equal("schema", result.Single().SchemaName);
-            Assert.Equal(true, result.Single().Active);
-            Assert.Equal(11, result.Single().GoalWorkerCount);
+            Assert.AreEqual(13, result.Single().Id);
+            Assert.AreEqual("connection", result.Single().ConnectionString);
+            Assert.AreEqual("schema", result.Single().SchemaName);
+            Assert.AreEqual(true, result.Single().Active);
+            Assert.AreEqual(11, result.Single().GoalWorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldWrite()
         {
             var system = new SystemUnderTest();
@@ -42,11 +42,11 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var result = system.ConfigurationApi.ReadConfigurations().Single();
-            Assert.Equal(22, result.Id);
-            Assert.Equal("connection", result.ConnectionString);
-            Assert.Equal("SchemaName", result.SchemaName);
+            Assert.AreEqual(22, result.Id);
+            Assert.AreEqual("connection", result.ConnectionString);
+            Assert.AreEqual("SchemaName", result.SchemaName);
             Assert.True(result.Active);
-            Assert.Equal(44, result.GoalWorkerCount);
+            Assert.AreEqual(44, result.GoalWorkerCount);
         }
     }
 }

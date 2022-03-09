@@ -1,13 +1,14 @@
 using System.Linq;
 using Hangfire.PostgreSql;
 using Npgsql;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class QueryAllWorkerServersTest
     {
-        [Fact]
+        [Test]
         public void ShouldQueryWorkerServers()
         {
             var system = new SystemUnderTest();
@@ -18,7 +19,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.NotNull(workerServers.Single());
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnWorkerServer()
         {
             var system = new SystemUnderTest();
@@ -26,10 +27,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, (PostgreSqlStorageOptions)null).Single();
 
-            Assert.Same(system.Hangfire.CreatedStorages.Single(), workerServer.JobStorage);
+            workerServer.JobStorage
+	            .Should().Be.SameInstanceAs(system.Hangfire.CreatedStorages.Single());
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdate()
         {
             var system = new SystemUnderTest();
@@ -49,10 +51,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	                    }
                     }, (PostgreSqlStorageOptions)null);
 
-            Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);
+            system.ConfigurationStorage.Data.Single().ConnectionString
+	            .Should().Contain("Hangfire");
         }
 
-        [Fact]
+        [Test]
         public void ShouldQueryWorkerServersWithDefaultSqlStorageOptions()
         {
             var system = new SystemUnderTest();
@@ -63,7 +66,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnStorageConfigurationId()
         {
             var system = new SystemUnderTest();
@@ -71,10 +74,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, (PostgreSqlStorageOptions)null).Single();
 
-            Assert.Equal(3, workerServer.ConfigurationId);
+            Assert.AreEqual(3, workerServer.ConfigurationId);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnConfigurationName()
         {
             var system = new SystemUnderTest();
@@ -82,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers(null, (PostgreSqlStorageOptions)null).Single();
 
-            Assert.Equal("name", workerServer.Name);
+            Assert.AreEqual("name", workerServer.Name);
         }
     }
 }

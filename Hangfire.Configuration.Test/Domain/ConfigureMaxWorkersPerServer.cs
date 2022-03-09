@@ -1,23 +1,23 @@
 ﻿using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ConfigureMaxWorkersPerServerTest
     {
-        [Theory]
-        [InlineData(5)]
-        [InlineData(6)]
+        [Test]
+        [TestCase(5)]
+        [TestCase(6)]
         public void ShouldWriteMaxWorkersPerServer(int expected)
         {
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer {MaxWorkers = expected});
 
-	        Assert.Equal(expected, system.ConfigurationStorage.MaxWorkersPerServer);
+	        Assert.AreEqual(expected, system.ConfigurationStorage.MaxWorkersPerServer);
         }
         
-        [Fact]
+        [Test]
         public void ShouldWriteMaxWorkersPerServerForSpecificConfiguration()
         {
 	        var system = new SystemUnderTest();
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        MaxWorkers = 7
 	        });
 
-	        Assert.Equal(7, system.ConfigurationStorage.Data.Single(x => x.Id == 2).MaxWorkersPerServer);
+	        Assert.AreEqual(7, system.ConfigurationStorage.Data.Single(x => x.Id == 2).MaxWorkersPerServer);
         }
     }
 }

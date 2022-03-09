@@ -2,13 +2,13 @@ using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class WorkerCountWithSampleTest
     {
-        [Fact]
+        [Test]
         public void ShouldDetermineWorkersFromSample()
         {
             var system = new SystemUnderTest();
@@ -17,10 +17,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldDetermineWorkersFromSample2()
         {
             var system = new SystemUnderTest();
@@ -29,10 +29,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10 / 5, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10 / 5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldDetermineWorkersWithoutSample()
         {
             var system = new SystemUnderTest();
@@ -40,10 +40,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldApplyMinimumServerCount()
         {
             var system = new SystemUnderTest();
@@ -57,10 +57,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 			});
             system.WorkerServerStarter.Start();
 
-            Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldDisableServerCountSampling()
         {
             var system = new SystemUnderTest();
@@ -74,10 +74,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCalculateWithoutServerCountFromServerRecycling()
         {
             var system = new SystemUnderTest();
@@ -88,10 +88,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCalculateWithoutServerCountFromServerRecycling_2()
         {
             var system = new SystemUnderTest();
@@ -102,10 +102,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCalculateWithEarliestSample()
         {
             var system = new SystemUnderTest();
@@ -123,10 +123,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(8 / 4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(8 / 4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldIgnoreSampleWhenServerCountIsZero()
         {
             var system = new SystemUnderTest();
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
     }
 }

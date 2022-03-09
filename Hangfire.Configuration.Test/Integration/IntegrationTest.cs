@@ -1,11 +1,12 @@
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Integration
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
+	[CleanDatabase]
 	public class IntegrationTest
 	{
-		[Fact, CleanDatabase]
+		[Test]
 		public void ShouldStartServerWithWorkers()
 		{
 			var system = new SystemUnderInfraTest();

@@ -1,64 +1,70 @@
 using System;
 using System.Data.SqlClient;
-using System.Reflection;
 using Dapper;
-using Xunit.Sdk;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace Hangfire.Configuration.Test
 {
-    public class CleanDatabaseAttribute : BeforeAfterTestAttribute
-    {
-        private readonly int? _schemaVersion;
+	public class CleanDatabaseAttribute : Attribute, ITestAction
+	{
+		private readonly int? _schemaVersion;
 
-        public CleanDatabaseAttribute()
-        {
-        }
+		public CleanDatabaseAttribute()
+		{
+		}
 
-        public CleanDatabaseAttribute(int schemaVersion)
-        {
-            _schemaVersion = schemaVersion;
-        }
+		public CleanDatabaseAttribute(int schemaVersion)
+		{
+			_schemaVersion = schemaVersion;
+		}
 
-        public override void Before(MethodInfo methodUnderTest)
-        {
-            closeOpenConnections();
-            dropDb();
-            createDb();
-            createAdminLogin();
-            initializeDb();
-        }
+		public ActionTargets Targets => ActionTargets.Test;
 
-        private static void closeOpenConnections()
-        {
-            var closeExistingConnSql = String.Format(
-                @"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
-                ConnectionUtils.GetDatabaseName());
+		public void BeforeTest(ITest test)
+		{
+			closeOpenConnections();
+			dropDb();
+			createDb();
+			createAdminLogin();
+			initializeDb();
+		}
 
-            executeSql(closeExistingConnSql);
-        }
+		public void AfterTest(ITest test)
+		{
+		}
 
-        private static void dropDb()
-        {
-            var dropDatabaseSql = String.Format(
-                @"if db_id('{0}') is not null drop database [{0}]",
-                ConnectionUtils.GetDatabaseName());
+		private static void closeOpenConnections()
+		{
+			var closeExistingConnSql = String.Format(
+				@"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
+				ConnectionUtils.GetDatabaseName());
 
-            executeSql(dropDatabaseSql);
-        }
+			executeSql(closeExistingConnSql);
+		}
 
-        private static void createDb()
-        {
-            var createDatabaseSql = String.Format(
+		private static void dropDb()
+		{
+			var dropDatabaseSql = String.Format(
+				@"if db_id('{0}') is not null drop database [{0}]",
+				ConnectionUtils.GetDatabaseName());
+
+			executeSql(dropDatabaseSql);
+		}
+
+		private static void createDb()
+		{
+			var createDatabaseSql = String.Format(
 				@"if db_id('{0}') is null create database [{0}] COLLATE SQL_Latin1_General_CP1_CI_AS",
-                ConnectionUtils.GetDatabaseName());
+				ConnectionUtils.GetDatabaseName());
 
-            executeSql(createDatabaseSql);
-        }
+			executeSql(createDatabaseSql);
+		}
 
-        private void createAdminLogin()
-        {
-            var login = ConnectionUtils.GetLoginUser();
-            var createLoginSql = $@"
+		private void createAdminLogin()
+		{
+			var login = ConnectionUtils.GetLoginUser();
+			var createLoginSql = $@"
 IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = N'{login}')
 BEGIN
 	CREATE LOGIN {login} WITH PASSWORD=N'{ConnectionUtils.GetLoginUserPassword()}', DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF	
@@ -66,27 +72,27 @@ BEGIN
 	ALTER LOGIN {login} ENABLE
 END";
 
-            executeSql(createLoginSql);
-        }
+			executeSql(createLoginSql);
+		}
 
-        private void initializeDb()
-        {
-            using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString()))
-            {
-                if (_schemaVersion.HasValue)
-                {
-                    if (_schemaVersion.Value > 0)
-                        SqlServerObjectsInstaller.Install(connection, _schemaVersion.Value);
-                }
-                else
-                    SqlServerObjectsInstaller.Install(connection);
-            }
-        }
+		private void initializeDb()
+		{
+			using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString()))
+			{
+				if (_schemaVersion.HasValue)
+				{
+					if (_schemaVersion.Value > 0)
+						SqlServerObjectsInstaller.Install(connection, _schemaVersion.Value);
+				}
+				else
+					SqlServerObjectsInstaller.Install(connection);
+			}
+		}
 
-        private static void executeSql(string sql)
-        {
-            using (var connection = new SqlConnection(ConnectionUtils.GetMasterConnectionString()))
-                connection.Execute(sql);
-        }
-    }
+		private static void executeSql(string sql)
+		{
+			using (var connection = new SqlConnection(ConnectionUtils.GetMasterConnectionString()))
+				connection.Execute(sql);
+		}
+	}
 }

@@ -2,13 +2,13 @@ using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class WorkerCountTest
     {
-        [Fact]
+        [Test]
         public void ShouldGetDefaultForFirstServer()
         {
             var system = new SystemUnderTest();
@@ -27,10 +27,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 },
                 null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetGoalForFirstServer()
         {
             var system = new SystemUnderTest();
@@ -38,10 +38,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetOneIfGoalIsZero()
         {
             var system = new SystemUnderTest();
@@ -49,10 +49,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null,null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetOneIfGoalIsNegative()
         {
             var system = new SystemUnderTest();
@@ -60,10 +60,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null,null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetMaxOneHundred()
         {
             var system = new SystemUnderTest();
@@ -71,10 +71,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(null,null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(100, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(100, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseDefaultGoalWorkerCount()
         {
             var system = new SystemUnderTest();
@@ -92,10 +92,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 	            DefaultGoalWorkerCount = 12
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(12, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(12, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseMinimumWorkerCount()
         {
             var system = new SystemUnderTest();
@@ -107,10 +107,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseMaximumGoalWorkerCount()
         {
             var system = new SystemUnderTest();
@@ -122,10 +122,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(200, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(200, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseMinimumServerCount()
         {
             var system = new SystemUnderTest();
@@ -137,10 +137,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(15 / 3, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(15 / 3, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseMinimumWorkerCountWithMinimumKnownServers()
         {
             var system = new SystemUnderTest();
@@ -153,10 +153,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetGoalForFirstServerWhenMinimumKnownServersIsZero()
         {
             var system = new SystemUnderTest();
@@ -170,10 +170,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 },
                 null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldDisableWorkerDeterminer()
         {
             var system = new SystemUnderTest();
@@ -185,10 +185,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 (SqlServerStorageOptions)null
             );
 
-            Assert.Equal(52, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(52, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldGetHalfOfDefaultForFirstServer()
         {
             var system = new SystemUnderTest();
@@ -208,10 +208,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 },
                 null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetHalfOfGoalForFirstServer()
         {
             var system = new SystemUnderTest();
@@ -223,10 +223,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldGetHalfOfGoalOnRestartOfSingleServer()
         {
             var system = new SystemUnderTest();
@@ -239,10 +239,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldGetHalfOfMaxOneHundred()
         {
             var system = new SystemUnderTest();
@@ -254,10 +254,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
 			}, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(50, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseDefaultGoalWorkerCountWithMinimumKnownServers()
         {
             var system = new SystemUnderTest();
@@ -276,7 +276,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
                 MinimumServerCount = 2
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
     }

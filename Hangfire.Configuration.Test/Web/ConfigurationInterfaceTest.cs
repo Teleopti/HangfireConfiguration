@@ -4,34 +4,35 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Newtonsoft.Json;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Web
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
 	public class ConfigurationInterfaceTest
 	{
-		[Fact]
+		[Test]
 		public async Task ShouldFindConfigurationInterface()
 		{
 			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
 			{
 				var response = await s.TestClient.GetAsync("/config");
-				Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+				Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldNotFindConfigurationInterface()
 		{
 			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
 			{
 				var response = await s.TestClient.GetAsync("/configIncorrect");
-				Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+				Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldSaveWorkerGoalCount()
 		{
 			var system = new SystemUnderTest();
@@ -51,13 +52,13 @@ namespace Hangfire.Configuration.Test.Web
 							workers = 10
 						})));
 
-				Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-				Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+				Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+				Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
 		{
 			var system = new SystemUnderTest();
@@ -78,14 +79,14 @@ namespace Hangfire.Configuration.Test.Web
 							workers = 11
 						})));
 
-				Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+				Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
 				var message = await response.Content.ReadAsStringAsync();
-				Assert.NotEmpty(message);
-				Assert.DoesNotContain("<", message);
+				message.Should().Not.Be.Empty();
+				message.Should().Not.Contain("<");
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldSaveWorkerGoalCountWithEmptyDatabase()
 		{
 			var system = new SystemUnderTest();
@@ -99,12 +100,12 @@ namespace Hangfire.Configuration.Test.Web
 							workers = 10
 						})));
 
-				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-				Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+				Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldActivateServer()
 		{
 			var system = new SystemUnderTest();
@@ -126,7 +127,7 @@ namespace Hangfire.Configuration.Test.Web
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldCreateNewServerConfiguration()
 		{
 			var system = new SystemUnderTest();
@@ -147,12 +148,13 @@ namespace Hangfire.Configuration.Test.Web
 								schemaCreatorPassword = "schemaCreatorPassword"
 							})));
 
-				Assert.Equal(1, system.ConfigurationStorage.Data.Single().Id);
-				Assert.Contains("database", system.ConfigurationStorage.Data.Single().ConnectionString);
+				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+				system.ConfigurationStorage.Data.Single().ConnectionString
+					.Should().Contain("database");
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldCreateNewServerConfigurationWithName()
 		{
 			var system = new SystemUnderTest();
@@ -174,21 +176,21 @@ namespace Hangfire.Configuration.Test.Web
 								schemaCreatorPassword = "schemaCreatorPassword"
 							})));
 
-				Assert.Equal("name", system.ConfigurationStorage.Data.Single().Name);
+				Assert.AreEqual("name", system.ConfigurationStorage.Data.Single().Name);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldNotFindUnknownAction()
 		{
 			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
 			{
 				var response = await s.TestClient.GetAsync("/config/unknownAction");
-				Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+				Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 			}
 		}
 
-		[Fact]
+		[Test]
 		public async Task ShouldInactivateServer()
 		{
 			var system = new SystemUnderTest();

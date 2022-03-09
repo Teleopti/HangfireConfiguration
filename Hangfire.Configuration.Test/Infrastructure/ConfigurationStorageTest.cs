@@ -1,20 +1,21 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("NotParallel")]
+    [Parallelizable(ParallelScope.None)]
+    [CleanDatabase]
     public class ConfigurationStorageTest
     {
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldReadEmptyConfiguration()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
 
-            Assert.Empty(storage.ReadConfigurations());
+            Assert.IsEmpty(storage.ReadConfigurations());
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldWrite()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -27,12 +28,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
             });
 
             var configuration = storage.ReadConfigurations().Single();
-            Assert.Equal("connection string", configuration.ConnectionString);
-            Assert.Equal("schema name", configuration.SchemaName);
-            Assert.Equal(false, configuration.Active);
+            Assert.AreEqual("connection string", configuration.ConnectionString);
+            Assert.AreEqual("schema name", configuration.SchemaName);
+            Assert.AreEqual(false, configuration.Active);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldRead()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -46,14 +47,14 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             var result = storage.ReadConfigurations().Single();
 
-            Assert.Equal(1, result.Id);
-            Assert.Equal("connectionString", result.ConnectionString);
-            Assert.Equal("schemaName", result.SchemaName);
-            Assert.Equal(3, result.GoalWorkerCount);
-            Assert.Equal(true, result.Active);
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("connectionString", result.ConnectionString);
+            Assert.AreEqual("schemaName", result.SchemaName);
+            Assert.AreEqual(3, result.GoalWorkerCount);
+            Assert.AreEqual(true, result.Active);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldUpdate()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -67,13 +68,13 @@ namespace Hangfire.Configuration.Test.Infrastructure
             storage.WriteConfiguration(existing);
 
             var configuration = storage.ReadConfigurations().Single();
-            Assert.Equal("connection", configuration.ConnectionString);
-            Assert.Equal("schema", configuration.SchemaName);
-            Assert.Equal(23, configuration.GoalWorkerCount);
-            Assert.Equal(true, configuration.Active);
+            Assert.AreEqual("connection", configuration.ConnectionString);
+            Assert.AreEqual("schema", configuration.SchemaName);
+            Assert.AreEqual(23, configuration.GoalWorkerCount);
+            Assert.AreEqual(true, configuration.Active);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldWriteName()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -84,10 +85,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
             });
 
             var configuration = storage.ReadConfigurations().Single();
-            Assert.Equal("name", configuration.Name);
+            Assert.AreEqual("name", configuration.Name);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldUpdateName()
         {
             var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
@@ -98,7 +99,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             storage.WriteConfiguration(existing);
 
             var configuration = storage.ReadConfigurations().Single();
-            Assert.Equal("name", configuration.Name);
+            Assert.AreEqual("name", configuration.Name);
         }
     }
 }

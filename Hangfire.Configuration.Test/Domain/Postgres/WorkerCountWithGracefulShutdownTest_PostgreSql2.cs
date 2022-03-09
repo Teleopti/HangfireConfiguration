@@ -1,13 +1,13 @@
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.PostgreSql;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class WorkerCountWithGracefulShutdownTest
     {
-        [Fact]
+        [Test]
         public void ShouldCalculateWorkersOnStartOfSecondServer()
         {
             var system = new SystemUnderTest();
@@ -16,10 +16,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
-            Assert.Equal(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldCalculateWorkersOnStartOfThirdServer()
         {
             var system = new SystemUnderTest();
@@ -29,10 +29,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
-            Assert.Equal(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldRoundWorkerCountUp()
         {
             var system = new SystemUnderTest();
@@ -43,10 +43,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
-            Assert.Equal(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldCalculateBasedOnMaxOneHundredWhenStartingFourthServer()
         {
             var system = new SystemUnderTest();
@@ -57,10 +57,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions) null);
 
-            Assert.Equal(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldCalculateGoalBasedOnMinimumKnownOnStartOfThirdServer()
         {
             var system = new SystemUnderTest();
@@ -74,7 +74,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                 ConnectionString = @"Host=localhost;Database=fakedb;"
 			}, null, (PostgreSqlStorageOptions)null);
 
-            Assert.Equal(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }        
         
     }

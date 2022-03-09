@@ -1,17 +1,12 @@
 using System.Data.SqlClient;
 using System.Linq;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
-    public class DefaultConfigurationNameTest : XunitContextBase
+    public class DefaultConfigurationNameTest
     {
-        public DefaultConfigurationNameTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
-        [Fact]
+        [Test]
         public void ShouldUpdateLegacyWithDefaultName()
         {
             var system = new SystemUnderTest();
@@ -19,10 +14,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-            Assert.Equal(DefaultConfigurationName.Name(), result.Single().Name);
+            Assert.AreEqual(DefaultConfigurationName.Name(), result.Single().Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateNamed()
         {
 	        var system = new SystemUnderTest();
@@ -30,10 +25,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
 	        var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-	        Assert.Equal("name", result.Single().Name);
+	        Assert.AreEqual("name", result.Single().Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateFirstLegacyWithDefaultName()
         {
             var system = new SystemUnderTest();
@@ -42,10 +37,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-            Assert.Equal(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 1).Name);
+            Assert.AreEqual(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 1).Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
@@ -53,10 +48,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-            Assert.Equal(DefaultConfigurationName.Name(), result.Single().Name);
+            Assert.AreEqual(DefaultConfigurationName.Name(), result.Single().Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateLegacyOverAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
@@ -73,7 +68,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
 			var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
-            Assert.Equal(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 2).Name);
+            Assert.AreEqual(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 2).Name);
             Assert.Null(result.Single(x => x.ConfigurationId == 1).Name);
         }
     }

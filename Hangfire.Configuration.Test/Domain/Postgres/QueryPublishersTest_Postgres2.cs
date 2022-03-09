@@ -2,13 +2,14 @@ using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.PostgreSql;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain.Postgres
 {
     public class QueryPublishersTest
     {
-        [Fact]
+        [Test]
         public void ShouldQueryPublishers()
         {
             var system = new SystemUnderTest();
@@ -20,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             Assert.NotNull(storage.Single());
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnStorageWithCorrectConnectionString()
         {
             var system = new SystemUnderTest();
@@ -30,10 +31,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var storage = system.PublisherQueries.QueryPublishers()
                 .Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnCreatedStorage()
         {
             var system = new SystemUnderTest();
@@ -42,10 +43,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage;
 
-            Assert.Same(system.Hangfire.CreatedStorages.Single(), storage);
+            storage.Should().Be.SameInstanceAs(system.Hangfire.CreatedStorages.Single());
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnTheActiveStorage()
         {
             var system = new SystemUnderTest();
@@ -56,10 +57,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnTheActiveStorageAfterServerStart()
         {
             var system = new SystemUnderTest();
@@ -69,10 +70,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnTheChangedActiveStorage()
         {
             var system = new SystemUnderTest();
@@ -84,10 +85,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Host=loscalhost;Initial Catalog=two;", storage.ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Initial Catalog=two;", storage.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdate()
         {
             var system = new SystemUnderTest();
@@ -107,10 +108,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	                    }
                     }, new PostgreSqlStorageOptions());
 
-            Assert.Contains("Hangfire", system.ConfigurationStorage.Data.Single().ConnectionString);
+            system.ConfigurationStorage.Data.Single().ConnectionString
+	            .Should().Contain("Hangfire");
         }
 
-        [Fact]
+        [Test]
         public void ShouldQueryPublishersWithDefaultStorageOptions()
         {
             var system = new SystemUnderTest();
@@ -126,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         }
 
         
-        [Fact]
+        [Test]
         public void ShouldReturnTheChangedActiveStorageWhenInactiveWasDeleted()
         {
             var system = new SystemUnderTest();
@@ -138,10 +140,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             
             var storage = system.PublisherQueries.QueryPublishers();
             
-            Assert.Equal("Host=loscalhost;Initial Catalog=2;", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Initial Catalog=2;", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
         }
         
-        [Fact]
+        [Test]
         public void ShouldReturnStorageConfigurationId()
         {
             var system = new SystemUnderTest();
@@ -150,10 +152,10 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var configurationInfo = system.PublisherQueries.QueryPublishers()
                 .Single();
 
-            Assert.Equal(4, configurationInfo.ConfigurationId);
+            Assert.AreEqual(4, configurationInfo.ConfigurationId);
         }
 
-        [Fact]
+        [Test]
         public void ShouldReturnConfigurationName()
         {
             var system = new SystemUnderTest();
@@ -162,7 +164,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var configurationInfo = system.PublisherQueries.QueryPublishers()
                 .Single();
 
-            Assert.Equal("name", configurationInfo.Name);
+            Assert.AreEqual("name", configurationInfo.Name);
         }
     }
 }

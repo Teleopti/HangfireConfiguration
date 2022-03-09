@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using Hangfire.Pro.Redis;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain.Redis
 {
 	public class ServerStorageTest
 	{
-		[Fact]
+		[Test]
 		public void ShouldUseRedisOptions()
 		{
 			var system = new SystemUnderTest();
@@ -16,17 +17,17 @@ namespace Hangfire.Configuration.Test.Domain.Redis
 			Assert.NotNull(system.Hangfire.StartedServers.Single().storage.RedisOptions);
 		}
 
-		[Fact]
+		[Test]
 		public void ShouldAdjustConnectionString()
 		{
 			var system = new SystemUnderTest();
 			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis$$connstring"});
 			system.WorkerServerStarter.Start();
 			
-			Assert.Equal("connstring", system.Hangfire.StartedServers.Single().storage.ConnectionString);
+			Assert.AreEqual("connstring", system.Hangfire.StartedServers.Single().storage.ConnectionString);
 		}
 
-		[Fact]
+		[Test]
 		public void ShouldUseProvidedRedisOptions()
 		{
 			var options = new RedisStorageOptions();
@@ -35,7 +36,8 @@ namespace Hangfire.Configuration.Test.Domain.Redis
 			system.Options.UseStorageOptions(options);
 			system.WorkerServerStarter.Start();
 			
-			Assert.Same(options, system.Hangfire.StartedServers.Single().storage.RedisOptions);
+			system.Hangfire.StartedServers.Single().storage.RedisOptions
+				.Should().Be.SameInstanceAs(options);
 		}
 	}
 }

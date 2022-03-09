@@ -1,18 +1,14 @@
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class ServerCountSampleRecorderTest : XunitContextBase
+    public class ServerCountSampleRecorderTest
     {
-        public ServerCountSampleRecorderTest(ITestOutputHelper output) : base(output)
-        {
-        }
-        
-        [Fact]
+        [Test]
         public void ShouldStartRecorder()
         {
             var system = new SystemUnderTest();
@@ -20,11 +16,12 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-            Assert.Single(system.Hangfire.StartedServers.Single().backgroundProcesses
-                .OfType<ServerCountSampleRecorder>());
+            system.Hangfire.StartedServers.Single().backgroundProcesses
+	            .OfType<ServerCountSampleRecorder>()
+	            .Should().Have.Count.EqualTo(1);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotStartRecorder()
         {
 	        var options = new ConfigurationOptions();
@@ -37,11 +34,11 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
 
-	        Assert.Empty(system.Hangfire.StartedServers.Single().backgroundProcesses
+	        Assert.IsEmpty(system.Hangfire.StartedServers.Single().backgroundProcesses
 		        .OfType<ServerCountSampleRecorder>());
         }
         
-        [Fact]
+        [Test]
         public void ShouldRecord()
         {
             var system = new SystemUnderTest();
@@ -50,10 +47,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(1, system.KeyValueStore.Samples().Single().Count);
+            Assert.AreEqual(1, system.KeyValueStore.Samples().Single().Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldRecordBoth()
         {
             var system = new SystemUnderTest();
@@ -63,20 +60,20 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
+            Assert.AreEqual(2, system.KeyValueStore.Samples().Single().Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotBoomWithoutConfigurations()
         {
             var system = new SystemUnderTest();
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Empty(system.KeyValueStore.Samples());
+            Assert.IsEmpty(system.KeyValueStore.Samples());
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotBoomWith2Configurations()
         {
             var system = new SystemUnderTest();
@@ -89,10 +86,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
+            Assert.AreEqual(2, system.KeyValueStore.Samples().Single().Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldRecordWithTimestamp()
         {
             var system = new SystemUnderTest();
@@ -103,10 +100,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal("2020-12-01 12:00".Utc(), system.KeyValueStore.Samples().Single().Timestamp);
+            Assert.AreEqual("2020-12-01 12:00".Utc(), system.KeyValueStore.Samples().Single().Timestamp);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotRecordDuplicateSample()
         {
             var system = new SystemUnderTest();
@@ -118,10 +115,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(2, system.KeyValueStore.Samples().Single().Count);
+            Assert.AreEqual(2, system.KeyValueStore.Samples().Single().Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldRecordNewSampleAfter10Minutes()
         {
             var system = new SystemUnderTest();
@@ -134,10 +131,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.ServerCountSampleRecorder.Record();
 
             var actual = system.KeyValueStore.Samples().Single(x => x.Timestamp == "2020-12-01 12:10".Utc());
-            Assert.Equal(1, actual.Count);
+            Assert.AreEqual(1, actual.Count);
         }
 
-        [Fact]
+        [Test]
         public void ShouldKeep6Samples()
         {
             var system = new SystemUnderTest();
@@ -151,10 +148,10 @@ namespace Hangfire.Configuration.Test.Domain
                 system.ServerCountSampleRecorder.Record();
             });
 
-            Assert.Equal(6, system.KeyValueStore.Samples().Count());
+            Assert.AreEqual(6, system.KeyValueStore.Samples().Count());
         }
 
-        [Fact]
+        [Test]
         public void ShouldRemoveOldestAndAddLatest()
         {
             var system = new SystemUnderTest();
@@ -171,11 +168,15 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:00");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Contains(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 13:00".Utc());
-            Assert.DoesNotContain(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
+            system.KeyValueStore.Samples()
+	            .FirstOrDefault(x => x.Timestamp == "2020-12-01 13:00".Utc())
+	            .Should().Not.Be.Null();
+            system.KeyValueStore.Samples()
+	            .FirstOrDefault(x => x.Timestamp == "2020-12-01 12:00".Utc())
+	            .Should().Be.Null();
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotRemoveWhenNotRecordable()
         {
             var system = new SystemUnderTest();
@@ -192,11 +193,13 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 12:50");
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(6, system.KeyValueStore.Samples().Count());
-            Assert.Contains(system.KeyValueStore.Samples(), x => x.Timestamp == "2020-12-01 12:00".Utc());
+            Assert.AreEqual(6, system.KeyValueStore.Samples().Count());
+            system.KeyValueStore.Samples()
+	            .FirstOrDefault(x => x.Timestamp == "2020-12-01 12:00".Utc())
+	            .Should().Not.Be.Null();
         }
 
-        [Fact]
+        [Test]
         public void ShouldKeep6Samples2()
         {
             var system = new SystemUnderTest();
@@ -214,10 +217,10 @@ namespace Hangfire.Configuration.Test.Domain
             system.Now("2020-12-01 13:10".Utc());
             system.ServerCountSampleRecorder.Record();
 
-            Assert.Equal(6, system.KeyValueStore.Samples().Count());
+            Assert.AreEqual(6, system.KeyValueStore.Samples().Count());
         }
         
-        [Fact]
+        [Test]
         public void ShouldKeepTheCorrect6Samples()
         {
             var system = new SystemUnderTest();
@@ -240,7 +243,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            .Samples()
                 .Select(x => x.Timestamp)
                 .ToArray();
-            Assert.Equal(new[] {
+            Assert.AreEqual(new[] {
                 "2020-12-01 12:20".Utc(),
                 "2020-12-01 12:30".Utc(),
                 "2020-12-01 12:40".Utc(),
@@ -250,7 +253,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }, actual);
         }
         
-        [Fact]
+        [Test]
         public void ShouldKeepTheLatest6Samples()
         {
             var system = new SystemUnderTest();
@@ -273,7 +276,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            .Samples()
                 .Select(x => x.Timestamp)
                 .ToArray();
-            Assert.Equal(new[] {
+            Assert.AreEqual(new[] {
                 "2020-12-01 12:20".Utc(),
                 "2020-12-01 12:30".Utc(),
                 "2020-12-01 12:40".Utc(),

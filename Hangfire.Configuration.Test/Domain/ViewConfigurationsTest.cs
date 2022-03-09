@@ -1,12 +1,12 @@
 using System.Data.SqlClient;
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ViewConfigurationsTest
     {
-        [Fact]
+        [Test]
         public void ShouldBuildConfiguration()
         {
             var system = new SystemUnderTest();
@@ -20,14 +20,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(1, result.Id);
-            Assert.Equal("Server", result.ServerName);
-            Assert.Equal("Test_Database", result.DatabaseName);
-            Assert.Equal("schemaName", result.SchemaName);
-            Assert.Equal(true, result.Active);
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("Server", result.ServerName);
+            Assert.AreEqual("Test_Database", result.DatabaseName);
+            Assert.AreEqual("schemaName", result.SchemaName);
+            Assert.AreEqual(true, result.Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBuildConfiguration2()
         {
             var system = new SystemUnderTest();
@@ -42,14 +42,14 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(2, result.Id);
-            Assert.Equal("Server2", result.ServerName);
-            Assert.Equal("Test_Database_2", result.DatabaseName);
-            Assert.Equal("schemaName2", result.SchemaName);
-            Assert.Equal(false, result.Active);
+            Assert.AreEqual(2, result.Id);
+            Assert.AreEqual("Server2", result.ServerName);
+            Assert.AreEqual("Test_Database_2", result.DatabaseName);
+            Assert.AreEqual("schemaName2", result.SchemaName);
+            Assert.AreEqual(false, result.Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBuildWithNullValues()
         {
             var system = new SystemUnderTest();
@@ -64,7 +64,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-            Assert.Equal(1, result.Id);
+            Assert.AreEqual(1, result.Id);
             Assert.Null(result.ServerName);
             Assert.Null(result.DatabaseName);
             Assert.Null(result.SchemaName);
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Null(result.Workers);
         }
         
-        [Fact]
+        [Test]
         public void ShouldBuildForMultipleConfigurations()
         {
             var system = new SystemUnderTest();
@@ -93,10 +93,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(2, result.Count());
+            Assert.AreEqual(2, result.Count());
         }
 
-        [Fact]
+        [Test]
         public void ShouldBuildWithWorkers()
         {
             var system = new SystemUnderTest();
@@ -104,10 +104,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(10, result.Single().Workers);
+            Assert.AreEqual(10, result.Single().Workers);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBuildWithDefaultSchemaName()
         {
             var system = new SystemUnderTest();
@@ -121,10 +121,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
+            Assert.AreEqual(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
         }
         
-        [Fact]
+        [Test]
         public void ShouldBuildWithConfigurationName()
         {
             var system = new SystemUnderTest();
@@ -135,10 +135,10 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal("name", result.Single().Name);
+            Assert.AreEqual("name", result.Single().Name);
         }
         
-        [Fact]
+        [Test]
         public void ShouldBuildWithMaxWorkersPerServer()
         {
             var system = new SystemUnderTest();
@@ -146,7 +146,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-            Assert.Equal(5, result.Single().MaxWorkersPerServer);
+            Assert.AreEqual(5, result.Single().MaxWorkersPerServer);
         }
     }
 }

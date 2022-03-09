@@ -2,18 +2,13 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.SqlServer;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
-    public class StartPublishersTest : XunitContextBase
+    public class StartPublishersTest
     {
-        public StartPublishersTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
-        [Fact]
+        [Test]
         public void ShouldConfigureAndStartWithAutoUpdatedConnectionString()
         {
             var system = new SystemUnderTest();
@@ -35,7 +30,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         }
 
         //Should this maybe throw???? 
-        [Fact]
+        [Test]
         public void ShouldNotStart()
         {
             var system = new SystemUnderTest();
@@ -45,7 +40,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.Null(system.Hangfire.LastCreatedStorage);
         }
 
-        [Fact]
+        [Test]
         public void ShouldStartWithExistingActiveConfiguration()
         {
             var system = new SystemUnderTest();
@@ -56,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
 
-        [Fact]
+        [Test]
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
@@ -65,10 +60,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("ActiveSchema", system.Hangfire.LastCreatedStorage.SqlServerOptions.SchemaName);
+            Assert.AreEqual("ActiveSchema", system.Hangfire.LastCreatedStorage.SqlServerOptions.SchemaName);
         }
 
-		[Fact]
+		[Test]
 		public void ShouldPassDefaultStorageOptionsToHangfire()
 		{
 			var system = new SystemUnderTest();
@@ -78,18 +73,18 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
 			var options = new SqlServerStorageOptions();
 			var storage = system.Hangfire.CreatedStorages.Single();
-			Assert.Equal(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
-			Assert.Equal(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
-			Assert.Equal(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
-			Assert.Equal(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
-			Assert.Equal(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
-			Assert.Equal(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
-			Assert.Equal(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
-			Assert.Equal(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
-			Assert.Equal(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
+			Assert.AreEqual(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
+			Assert.AreEqual(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
+			Assert.AreEqual(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
+			Assert.AreEqual(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
+			Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
+			Assert.AreEqual(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
+			Assert.AreEqual(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
+			Assert.AreEqual(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
+			Assert.AreEqual(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
-		[Fact]
+		[Test]
 		public void ShouldUseStorageOptions()
 		{
 			var system = new SystemUnderTest();
@@ -110,18 +105,18 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 			system.PublisherStarter.Start(null, options);
 
 			var storage = system.Hangfire.CreatedStorages.Single();
-			Assert.Equal(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
-			Assert.Equal(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
-			Assert.Equal(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
-			Assert.Equal(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
-			Assert.Equal(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
-			Assert.Equal(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
-			Assert.Equal(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
-			Assert.Equal(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
-			Assert.Equal(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
+			Assert.AreEqual(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
+			Assert.AreEqual(options.SlidingInvisibilityTimeout, storage.SqlServerOptions.SlidingInvisibilityTimeout);
+			Assert.AreEqual(options.JobExpirationCheckInterval, storage.SqlServerOptions.JobExpirationCheckInterval);
+			Assert.AreEqual(options.CountersAggregateInterval, storage.SqlServerOptions.CountersAggregateInterval);
+			Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.SqlServerOptions.PrepareSchemaIfNecessary);
+			Assert.AreEqual(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
+			Assert.AreEqual(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
+			Assert.AreEqual(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
+			Assert.AreEqual(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
-		[Fact]
+		[Test]
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
@@ -129,10 +124,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.PublisherStarter.Start();
 
-            Assert.Equal("SchemaName", system.Hangfire.CreatedStorages.Single().SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName", system.Hangfire.CreatedStorages.Single().SqlServerOptions.SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
@@ -142,11 +137,11 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.PublisherStarter.Start();
 
             var storages = system.Hangfire.CreatedStorages;
-            Assert.Equal("SchemaName1", storages.First().SqlServerOptions.SchemaName);
-            Assert.Equal("SchemaName2", storages.Last().SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName1", storages.First().SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName2", storages.Last().SqlServerOptions.SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotCreateInactiveStorages()
         {
             var system = new SystemUnderTest();
@@ -158,7 +153,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.PublisherStarter.Start();
 
-            Assert.Equal(connectionString, system.Hangfire.CreatedStorages.Single().ConnectionString);
+            Assert.AreEqual(connectionString, system.Hangfire.CreatedStorages.Single().ConnectionString);
         }
     }
 }

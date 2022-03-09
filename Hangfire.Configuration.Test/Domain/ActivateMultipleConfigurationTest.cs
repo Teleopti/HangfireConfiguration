@@ -1,11 +1,11 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ActivateMultipleConfigurationTest
     {
-        [Fact]
+        [Test]
         public void ShouldActivateMultipleConfigurations()
         {
             var system = new SystemUnderTest();
@@ -28,11 +28,11 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.ActivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
-            Assert.Equal(true, configurations.ElementAt(0).Active);
-            Assert.Equal(true, configurations.ElementAt(1).Active);
+            Assert.AreEqual(true, configurations.ElementAt(0).Active);
+            Assert.AreEqual(true, configurations.ElementAt(1).Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateConfiguration()
         {
             var system = new SystemUnderTest();
@@ -54,11 +54,11 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.ActivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
-            Assert.Equal(false, configurations.Single(x => x.Id == 1).Active);
-            Assert.Equal(true, configurations.Single(x => x.Id == 2).Active);
+            Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
+            Assert.AreEqual(true, configurations.Single(x => x.Id == 2).Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldInactivateConfiguration()
         {
             var system = new SystemUnderTest();
@@ -75,11 +75,11 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.InactivateServer(1);
 
             var configuration = system.ConfigurationStorage.Data.Single();
-            Assert.Equal(false, configuration.Active);
+            Assert.AreEqual(false, configuration.Active);
         }
 
 
-        [Fact]
+        [Test]
         public void ShouldInactivateGivenConfiguration()
         {
             var system = new SystemUnderTest();
@@ -101,8 +101,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.InactivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
-            Assert.Equal(true, configurations.Single(x => x.Id == 1).Active);
-            Assert.Equal(false, configurations.Single(x => x.Id == 2).Active);
+            Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
+            Assert.AreEqual(false, configurations.Single(x => x.Id == 2).Active);
         }
     }
 }

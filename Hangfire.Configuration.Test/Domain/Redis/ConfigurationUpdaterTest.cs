@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using Hangfire.Pro.Redis;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain.Redis
 {
 	public class ConfigurationUpdaterTest
 	{
-		[Fact]
+		[Test]
 		public void ShouldUseRedisOptions()
 		{
 			var system = new SystemUnderTest();
@@ -23,7 +24,8 @@ namespace Hangfire.Configuration.Test.Domain.Redis
 				}
 			}, null, options);
 
-			Assert.Same(options, system.Hangfire.StartedServers.Single().storage.RedisOptions);
+			system.Hangfire.StartedServers.Single().storage.RedisOptions
+				.Should().Be.SameInstanceAs(options);
 		}
 	}
 }

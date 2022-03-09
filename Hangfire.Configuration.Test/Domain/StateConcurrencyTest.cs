@@ -1,17 +1,12 @@
 using System.Linq;
 using Hangfire.SqlServer;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class StateConcurrencyTest : XunitContextBase
+    public class StateConcurrencyTest
     {
-        public StateConcurrencyTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
-        [Fact]
+        [Test]
         public void ShouldReturnCorrectNumberOfWorkServersConcurrently()
         {
             const int storageCount = 500;
@@ -23,7 +18,7 @@ namespace Hangfire.Configuration.Test.Domain
             run.InParallel(() =>
                 {
                     var actual = system.WorkerServerQueries.QueryAllWorkerServers(null, (SqlServerStorageOptions)null).Count();
-                    Assert.Equal(storageCount, actual);
+                    Assert.AreEqual(storageCount, actual);
                 })
                 .Times(100)
                 .Wait();

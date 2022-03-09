@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Api
 {
-    [Collection("NotParallel")]
+    [Parallelizable(ParallelScope.None)]
     public class CurrentStaticTest
     {
-        [Fact]
+        [Test]
         public void ShouldQueryPublishersAfterStartingPublishers()
         {
             var system = new SystemUnderTest();
@@ -18,10 +18,10 @@ namespace Hangfire.Configuration.Test.Api
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Data Source=.;Initial Catalog=fakedb;", storage.ConnectionString);
+            Assert.AreEqual("Data Source=.;Initial Catalog=fakedb;", storage.ConnectionString);
         }
         
-        [Fact]
+        [Test]
         public void ShouldQueryPublishersAfterStartingServers()
         {
             var system = new SystemUnderTest();
@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test.Api
 
             var storage = HangfireConfiguration.Current.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.Equal("Data Source=.;Initial Catalog=fakedb;", storage.ConnectionString);
+            Assert.AreEqual("Data Source=.;Initial Catalog=fakedb;", storage.ConnectionString);
         }
     }
 }

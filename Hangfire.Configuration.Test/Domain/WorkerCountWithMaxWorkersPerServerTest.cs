@@ -1,11 +1,11 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class WorkerCountWithMaxWorkersPerServerTest
     {
-        [Fact]
+        [Test]
         public void ShouldUseMaxWorkersPerServer()
         {
             var system = new SystemUnderTest();
@@ -15,10 +15,10 @@ namespace Hangfire.Configuration.Test.Domain
             
             system.StartWorkerServer();
 
-            Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
         
-        [Fact]
+        [Test]
         public void ShouldUseMinimumWhenMaxIsLess()
         {
             var system = new SystemUnderTest();
@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
             
             system.StartWorkerServer();
 
-            Assert.Equal(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+            Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
     }
 }

@@ -1,12 +1,13 @@
 using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("NotParallel")]
+    [Parallelizable(ParallelScope.None)]
+    [CleanDatabase]
     public class SampleStorageTest
     {
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldWrite()
         {
             var system = new SystemUnderInfraTest();
@@ -17,11 +18,11 @@ namespace Hangfire.Configuration.Test.Infrastructure
             {Samples = new[] {new ServerCountSample {Timestamp = "2020-12-02 12:00".Utc(), Count = 1}}});
 
             var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
-            Assert.Equal("2020-12-02 12:00".Utc(), sample.Timestamp);
-            Assert.Equal(1, sample.Count);
+            Assert.AreEqual("2020-12-02 12:00".Utc(), sample.Timestamp);
+            Assert.AreEqual(1, sample.Count);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldReadEmpty()
         {
             var system = new SystemUnderInfraTest();
@@ -29,10 +30,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             var sample = system.KeyValueStore.ServerCountSamples();
 
-            Assert.Empty(sample.Samples);
+            Assert.IsEmpty(sample.Samples);
         }
 
-        [Fact, CleanDatabase]
+        [Test]
         public void ShouldUpdate()
         {
             var system = new SystemUnderInfraTest();
@@ -44,7 +45,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
             { Samples = new[] {new ServerCountSample {Count = 2} }});
 
             var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
-            Assert.Equal(2, sample.Count);
+            Assert.AreEqual(2, sample.Count);
         }
     }
 }

@@ -1,10 +1,10 @@
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Api
 {
     public class ApplicationBuilderExtensionTest
     {
-        [Fact]
+        [Test]
         public void ShouldNotThrow()
         {
             var system = new SystemUnderTest();

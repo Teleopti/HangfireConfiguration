@@ -1,13 +1,15 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Xunit;
+using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
+	[CleanDatabase]
 	public class AutoUpdateConcurrencyTest
 	{
-		[Fact, CleanDatabase]
+		[Test]
 		public void ShouldNotInsertMultiple()
 		{
 			Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
@@ -30,7 +32,8 @@ namespace Hangfire.Configuration.Test.Integration
 				.Start(null);
 			});
 
-			Assert.Single(new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations());
+			new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations()
+				.Should().Have.Count.EqualTo(1);
 		}
 	}
 }

@@ -1,12 +1,12 @@
 using System;
-using System.Reflection;
 using Dapper;
 using Npgsql;
-using Xunit.Sdk;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace Hangfire.Configuration.Test
 {
-    public class CleanDatabasePostgresAttribute : BeforeAfterTestAttribute
+    public class CleanDatabasePostgresAttribute : Attribute, ITestAction
     {
         private readonly int? _schemaVersion;
 
@@ -19,13 +19,19 @@ namespace Hangfire.Configuration.Test
             _schemaVersion = schemaVersion;
         }
 
-        public override void Before(MethodInfo methodUnderTest)
+        public ActionTargets Targets => ActionTargets.Test;
+
+        public void BeforeTest(ITest test)
         {
             closeOpenConnections();
             dropDb();
             createDb();
             createAdminLogin();
             initializeDb();
+        }
+
+        public void AfterTest(ITest test)
+        {
         }
 
         private static void closeOpenConnections()
@@ -87,5 +93,6 @@ namespace Hangfire.Configuration.Test
             using (var connection = new NpgsqlConnection(ConnectionUtils.GetMasterConnectionString()))
                 connection.Execute(sql);
         }
+
     }
 }

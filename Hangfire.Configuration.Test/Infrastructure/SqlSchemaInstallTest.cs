@@ -2,41 +2,36 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Collection("NotParallel")]
-    public class SqlSchemaInstallTest : XunitContextBase
+    [Parallelizable(ParallelScope.None)]
+    public class SqlSchemaInstallTest
     {
-        public SqlSchemaInstallTest(ITestOutputHelper output) : base(output)
-        {
-        }
-
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 1)]
         public void ShouldInstallSchemaVersion1()
         {
-            Assert.Equal(1, version());
+            Assert.AreEqual(1, version());
         }
 
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldInstallSchemaVersion2()
         {
-            Assert.Equal(2, version());
+            Assert.AreEqual(2, version());
         }
 
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 3)]
         public void ShouldInstallSchemaVersion3()
         {
-            Assert.Equal(3, version());
+            Assert.AreEqual(3, version());
         }
 
-        [Fact, CleanDatabase(schemaVersion: 0)]
+        [Test, CleanDatabase(schemaVersion: 0)]
         public void ShouldUpgradeFrom0ToLatest()
         {
             install();
-            Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
+            Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 1)]
@@ -47,14 +42,14 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             install();
 
-            Assert.Equal(52, read().Single().GoalWorkerCount);
-            Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
+            Assert.AreEqual(52, read().Single().GoalWorkerCount);
+            Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldUpgradeFrom2ToLatest()
         {
-            Assert.Equal(2, version());
+            Assert.AreEqual(2, version());
             using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
                 c.Execute(@"
 INSERT INTO 
@@ -65,14 +60,14 @@ INSERT INTO
 
             install();
 
-            Assert.Equal(99, read().Single().GoalWorkerCount);
-            Assert.Equal(SqlServerObjectsInstaller.SchemaVersion, version());
+            Assert.AreEqual(99, read().Single().GoalWorkerCount);
+            Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
         }
 
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 2)]
         public void ShouldUpgradeFrom2To3()
         {
-            Assert.Equal(2, version());
+            Assert.AreEqual(2, version());
             using (var c = new SqlConnection(ConnectionUtils.GetConnectionString()))
             {
                 c.Execute(@"INSERT INTO HangfireConfiguration.Configuration (ConnectionString) VALUES (@ConnectionString)", new values());
@@ -81,8 +76,8 @@ INSERT INTO
 
             install(3);
 
-            Assert.Equal(DefaultConfigurationName.Name(), read().First().Name);
-            Assert.Equal(3, version());
+            Assert.AreEqual(DefaultConfigurationName.Name(), read().First().Name);
+            Assert.AreEqual(3, version());
         }
 
         private void install(int? schemaVersion = null)

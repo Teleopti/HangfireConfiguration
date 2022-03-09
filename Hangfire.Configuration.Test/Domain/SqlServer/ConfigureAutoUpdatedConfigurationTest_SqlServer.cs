@@ -1,13 +1,13 @@
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.SqlServer;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain.SqlServer
 {
     public class ConfigureAutoUpdatedConfigurationTest
     {
-        [Fact]
+        [Test]
         public void ShouldConfigureAutoUpdatedServer()
         {
             var system = new SystemUnderTest();
@@ -25,20 +25,20 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
-            Assert.Equal("DataSource", dataSource);
+            Assert.AreEqual("DataSource", dataSource);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotConfigureAutoUpdatedServerIfNoneGiven()
         {
             var system = new SystemUnderTest();
 
             system.WorkerServerStarter.Start(new ConfigurationOptions(), null, (SqlServerStorageOptions)null);
 
-            Assert.Empty(system.ConfigurationStorage.Data);
+            Assert.IsEmpty(system.ConfigurationStorage.Data);
         }
 
-        [Fact]
+        [Test]
         public void ShouldMarkAutoUpdatedConnectionString()
         {
             var system = new SystemUnderTest();
@@ -56,10 +56,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var applicationName = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
-            Assert.Equal("ApplicationName.AutoUpdate", applicationName);
+            Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldMarkAutoUpdatedConnectionStringWhenNoApplicationName()
         {
             var system = new SystemUnderTest();
@@ -77,10 +77,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var applicationName = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
-            Assert.Equal("Hangfire.AutoUpdate", applicationName);
+            Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
         {
             var system = new SystemUnderTest();
@@ -100,10 +100,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked2()
         {
             var system = new SystemUnderTest();
@@ -123,10 +123,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
         {
             var system = new SystemUnderTest();
@@ -146,10 +146,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
-            Assert.Equal(existing, actual.ConnectionString);
+            Assert.AreEqual(existing, actual.ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
         {
             var system = new SystemUnderTest();
@@ -168,10 +168,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).Last();
-            Assert.Equal("autoupdated", new SqlConnectionStringBuilder(actual.ConnectionString).DataSource);
+            Assert.AreEqual("autoupdated", new SqlConnectionStringBuilder(actual.ConnectionString).DataSource);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdate()
         {
             var system = new SystemUnderTest();
@@ -191,11 +191,11 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
            }, null, (SqlServerStorageOptions)null);
 
             var updatedConnectionString = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString);
-            Assert.Equal("newDataSource", updatedConnectionString.DataSource);
-            Assert.Equal("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
+            Assert.AreEqual("newDataSource", updatedConnectionString.DataSource);
+            Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateLegacyConfiguration()
         {
             var system = new SystemUnderTest();
@@ -214,11 +214,11 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
-            Assert.Equal(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-            Assert.Equal(expected, system.ConfigurationStorage.Data.Single().ConnectionString);
+            Assert.AreEqual(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Single().ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldUpdateOneOfTwo()
         {
             var system = new SystemUnderTest();
@@ -240,10 +240,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, null, (SqlServerStorageOptions)null);
 
             var expected = new SqlConnectionStringBuilder {DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
-            Assert.Equal(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
+            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateOnFirstUpdate()
         {
             var system = new SystemUnderTest();
@@ -263,7 +263,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
         {
             var system = new SystemUnderTest();
@@ -284,7 +284,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldBeActiveOnUpdateIfActiveBefore()
         {
             var system = new SystemUnderTest();
@@ -309,7 +309,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotActivateWhenUpdating()
         {
             var system = new SystemUnderTest();
@@ -332,7 +332,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             Assert.True(system.ConfigurationStorage.Data.Last().Active);
         }
 
-        [Fact]
+        [Test]
         public void ShouldSaveSchemaName()
         {
             var system = new SystemUnderTest();
@@ -350,10 +350,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 	            }
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
             var system = new SystemUnderTest();
@@ -372,10 +372,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 	            }
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
 
-        [Fact]
+        [Test]
         public void ShouldOnlyAutoUpdateOnce()
         {
             var system = new SystemUnderTest();
@@ -404,10 +404,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, new SqlServerStorageOptions());
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
-            Assert.Equal("FirstUpdate", dataSource);
+            Assert.AreEqual("FirstUpdate", dataSource);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
         {
             var system = new SystemUnderTest();
@@ -437,10 +437,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             }, new SqlServerStorageOptions());
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
-            Assert.Equal("SecondUpdate", dataSource);
+            Assert.AreEqual("SecondUpdate", dataSource);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateWithDefaultConfigurationName()
         {
             var system = new SystemUnderTest();
@@ -457,10 +457,10 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 	            }
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }
 
-        [Fact]
+        [Test]
         public void ShouldAutoUpdateWithDefaultConfigurationName2()
         {
             var system = new SystemUnderTest();
@@ -478,7 +478,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 	            }
             }, null, (SqlServerStorageOptions)null);
 
-            Assert.Equal("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }
     }
 }

@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
     public class ConfigureGoalWorkerCountTest
     {
-        [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
+        [Test]
+        [TestCase(1)]
+        [TestCase(2)]
         public void ShouldWriteGoalWorkerCount(int workers)
         {
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
-            Assert.Equal(workers, system.ConfigurationStorage.Workers);
+            Assert.AreEqual(workers, system.ConfigurationStorage.Workers);
         }
 
-        [Fact]
+        [Test]
         public void ShouldWriteNullableGoalWorkerCount()
         {
             var system = new SystemUnderTest();
@@ -33,7 +33,7 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.Null(system.ConfigurationStorage.Workers);
         }
 
-        [Fact]
+        [Test]
         public void ShouldWriteGoalWorkerCountForSpecificConfiguration()
         {
             var system = new SystemUnderTest();
@@ -51,19 +51,19 @@ namespace Hangfire.Configuration.Test.Domain
                 Workers = 5
             });
 
-            Assert.Equal(5, system.ConfigurationStorage.Data.Single(x => x.Id == 2).GoalWorkerCount);
+            Assert.AreEqual(5, system.ConfigurationStorage.Data.Single(x => x.Id == 2).GoalWorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldThrowIfGoalWorkerCountHigherThan100()
         {
             var system = new SystemUnderTest();
 
             var e = Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 101}));
-            Assert.Equal("Invalid goal worker count.", e.Message);
+            Assert.AreEqual("Invalid goal worker count.", e.Message);
         }
 
-        [Fact]
+        [Test]
         public void ShouldNotWriteIfGoalWorkerCountHigherThan100()
         {
             var system = new SystemUnderTest();
@@ -81,10 +81,10 @@ namespace Hangfire.Configuration.Test.Domain
             {
             }
 
-            Assert.Equal(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+            Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
         }
 
-        [Fact]
+        [Test]
         public void ShouldThrowIfGoalWorkerCountHigherThanOptions()
         {
             var system = new SystemUnderTest();

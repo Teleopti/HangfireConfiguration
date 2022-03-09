@@ -1,12 +1,13 @@
 ﻿using System.Linq;
-using Xunit;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	[Collection("NotParallel")]
+	[Parallelizable(ParallelScope.None)]
+	[CleanDatabase]
 	public class ConfigurationStorageMaxWorkersPerServerTest
 	{
-		[Fact, CleanDatabase]
+		[Test]
 		public void ShouldWriteMaxWorkersPerServer()
 		{
 			var system = new SystemUnderInfraTest();
@@ -14,10 +15,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
 			system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
 
-			Assert.Equal(5, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
+			Assert.AreEqual(5, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
 		}
 		
-		[Fact, CleanDatabase]
+		[Test]
 		public void ShouldUpdateMaxWorkersPerServer()
 		{
 			var system = new SystemUnderInfraTest();
@@ -28,7 +29,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			existing.MaxWorkersPerServer = 3;
 			system.ConfigurationStorage.WriteConfiguration(existing);
 			
-			Assert.Equal(3, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
+			Assert.AreEqual(3, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
 		}
 	}
 }
