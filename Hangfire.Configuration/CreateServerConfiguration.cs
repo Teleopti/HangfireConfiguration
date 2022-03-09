@@ -16,5 +16,12 @@ namespace Hangfire.Configuration
         
         public string SchemaName { get; set; }
         public string DatabaseProvider { get; set; }
+
+        internal ICreateServerConfiguration CreateCreator(IConfigurationStorage storage, IHangfireSchemaCreator creator)
+        {
+	        if (DatabaseProvider == "PostgreSql")
+		        return new PostgresCreateServerConfiguration(storage, creator);
+	        return new SqlServerCreateServerConfiguration(storage, creator);
+        }
     }
 }

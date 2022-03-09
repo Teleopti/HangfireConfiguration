@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {
-    public class ConfigurationApi
+	public class ConfigurationApi
     {
         private readonly IConfigurationStorage _storage;
         private readonly IHangfireSchemaCreator _creator;
@@ -62,36 +61,7 @@ namespace Hangfire.Configuration
 
         public void CreateServerConfiguration(CreateServerConfiguration config)
         {
-			var storageConnectionString = config.StorageConnectionString ?? $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.User};Password={config.Password}";
-			var creatorConnectionString = config.SchemaCreatorConnectionString ??
-			                              $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword}";
-			
-			if (!string.IsNullOrEmpty(config.DatabaseProvider) && config.DatabaseProvider == "PostgreSql")
-			{
-				storageConnectionString = config.StorageConnectionString ?? $@"Host={config.Server};Database=""{config.Database}"";User ID={config.User};Password={config.Password};";
-				creatorConnectionString = config.SchemaCreatorConnectionString ??
-				                              $@"Host={config.Server};Database=""{config.Database}"";User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword};";
-			}
-
-			_creator.TryConnect(storageConnectionString);
-            
-            _creator.TryConnect(creatorConnectionString);
-
-            config.SchemaName ??= new ConnectionStringDialectSelector(creatorConnectionString)
-	            .SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
-            
-            if (_creator.HangfireStorageSchemaExists(config.SchemaName, creatorConnectionString))
-                throw new Exception("Schema already exists.");
-
-            _creator.CreateHangfireStorageSchema(config.SchemaName, creatorConnectionString);
-
-            _storage.WriteConfiguration(new StoredConfiguration
-            {
-                Name = config.Name,
-                ConnectionString = storageConnectionString,
-                SchemaName = config.SchemaName,
-                Active = false
-            });
+	        config.CreateCreator(_storage, _creator).Create(config);
         }
 
         public void ActivateServer(int configurationId)
