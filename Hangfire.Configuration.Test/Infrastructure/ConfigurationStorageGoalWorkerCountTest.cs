@@ -5,12 +5,22 @@ namespace Hangfire.Configuration.Test.Infrastructure
 {
     [Parallelizable(ParallelScope.None)]
     [CleanDatabase]
+    [CleanDatabasePostgres]
+    [TestFixture(ConnectionUtils.DefaultConnectionStringTemplate)]
+    [TestFixture(ConnectionUtilsPostgres.DefaultConnectionStringTemplate)]
     public class ConfigurationStorageGoalWorkerCountTest
     {
+	    private readonly string _connectionString;
+
+	    public ConfigurationStorageGoalWorkerCountTest(string connectionString)
+	    {
+		    _connectionString = connectionString;
+	    }
+	    
         [Test]
         public void ShouldReadEmptyGoalWorkerCount()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(_connectionString);
 
             Assert.IsEmpty(storage.ReadConfigurations());
         }
@@ -18,7 +28,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWriteGoalWorkerCount()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(_connectionString);
 
             storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
@@ -28,7 +38,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldReadGoalWorkerCount()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(_connectionString);
             storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
             var actual = storage.ReadConfigurations();
@@ -39,7 +49,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWriteNullGoalWorkerCount()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(_connectionString);
             storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
             var configuration = storage.ReadConfigurations().Single();

@@ -1,5 +1,6 @@
 using System;
 using Dapper;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
@@ -46,18 +47,18 @@ namespace Hangfire.Configuration.Test
         private static void dropDb()
         {
             var dropDatabaseSql = 
-				$"DROP DATABASE IF EXISTS \"{ ConnectionUtils.GetDatabaseName()}\" WITH (FORCE);";
+				$"DROP DATABASE IF EXISTS \"{ ConnectionUtils.GetConnectionString().DatabaseName()}\" WITH (FORCE);";
 
-            executeSql(dropDatabaseSql);
+            executeOnMaster(dropDatabaseSql);
         }
 
         private static void createDb()
         {
             var createDatabaseSql = String.Format(
 				@"CREATE DATABASE ""{0}""",
-                ConnectionUtils.GetDatabaseName());
+                ConnectionUtils.GetConnectionString().DatabaseName());
 
-            executeSql(createDatabaseSql);
+            executeOnMaster(createDatabaseSql);
         }
 
         private void createAdminLogin()
@@ -76,7 +77,7 @@ namespace Hangfire.Configuration.Test
 
         private void initializeDb()
         {
-            using (var connection = new NpgsqlConnection(ConnectionUtils.GetConnectionString()))
+            using (var connection = new NpgsqlConnection(ConnectionUtilsPostgres.GetConnectionString()))
             {
                 if (_schemaVersion.HasValue)
                 {
@@ -88,9 +89,9 @@ namespace Hangfire.Configuration.Test
             }
         }
 
-        private static void executeSql(string sql)
+        private static void executeOnMaster(string sql)
         {
-            using (var connection = new NpgsqlConnection(ConnectionUtils.GetMasterConnectionString()))
+            using (var connection = new NpgsqlConnection(ConnectionUtilsPostgres.GetConnectionString().PointToMasterDatabase()))
                 connection.Execute(sql);
         }
 

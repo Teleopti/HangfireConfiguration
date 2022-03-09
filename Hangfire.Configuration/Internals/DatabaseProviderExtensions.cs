@@ -18,5 +18,12 @@ namespace Hangfire.Configuration.Internals
 				() => new SqlConnectionStringBuilder(connectionString).DataSource,
 				() => new NpgsqlConnectionStringBuilder(connectionString).Host);
 		}
+
+		public static string PointToMasterDatabase(this string connectionString)
+		{
+			return new ConnectionStringDialectSelector(connectionString).SelectDialect(
+				() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = "master"}.ToString(),
+				() => new NpgsqlConnectionStringBuilder(connectionString) {Database = "postgres"}.ToString());
+		}
 	}
 }

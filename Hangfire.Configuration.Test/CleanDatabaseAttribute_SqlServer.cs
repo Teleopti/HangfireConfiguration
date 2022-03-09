@@ -1,6 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using Dapper;
+using Hangfire.Configuration.Internals;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 
@@ -38,27 +39,27 @@ namespace Hangfire.Configuration.Test
 		{
 			var closeExistingConnSql = String.Format(
 				@"if db_id('{0}') is not null alter database [{0}] set single_user with rollback immediate",
-				ConnectionUtils.GetDatabaseName());
+				ConnectionUtils.GetConnectionString().DatabaseName());
 
-			executeSql(closeExistingConnSql);
+			executeOnMaster(closeExistingConnSql);
 		}
 
 		private static void dropDb()
 		{
 			var dropDatabaseSql = String.Format(
 				@"if db_id('{0}') is not null drop database [{0}]",
-				ConnectionUtils.GetDatabaseName());
+				ConnectionUtils.GetConnectionString().DatabaseName());
 
-			executeSql(dropDatabaseSql);
+			executeOnMaster(dropDatabaseSql);
 		}
 
 		private static void createDb()
 		{
 			var createDatabaseSql = String.Format(
 				@"if db_id('{0}') is null create database [{0}] COLLATE SQL_Latin1_General_CP1_CI_AS",
-				ConnectionUtils.GetDatabaseName());
+				ConnectionUtils.GetConnectionString().DatabaseName());
 
-			executeSql(createDatabaseSql);
+			executeOnMaster(createDatabaseSql);
 		}
 
 		private void createAdminLogin()
@@ -72,7 +73,7 @@ BEGIN
 	ALTER LOGIN {login} ENABLE
 END";
 
-			executeSql(createLoginSql);
+			executeOnMaster(createLoginSql);
 		}
 
 		private void initializeDb()
@@ -89,9 +90,9 @@ END";
 			}
 		}
 
-		private static void executeSql(string sql)
+		private static void executeOnMaster(string sql)
 		{
-			using (var connection = new SqlConnection(ConnectionUtils.GetMasterConnectionString()))
+			using (var connection = new SqlConnection(ConnectionUtils.GetConnectionString().PointToMasterDatabase()))
 				connection.Execute(sql);
 		}
 	}
