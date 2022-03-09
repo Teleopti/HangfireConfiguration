@@ -25,4 +25,9 @@ public static class ConnectionStringExt
 		return connString != null && connString.StartsWith(redisStart) ? 
 			redis(connString.Substring(redisStart.Length)) : relationalDb();
 	}
+
+	public static string TrimRedisPrefix(this string connString)
+	{
+		return connString.StartsWith(redisStart) ? connString.Substring(redisStart.Length) : connString;
+	}
 }
