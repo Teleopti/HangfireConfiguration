@@ -13,7 +13,7 @@ namespace Hangfire.Configuration
         public IEnumerable<UpdateStorageConfiguration> UpdateConfigurations { get; set; }
 
         public bool UseWorkerDeterminer { get; set; } = true;
-        public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new WorkerDeterminerOptions();
+        public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new();
 
         public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
     }

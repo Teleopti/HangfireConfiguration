@@ -11,11 +11,11 @@ namespace Hangfire.Configuration
         public const string SchemaName = "HangfireConfiguration";
         public const int SchemaVersion = 5;
 
-        public static readonly string SqlScript = GetStringResource(
+        private static readonly string sqlScript = getStringResource(
             typeof(SqlServerObjectsInstaller).GetTypeInfo().Assembly,
 			"Hangfire.Configuration.InstallSqlServer.sql");
 
-        public static readonly string PostgreSqlScript = GetStringResource(
+        private static readonly string postgreSqlScript = getStringResource(
 	        typeof(SqlServerObjectsInstaller).GetTypeInfo().Assembly,
 	        "Hangfire.Configuration.InstallPostgreSql.sql");
 
@@ -27,29 +27,22 @@ namespace Hangfire.Configuration
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
 			var dbScript= new ConnectionStringDialectSelector(connection.ConnectionString).SelectDialect(
-				() => SqlScript, 
-				() => PostgreSqlScript);
+				() => sqlScript, 
+				() => postgreSqlScript);
             var scriptWithSchema = dbScript
 					.Replace("$(HangfireConfigurationSchema)", SchemaName)
                     .Replace("$(HangfireConfigurationSchemaVersion)", schemaVersion.ToString())
                 ;
-   //         var cmd = new NpgsqlCommand(scriptWithSchema, (NpgsqlConnection)connection);
-			//connection.Open();
-			// cmd.CommandType = CommandType.Text;
-            //cmd.ExecuteNonQuery();
-			//connection.Close();
             connection.Execute(scriptWithSchema, commandTimeout: 0);
         }
 
-        private static string GetStringResource(Assembly assembly, string resourceName)
+        private static string getStringResource(Assembly assembly, string resourceName)
         {
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                    throw new InvalidOperationException($"Requested resource `{resourceName}` was not found in the assembly `{assembly}`.");
-                using (var reader = new StreamReader(stream))
-                    return reader.ReadToEnd();
-            }
+	        using var stream = assembly.GetManifestResourceStream(resourceName);
+	        if (stream == null)
+		        throw new InvalidOperationException($"Requested resource `{resourceName}` was not found in the assembly `{assembly}`.");
+	        using var reader = new StreamReader(stream);
+	        return reader.ReadToEnd();
         }
     }
 }

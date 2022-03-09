@@ -1,5 +1,3 @@
-using System;
-
 namespace Hangfire.Configuration
 {
     public class CompositionRoot
@@ -60,15 +58,5 @@ namespace Hangfire.Configuration
             new KeyValueStore(buildUnitOfWork());
 
         protected virtual INow BuildNow() => new Now();
-    }
-
-    public class Now : INow
-    {
-        public DateTime UtcDateTime() => DateTime.UtcNow;
-    }
-
-    public interface INow
-    {
-        DateTime UtcDateTime();
     }
 }

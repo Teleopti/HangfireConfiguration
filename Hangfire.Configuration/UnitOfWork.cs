@@ -64,9 +64,6 @@ namespace Hangfire.Configuration
 
     internal class UnitOfWork : UnitOfWorkBase
     {
-        //public string ConnectionString { get; set; }
-
-
         protected override void operation(Action<IDbConnection, IDbTransaction> action)
         {
 	        new ConnectionStringDialectSelector(ConnectionString).SelectDialectVoid(
@@ -95,8 +92,6 @@ namespace Hangfire.Configuration
         private readonly IDbConnection _connection;
         private readonly IDbTransaction _transaction;
 
-        //public string ConnectionString { get; set; }
-
 		public UnitOfWorkTransaction(string connectionString)
 		{
 			ConnectionString = connectionString;
@@ -105,8 +100,7 @@ namespace Hangfire.Configuration
             _transaction = _connection.BeginTransaction();
         }
 
-
-        protected override void operation(Action<IDbConnection, IDbTransaction> action)
+		protected override void operation(Action<IDbConnection, IDbTransaction> action)
         {
             action.Invoke(_connection, _transaction);
         }

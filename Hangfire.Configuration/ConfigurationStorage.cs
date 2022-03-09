@@ -4,16 +4,7 @@ using System.Linq;
 
 namespace Hangfire.Configuration
 {
-    public interface IConfigurationStorage
-    {
-        IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null);
-        void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null);
-
-        void UnitOfWork(Action<IUnitOfWork> action);
-        void LockConfiguration(IUnitOfWork unitOfWork);
-    }
-
-    public class ConfigurationStorage : IConfigurationStorage
+	public class ConfigurationStorage : IConfigurationStorage
     {
         private readonly UnitOfWork _unitOfWork;
 
@@ -26,11 +17,9 @@ namespace Hangfire.Configuration
 
         public void UnitOfWork(Action<IUnitOfWork> action)
         {
-            using (var transaction = new UnitOfWorkTransaction(_unitOfWork.ConnectionString))
-            {
-                action.Invoke(transaction);
-                transaction.Commit();
-            }
+	        using var transaction = new UnitOfWorkTransaction(_unitOfWork.ConnectionString);
+	        action.Invoke(transaction);
+	        transaction.Commit();
         }
 
         public void LockConfiguration(IUnitOfWork unitOfWork)
