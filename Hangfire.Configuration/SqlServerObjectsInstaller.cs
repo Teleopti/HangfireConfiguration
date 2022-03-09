@@ -11,7 +11,7 @@ namespace Hangfire.Configuration
         public const string SchemaName = "HangfireConfiguration";
         public const int SchemaVersion = 5;
 
-        private static readonly string sqlScript = getStringResource(
+        private static readonly string sqlServerScript = getStringResource(
             typeof(SqlServerObjectsInstaller).GetTypeInfo().Assembly,
 			"Hangfire.Configuration.InstallSqlServer.sql");
 
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
 			var dbScript= new ConnectionStringDialectSelector(connection.ConnectionString).SelectDialect(
-				() => sqlScript, 
+				() => sqlServerScript, 
 				() => postgreSqlScript);
             var scriptWithSchema = dbScript
 					.Replace("$(HangfireConfigurationSchema)", SchemaName)

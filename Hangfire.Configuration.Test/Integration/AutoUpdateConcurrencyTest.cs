@@ -6,23 +6,23 @@ using SharpTestsEx;
 namespace Hangfire.Configuration.Test.Integration
 {
 	[Parallelizable(ParallelScope.None)]
-	[CleanDatabase]
 	public class AutoUpdateConcurrencyTest
 	{
 		[Test]
 		public void ShouldNotInsertMultiple()
 		{
+			DatabaseTestSetup.Setup(ConnectionStrings.SqlServer);
 			Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
 			{
 			var system = new SystemUnderInfraTest();
 			system.WithOptions(new ConfigurationOptions
 			{
-				ConnectionString = ConnectionUtils.GetConnectionString(),
+				ConnectionString = ConnectionStrings.SqlServer,
 				UpdateConfigurations = new []
 				{
 					new UpdateStorageConfiguration
 					{
-						ConnectionString = ConnectionUtils.GetConnectionString(),
+						ConnectionString = ConnectionStrings.SqlServer,
 						Name = DefaultConfigurationName.Name()
 					}
 				}
@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Integration
 				.Start(null);
 			});
 
-			new ConfigurationStorage(ConnectionUtils.GetConnectionString()).ReadConfigurations()
+			new ConfigurationStorage(ConnectionStrings.SqlServer).ReadConfigurations()
 				.Should().Have.Count.EqualTo(1);
 		}
 	}
