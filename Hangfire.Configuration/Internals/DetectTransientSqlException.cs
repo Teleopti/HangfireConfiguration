@@ -1,7 +1,7 @@
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration.Internals
 {
     internal static class DetectTransientSqlException
     {

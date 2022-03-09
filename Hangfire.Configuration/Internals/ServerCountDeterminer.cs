@@ -4,7 +4,7 @@ using System.Linq;
 using Hangfire.Storage;
 using Polly;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration.Internals
 {
     internal class ServerCountDeterminer
     {

@@ -1,6 +1,6 @@
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public class RedisCreateServerConfiguration : ICreateServerConfiguration
+internal class RedisCreateServerConfiguration : ICreateServerConfiguration
 {
 	private readonly IConfigurationStorage _storage;
 

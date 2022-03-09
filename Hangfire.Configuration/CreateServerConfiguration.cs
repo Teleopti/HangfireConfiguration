@@ -1,3 +1,5 @@
+using Hangfire.Configuration.Internals;
+
 namespace Hangfire.Configuration
 {
     public class CreateServerConfiguration

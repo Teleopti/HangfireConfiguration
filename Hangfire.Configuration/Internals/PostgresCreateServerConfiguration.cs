@@ -1,6 +1,6 @@
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public class PostgresCreateServerConfiguration : CreateServerConfigurationRelationalDb
+internal class PostgresCreateServerConfiguration : CreateServerConfigurationRelationalDb
 {
 	public PostgresCreateServerConfiguration(IConfigurationStorage storage, IHangfireSchemaCreator creator) : base(storage, creator)
 	{

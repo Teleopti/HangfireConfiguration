@@ -1,9 +1,8 @@
 ﻿using System;
-using Hangfire.Configuration.Internals;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public abstract class CreateServerConfigurationRelationalDb : ICreateServerConfiguration
+internal abstract class CreateServerConfigurationRelationalDb : ICreateServerConfiguration
 {
 	private readonly IConfigurationStorage _storage;
 	private readonly IHangfireSchemaCreator _creator;

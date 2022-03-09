@@ -1,4 +1,4 @@
-﻿namespace Hangfire.Configuration;
+﻿namespace Hangfire.Configuration.Internals;
 
 internal static class ConfigurationAndStorageExtensions
 {

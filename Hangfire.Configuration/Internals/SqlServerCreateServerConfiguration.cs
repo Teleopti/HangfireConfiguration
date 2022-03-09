@@ -1,6 +1,6 @@
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public class SqlServerCreateServerConfiguration : CreateServerConfigurationRelationalDb
+internal class SqlServerCreateServerConfiguration : CreateServerConfigurationRelationalDb
 {
 	public SqlServerCreateServerConfiguration(IConfigurationStorage storage, IHangfireSchemaCreator creator) : base(storage, creator)
 	{

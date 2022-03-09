@@ -1,13 +1,13 @@
 using System;
 using Hangfire.Storage;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration.Internals
 {
-	public class WorkerDeterminer
+	internal class WorkerDeterminer
 	{
 		private readonly ServerCountDeterminer _serverCountDeterminer;
 
-		public WorkerDeterminer(IKeyValueStore store)
+		internal WorkerDeterminer(IKeyValueStore store)
 		{
 			_serverCountDeterminer = new ServerCountDeterminer(store);
 		}
