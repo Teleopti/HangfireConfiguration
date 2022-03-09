@@ -6,6 +6,15 @@ namespace Hangfire.Configuration.Internals
 {
 	internal static class DatabaseProviderExtensions
 	{
+		public const string RedisStart = "redis$$";
+	
+		public static string TrimRedisPrefix(this string connString)
+		{
+			return connString != null && connString.StartsWith(RedisStart) ? 
+				connString.Substring(RedisStart.Length) : 
+				connString;
+		}
+		
 		public static string DatabaseName(this string connectionString)
 		{
 			return new ConnectionStringDialectSelector(connectionString).SelectDialect(

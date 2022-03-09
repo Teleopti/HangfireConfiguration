@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlClient;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -28,7 +29,7 @@ namespace Hangfire.Configuration
 				return sqlServer();
 			if (IsPostgreSql())
 				return postgres();
-			if (_connectionString.StartsWith(ConnectionStringExt.RedisStart))
+			if (_connectionString.StartsWith(DatabaseProviderExtensions.RedisStart))
 				return redis();
 			return default;
 		}
