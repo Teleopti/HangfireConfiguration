@@ -2,7 +2,7 @@ using System.Reflection;
 using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
 internal static class DefaultSchemaName
 {

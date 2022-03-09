@@ -1,35 +1,36 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test.Infrastructure;
+
+public class ConfigurationStorageMaxWorkersPerServerTest : DatabaseTestBase
 {
-	[Parallelizable(ParallelScope.None)]
-	[CleanDatabase]
-	public class ConfigurationStorageMaxWorkersPerServerTest
+	public ConfigurationStorageMaxWorkersPerServerTest(string connectionString) : base(connectionString)
 	{
-		[Test]
-		public void ShouldWriteMaxWorkersPerServer()
-		{
-			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
+	}
 
-			system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
+	[Test]
+	public void ShouldWriteMaxWorkersPerServer()
+	{
+		var system = new SystemUnderInfraTest();
+		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-			Assert.AreEqual(5, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
-		}
-		
-		[Test]
-		public void ShouldUpdateMaxWorkersPerServer()
-		{
-			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
-			system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
-			var existing = system.ConfigurationStorage.ReadConfigurations().Single();
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
 
-			existing.MaxWorkersPerServer = 3;
-			system.ConfigurationStorage.WriteConfiguration(existing);
-			
-			Assert.AreEqual(3, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
-		}
+		Assert.AreEqual(5, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
+	}
+
+	[Test]
+	public void ShouldUpdateMaxWorkersPerServer()
+	{
+		var system = new SystemUnderInfraTest();
+		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
+		var existing = system.ConfigurationStorage.ReadConfigurations().Single();
+
+		existing.MaxWorkersPerServer = 3;
+		system.ConfigurationStorage.WriteConfiguration(existing);
+
+		Assert.AreEqual(3, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
 	}
 }

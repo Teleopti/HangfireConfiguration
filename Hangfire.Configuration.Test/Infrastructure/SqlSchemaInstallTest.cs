@@ -2,13 +2,17 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
+using Hangfire.Configuration.Internals;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Parallelizable(ParallelScope.None)]
-    public class SqlSchemaInstallTest
+    public class SqlSchemaInstallTest : DatabaseTestBase
     {
+	    public SqlSchemaInstallTest(string connectionString) : base(connectionString)
+	    {
+	    }
+
         [FactSkipPostgreSql, CleanDatabase(schemaVersion: 1)]
         public void ShouldInstallSchemaVersion1()
         {
@@ -82,29 +86,25 @@ INSERT INTO
 
         private void install(int? schemaVersion = null)
         {
-            using (var c = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString()).GetConnection())
-            {
-                if (schemaVersion.HasValue)
-                    SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
-                else
-                    SqlServerObjectsInstaller.Install(c);
-            }
+	        using var c = ConnectionString.CreateConnection();
+	        if (schemaVersion.HasValue)
+		        SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
+	        else
+		        SqlServerObjectsInstaller.Install(c);
         }
 
         private IEnumerable<values> read()
         {
-			using (var c = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString()).GetConnection())
+	        using var c = ConnectionString.CreateConnection();
 				return c.Query<values>("SELECT * FROM hangfireconfiguration.configuration");
         }
 
-        private static int version()
+        private int version()
         {
-	        var sqlDialectSelector = new ConnectionStringDialectSelector(ConnectionUtils.GetConnectionString());
-
-			using (var c = sqlDialectSelector.GetConnection())
-				return sqlDialectSelector.SelectDialect(
-					() => c.Query<int>("SELECT Version FROM HangfireConfiguration.[Schema]").Single(), 
-					() => c.Query<int>("SELECT version FROM hangfireconfiguration.schema").Single());
+	        var schemaName = new ConnectionStringDialectSelector(ConnectionString)
+		        .SelectDialect(() => "[Schema]", () => "schema");
+	        using var c = ConnectionString.CreateConnection();
+	        return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
         }
 
         private class values

@@ -1,4 +1,5 @@
 using Dapper;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -7,35 +8,36 @@ namespace Hangfire.Configuration
 	{
 		public void TryConnect(string connectionString)
 		{
-			using var conn = new ConnectionStringDialectSelector(connectionString).GetConnection();
+			using var conn = connectionString.CreateConnection();
 			conn.Open();
 		}
 
-		public void CreateHangfireSchema(string schemaName, string connectionString)
+		public void CreateHangfireStorageSchema(string schemaName, string connectionString)
 		{
-			
 			var dialectSelector = new ConnectionStringDialectSelector(connectionString);
-			using var conn = dialectSelector.GetConnection();
+
 			dialectSelector.SelectDialectVoid(
-				() => SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true),
 				() =>
 				{
+					using var conn = connectionString.CreateConnection();
+					conn.Open();
+					SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
+				},
+				() =>
+				{
+					using var conn = connectionString.CreateConnection();
 					conn.Open();
 					if (string.IsNullOrWhiteSpace(schemaName))
-					{
-						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection)conn);
-					}
+						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn);
 					else
-					{
-						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection)conn, schemaName);
-					}
+						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn, schemaName);
 				}
 			);
 		}
 
-		public bool SchemaExists(string schemaName, string connectionString)
+		public bool HangfireStorageSchemaExists(string schemaName, string connectionString)
 		{
-			using var conn = new ConnectionStringDialectSelector(connectionString).GetConnection();
+			using var conn = connectionString.CreateConnection();
 			return conn.ExecuteScalar<int>($"SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{schemaName}'") > 0;
 		}
 	}

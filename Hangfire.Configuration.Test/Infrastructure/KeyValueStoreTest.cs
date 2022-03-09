@@ -2,15 +2,17 @@
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	[Parallelizable(ParallelScope.None)]
-	[CleanDatabase]
-	public class KeyValueStoreTest
+	public class KeyValueStoreTest : DatabaseTestBase
 	{
+		public KeyValueStoreTest(string connectionString) : base(connectionString)
+		{
+		}
+
 		[Test]
 		public void ShouldReadValueMatchingKey()
 		{
 			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
+			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 			system.KeyValueStore.Write("firstKey", "1");
 			system.KeyValueStore.Write("secondKey", "2");
 

@@ -1,62 +1,53 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test.Infrastructure;
+
+public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
 {
-    [Parallelizable(ParallelScope.None)]
-    [CleanDatabase]
-    [CleanDatabasePostgres]
-    [TestFixture(ConnectionUtils.DefaultConnectionStringTemplate)]
-    [TestFixture(ConnectionUtilsPostgres.DefaultConnectionStringTemplate)]
-    public class ConfigurationStorageGoalWorkerCountTest
-    {
-	    private readonly string _connectionString;
+	public ConfigurationStorageGoalWorkerCountTest(string connectionString) : base(connectionString)
+	{
+	}
 
-	    public ConfigurationStorageGoalWorkerCountTest(string connectionString)
-	    {
-		    _connectionString = connectionString;
-	    }
-	    
-        [Test]
-        public void ShouldReadEmptyGoalWorkerCount()
-        {
-            var storage = new ConfigurationStorage(_connectionString);
+	[Test]
+	public void ShouldReadEmptyGoalWorkerCount()
+	{
+		var storage = new ConfigurationStorage(ConnectionString);
 
-            Assert.IsEmpty(storage.ReadConfigurations());
-        }
+		Assert.IsEmpty(storage.ReadConfigurations());
+	}
 
-        [Test]
-        public void ShouldWriteGoalWorkerCount()
-        {
-            var storage = new ConfigurationStorage(_connectionString);
+	[Test]
+	public void ShouldWriteGoalWorkerCount()
+	{
+		var storage = new ConfigurationStorage(ConnectionString);
 
-            storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            Assert.AreEqual(1, storage.ReadConfigurations().Single().GoalWorkerCount);
-        }
+		Assert.AreEqual(1, storage.ReadConfigurations().Single().GoalWorkerCount);
+	}
 
-        [Test]
-        public void ShouldReadGoalWorkerCount()
-        {
-            var storage = new ConfigurationStorage(_connectionString);
-            storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+	[Test]
+	public void ShouldReadGoalWorkerCount()
+	{
+		var storage = new ConfigurationStorage(ConnectionString);
+		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            var actual = storage.ReadConfigurations();
-            
-            Assert.AreEqual(1, actual.Single().GoalWorkerCount);
-        }
+		var actual = storage.ReadConfigurations();
 
-        [Test]
-        public void ShouldWriteNullGoalWorkerCount()
-        {
-            var storage = new ConfigurationStorage(_connectionString);
-            storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
+		Assert.AreEqual(1, actual.Single().GoalWorkerCount);
+	}
 
-            var configuration = storage.ReadConfigurations().Single();
-            configuration.GoalWorkerCount = null;
-            storage.WriteConfiguration(configuration);
+	[Test]
+	public void ShouldWriteNullGoalWorkerCount()
+	{
+		var storage = new ConfigurationStorage(ConnectionString);
+		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
-            Assert.Null(storage.ReadConfigurations().Single().GoalWorkerCount);
-        }
-    }
+		var configuration = storage.ReadConfigurations().Single();
+		configuration.GoalWorkerCount = null;
+		storage.WriteConfiguration(configuration);
+
+		Assert.Null(storage.ReadConfigurations().Single().GoalWorkerCount);
+	}
 }

@@ -40,16 +40,6 @@ namespace Hangfire.Configuration
 			throw new Exception("Invalid connectionstring");
 		}
 
-		// should be made extension. no throwing
-		public DbConnection GetConnection()
-		{
-			if (isSqlServer())
-				return new SqlConnection(_connectionString);
-			if (IsPostgreSql())
-				return new NpgsqlConnection(_connectionString);
-			throw new Exception("Invalid connectionstring");
-		}
-
 		private bool isSqlServer()
 		{
 			try

@@ -3,14 +3,16 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Parallelizable(ParallelScope.None)]
-    [CleanDatabase]
-    public class ConfigurationStorageTest
+    public class ConfigurationStorageTest : DatabaseTestBase
     {
+	    public ConfigurationStorageTest(string connectionString) : base(connectionString)
+	    {
+	    }
+
         [Test]
         public void ShouldReadEmptyConfiguration()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
 
             Assert.IsEmpty(storage.ReadConfigurations());
         }
@@ -18,7 +20,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWrite()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
 
             storage.WriteConfiguration(new StoredConfiguration
             {
@@ -36,7 +38,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldRead()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
             storage.WriteConfiguration(new StoredConfiguration
             {
                 ConnectionString = "connectionString",
@@ -57,7 +59,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldUpdate()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
             storage.WriteConfiguration(new StoredConfiguration());
 
             var existing = storage.ReadConfigurations().Single();
@@ -77,7 +79,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWriteName()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
 
             storage.WriteConfiguration(new StoredConfiguration
             {
@@ -91,7 +93,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldUpdateName()
         {
-            var storage = new ConfigurationStorage(ConnectionUtils.GetConnectionString());
+            var storage = new ConfigurationStorage(ConnectionString);
             storage.WriteConfiguration(new StoredConfiguration());
 
             var existing = storage.ReadConfigurations().Single();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {
@@ -79,10 +80,10 @@ namespace Hangfire.Configuration
             config.SchemaName ??= new ConnectionStringDialectSelector(creatorConnectionString)
 	            .SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
             
-            if (_creator.SchemaExists(config.SchemaName, creatorConnectionString))
+            if (_creator.HangfireStorageSchemaExists(config.SchemaName, creatorConnectionString))
                 throw new Exception("Schema already exists.");
 
-            _creator.CreateHangfireSchema(config.SchemaName, creatorConnectionString);
+            _creator.CreateHangfireStorageSchema(config.SchemaName, creatorConnectionString);
 
             _storage.WriteConfiguration(new StoredConfiguration
             {

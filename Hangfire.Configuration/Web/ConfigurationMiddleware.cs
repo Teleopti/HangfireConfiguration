@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Hangfire.Configuration.Internals;
 using Newtonsoft.Json.Linq;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,7 @@ namespace Hangfire.Configuration.Web
             _configuration = HangfireConfiguration.UseHangfireConfiguration(null, _options, properties);
             _configurationApi = _configuration.ConfigurationApi();
             if (_options.PrepareSchemaIfNecessary)
-				using (var c = new ConnectionStringDialectSelector(_options.ConnectionString).GetConnection())
+				using (var c = _options.ConnectionString.CreateConnection())
                     SqlServerObjectsInstaller.Install(c);
         }
 

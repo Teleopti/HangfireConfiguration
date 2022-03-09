@@ -20,14 +20,14 @@ namespace Hangfire.Configuration.Test.Domain.Fake
                 throw TryConnectFailsWith;
         }
 
-        public void CreateHangfireSchema(string schemaName, string connectionString)
+        public void CreateHangfireStorageSchema(string schemaName, string connectionString)
         {
             Schemas = Schemas
                 .Append((schemaName, connectionString))
                 .ToArray();
         }
 
-        public bool SchemaExists(string schemaName, string connectionString)
+        public bool HangfireStorageSchemaExists(string schemaName, string connectionString)
         {
             return Schemas
                 .Where(x => string.Equals(x.SchemaName, schemaName, StringComparison.InvariantCultureIgnoreCase))

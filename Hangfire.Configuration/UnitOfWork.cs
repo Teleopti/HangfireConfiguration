@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Polly;
 using Dapper;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -95,7 +96,7 @@ namespace Hangfire.Configuration
 		public UnitOfWorkTransaction(string connectionString)
 		{
 			ConnectionString = connectionString;
-	        _connection = new ConnectionStringDialectSelector(connectionString).GetConnection();
+			_connection = connectionString.CreateConnection();
             OpenWithRetry(_connection);
             _transaction = _connection.BeginTransaction();
         }

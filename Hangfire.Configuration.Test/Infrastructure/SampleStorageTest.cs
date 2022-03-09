@@ -3,49 +3,52 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    [Parallelizable(ParallelScope.None)]
-    [CleanDatabase]
-    public class SampleStorageTest
-    {
-        [Test]
-        public void ShouldWrite()
-        {
-            var system = new SystemUnderInfraTest();
-            system.BuildOptions().UseOptions(new ConfigurationOptions
-                {ConnectionString = ConnectionUtils.GetConnectionString()});
+	public class SampleStorageTest : DatabaseTestBase
+	{
+		public SampleStorageTest(string connectionString) : base(connectionString)
+		{
+		}
 
-            system.KeyValueStore.ServerCountSamples(new ServerCountSamples
-            {Samples = new[] {new ServerCountSample {Timestamp = "2020-12-02 12:00".Utc(), Count = 1}}});
+		[Test]
+		public void ShouldWrite()
+		{
+			var system = new SystemUnderInfraTest();
+			system.BuildOptions().UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-            var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
-            Assert.AreEqual("2020-12-02 12:00".Utc(), sample.Timestamp);
-            Assert.AreEqual(1, sample.Count);
-        }
+			system.KeyValueStore.ServerCountSamples(new ServerCountSamples
+			{
+				Samples = new[] {new ServerCountSample {Timestamp = "2020-12-02 12:00".Utc(), Count = 1}}
+			});
 
-        [Test]
-        public void ShouldReadEmpty()
-        {
-            var system = new SystemUnderInfraTest();
-            system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
+			var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
+			Assert.AreEqual("2020-12-02 12:00".Utc(), sample.Timestamp);
+			Assert.AreEqual(1, sample.Count);
+		}
 
-            var sample = system.KeyValueStore.ServerCountSamples();
+		[Test]
+		public void ShouldReadEmpty()
+		{
+			var system = new SystemUnderInfraTest();
+			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-            Assert.IsEmpty(sample.Samples);
-        }
+			var sample = system.KeyValueStore.ServerCountSamples();
 
-        [Test]
-        public void ShouldUpdate()
-        {
-            var system = new SystemUnderInfraTest();
-            system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionUtils.GetConnectionString()});
+			Assert.IsEmpty(sample.Samples);
+		}
 
-            system.KeyValueStore.ServerCountSamples(new ServerCountSamples
-            { Samples = new[] {new ServerCountSample {Count = 1} }});
-            system.KeyValueStore.ServerCountSamples(new ServerCountSamples
-            { Samples = new[] {new ServerCountSample {Count = 2} }});
+		[Test]
+		public void ShouldUpdate()
+		{
+			var system = new SystemUnderInfraTest();
+			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-            var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
-            Assert.AreEqual(2, sample.Count);
-        }
-    }
+			system.KeyValueStore.ServerCountSamples(new ServerCountSamples
+				{Samples = new[] {new ServerCountSample {Count = 1}}});
+			system.KeyValueStore.ServerCountSamples(new ServerCountSamples
+				{Samples = new[] {new ServerCountSample {Count = 2}}});
+
+			var sample = system.KeyValueStore.ServerCountSamples().Samples.Single();
+			Assert.AreEqual(2, sample.Count);
+		}
+	}
 }

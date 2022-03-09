@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.Common;
+using Hangfire.Configuration.Internals;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 using NUnit.Framework;

@@ -3,6 +3,6 @@
 public interface IHangfireSchemaCreator
 {
 	void TryConnect(string connectionString);
-	void CreateHangfireSchema(string schemaName, string connectionString);
-	bool SchemaExists(string schemaName, string connectionString);
+	void CreateHangfireStorageSchema(string schemaName, string connectionString);
+	bool HangfireStorageSchemaExists(string schemaName, string connectionString);
 }
