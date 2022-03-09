@@ -1,5 +1,4 @@
 using System;
-using System.Data.Common;
 using System.Data.SqlClient;
 using Npgsql;
 
@@ -20,6 +19,17 @@ namespace Hangfire.Configuration
 				return sqlServer();
 			if (IsPostgreSql())
 				return postgres();
+			return default;
+		}
+		
+		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
+		{
+			if (isSqlServer())
+				return sqlServer();
+			if (IsPostgreSql())
+				return postgres();
+			if (_connectionString.StartsWith(ConnectionStringExt.RedisStart))
+				return redis();
 			return default;
 		}
 

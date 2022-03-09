@@ -104,25 +104,19 @@ namespace Hangfire.Configuration
 										Name = update.Name,
 										Active = true
 									};
-				
-				update.ConnectionString.Run(
-					_ =>
-					{
-						configuration.ConnectionString = update.ConnectionString;
-					}, () =>
-					{
-						if (update.Name == DefaultConfigurationName.Name())
-						{
-							configuration.ConnectionString = new ConnectionStringDialectSelector(update.ConnectionString)
-								.SelectDialect(
-									() => markConnectionStringSqlServer(update.ConnectionString), 
-									() => markConnectionStringPostgreSql(update.ConnectionString));
-						}
-						else
-						{
-							configuration.ConnectionString = update.ConnectionString;
-						}
-					});
+
+				if (update.Name == DefaultConfigurationName.Name())
+				{
+					configuration.ConnectionString = new ConnectionStringDialectSelector(update.ConnectionString)
+						.SelectDialect(
+							() => markConnectionStringSqlServer(update.ConnectionString), 
+							() => markConnectionStringPostgreSql(update.ConnectionString),
+							() => configuration.ConnectionString = update.ConnectionString);
+				}
+				else
+				{
+					configuration.ConnectionString = update.ConnectionString;
+				}
 
 				configuration.SchemaName = update.SchemaName;
 				_storage.WriteConfiguration(configuration, connection);

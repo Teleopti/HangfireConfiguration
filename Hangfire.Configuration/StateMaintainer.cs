@@ -44,28 +44,27 @@ public class StateMaintainer
 						existing.Configuration = c;
 						return existing;
 					}
+					
+					// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
+					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
+					var connectionString = c.ConnectionString ?? options.ConnectionString;
+					var result = new ConnectionStringDialectSelector(connectionString)
+						.SelectDialect(
+							() => makeJobStorage(c, _state.StorageOptionsSqlServer),
+							() => makeJobStorage(c, _state.StorageOptionsPostgreSql),
+							() =>
+							{
+								var options = _state.StorageOptionsRedis ?? new RedisStorageOptions();
+								return new ConfigurationAndStorage
+								{
+									JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString.TrimRedisPrefix(), options),
+									Configuration = c
+								};
+							});
+					if (result == null)
+						return makeJobStorage(c, _state.StorageOptionsSqlServer);
+					return result;
 
-					return c.ConnectionString.Select(redisConnstring =>
-					{
-						var options = _state.StorageOptionsRedis ?? new RedisStorageOptions();
-						return new ConfigurationAndStorage
-						{
-							JobStorageCreator = () => _hangfire.MakeSqlJobStorage(redisConnstring, options),
-							Configuration = c
-						};
-					}, () =>
-					{					
-						// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
-						// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
-						var connectionString = c.ConnectionString ?? options.ConnectionString;
-						var result = new ConnectionStringDialectSelector(connectionString)
-							.SelectDialect(
-								() => makeJobStorage(c, _state.StorageOptionsSqlServer),
-								() => makeJobStorage(c, _state.StorageOptionsPostgreSql));
-						if (result == null)
-							return makeJobStorage(c, _state.StorageOptionsSqlServer);
-						return result;
-					});
 				}).ToArray();
 		}
 	}
