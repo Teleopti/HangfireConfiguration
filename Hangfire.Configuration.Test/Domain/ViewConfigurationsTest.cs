@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
-                ConnectionString = "Data Source=Server;Integrated Security=SSPI;Initial Catalog=Test_Database;Application Name=Test",
+                ConnectionString = "theConnstring",
                 SchemaName = "schemaName",
                 Active = true
             });
@@ -22,8 +22,7 @@ namespace Hangfire.Configuration.Test.Domain
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
             Assert.AreEqual(1, result.Id);
-            Assert.AreEqual("Server", result.ServerName);
-            Assert.AreEqual("Test_Database", result.DatabaseName);
+            Assert.AreEqual("theConnstring", result.ConnectionString);
             Assert.AreEqual("schemaName", result.SchemaName);
             Assert.AreEqual(true, result.Active);
         }
@@ -44,8 +43,6 @@ namespace Hangfire.Configuration.Test.Domain
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
             Assert.AreEqual(2, result.Id);
-            Assert.AreEqual("Server2", result.ServerName);
-            Assert.AreEqual("Test_Database_2", result.DatabaseName);
             Assert.AreEqual("schemaName2", result.SchemaName);
             Assert.AreEqual(false, result.Active);
         }
@@ -66,8 +63,6 @@ namespace Hangfire.Configuration.Test.Domain
             var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
             Assert.AreEqual(1, result.Id);
-            Assert.Null(result.ServerName);
-            Assert.Null(result.DatabaseName);
             Assert.Null(result.SchemaName);
             Assert.Null(result.Active);
             Assert.Null(result.Workers);

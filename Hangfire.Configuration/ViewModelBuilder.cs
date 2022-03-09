@@ -16,7 +16,7 @@ namespace Hangfire.Configuration
 		public IEnumerable<ViewModel> BuildServerConfigurations()
 		{
 			return _storage.ReadConfigurations()
-				.Select((x, i) =>
+				.Select(x =>
 				{
 					var schemaName = x.SchemaName;
 					var dialectSelector = new ConnectionStringDialectSelector(x.ConnectionString);
@@ -30,8 +30,7 @@ namespace Hangfire.Configuration
 					{
 						Id = x.Id,
 						Name = x.Name,
-						ServerName = string.IsNullOrEmpty(x.ConnectionString) ? null : x.ConnectionString.ServerName(),
-						DatabaseName = string.IsNullOrEmpty(x.ConnectionString) ? null : x.ConnectionString.DatabaseName(),
+						ConnectionString = x.ConnectionString,
 						SchemaName = schemaName,
 						Active = x.Active,
 						Workers = x.GoalWorkerCount,

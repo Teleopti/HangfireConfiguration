@@ -108,14 +108,11 @@ namespace Hangfire.Configuration.Web
                     <fieldset>
                         <legend>{title}</legend>");
 
-            if (!string.IsNullOrEmpty(configuration.ServerName))
+            WriteLiteral($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
+            if (!string.IsNullOrEmpty(configuration.SchemaName))
             {
-                WriteLiteral($@"
-                    <div><label>Server:</label><span>{configuration.ServerName}</span></div>
-                    <div><label>Database:</label><span>{configuration.DatabaseName}</span></div>
-                    <div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
+	            WriteLiteral($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
             }
-
             WriteLiteral($@"
                 <div>
                     <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount' style='margin-bottom: 3px'>
