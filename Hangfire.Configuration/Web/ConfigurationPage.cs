@@ -170,18 +170,10 @@ namespace Hangfire.Configuration.Web
                 return;
 
             WriteLiteral(
-                $@"
+                @"
 <fieldset>
     <legend>Create new Hangfire storage</legend>
     <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
-<!--
-        <div class='flex-grid'>
-            <fieldset>
-                <label for='server'>Name: </label><br>
-                <input type='text' id='name' name='name'><br>
-             </fieldset>
-        </div>
--->
         <div class='flex-grid'>
             <fieldset>
                 <h3>Storage</h3>
@@ -189,13 +181,16 @@ namespace Hangfire.Configuration.Web
                 <select id='databaseProvider' name='databaseProvider'>
 					<option value='SqlServer' selected='true'>SQL Server</option>
 					<option value='PostgreSql'>PostgreSql</option>
+					<option value='redis'>Redis</option>
 				</select><br>
 				<label for='server'>Server: </label><br>
                 <input type='text' id='server' name='server'><br>
-                <label for='database'>Database (existing): </label><br>
-                <input type='text' id='database' name='database'><br>
-                <label for='schemaName'>Schema (optional): </label><br>
-                <input type='text' id='schemaName' name='schemaName'>
+				<div id='relationalDb'>
+					<label for='database'>Database (existing): </label><br>
+					<input type='text' id='database' name='database'><br>
+					<label for='schemaName'>Schema (optional): </label><br>
+					<input type='text' id='schemaName' name='schemaName'>
+				</div>
              </fieldset>
              <fieldset>
                 <h3>Application user</h3>
@@ -205,11 +200,14 @@ namespace Hangfire.Configuration.Web
                 <input type='password' id='password' name='password'>
             </fieldset>
             <fieldset>
-                <h3>Patch user (with create permissions)</h3>
-                <label for='schemaCreatorUser'>SQL User Name: </label><br>
-                <input type='text' id='schemaCreatorUser' name='schemaCreatorUser'><br>
-                <label for='schemaCreatorPassword'>SQL Password: </label><br>
-                <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword'><br><br>
+				<div id='patchuser'>
+					<h3>Patch user (with create permissions)</h3>
+					<label for='schemaCreatorUser'>SQL User Name: </label><br>
+					<input type='text' id='schemaCreatorUser' name='schemaCreatorUser'><br>
+					<label for='schemaCreatorPassword'>SQL Password: </label><br>
+					<input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword'>
+				</div>
+				<br><br>
                 <button class='button' type='button'>Create</button>
             </fieldset>
         </div>

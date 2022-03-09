@@ -1,3 +1,14 @@
+var provider = document.getElementById('databaseProvider')
+provider.addEventListener('change', function(){
+	if(provider.value==='redis'){
+		document.getElementById('relationalDb').style.display='none';
+		document.getElementById('patchuser').style.display='none';
+	} else {
+		document.getElementById('relationalDb').style.display='block';
+		document.getElementById('patchuser').style.display='block';
+	}
+});
+
 var forms = document.querySelectorAll('form');
 
 forms.forEach(function(form) {
