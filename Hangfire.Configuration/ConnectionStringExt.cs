@@ -28,6 +28,8 @@ public static class ConnectionStringExt
 
 	public static string TrimRedisPrefix(this string connString)
 	{
-		return connString.StartsWith(redisStart) ? connString.Substring(redisStart.Length) : connString;
+		return connString != null && connString.StartsWith(redisStart) ? 
+			connString.Substring(redisStart.Length) : 
+			connString;
 	}
 }
