@@ -21,6 +21,8 @@ namespace Hangfire.Configuration
         {
 	        if (DatabaseProvider == "PostgreSql")
 		        return new PostgresCreateServerConfiguration(storage, creator);
+	        if (DatabaseProvider == "redis")
+		        return new RedisCreateServerConfiguration(storage);
 	        return new SqlServerCreateServerConfiguration(storage, creator);
         }
     }
