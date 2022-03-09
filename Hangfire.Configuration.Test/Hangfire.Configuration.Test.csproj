@@ -1,8 +1,4 @@
-<Project>
-	<PropertyGroup>
-		<BaseIntermediateOutputPath>obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-	</PropertyGroup>
-	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Hangfire.Configuration.Test</RootNamespace>
 		<TargetFrameworks>net6.0;net472</TargetFrameworks>
@@ -10,7 +6,6 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	</PropertyGroup>
-	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
@@ -25,10 +20,5 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Hangfire.Configuration\Hangfire.Configuration.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Remove="obj\**" />
-		<None Remove="obj\**" />
-		<Compile Remove="**\*_PostgreSql.cs" />
 	</ItemGroup>
 </Project>
