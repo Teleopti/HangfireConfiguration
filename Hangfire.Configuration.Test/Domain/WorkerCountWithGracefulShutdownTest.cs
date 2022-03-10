@@ -1,9 +1,8 @@
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.SqlServer;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.SqlServer
+namespace Hangfire.Configuration.Test.Domain
 {
     public class WorkerCountWithGracefulShutdownTest
     {
@@ -14,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.ConfigurationStorage.HasGoalWorkerCount(8);
             system.Monitor.AnnounceServer("runningServer");
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -27,7 +26,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.Monitor.AnnounceServer("server1");
             system.Monitor.AnnounceServer("server2");
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -41,7 +40,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.Monitor.AnnounceServer("server2");
             system.Monitor.AnnounceServer("server3");
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -55,7 +54,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.Monitor.AnnounceServer("server2");
             system.Monitor.AnnounceServer("server3");
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
@@ -70,9 +69,8 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
-                MinimumServerCount = 4,
-                ConnectionString = @"Data Source=.;Initial Catalog=fakedb;"
-			}, null, (SqlServerStorageOptions)null);
+                MinimumServerCount = 4
+			});
 
             Assert.AreEqual(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }        
