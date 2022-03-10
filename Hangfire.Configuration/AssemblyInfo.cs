@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 
-
-[assembly: InternalsVisibleTo("Hangfire.Configuration.PostgreSql.Test")]
+//2 be removed...
 [assembly: InternalsVisibleTo("Hangfire.Configuration.Test")]
 
