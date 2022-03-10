@@ -1,7 +1,4 @@
-﻿using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
-using Hangfire.Server;
-using Hangfire.SqlServer;
+﻿using Hangfire.Server;
 
 namespace Hangfire.Configuration;
 
@@ -12,7 +9,5 @@ public interface IHangfire
 		BackgroundJobServerOptions options,
 		params IBackgroundProcess[] additionalProcesses);
 
-	JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options);
-	JobStorage MakeSqlJobStorage(string connectionString, RedisStorageOptions options);
-	JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options);
+	JobStorage MakeJobStorage(string connectionString, object options);
 }

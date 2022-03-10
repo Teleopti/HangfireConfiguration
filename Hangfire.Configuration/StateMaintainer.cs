@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
@@ -44,69 +45,63 @@ public class StateMaintainer
 						existing.Configuration = c;
 						return existing;
 					}
-					
+
 					// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
 					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
 					var connectionString = c.ConnectionString ?? options.ConnectionString;
-					var result = new ConnectionStringDialectSelector(connectionString)
-						.SelectDialect(
-							() => makeJobStorage(c, _state.StorageOptionsSqlServer),
-							() => makeJobStorage(c, _state.StorageOptionsPostgreSql),
-							() =>
-							{
-								var options = _state.StorageOptionsRedis ?? new RedisStorageOptions();
-								return new ConfigurationAndStorage
-								{
-									JobStorageCreator = () => _hangfire.MakeSqlJobStorage(connectionString.TrimRedisPrefix(), options),
-									Configuration = c
-								};
-							});
-					if (result == null)
-						return makeJobStorage(c, _state.StorageOptionsSqlServer);
-					return result;
 
+					var storageOptions = new ConnectionStringDialectSelector(connectionString)
+						.SelectDialect<object>(
+							() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
+							() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),
+							() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
+						);
+
+					var storageConnectionString = connectionString.TrimRedisPrefix();
+
+					// suggests some tests are weird?
+					// defaults to sql server when what it really is is unknown
+					if (storageOptions == null)
+					{
+						storageConnectionString = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "_"}.ToString();
+						storageOptions = _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions();
+					}
+
+					return makeJobStorage(storageConnectionString, c, storageOptions);
 				}).ToArray();
 		}
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, SqlServerStorageOptions storageOptions)
+	private ConfigurationAndStorage makeJobStorage(string connectionString, StoredConfiguration configuration, object storageOptions)
 	{
-		var options = copyOptions(storageOptions ?? new SqlServerStorageOptions());
+		var options = copyOptions(storageOptions);
 
-		if (string.IsNullOrEmpty(configuration.SchemaName))
-			options.SchemaName = DefaultSchemaName.SqlServer();
-		else
-			options.SchemaName = configuration.SchemaName;
+		if (options is SqlServerStorageOptions o1)
+			if (string.IsNullOrEmpty(configuration.SchemaName))
+				o1.SchemaName = DefaultSchemaName.SqlServer();
+			else
+				o1.SchemaName = configuration.SchemaName;
+
+		if (options is PostgreSqlStorageOptions o2)
+			if (string.IsNullOrEmpty(configuration.SchemaName))
+				o2.SchemaName = DefaultSchemaName.Postgres();
+			else
+				o2.SchemaName = configuration.SchemaName;
 
 		return new ConfigurationAndStorage
 		{
-			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
+			JobStorageCreator = () => _hangfire.MakeJobStorage(connectionString, options),
 			Configuration = configuration
 		};
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, PostgreSqlStorageOptions storageOptions)
+	private static object copyOptions(object options)
 	{
-		var options = copyOptions(storageOptions ?? new PostgreSqlStorageOptions());
-		if (string.IsNullOrEmpty(configuration.SchemaName))
-			options.SchemaName = DefaultSchemaName.Postgres();
-		else
-			options.SchemaName = configuration.SchemaName;
-
-		return new ConfigurationAndStorage
+		return options switch
 		{
-			JobStorageCreator = () => _hangfire.MakeSqlJobStorage(configuration.ConnectionString, options),
-			Configuration = configuration
+			SqlServerStorageOptions => JsonConvert.DeserializeObject<SqlServerStorageOptions>(JsonConvert.SerializeObject(options)),
+			PostgreSqlStorageOptions => JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(JsonConvert.SerializeObject(options)),
+			_ => options
 		};
 	}
-
-	private static SqlServerStorageOptions copyOptions(SqlServerStorageOptions storageOptions) =>
-		JsonConvert.DeserializeObject<SqlServerStorageOptions>(
-			JsonConvert.SerializeObject(storageOptions)
-		);
-
-	private static PostgreSqlStorageOptions copyOptions(PostgreSqlStorageOptions storageOptions) =>
-		JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(
-			JsonConvert.SerializeObject(storageOptions)
-		);
 }

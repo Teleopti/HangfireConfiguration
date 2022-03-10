@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
 using Hangfire.Server;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
@@ -33,25 +30,11 @@ namespace Hangfire.Configuration.Test.Domain.Fake
             StartedServers = StartedServers.Append((_appBuilder, storage as FakeJobStorage, options, additionalProcesses)).ToArray();
         }
 
-        public JobStorage MakeSqlJobStorage(string connectionString, RedisStorageOptions options)
+        public JobStorage MakeJobStorage(string connectionString, object options)
         {
 	        var storage = new FakeJobStorage(connectionString, options, _monitoringApi);
 	        CreatedStorages = CreatedStorages.Append(storage).ToArray();
 	        return storage;
         }
-
-        public JobStorage MakeSqlJobStorage(string connectionString, SqlServerStorageOptions options)
-        {
-            var storage = new FakeJobStorage(connectionString, options, _monitoringApi);
-            CreatedStorages = CreatedStorages.Append(storage).ToArray();
-            return storage;
-        }
-
-        public JobStorage MakeSqlJobStorage(string connectionString, PostgreSqlStorageOptions options)
-        {
-			var storage = new FakeJobStorage(connectionString, options, _monitoringApi);
-			CreatedStorages = CreatedStorages.Append(storage).ToArray();
-			return storage;
-		}
     }
 }

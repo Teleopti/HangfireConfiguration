@@ -77,15 +77,15 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheChangedActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Initial Catalog=one;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "Host=loscalhost;Initial Catalog=two;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=one;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "Host=loscalhost;Database=two;" });
             system.PublisherStarter.Start();
             var configurationId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
             system.ConfigurationApi.ActivateServer(configurationId);
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
-            Assert.AreEqual("Host=loscalhost;Initial Catalog=two;", storage.ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Database=two;", storage.ConnectionString);
         }
 
         [Test]
@@ -132,15 +132,15 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheChangedActiveStorageWhenInactiveWasDeleted()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Host=loscalhost;Initial Catalog=1;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Host=loscalhost;Initial Catalog=2;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Host=loscalhost;Database=1;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Host=loscalhost;Database=2;" });
             system.PublisherQueries.QueryPublishers();
             system.ConfigurationStorage.Data = system.ConfigurationStorage.Data.Where(x => x.Id == 2).ToArray();
             system.ConfigurationApi.ActivateServer(2);
             
             var storage = system.PublisherQueries.QueryPublishers();
             
-            Assert.AreEqual("Host=loscalhost;Initial Catalog=2;", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
+            Assert.AreEqual("Host=loscalhost;Database=2;", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
         }
         
         [Test]
