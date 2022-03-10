@@ -26,7 +26,7 @@ namespace Hangfire.Configuration
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
-			var dbScript= new ConnectionStringDialectSelector(connection.ConnectionString).SelectDialect(
+			var dbScript = connection.ToDbVendorSelector().SelectDialect(
 				() => sqlServerScript, 
 				() => postgreSqlScript);
             var scriptWithSchema = dbScript
