@@ -7,6 +7,8 @@ namespace Hangfire.Configuration;
 
 internal static class DbVendorExtensions
 {
+	private const string redisStart = "redis$$";
+	
 	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) => 
 		new connectionStringDialectSelector(connectionString);
 	
@@ -36,15 +38,12 @@ internal static class DbVendorExtensions
 	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) => 
 		selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
 
-	//TODO: remove me when naming convention is gone
-	private const string redisStart = "redis$$";
-	public static string TrimRedisPrefix(this string connString)
-	{
-		return connString != null && connString.StartsWith(redisStart) ? 
-			connString.Substring(redisStart.Length) : 
-			connString;
-	}
-	//
+	public static string TrimRedisPrefix(this string connectionString) =>
+		connectionString.ToDbVendorSelector().SelectDialect(
+			() => connectionString,
+			() => connectionString,
+			() => connectionString.Substring(redisStart.Length)) 
+		?? connectionString;
 
 	public static string ApplicationName(this string connectionString) =>
 		connectionString.ToDbVendorSelector().SelectDialect(
@@ -76,12 +75,17 @@ internal static class DbVendorExtensions
         
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
+			if (isRedis())
+				return redis();
 			if (isSqlServer())
 				return sqlServer();
 			if (isPostgreSql())
 				return postgres();
-			return redis();
+			return default;
 		}
+
+		private bool isRedis() => 
+			_connectionString != null && _connectionString.StartsWith(redisStart);
 
 		private bool isSqlServer()
 		{

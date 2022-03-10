@@ -14,12 +14,14 @@ namespace Hangfire.Configuration
 
 		public void CreateHangfireStorageSchema(string schemaName, string connectionString)
 		{
+			bool wasCalled_REMOVEMELATER=false;
 			connectionString.ToDbVendorSelector().ExecuteDialect(
 				() =>
 				{
 					using var conn = connectionString.CreateConnection();
 					conn.Open();
 					SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
+					wasCalled_REMOVEMELATER = true;
 				},
 				() =>
 				{
@@ -29,9 +31,11 @@ namespace Hangfire.Configuration
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn);
 					else
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn, schemaName);
-				},
-				() => throw new Exception("Invalid connectionstring")
+					wasCalled_REMOVEMELATER = true;
+				}
 			);
+			if (!wasCalled_REMOVEMELATER)
+				throw new Exception("Invalid connectionstring");
 		}
 
 		public bool HangfireStorageSchemaExists(string schemaName, string connectionString)
