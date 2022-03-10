@@ -91,12 +91,10 @@ INSERT INTO
 			SqlServerObjectsInstaller.Install(c);
 	}
 
-	private int version()
+	private static int version()
 	{
-		var schemaName = new ConnectionStringDialectSelector(ConnectionStrings.SqlServer)
-			.SelectDialect(() => "[Schema]", () => "schema");
 		using var c = ConnectionStrings.SqlServer.CreateConnection();
-		return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
+		return c.Query<int>($"SELECT Version FROM HangfireConfiguration.Schema").Single();
 	}
 
 	private IEnumerable<values> read()

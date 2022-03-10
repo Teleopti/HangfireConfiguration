@@ -70,23 +70,6 @@ namespace Hangfire.Configuration.Test
 			return default;
 		}
 
-		// should be made extension. no throwing
-		public void SelectDialectVoid(Action sqlServer, Action postgres)
-		{
-			if (isSqlServer())
-			{
-				sqlServer();
-				return;
-			}
-			if (IsPostgreSql())
-			{
-				postgres();
-				return;
-			}
-
-			throw new Exception("Invalid connectionstring");
-		}
-
 		private bool isSqlServer()
 		{
 			try
