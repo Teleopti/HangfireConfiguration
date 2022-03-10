@@ -1,6 +1,5 @@
 using System;
 using Dapper;
-using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration.Test;
 
