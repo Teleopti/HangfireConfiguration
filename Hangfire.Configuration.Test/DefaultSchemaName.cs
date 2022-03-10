@@ -1,10 +1,6 @@
-using System;
-using System.Data.Common;
-using System.Data.SqlClient;
 using System.Reflection;
 using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
-using Npgsql;
 
 namespace Hangfire.Configuration.Test
 {
