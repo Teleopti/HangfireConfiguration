@@ -30,7 +30,10 @@ public class DatabaseTestBase
 	[SetUp]
 	public void Setup()
 	{
-		DatabaseTestSetup.Setup(ConnectionString);
+		if(_isSqlServer)
+			DatabaseTestSetup.SetupSqlServer(ConnectionString);
+		else
+			DatabaseTestSetup.SetupPostgres(ConnectionString);
 	}
 	
 	protected T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)

@@ -1,6 +1,5 @@
 using System.Linq;
 using Dapper;
-using Hangfire.Configuration.Internals;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
@@ -14,8 +13,6 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		[Test]
 		public void ShouldUpgradeFrom0ToLatest()
 		{
-			DatabaseTestSetup.Setup(ConnectionString);
-
 			using var c = ConnectionString.CreateConnection();
 			SqlServerObjectsInstaller.Install(c);
 

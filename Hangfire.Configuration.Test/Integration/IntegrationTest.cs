@@ -8,7 +8,7 @@ namespace Hangfire.Configuration.Test.Integration
 		[Test]
 		public void ShouldStartServerWithWorkers()
 		{
-			DatabaseTestSetup.Setup(ConnectionStrings.SqlServer);
+			DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer);
 			
 			var system = new SystemUnderInfraTest();
 			system.WithOptions(new ConfigurationOptions

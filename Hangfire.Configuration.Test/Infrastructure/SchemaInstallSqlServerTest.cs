@@ -12,7 +12,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldInstallSchemaVersion1()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 1);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 1);
 
 		Assert.AreEqual(1, version());
 	}
@@ -20,7 +20,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldInstallSchemaVersion2()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 2);
 
 		Assert.AreEqual(2, version());
 	}
@@ -28,7 +28,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldInstallSchemaVersion3()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 3);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 3);
 
 		Assert.AreEqual(3, version());
 	}
@@ -36,7 +36,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldUpgradeFrom2ToLatest()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 2);
 		Assert.AreEqual(2, version());
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 			c.Execute(@"
@@ -55,7 +55,7 @@ INSERT INTO
 	[Test]
 	public void ShouldUpgradeFrom2To3()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 2);
 		Assert.AreEqual(2, version());
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 		{
@@ -72,7 +72,7 @@ INSERT INTO
 	[Test]
 	public void ShouldUpgradeFrom1ToLatest()
 	{
-		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 1);
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 1);
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 			c.Execute("INSERT INTO HangfireConfiguration.Configuration ([Key], Value) VALUES ('GoalWorkerCount', 52)");
 

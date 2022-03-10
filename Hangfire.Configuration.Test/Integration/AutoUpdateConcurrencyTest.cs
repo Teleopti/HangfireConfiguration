@@ -11,7 +11,7 @@ namespace Hangfire.Configuration.Test.Integration
 		[Test]
 		public void ShouldNotInsertMultiple()
 		{
-			DatabaseTestSetup.Setup(ConnectionStrings.SqlServer);
+			DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer);
 			Parallel.ForEach(Enumerable.Range(1, 1), (item) =>
 			{
 			var system = new SystemUnderInfraTest();
