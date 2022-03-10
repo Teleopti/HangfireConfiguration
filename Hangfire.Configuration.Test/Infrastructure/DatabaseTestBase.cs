@@ -1,4 +1,5 @@
 using System;
+using System.Data.SqlClient;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
@@ -14,17 +15,18 @@ public class DatabaseTestBase
 
 	public DatabaseTestBase(string connectionString)
 	{
+		try
+		{
+			new SqlConnectionStringBuilder(connectionString);
+			_isSqlServer = true;
+			DefaultSchemaName = "HangFire";
+		}
+		catch (Exception)
+		{
+			_isSqlServer = false;
+			DefaultSchemaName = "hangfire";
+		}
 		ConnectionString = connectionString;
-		DefaultSchemaName = new ConnectionStringDialectSelector(ConnectionString)
-			.SelectDialect(() =>
-			{
-				_isSqlServer = true;
-				return "HangFire";
-			}, () =>
-			{
-				_isSqlServer = false;
-				return "hangfire";
-			});
 	}
 
 	[SetUp]
