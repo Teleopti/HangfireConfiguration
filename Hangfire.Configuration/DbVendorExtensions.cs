@@ -75,17 +75,12 @@ internal static class DbVendorExtensions
         
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
-			if (isRedis())
-				return redis();
 			if (isSqlServer())
 				return sqlServer();
 			if (isPostgreSql())
 				return postgres();
-			return default;
+			return redis();
 		}
-
-		private bool isRedis() => 
-			_connectionString != null && _connectionString.StartsWith(redisStart);
 
 		private bool isSqlServer()
 		{

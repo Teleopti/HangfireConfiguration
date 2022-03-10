@@ -1,5 +1,5 @@
+using System;
 using Dapper;
-using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -29,7 +29,8 @@ namespace Hangfire.Configuration
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn);
 					else
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn, schemaName);
-				}
+				},
+				() => throw new Exception("Invalid connectionstring")
 			);
 		}
 
