@@ -50,33 +50,12 @@ internal static class DbVendorExtensions
 			() => connectionString.Substring(redisStart.Length)) 
 		       ?? connectionString;
 	}
-	
-	public static string DatabaseName(this string connectionString)
-	{
-		return connectionString.ToDbVendorSelector().SelectDialect(
-			() => new SqlConnectionStringBuilder(connectionString).InitialCatalog,
-			() => new NpgsqlConnectionStringBuilder(connectionString).Database);
-	}
 
 	public static string ApplicationName(this string connectionString)
 	{
 		return connectionString.ToDbVendorSelector().SelectDialect(
 			() => new SqlConnectionStringBuilder(connectionString).ApplicationName,
 			() => new NpgsqlConnectionStringBuilder(connectionString).ApplicationName);
-	}
-
-	public static string PointToMasterDatabase(this string connectionString)
-	{
-		return connectionString.ToDbVendorSelector().SelectDialect(
-			() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = "master"}.ToString(),
-			() => new NpgsqlConnectionStringBuilder(connectionString) {Database = "postgres"}.ToString());
-	}
-
-	public static string ChangeDatabase(this string connectionString, string newDatabase)
-	{
-		return connectionString.ToDbVendorSelector().SelectDialect(
-			() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = newDatabase}.ToString(),
-			() => new NpgsqlConnectionStringBuilder(connectionString) {Database = newDatabase}.ToString());
 	}
 
 	public static string ChangeApplicationName(this string connectionString, string applicationName) =>
