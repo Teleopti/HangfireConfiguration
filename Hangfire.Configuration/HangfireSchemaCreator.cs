@@ -14,9 +14,7 @@ namespace Hangfire.Configuration
 
 		public void CreateHangfireStorageSchema(string schemaName, string connectionString)
 		{
-			var dialectSelector = new ConnectionStringDialectSelector(connectionString);
-
-			dialectSelector.SelectDialectVoid(
+			connectionString.ToDbVendorSelector().ExecuteDialect(
 				() =>
 				{
 					using var conn = connectionString.CreateConnection();

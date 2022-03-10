@@ -71,7 +71,7 @@ namespace Hangfire.Configuration
     {
         protected override void operation(Action<IDbConnection, IDbTransaction> action)
         {
-	        new ConnectionStringDialectSelector(ConnectionString).SelectDialectVoid(
+	        this.ExecuteDialect(
 		        () =>
 		        {
 			        using var conn = new SqlConnection(ConnectionString);
