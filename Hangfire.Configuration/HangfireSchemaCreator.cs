@@ -34,6 +34,7 @@ namespace Hangfire.Configuration
 					wasCalled_REMOVEMELATER = true;
 				}
 			);
+			//hack to get ShouldThrowOnCreateWhenInvalidConnectionString green
 			if (!wasCalled_REMOVEMELATER)
 				throw new Exception("Invalid connectionstring");
 		}

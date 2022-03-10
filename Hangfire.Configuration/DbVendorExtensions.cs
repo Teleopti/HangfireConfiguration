@@ -7,8 +7,6 @@ namespace Hangfire.Configuration;
 
 internal static class DbVendorExtensions
 {
-	private const string redisStart = "redis$$";
-	
 	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) => 
 		new connectionStringDialectSelector(connectionString);
 	
@@ -38,12 +36,15 @@ internal static class DbVendorExtensions
 	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) => 
 		selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
 
+	//TODO: remove me when naming convention is gone
+	private const string redisStart = "redis$$";
 	public static string TrimRedisPrefix(this string connectionString) =>
 		connectionString.ToDbVendorSelector().SelectDialect(
 			() => connectionString,
 			() => connectionString,
 			() => connectionString.Substring(redisStart.Length)) 
 		?? connectionString;
+	//
 
 	public static string ApplicationName(this string connectionString) =>
 		connectionString.ToDbVendorSelector().SelectDialect(
