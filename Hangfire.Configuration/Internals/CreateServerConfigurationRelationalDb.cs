@@ -26,7 +26,7 @@ internal abstract class CreateServerConfigurationRelationalDb : ICreateServerCon
             
 		_creator.TryConnect(creatorConnectionString);
 
-		config.SchemaName ??= new ConnectionStringDialectSelector(creatorConnectionString)
+		config.SchemaName ??= creatorConnectionString.ToDbVendorSelector()
 			.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
             
 		if (_creator.HangfireStorageSchemaExists(config.SchemaName, creatorConnectionString))

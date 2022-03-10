@@ -18,28 +18,28 @@ namespace Hangfire.Configuration.Internals
 		
 		public static string DatabaseName(this string connectionString)
 		{
-			return new connectionStringDialectSelector(connectionString).Select(
+			return connectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(connectionString).InitialCatalog,
 				() => new NpgsqlConnectionStringBuilder(connectionString).Database);
 		}
 
 		public static string ApplicationName(this string connectionString)
 		{
-			return new connectionStringDialectSelector(connectionString).Select(
+			return connectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(connectionString).ApplicationName,
 				() => new NpgsqlConnectionStringBuilder(connectionString).ApplicationName);
 		}
 
 		public static string PointToMasterDatabase(this string connectionString)
 		{
-			return new connectionStringDialectSelector(connectionString).Select(
+			return connectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = "master"}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(connectionString) {Database = "postgres"}.ToString());
 		}
 
 		public static string ChangeDatabase(this string connectionString, string newDatabase)
 		{
-			return new connectionStringDialectSelector(connectionString).Select(
+			return connectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = newDatabase}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(connectionString) {Database = newDatabase}.ToString());
 		}
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Internals
 
 		public static DbConnection CreateConnection(this string connectionString)
 		{
-			var connection = new connectionStringDialectSelector(connectionString).Select<DbConnection>(
+			var connection = connectionString.ToDbVendorSelector().SelectDialect<DbConnection>(
 				() => new SqlConnection(), () => new NpgsqlConnection());
 			connection.ConnectionString = connectionString;
 			return connection;
@@ -64,9 +64,6 @@ namespace Hangfire.Configuration.Internals
 			{
 			}
 
-			public T Select<T>(Func<T> sqlServer, Func<T> postgres) =>
-				SelectDialect(sqlServer, postgres);
-			
 			public T Select<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis) =>
 				SelectDialect(sqlServer, postgres, redis);
 		}
