@@ -1,8 +1,7 @@
-using System.Data.SqlClient;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.SqlServer
+namespace Hangfire.Configuration.Test.Domain
 {
     public class DefaultConfigurationNameTest
     {
@@ -44,7 +43,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
         public void ShouldUpdateAutoUpdateMarkedWithDefaultName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()});
+            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "Application Name=name.AutoUpdate"});
 
             var result = system.WorkerServerQueries.QueryAllWorkerServers();
 
@@ -58,7 +57,7 @@ namespace Hangfire.Configuration.Test.Domain.SqlServer
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
 	            Id = 1, 
-	            ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString()
+	            ConnectionString = "Application Name=name.AutoUpdate"
             });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
