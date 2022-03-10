@@ -50,7 +50,7 @@ public class StateMaintainer
 					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
 					var connectionString = c.ConnectionString ?? options.ConnectionString;
 
-					var storageOptions = new ConnectionStringDialectSelector(connectionString)
+					var storageOptions = connectionString.ToDbVendorSelector()
 						.SelectDialect<object>(
 							() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
 							() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),

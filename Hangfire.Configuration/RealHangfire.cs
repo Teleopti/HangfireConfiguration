@@ -33,7 +33,7 @@ namespace Hangfire.Configuration
 
 		public JobStorage MakeJobStorage(string connectionString, object options)
 		{
-			return new ConnectionStringDialectSelector(connectionString)
+			return connectionString.ToDbVendorSelector()
 				.SelectDialect<JobStorage>(
 					() => new SqlServerStorage(connectionString, (SqlServerStorageOptions) options),
 					() => new PostgreSqlStorage(connectionString, (PostgreSqlStorageOptions) options),
