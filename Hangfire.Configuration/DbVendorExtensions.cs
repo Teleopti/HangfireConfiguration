@@ -32,31 +32,23 @@ internal static class DbVendorExtensions
 		});
 	}
 	
-	public static T SelectDialect<T>(this IDbVendorSelector selector, Func<T> sqlServer, Func<T> postgres)
-	{
-		return selector.SelectDialect(sqlServer, postgres, () => default);
-	}
-	
-	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default)
-	{
-		return selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
-	}
-	
-	public static string TrimRedisPrefix(this string connectionString)
-	{
-		return connectionString.ToDbVendorSelector().SelectDialect(
+	public static T SelectDialect<T>(this IDbVendorSelector selector, Func<T> sqlServer, Func<T> postgres) => 
+		selector.SelectDialect(sqlServer, postgres, () => default);
+
+	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) => 
+		selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
+
+	public static string TrimRedisPrefix(this string connectionString) =>
+		connectionString.ToDbVendorSelector().SelectDialect(
 			() => connectionString,
 			() => connectionString,
 			() => connectionString.Substring(redisStart.Length)) 
-		       ?? connectionString;
-	}
+		?? connectionString;
 
-	public static string ApplicationName(this string connectionString)
-	{
-		return connectionString.ToDbVendorSelector().SelectDialect(
+	public static string ApplicationName(this string connectionString) =>
+		connectionString.ToDbVendorSelector().SelectDialect(
 			() => new SqlConnectionStringBuilder(connectionString).ApplicationName,
 			() => new NpgsqlConnectionStringBuilder(connectionString).ApplicationName);
-	}
 
 	public static string ChangeApplicationName(this string connectionString, string applicationName) =>
 		connectionString.ToDbVendorSelector().SelectDialect(
@@ -92,10 +84,8 @@ internal static class DbVendorExtensions
 			return default;
 		}
 
-		private bool isRedis()
-		{
-			return _connectionString != null && _connectionString.StartsWith(redisStart);
-		}
+		private bool isRedis() => 
+			_connectionString != null && _connectionString.StartsWith(redisStart);
 
 		private bool isSqlServer()
 		{
