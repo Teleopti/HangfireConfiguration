@@ -28,16 +28,5 @@ namespace Hangfire.Configuration.Test
                 _options.UseStorageOptions(storageOptions);
             return _instance.QueryAllWorkerServers();
         }
-
-        public IEnumerable<ConfigurationInfo> QueryAllWorkerServers(
-	        ConfigurationOptions options,
-	        PostgreSqlStorageOptions storageOptions)
-        {
-	        if (options != null)
-		        _options.UseOptions(options);
-	        if (storageOptions != null)
-		        _options.UseStorageOptions(storageOptions);
-	        return _instance.QueryAllWorkerServers();
-        }
-	}
+    }
 }

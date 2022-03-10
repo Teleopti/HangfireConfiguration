@@ -70,19 +70,15 @@ namespace Hangfire.Configuration
 	        new ConnectionStringDialectSelector(ConnectionString).SelectDialectVoid(
 		        () =>
 		        {
-					using (var conn = new SqlConnection(ConnectionString))
-					{
-						OpenWithRetry(conn);
-						action.Invoke(conn, null);
-					}
-					
+			        using var conn = new SqlConnection(ConnectionString);
+			        OpenWithRetry(conn);
+			        action.Invoke(conn, null);
 		        }
-		        , () => {
-			        using (var conn = new NpgsqlConnection(ConnectionString))
-			        {
-						conn.Open();
-						action.Invoke(conn, null);
-			        }
+		        , () =>
+		        {
+			        using var conn = new NpgsqlConnection(ConnectionString);
+			        conn.Open();
+			        action.Invoke(conn, null);
 		        }
 			);
         }

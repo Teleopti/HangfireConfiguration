@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
-using Npgsql;
 
 namespace Hangfire.Configuration
 {

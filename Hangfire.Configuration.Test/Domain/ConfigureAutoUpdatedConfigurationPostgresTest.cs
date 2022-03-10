@@ -84,7 +84,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
         {
             var system = new SystemUnderTest();
-            var existing = new NpgsqlConnectionStringBuilder() { Host = "existing" }.ToString();
+            var existing = new NpgsqlConnectionStringBuilder { Host = "existing" }.ToString();
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions

@@ -98,7 +98,7 @@ namespace Hangfire.Configuration.Test.Domain
 		{
 		    var system = new SystemUnderTest();
 		    system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=fakedb;"});
-		    var options = new PostgreSqlStorageOptions()
+		    var options = new PostgreSqlStorageOptions
 		    {
 		        QueuePollInterval = TimeSpan.FromSeconds(1.0),
 		        JobExpirationCheckInterval = TimeSpan.FromMinutes(4),

@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Api
         public void ShouldQueryPublishersAfterStartingPublishers()
         {
             var system = new SystemUnderTest();
-            HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
+            HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object> {{"CompositionRoot", system}});
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Data Source=.;Initial Catalog=fakedb;"});
             system.PublisherStarter.Start();
 
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Api
         public void ShouldQueryPublishersAfterStartingServers()
         {
             var system = new SystemUnderTest();
-            HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object>() {{"CompositionRoot", system}});
+            HangfireConfiguration.UseHangfireConfiguration(null, null, new Dictionary<string, object> {{"CompositionRoot", system}});
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Data Source=.;Initial Catalog=fakedb;" });
             system.WorkerServerStarter.Start();
 

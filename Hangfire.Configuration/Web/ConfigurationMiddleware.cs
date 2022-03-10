@@ -70,8 +70,8 @@ namespace Hangfire.Configuration.Web
             {
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
                 context.Response.ContentType = "application/javascript";
-                using (var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.script.js"))
-                    await stream.CopyToAsync(context.Response.Body);
+                using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.script.js");
+                await stream.CopyToAsync(context.Response.Body);
                 return;
             }
 
@@ -79,8 +79,8 @@ namespace Hangfire.Configuration.Web
             {
                 context.Response.StatusCode = (int) HttpStatusCode.OK;
                 context.Response.ContentType = "text/css";
-                using (var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css"))
-                    await stream.CopyToAsync(context.Response.Body);
+                using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css");
+                await stream.CopyToAsync(context.Response.Body);
                 return;
             }
 
@@ -209,8 +209,8 @@ namespace Hangfire.Configuration.Web
             return parsed;
         }
 
-        private int? tryParseNullable(string value) =>
-            int.TryParse(value, out var outValue) ? (int?) outValue : null;
+        private static int? tryParseNullable(string value) =>
+            int.TryParse(value, out var outValue) ? outValue : null;
 
 #if NETSTANDARD2_0
         private async Task processRequest(HttpContext context, Func<Task> action)

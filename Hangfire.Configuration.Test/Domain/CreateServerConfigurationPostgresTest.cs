@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -256,7 +256,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Name = "namedConfiguration",
                 StorageConnectionString = "storage",

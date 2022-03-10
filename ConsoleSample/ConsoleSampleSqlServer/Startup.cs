@@ -115,7 +115,7 @@ namespace ConsoleSample
 
             hangfireConfiguration
                 .QueryAllWorkerServers()
-                .Select((configurationInfo, i) => (configurationInfo: configurationInfo, i: i))
+                .Select((configurationInfo, i) => (configurationInfo, i))
                 .ForEach(s =>
                 {
                     Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");

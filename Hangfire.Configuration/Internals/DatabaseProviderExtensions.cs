@@ -23,13 +23,6 @@ namespace Hangfire.Configuration.Internals
 				() => new NpgsqlConnectionStringBuilder(connectionString).Database);
 		}
 
-		public static string ServerName(this string connectionString)
-		{
-			return new connectionStringDialectSelector(connectionString).Select(
-				() => new SqlConnectionStringBuilder(connectionString).DataSource,
-				() => new NpgsqlConnectionStringBuilder(connectionString).Host);
-		}
-
 		public static string ApplicationName(this string connectionString)
 		{
 			return new connectionStringDialectSelector(connectionString).Select(
@@ -49,13 +42,6 @@ namespace Hangfire.Configuration.Internals
 			return new connectionStringDialectSelector(connectionString).Select(
 				() => new SqlConnectionStringBuilder(connectionString) {InitialCatalog = newDatabase}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(connectionString) {Database = newDatabase}.ToString());
-		}
-
-		public static string ChangeServer(this string connectionString, string server)
-		{
-			return new connectionStringDialectSelector(connectionString).Select(
-				() => new SqlConnectionStringBuilder(connectionString) {DataSource = server}.ToString(),
-				() => new NpgsqlConnectionStringBuilder(connectionString) {Host = server}.ToString());
 		}
 
 		public static string ChangeApplicationName(this string connectionString, string applicationName) =>

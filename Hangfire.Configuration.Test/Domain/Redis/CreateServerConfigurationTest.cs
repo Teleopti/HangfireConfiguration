@@ -10,7 +10,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 		{
 			Server = "AwesomeServer:425",
 			DatabaseProvider = "redis"
@@ -25,7 +25,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 		{
 			DatabaseProvider = "redis",
 			Name = "matte"
@@ -40,7 +40,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration()
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 		{
 			DatabaseProvider = "redis"
 		});

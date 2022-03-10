@@ -17,19 +17,17 @@ namespace Hangfire.Configuration.Test.Web
 				Id = 1,
 			});
 
-			using (var s = new ServerUnderTest(system))
-			{
-				_ = s.TestClient.PostAsync(
-						"/config/saveMaxWorkersPerServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 1,
-							maxWorkers = 5
-						})))
-					.Result;
+			using var s = new ServerUnderTest(system);
+			_ = s.TestClient.PostAsync(
+					"/config/saveMaxWorkersPerServer",
+					new StringContent(JsonConvert.SerializeObject(new
+					{
+						configurationId = 1,
+						maxWorkers = 5
+					})))
+				.Result;
 
-				Assert.AreEqual(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
-			}
+			Assert.AreEqual(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
 		}
 
 		[Test]
@@ -42,19 +40,17 @@ namespace Hangfire.Configuration.Test.Web
 				MaxWorkersPerServer = 4
 			});
 
-			using (var s = new ServerUnderTest(system))
-			{
-				_ = s.TestClient.PostAsync(
-						"/config/saveMaxWorkersPerServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 1,
-							maxWorkers = ""
-						})))
-					.Result;
+			using var s = new ServerUnderTest(system);
+			_ = s.TestClient.PostAsync(
+					"/config/saveMaxWorkersPerServer",
+					new StringContent(JsonConvert.SerializeObject(new
+					{
+						configurationId = 1,
+						maxWorkers = ""
+					})))
+				.Result;
 
-				Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
-			}
+			Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
 		}
 	}
 }

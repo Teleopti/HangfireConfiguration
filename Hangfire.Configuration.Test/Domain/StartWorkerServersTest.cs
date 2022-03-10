@@ -293,7 +293,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 20});
             system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 100});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions() { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" }, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" }, null, (SqlServerStorageOptions)null);
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.AreEqual(new[] {20, 100}, actual);

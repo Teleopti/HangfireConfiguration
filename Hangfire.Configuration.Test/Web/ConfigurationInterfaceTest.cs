@@ -200,17 +200,15 @@ namespace Hangfire.Configuration.Test.Web
 				Active = true
 			});
 
-			using (var s = new ServerUnderTest(system, null))
-			{
-				await s.TestClient.PostAsync(
-						"/config/inactivateServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 3
-						})));
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/inactivateServer",
+				new StringContent(JsonConvert.SerializeObject(new
+				{
+					configurationId = 3
+				})));
 
-				Assert.False(system.ConfigurationStorage.Data.Single().Active);
-			}
+			Assert.False(system.ConfigurationStorage.Data.Single().Active);
 		}
 	}
 }

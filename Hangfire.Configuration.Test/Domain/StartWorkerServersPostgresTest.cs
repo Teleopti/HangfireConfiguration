@@ -152,7 +152,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration{ ConnectionString = @"Host=localhost;Database=fakedb;" });
 
             system.WorkerServerStarter.Start(null, null,
-                new PostgreSqlStorageOptions() {PrepareSchemaIfNecessary = false});
+                new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
 
             Assert.False(system.Hangfire.StartedServers.Single().storage.PostgresOptions.PrepareSchemaIfNecessary);
         }

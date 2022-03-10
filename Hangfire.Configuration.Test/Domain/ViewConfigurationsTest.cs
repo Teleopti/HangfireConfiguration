@@ -79,7 +79,7 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaName = "schemaName1",
                     Active = true
                 },
-                new StoredConfiguration()
+                new StoredConfiguration
                 {
                     Id = 2,
                     ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",

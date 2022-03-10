@@ -56,7 +56,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.ConfigurationStorage.Has(new StoredConfiguration() {Active = true, SchemaName = "ActiveSchema"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "ActiveSchema"});
 
             system.PublisherStarter.Start();
 
