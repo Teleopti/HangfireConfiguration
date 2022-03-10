@@ -94,7 +94,7 @@ INSERT INTO
 	private static int version()
 	{
 		using var c = new SqlConnection(ConnectionStrings.SqlServer);
-		return c.Query<int>("SELECT Version FROM HangfireConfiguration.Schema").Single();
+		return c.Query<int>("SELECT Version FROM HangfireConfiguration.[Schema]").Single();
 	}
 
 	private IEnumerable<values> read()
