@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Data.SqlClient;
 using Npgsql;
 
@@ -45,7 +44,7 @@ namespace Hangfire.Configuration.Internals
 		}
 
 		public static string ChangeApplicationName(this string connectionString, string applicationName) =>
-			new connectionStringDialectSelector(connectionString).Select(
+			connectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(connectionString) {ApplicationName = applicationName}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(connectionString) {ApplicationName = applicationName}.ToString(),
 				() => connectionString);
@@ -56,16 +55,6 @@ namespace Hangfire.Configuration.Internals
 				() => new SqlConnection(), () => new NpgsqlConnection());
 			connection.ConnectionString = connectionString;
 			return connection;
-		}
-
-		private class connectionStringDialectSelector : ConnectionStringDialectSelector
-		{
-			public connectionStringDialectSelector(string connectionString) : base(connectionString)
-			{
-			}
-
-			public T Select<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis) =>
-				SelectDialect(sqlServer, postgres, redis);
 		}
 	}
 }
