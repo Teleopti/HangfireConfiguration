@@ -5,14 +5,9 @@ using Npgsql;
 
 namespace Hangfire.Configuration;
 
-public interface IDbVendorSelector
-{
-	T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis);
-}
-
 internal static class DbVendorExtensions
 {
-	private const string RedisStart = "redis$$";
+	private const string redisStart = "redis$$";
 	
 	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) => 
 		new connectionStringDialectSelector(connectionString);
@@ -52,7 +47,7 @@ internal static class DbVendorExtensions
 		return connectionString.ToDbVendorSelector().SelectDialect(
 			() => connectionString,
 			() => connectionString,
-			() => connectionString.Substring(RedisStart.Length)) 
+			() => connectionString.Substring(redisStart.Length)) 
 		       ?? connectionString;
 	}
 	
@@ -120,7 +115,7 @@ internal static class DbVendorExtensions
 
 		private bool isRedis()
 		{
-			return _connectionString != null && _connectionString.StartsWith(RedisStart);
+			return _connectionString != null && _connectionString.StartsWith(redisStart);
 		}
 
 		private bool isSqlServer()
