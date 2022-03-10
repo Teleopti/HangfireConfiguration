@@ -12,6 +12,8 @@ public interface IDbVendorSelector
 
 internal static class DbVendorExtensions
 {
+	public const string RedisStart = "redis$$";
+	
 	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) => 
 		new connectionStringDialectSelector(connectionString);
 	
@@ -56,11 +58,18 @@ internal static class DbVendorExtensions
         
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
+			if (isRedis())
+				return redis();
 			if (isSqlServer())
 				return sqlServer();
 			if (isPostgreSql())
 				return postgres();
 			return default;
+		}
+
+		private bool isRedis()
+		{
+			return _connectionString.StartsWith(RedisStart);
 		}
 
 		private bool isSqlServer()
