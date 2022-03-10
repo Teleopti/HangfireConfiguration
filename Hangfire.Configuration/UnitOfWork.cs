@@ -9,10 +9,9 @@ using Npgsql;
 
 namespace Hangfire.Configuration
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDbVendorSelector
     {
-	    string ConnectionString { get; set; }
-		int Execute(string sql);
+	    int Execute(string sql);
         int Execute(string sql, object param);
         IEnumerable<T> Query<T>(string sql);
         IEnumerable<T> Query<T>(string sql, object param);
@@ -60,6 +59,11 @@ namespace Hangfire.Configuration
         protected void OpenWithRetry(IDbConnection connection)
         {
             _connectionRetry.Execute(() => connection.Open());
+        }
+
+        public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
+        {
+	        return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
         }
     }
 

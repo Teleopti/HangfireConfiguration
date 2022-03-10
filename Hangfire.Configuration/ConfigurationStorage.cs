@@ -24,15 +24,15 @@ namespace Hangfire.Configuration
 
         public void LockConfiguration(IUnitOfWork unitOfWork)
         {
-	        if (new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql())
-	        {
-		        unitOfWork.Execute($@"SELECT * FROM {SqlServerObjectsInstaller.SchemaName}.configuration");
-			}
-			else
-	        {
-				unitOfWork.Execute($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)");
-			}
-		}
+	        unitOfWork.ExecuteDialect(
+		        () =>
+		        {
+			        unitOfWork.Execute($@"SELECT * FROM {SqlServerObjectsInstaller.SchemaName}.configuration");
+		        }, () =>
+		        {
+			        unitOfWork.Execute($@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)");
+		        });
+        }
 
         public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null)
         {
@@ -60,15 +60,9 @@ FROM
     {SqlServerObjectsInstaller.SchemaName}.configuration 
 ORDER BY Id";
 	        unitOfWork = getUnitOfWork(unitOfWork);
-			if (new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql())
-			{
-				return unitOfWork
-					.Query<StoredConfiguration>(postgreSql).ToArray();
-			}
-
-			return unitOfWork
-			.Query<StoredConfiguration>(sqlServer).ToArray();
-
+	        return unitOfWork.SelectDialect(
+		        () => unitOfWork.Query<StoredConfiguration>(sqlServer).ToArray(),
+		        () => unitOfWork.Query<StoredConfiguration>(postgreSql).ToArray());
         }
 
         public void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null)
@@ -86,9 +80,24 @@ ORDER BY Id";
 
         private static void insert(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
-	        unitOfWork.Execute(
-		        new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql()
-			        ? $@"
+	        var sql = unitOfWork.SelectDialect($@"
+INSERT INTO 
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
+    (
+        Name,
+    [ConnectionString], 
+[SchemaName], 
+GoalWorkerCount, 
+Active,
+MaxWorkersPerServer
+    ) VALUES (
+    @Name,
+    @ConnectionString, 
+    @SchemaName, 
+    @GoalWorkerCount, 
+    @Active,
+    @MaxWorkersPerServer
+);", $@"
 INSERT INTO 
     {SqlServerObjectsInstaller.SchemaName}.Configuration 
 (
@@ -105,33 +114,24 @@ INSERT INTO
     @GoalWorkerCount, 
     @Active,
     @MaxWorkersPerServer
-);"
-			        : $@"
-INSERT INTO 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
-(
-    Name,
-    [ConnectionString], 
-    [SchemaName], 
-    GoalWorkerCount, 
-    Active,
-	MaxWorkersPerServer
-) VALUES (
-    @Name,
-    @ConnectionString, 
-    @SchemaName, 
-    @GoalWorkerCount, 
-    @Active,
-    @MaxWorkersPerServer
-);", configuration);
+);");
+	        unitOfWork.Execute(sql, configuration);
         }
 
         private static void update(StoredConfiguration configuration, IUnitOfWork unitOfWork)
         {
-            unitOfWork.Execute(
-	            new ConnectionStringDialectSelector(unitOfWork.ConnectionString).IsPostgreSql()
-		            ?
-		            $@"
+	        var sql = unitOfWork.SelectDialect($@"
+UPDATE 
+    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
+SET 
+    Name = @Name,
+    ConnectionString = @ConnectionString, 
+    SchemaName = @SchemaName, 
+    GoalWorkerCount = @GoalWorkerCount, 
+    Active = @Active,
+    MaxWorkersPerServer = @MaxWorkersPerServer    
+WHERE 
+    Id = @Id;", $@"
 UPDATE 
     {SqlServerObjectsInstaller.SchemaName}.Configuration 
 SET 
@@ -142,19 +142,9 @@ SET
     Active = @Active,
     MaxWorkersPerServer = @MaxWorkersPerServer    
 WHERE 
-    Id = @Id;"  :
-				$@"
-UPDATE 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
-SET 
-    Name = @Name,
-    ConnectionString = @ConnectionString, 
-    SchemaName = @SchemaName, 
-    GoalWorkerCount = @GoalWorkerCount, 
-    Active = @Active,
-    MaxWorkersPerServer = @MaxWorkersPerServer    
-WHERE 
-    Id = @Id;", configuration);
+    Id = @Id;");
+	        
+	        unitOfWork.Execute(sql, configuration);
         }
     }
 }
