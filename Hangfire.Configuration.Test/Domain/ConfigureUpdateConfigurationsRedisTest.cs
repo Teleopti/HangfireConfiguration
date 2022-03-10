@@ -3,9 +3,9 @@ using Hangfire.Pro.Redis;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain.Redis
+namespace Hangfire.Configuration.Test.Domain
 {
-	public class ConfigurationUpdaterTest
+	public class ConfigureUpdateConfigurationsRedisTest
 	{
 		[Test]
 		public void ShouldUseRedisOptions()

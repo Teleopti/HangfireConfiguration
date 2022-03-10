@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.Redis;
+namespace Hangfire.Configuration.Test.Domain;
 
-public class ViewConfigurationsTest
+public class ViewConfigurationsRedisTest
 {
 	[Test]
 	public void ShouldFilterRedisPrefix()

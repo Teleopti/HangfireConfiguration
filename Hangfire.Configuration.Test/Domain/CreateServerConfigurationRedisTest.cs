@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.Redis;
+namespace Hangfire.Configuration.Test.Domain;
 
-public class CreateServerConfigurationTest
+public class CreateServerConfigurationRedisTest
 {
 	[Test]
 	public void ShouldStoreConnectionString()
