@@ -2,7 +2,6 @@
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
-using Hangfire.Configuration.Internals;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
@@ -10,8 +9,6 @@ namespace Hangfire.Configuration.Test.Infrastructure;
 [Parallelizable(ParallelScope.None)]
 public class SchemaInstallSqlServerTest
 {
-	private string ConnectionString => ConnectionStrings.SqlServer;
-
 	[Test]
 	public void ShouldInstallSchemaVersion1()
 	{
@@ -23,7 +20,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldInstallSchemaVersion2()
 	{
-		DatabaseTestSetup.Setup(ConnectionString, schemaVersion: 2);
+		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
 
 		Assert.AreEqual(2, version());
 	}
@@ -31,7 +28,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldInstallSchemaVersion3()
 	{
-		DatabaseTestSetup.Setup(ConnectionString, schemaVersion: 3);
+		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 3);
 
 		Assert.AreEqual(3, version());
 	}
@@ -39,7 +36,7 @@ public class SchemaInstallSqlServerTest
 	[Test]
 	public void ShouldUpgradeFrom2ToLatest()
 	{
-		DatabaseTestSetup.Setup(ConnectionString, schemaVersion: 2);
+		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
 		Assert.AreEqual(2, version());
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 			c.Execute(@"
@@ -58,7 +55,7 @@ INSERT INTO
 	[Test]
 	public void ShouldUpgradeFrom2To3()
 	{
-		DatabaseTestSetup.Setup(ConnectionString, schemaVersion: 2);
+		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 2);
 		Assert.AreEqual(2, version());
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 		{
@@ -75,7 +72,7 @@ INSERT INTO
 	[Test]
 	public void ShouldUpgradeFrom1ToLatest()
 	{
-		DatabaseTestSetup.Setup(ConnectionString, schemaVersion: 1);
+		DatabaseTestSetup.Setup(ConnectionStrings.SqlServer, schemaVersion: 1);
 		using (var c = new SqlConnection(ConnectionStrings.SqlServer))
 			c.Execute("INSERT INTO HangfireConfiguration.Configuration ([Key], Value) VALUES ('GoalWorkerCount', 52)");
 
@@ -87,7 +84,7 @@ INSERT INTO
 
 	private void install(int? schemaVersion = null)
 	{
-		using var c = ConnectionString.CreateConnection();
+		using var c = ConnectionStrings.SqlServer.CreateConnection();
 		if (schemaVersion.HasValue)
 			SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
 		else
@@ -96,15 +93,15 @@ INSERT INTO
 
 	private int version()
 	{
-		var schemaName = new ConnectionStringDialectSelector(ConnectionString)
+		var schemaName = new ConnectionStringDialectSelector(ConnectionStrings.SqlServer)
 			.SelectDialect(() => "[Schema]", () => "schema");
-		using var c = ConnectionString.CreateConnection();
+		using var c = ConnectionStrings.SqlServer.CreateConnection();
 		return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
 	}
 
 	private IEnumerable<values> read()
 	{
-		using var c = ConnectionString.CreateConnection();
+		using var c = ConnectionStrings.SqlServer.CreateConnection();
 		return c.Query<values>("SELECT * FROM hangfireconfiguration.configuration");
 	}
 
