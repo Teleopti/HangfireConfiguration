@@ -7,7 +7,7 @@ namespace Hangfire.Configuration;
 
 public interface IDbVendorSelector
 {
-	T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres);
+	T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis);
 }
 
 internal static class DbVendorExtensions
@@ -17,8 +17,8 @@ internal static class DbVendorExtensions
 	
 	public static IDbVendorSelector ToDbVendorSelector(this DbConnection dbConnection) => 
 		ToDbVendorSelector(dbConnection.ConnectionString);
-	
-	public static void ExecuteDialect(this IDbVendorSelector selector, Action sqlServer, Action postgres)
+
+	public static void ExecuteDialect(this IDbVendorSelector selector, Action sqlServer, Action postgres, Action redis = null)
 	{
 		selector.SelectDialect(() =>
 		{
@@ -28,12 +28,21 @@ internal static class DbVendorExtensions
 		{
 			postgres();
 			return true;
+		}, () =>
+		{
+			redis();
+			return true;
 		});
 	}
 	
-	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres)
+	public static T SelectDialect<T>(this IDbVendorSelector selector, Func<T> sqlServer, Func<T> postgres)
 	{
-		return selector.SelectDialect(() => sqlServer, () => postgres);
+		return selector.SelectDialect(sqlServer, postgres, () => default);
+	}
+	
+	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default)
+	{
+		return selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
 	}
 		
 	private class connectionStringDialectSelector : IDbVendorSelector
@@ -45,7 +54,7 @@ internal static class DbVendorExtensions
 			_connectionString = connectionString;
 		}
         
-		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
+		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
 			if (isSqlServer())
 				return sqlServer();

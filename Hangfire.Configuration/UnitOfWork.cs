@@ -61,7 +61,7 @@ namespace Hangfire.Configuration
             _connectionRetry.Execute(() => connection.Open());
         }
 
-        public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
+        public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
         {
 	        return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
         }

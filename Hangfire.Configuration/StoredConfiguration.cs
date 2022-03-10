@@ -12,8 +12,8 @@ public class StoredConfiguration : IDbVendorSelector
 	public bool? Active { get; set; }
 	public int? MaxWorkersPerServer { get; set; }
 	
-	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
+	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 	{
-		return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
+		return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres, redis);
 	}
 }
