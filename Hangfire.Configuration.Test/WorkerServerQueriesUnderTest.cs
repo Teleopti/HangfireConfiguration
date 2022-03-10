@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test

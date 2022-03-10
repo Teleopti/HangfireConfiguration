@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
 using Npgsql;
 using NUnit.Framework;

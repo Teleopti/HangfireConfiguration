@@ -1,6 +1,5 @@
 using System.Data.SqlClient;
 using System.Linq;
-using Hangfire.Configuration.Internals;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain

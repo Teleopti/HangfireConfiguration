@@ -2,7 +2,6 @@ using System;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Dapper;
-using Hangfire.Configuration.Internals;
 using Npgsql;
 using NUnit.Framework;
 using SharpTestsEx;

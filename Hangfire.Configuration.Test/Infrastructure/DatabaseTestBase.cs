@@ -11,7 +11,7 @@ public class DatabaseTestBase
 {
 	protected readonly string ConnectionString;
 	protected readonly string DefaultSchemaName;
-	private bool _isSqlServer;
+	private readonly bool _isSqlServer;
 
 	public DatabaseTestBase(string connectionString)
 	{
