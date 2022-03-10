@@ -1,5 +1,8 @@
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
+using Npgsql;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
@@ -13,7 +16,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		[Test]
 		public void ShouldUpgradeFrom0ToLatest()
 		{
-			using var c = ConnectionString.CreateConnection();
+			using var c = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			SqlServerObjectsInstaller.Install(c);
 
 			Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
@@ -22,7 +25,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		private int version()
 		{
 			var schemaName = SelectDialect(() => "[Schema]", () => "schema");
-			using var c = ConnectionString.CreateConnection();
+			using var c = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
 		}
 	}

@@ -84,7 +84,7 @@ INSERT INTO
 
 	private void install(int? schemaVersion = null)
 	{
-		using var c = ConnectionStrings.SqlServer.CreateConnection();
+		using var c = new SqlConnection(ConnectionStrings.SqlServer);
 		if (schemaVersion.HasValue)
 			SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
 		else
@@ -93,13 +93,13 @@ INSERT INTO
 
 	private static int version()
 	{
-		using var c = ConnectionStrings.SqlServer.CreateConnection();
-		return c.Query<int>($"SELECT Version FROM HangfireConfiguration.Schema").Single();
+		using var c = new SqlConnection(ConnectionStrings.SqlServer);
+		return c.Query<int>("SELECT Version FROM HangfireConfiguration.Schema").Single();
 	}
 
 	private IEnumerable<values> read()
 	{
-		using var c = ConnectionStrings.SqlServer.CreateConnection();
+		using var c = new SqlConnection(ConnectionStrings.SqlServer);
 		return c.Query<values>("SELECT * FROM hangfireconfiguration.configuration");
 	}
 
