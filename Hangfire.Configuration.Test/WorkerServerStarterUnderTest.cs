@@ -16,7 +16,17 @@ namespace Hangfire.Configuration.Test
             _options = options;
         }
 
-        public void Start() => Start(null, null, (SqlServerStorageOptions)null, null); 
+        public void Start() => 
+	        _instance.Start();
+
+        public void Start(ConfigurationOptions options)
+        {
+	        _options.UseOptions(options);
+	        _instance.Start();
+        }
+
+        public void Start(IBackgroundProcess[] additionalProcesses) => 
+	        _instance.Start(additionalProcesses);
 
         public void Start(
             ConfigurationOptions options,

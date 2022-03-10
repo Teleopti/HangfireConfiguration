@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -99,24 +100,16 @@ namespace Hangfire.Configuration
 			received.ForEach(update =>
 			{
 				var configuration = stored.FirstOrDefault(c => c.Name == update.Name) ??
-									new StoredConfiguration
-									{
-										Name = update.Name,
-										Active = true
-									};
+				                    new StoredConfiguration
+				                    {
+					                    Name = update.Name,
+					                    Active = true
+				                    };
 
 				if (update.Name == DefaultConfigurationName.Name())
-				{
-					configuration.ConnectionString = new ConnectionStringDialectSelector(update.ConnectionString)
-						.SelectDialect(
-							() => markConnectionStringSqlServer(update.ConnectionString), 
-							() => markConnectionStringPostgreSql(update.ConnectionString),
-							() => configuration.ConnectionString = update.ConnectionString);
-				}
+					configuration.ConnectionString = markConnectionString(update.ConnectionString);
 				else
-				{
 					configuration.ConnectionString = update.ConnectionString;
-				}
 
 				configuration.SchemaName = update.SchemaName;
 				_storage.WriteConfiguration(configuration, connection);
@@ -137,49 +130,27 @@ namespace Hangfire.Configuration
 
 		private static bool isMarked(StoredConfiguration configuration)
 		{
-			try
-			{
-				return new ConnectionStringDialectSelector(configuration.ConnectionString)
-					.SelectDialect(
-						() => new SqlConnectionStringBuilder(configuration.ConnectionString).ApplicationName.EndsWith(".AutoUpdate"),
-						() => new NpgsqlConnectionStringBuilder(configuration.ConnectionString).ApplicationName == null 
-							? false
-							: new NpgsqlConnectionStringBuilder(configuration.ConnectionString).ApplicationName.EndsWith(".AutoUpdate")
-					);
-			}
-			catch (ArgumentException)
-			{
+			var applicationName = configuration.ConnectionString.ApplicationName();
+			if (applicationName == null)
 				return false;
+			return applicationName.EndsWith(".AutoUpdate");
+		}
+
+		private static string markConnectionString(string connectionString)
+		{
+			static bool applicationNameIsNotSet(string connectionString)
+			{
+				// because builder will return a app name even though the connection string does not have one
+				var applicationName = connectionString.ApplicationName();
+				return string.IsNullOrEmpty(applicationName) ||
+				       applicationName == ".Net SqlClient Data Provider" ||
+				       applicationName == "Core .Net SqlClient Data Provider";
 			}
-		}
 
-		private static string markConnectionStringSqlServer(string connectionString)
-		{
-			var builder = new SqlConnectionStringBuilder(connectionString);
-			if (applicationNameIsNotSet(builder))
-				builder.ApplicationName = "Hangfire";
-			builder.ApplicationName += ".AutoUpdate";
-			return builder.ToString();
+			var applicationName = connectionString.ApplicationName();
+			if (applicationNameIsNotSet(connectionString))
+				applicationName = "Hangfire";
+			return connectionString.ChangeApplicationName($"{applicationName}.AutoUpdate");
 		}
-		
-		private static string markConnectionStringPostgreSql(string connectionString)
-		{
-			var builder = new NpgsqlConnectionStringBuilder(connectionString);
-			if (applicationNameIsNotSet(builder))
-				builder.ApplicationName = "Hangfire";
-			builder.ApplicationName += ".AutoUpdate";
-			return builder.ToString();
-		}
-
-		// because builder will return a app name even though the connection string does not have one
-		private static bool applicationNameIsNotSet(SqlConnectionStringBuilder builder) =>
-			string.IsNullOrEmpty(builder.ApplicationName) ||
-			builder.ApplicationName == ".Net SqlClient Data Provider" ||
-			builder.ApplicationName == "Core .Net SqlClient Data Provider";
-
-		private static bool applicationNameIsNotSet(NpgsqlConnectionStringBuilder builder) =>
-			string.IsNullOrEmpty(builder.ApplicationName) ||
-			builder.ApplicationName == ".Net SqlClient Data Provider" ||
-			builder.ApplicationName == "Core .Net SqlClient Data Provider";
 	}
 }

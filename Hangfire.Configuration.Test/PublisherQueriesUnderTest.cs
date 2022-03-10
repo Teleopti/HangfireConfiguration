@@ -18,6 +18,13 @@ namespace Hangfire.Configuration.Test
         public IEnumerable<ConfigurationInfo> QueryPublishers()
             => _instance.QueryPublishers();
         
+        public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options)
+        {
+	        if (options != null)
+		        _options.UseOptions(options);
+	        return _instance.QueryPublishers();
+        }
+        
         public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
         {
             if (options != null)

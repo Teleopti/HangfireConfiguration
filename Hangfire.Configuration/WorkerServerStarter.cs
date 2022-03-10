@@ -27,6 +27,8 @@ namespace Hangfire.Configuration
             _recorder = recorder;
         }
 
+        public void Start() => Start(null);
+        
         public void Start(IBackgroundProcess[] additionalProcesses)
         {
             var options = _state.ReadOptions();

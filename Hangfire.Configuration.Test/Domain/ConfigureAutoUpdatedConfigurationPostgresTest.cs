@@ -1,13 +1,11 @@
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.PostgreSql;
-using Hangfire.SqlServer;
 using Npgsql;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.Postgres
+namespace Hangfire.Configuration.Test.Domain
 {
-    public class ConfigureAutoUpdatedConfigurationTest
+    public class ConfigureAutoUpdatedConfigurationPostgresTest
     {
         [Test]
         public void ShouldConfigureAutoUpdatedServer()
@@ -132,7 +130,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
         {
             var system = new SystemUnderTest();
-            var existing = new SqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
+            var existing = new NpgsqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
@@ -292,7 +290,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
-                ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(),
+                ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(),
                 Active = true
             });
 
@@ -315,7 +313,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         public void ShouldNotActivateWhenUpdating()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "DataSource"}.ToString(), Active = true});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
@@ -403,7 +401,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, new SqlServerStorageOptions());
+            });
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
             Assert.AreEqual("FirstUpdate", host);
@@ -436,7 +434,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, new SqlServerStorageOptions());
+            });
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
             Assert.AreEqual("SecondUpdate", host);
@@ -466,7 +464,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         public void ShouldAutoUpdateWithDefaultConfigurationName2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
