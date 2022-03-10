@@ -15,6 +15,7 @@ public class DatabaseTestBase
 
 	public DatabaseTestBase(string connectionString)
 	{
+		// fix/break out when/if redis tests are needed
 		try
 		{
 			new SqlConnectionStringBuilder(connectionString);

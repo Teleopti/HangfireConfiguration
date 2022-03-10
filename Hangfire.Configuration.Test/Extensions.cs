@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test
 
         public static void Times(this int times, Action action)
         {
-            Enumerable.Range(0, times).ForEach(i => action());
+            Enumerable.Range(0, times).ForEach(_ => action());
         }
         
         public static void Times(this int times, Action<int> action)
