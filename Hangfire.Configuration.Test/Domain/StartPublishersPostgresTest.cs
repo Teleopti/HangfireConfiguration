@@ -1,11 +1,12 @@
-using System.Data.SqlClient;
+using System;
 using System.Linq;
 using Hangfire.PostgreSql;
+using Npgsql;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.Postgres
+namespace Hangfire.Configuration.Test.Domain
 {
-    public class StartPublishersTest
+    public class StartPublishersPostgresTest
     {
         [Test]
         public void ShouldConfigureAndStartWithAutoUpdatedConnectionString()
@@ -19,14 +20,14 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	                {
 		                new UpdateStorageConfiguration
 		                {
-			                ConnectionString = new SqlConnectionStringBuilder
+			                ConnectionString = new NpgsqlConnectionStringBuilder
 			                {
-				                DataSource = "Hangfire"
+				                Host = "Hangfire"
 			                }.ToString(),
 			                Name = DefaultConfigurationName.Name()
 		                }
 	                }
-                }, (PostgreSqlStorageOptions)null);
+                });
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
@@ -92,37 +93,25 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 			Assert.AreEqual(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
 		}
 
-		//[Test]
-		//public void ShouldUseStorageOptions()
-		//{
-		//    var system = new SystemUnderTest();
-		//    system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
-		//    var options = new SqlServerStorageOptions
-		//    {
-		//        QueuePollInterval = TimeSpan.FromSeconds(1.0),
-		//        SlidingInvisibilityTimeout = TimeSpan.FromSeconds(2),
-		//        JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
-		//        CountersAggregateInterval = TimeSpan.FromMinutes(5.0),
-		//        PrepareSchemaIfNecessary = !new SqlServerStorageOptions().PrepareSchemaIfNecessary,
-		//        DashboardJobListLimit = 6,
-		//        TransactionTimeout = TimeSpan.FromMinutes(7.0),
-		//        DisableGlobalLocks = !new SqlServerStorageOptions().DisableGlobalLocks,
-		//        UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
-		//    };
+		[Test]
+		public void ShouldUseStorageOptions()
+		{
+		    var system = new SystemUnderTest();
+		    system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=fakedb;"});
+		    var options = new PostgreSqlStorageOptions()
+		    {
+		        QueuePollInterval = TimeSpan.FromSeconds(1.0),
+		        JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
+		        PrepareSchemaIfNecessary = !new PostgreSqlStorageOptions().PrepareSchemaIfNecessary,
+		    };
 
-		//    system.PublisherStarter.Start(null, options);
+		    system.PublisherStarter.Start(null, options);
 
-		//    var storage = system.Hangfire.CreatedStorages.Single();
-		//    Assert.AreEqual(options.QueuePollInterval, storage.Options.QueuePollInterval);
-		//    Assert.AreEqual(options.SlidingInvisibilityTimeout, storage.Options.SlidingInvisibilityTimeout);
-		//    Assert.AreEqual(options.JobExpirationCheckInterval, storage.Options.JobExpirationCheckInterval);
-		//    Assert.AreEqual(options.CountersAggregateInterval, storage.Options.CountersAggregateInterval);
-		//    Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.Options.PrepareSchemaIfNecessary);
-		//    Assert.AreEqual(options.DashboardJobListLimit, storage.Options.DashboardJobListLimit);
-		//    Assert.AreEqual(options.TransactionTimeout, storage.Options.TransactionTimeout);
-		//    Assert.AreEqual(options.DisableGlobalLocks, storage.Options.DisableGlobalLocks);
-		//    Assert.AreEqual(options.UsePageLocksOnDequeue, storage.Options.UsePageLocksOnDequeue);
-		//}
+		    var storage = system.Hangfire.CreatedStorages.Single();
+		    Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
+		    Assert.AreEqual(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
+		    Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
+		}
 
 		[Test]
         public void ShouldUseSchemaNameFromConfiguration()

@@ -5,7 +5,7 @@ using Hangfire.SqlServer;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain.SqlServer
+namespace Hangfire.Configuration.Test.Domain
 {
     public class QueryPublishersTest
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using Hangfire.SqlServer;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain.SqlServer
+namespace Hangfire.Configuration.Test.Domain
 {
     public class StartPublishersTest
     {

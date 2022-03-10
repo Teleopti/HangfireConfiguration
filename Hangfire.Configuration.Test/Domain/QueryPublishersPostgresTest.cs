@@ -1,13 +1,13 @@
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.PostgreSql;
+using Npgsql;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain.Postgres
+namespace Hangfire.Configuration.Test.Domain
 {
-    public class QueryPublishersTest
+    public class QueryPublishersPostgresTest
     {
         [Test]
         public void ShouldQueryPublishers()
@@ -102,7 +102,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	                    {
 		                    new UpdateStorageConfiguration
 		                    {
-			                    ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
+			                    ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
 			                    Name = DefaultConfigurationName.Name()
 		                    }
 	                    }

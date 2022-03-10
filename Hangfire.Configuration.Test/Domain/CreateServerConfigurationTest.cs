@@ -2,12 +2,11 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
-using Hangfire.PostgreSql;
-using Npgsql;
+using Hangfire.SqlServer;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain.Postgres
+namespace Hangfire.Configuration.Test.Domain
 {
     public class CreateServerConfigurationTest
     {
@@ -24,12 +23,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                 Password = "awesomePassword",
                 SchemaCreatorUser = "createuser",
                 SchemaCreatorPassword = "createPassword",
-                SchemaName = "awesomeSchema",
-				DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "awesomeSchema"
+            });
 
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
-            Assert.AreEqual(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=testUser;Password=awesomePassword;", storedConfiguration.ConnectionString);
+            Assert.AreEqual("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
             Assert.AreEqual("awesomeSchema", storedConfiguration.SchemaName);
         }
 
@@ -43,12 +41,12 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),
 			            SchemaName = "defaultSchemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -58,8 +56,7 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                 Password = "Password",
                 SchemaCreatorUser = "createUser",
                 SchemaCreatorPassword = "createPassword",
-                DatabaseProvider = "PostgreSql"
-			});
+            });
 
             system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
 
@@ -77,12 +74,12 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
 			            Name = DefaultConfigurationName.Name(),
 			            SchemaName = "defaultSchemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            }, null, (SqlServerStorageOptions)null);
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Server = "newServer",
@@ -91,9 +88,8 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                 Password = "Password",
                 SchemaCreatorUser = "createUser",
                 SchemaCreatorPassword = "createPassword",
-                SchemaName = "newSchemaName",
-                DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "newSchemaName"
+            });
 
             var configurations = system.ConfigurationStorage.ReadConfigurations();
 
@@ -112,9 +108,8 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                     Server = "Server",
                     Database = "TestDatabase",
                     User = "testUser",
-                    Password = "awesomePassword",
-                    DatabaseProvider = "PostgreSql"
-				}));
+                    Password = "awesomePassword"
+                }));
         }
 
         [Test]
@@ -128,12 +123,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
                     User = "testUser",
-                    Password = "awesomePassword",
-                    DatabaseProvider = "PostgreSql"
-				});
+                    Password = "awesomePassword"
+                });
 
             system.SchemaCreator.ConnectionTriedWith
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=testUser;Password=awesomePassword;");
+	            .Should().Contain("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword");
         }
 
         [Test]
@@ -147,12 +141,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
                     SchemaCreatorUser = "createUser",
-                    SchemaCreatorPassword = "createPassword",
-                    DatabaseProvider = "PostgreSql"
-				});
+                    SchemaCreatorPassword = "createPassword"
+                });
 
             system.SchemaCreator.ConnectionTriedWith
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=createUser;Password=createPassword;");
+	            .Should().Contain("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword");
         }
 
         [Test]
@@ -167,12 +160,11 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                     Database = "TestDatabase",
                     SchemaCreatorUser = "createUser",
                     SchemaCreatorPassword = "createPassword",
-                    SchemaName = "schema",
-                    DatabaseProvider = "PostgreSql"
-				});
-
+                    SchemaName = "schema"
+                });
+            
             system.SchemaCreator.Schemas.Last().ConnectionString
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=createUser;Password=createPassword;");
+	            .Should().Contain("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=createUser;Password=createPassword");
             Assert.AreEqual("schema", system.SchemaCreator.Schemas.Last().SchemaName);
         }
 
@@ -185,9 +177,8 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             {
                 StorageConnectionString = "storage",
                 SchemaCreatorConnectionString = "creator",
-                SchemaName = "schema",
-                DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "schema"
+            });
 
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.AreEqual("creator", system.SchemaCreator.Schemas.Last().ConnectionString);
@@ -203,18 +194,16 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             {
                 Server = "server",
                 Database = "existingDatabase",
-                SchemaName = "existingSchema",
-                DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "existingSchema"
+            });
 
             var e = Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     Server = "server",
                     Database = "existingDatabase",
-                    SchemaName = "existingSchema",
-                    DatabaseProvider = "PostgreSql"
-				}));
+                    SchemaName = "existingSchema"
+                }));
             Assert.AreEqual("Schema already exists.", e.Message);
         }
 
@@ -223,15 +212,15 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
         {
             var system = new SystemUnderTest();
             var connection = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "existingDatabase"}.ToString();
-            system.SchemaCreator.Has(DefaultSchemaName.Postgres(), connection);
+            
+            system.SchemaCreator.Has(DefaultSchemaName.SqlServer(), connection);
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
                     SchemaCreatorConnectionString = connection,
-                    SchemaName = null,
-                    DatabaseProvider = "PostgreSql"
-				}));
+                    SchemaName = null
+                }));
         }
 
         [Test]
@@ -243,9 +232,8 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 SchemaCreatorConnectionString = "connectionTwo",
-                SchemaName = "schemaName",
-                DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "schemaName"
+            });
 
             Assert.AreEqual(2, system.SchemaCreator.Schemas.Count());
             Assert.AreEqual("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
@@ -262,9 +250,8 @@ namespace Hangfire.Configuration.Test.Domain.Postgres
                 Name = "namedConfiguration",
                 StorageConnectionString = "storage",
                 SchemaCreatorConnectionString = "creator",
-                SchemaName = "schema",
-                DatabaseProvider = "PostgreSql"
-			});
+                SchemaName = "schema"
+            });
 
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.AreEqual("namedConfiguration", storedConfiguration.Name);
