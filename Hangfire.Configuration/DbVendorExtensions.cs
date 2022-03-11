@@ -36,16 +36,6 @@ internal static class DbVendorExtensions
 	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) => 
 		selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
 
-	//TODO: remove me when naming convention is gone
-	private const string redisStart = "redis$$";
-	public static string TrimRedisPrefix(this string connectionString)
-	{
-		if (connectionString != null && connectionString.StartsWith(redisStart))
-			return connectionString.Substring(redisStart.Length);
-		return connectionString;
-	}
-	//
-
 	public static string ApplicationName(this string connectionString) =>
 		connectionString.ToDbVendorSelector().SelectDialect(
 			() => new SqlConnectionStringBuilder(connectionString).ApplicationName,

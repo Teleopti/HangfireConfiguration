@@ -17,7 +17,7 @@ public class CreateServerConfigurationRedisTest
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
-		Assert.AreEqual("redis$$AwesomeServer:425", storedConfiguration.ConnectionString);
+		Assert.AreEqual("AwesomeServer:425", storedConfiguration.ConnectionString);
 	}
 	
 	[Test]

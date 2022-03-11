@@ -57,9 +57,7 @@ public class StateMaintainer
 							() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
 						);
 
-					var storageConnectionString = connectionString.TrimRedisPrefix();
-
-					return makeJobStorage(storageConnectionString, c, storageOptions);
+					return makeJobStorage(connectionString, c, storageOptions);
 				}).ToArray();
 		}
 	}

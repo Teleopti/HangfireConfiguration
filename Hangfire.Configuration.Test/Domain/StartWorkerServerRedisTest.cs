@@ -20,21 +20,10 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 
 		[Test]
-		public void ShouldAdjustConnectionString()
-		{
-			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis$$connstring"});
-
-			system.WorkerServerStarter.Start();
-
-			Assert.AreEqual("connstring", system.Hangfire.StartedServers.Single().storage.ConnectionString);
-		}
-
-		[Test]
 		public void ShouldUseProvidedRedisOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis$$Foo"});
+			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis"});
 			var options = new RedisStorageOptions
 			{
 				MultiplexerPoolSize = 1,

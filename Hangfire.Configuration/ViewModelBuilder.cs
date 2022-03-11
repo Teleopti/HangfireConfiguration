@@ -28,7 +28,7 @@ namespace Hangfire.Configuration
 					{
 						Id = x.Id,
 						Name = x.Name,
-						ConnectionString = x.ConnectionString.TrimRedisPrefix(),
+						ConnectionString = x.ConnectionString,
 						SchemaName = schemaName,
 						Active = x.Active,
 						Workers = x.GoalWorkerCount,
