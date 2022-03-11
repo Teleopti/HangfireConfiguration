@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Hangfire.Configuration
 {
@@ -15,5 +16,9 @@ namespace Hangfire.Configuration
             return source;
         }
         
+	    internal static T DeepCopy<T>(this T obj)
+	    {
+		    return obj == null ? default : JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(obj));
+	    }
     }
 }

@@ -3,7 +3,6 @@ using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
 using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
-using Newtonsoft.Json;
 
 namespace Hangfire.Configuration;
 
@@ -53,7 +52,6 @@ public class StateMaintainer
 	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration)
 	{
 		var options = getStorageOptions(configuration);
-		options = copyOptions(options);
 		assignSchemaName(configuration.SchemaName, options);
 		return new ConfigurationAndStorage
 		{
@@ -65,9 +63,9 @@ public class StateMaintainer
 	private object getStorageOptions(StoredConfiguration configuration) =>
 		configuration.ConnectionString.ToDbVendorSelector()
 			.SelectDialect<object>(
-				() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
-				() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),
-				() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
+				() => _state.StorageOptionsSqlServer.DeepCopy() ?? new SqlServerStorageOptions(),
+				() => _state.StorageOptionsPostgreSql.DeepCopy() ?? new PostgreSqlStorageOptions(),
+				() => _state.StorageOptionsRedis.DeepCopy() ?? new RedisStorageOptions()
 			);
 
 	private static void assignSchemaName(string schemaName, object options)
@@ -75,25 +73,17 @@ public class StateMaintainer
 		if (string.IsNullOrEmpty(schemaName))
 			schemaName = DefaultSchemaName.For(options);
 
-		(options switch
+		switch (options)
 		{
-			SqlServerStorageOptions => options.GetType().GetProperty("SchemaName"),
-			PostgreSqlStorageOptions => options.GetType().GetProperty("SchemaName"),
-			RedisStorageOptions => options.GetType().GetProperty("Prefix"),
-			_ => null
-		})?.SetValue(options, schemaName);
-	}
-
-	private static object copyOptions(object options)
-	{
-		if (options == null)
-			return null;
-		return options switch
-		{
-			SqlServerStorageOptions => JsonConvert.DeserializeObject<SqlServerStorageOptions>(JsonConvert.SerializeObject(options)),
-			PostgreSqlStorageOptions => JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(JsonConvert.SerializeObject(options)),
-			RedisStorageOptions => JsonConvert.DeserializeObject<RedisStorageOptions>(JsonConvert.SerializeObject(options)),
-			_ => null
-		};
+			case SqlServerStorageOptions sqlServerStorageOptions:
+				sqlServerStorageOptions.SchemaName = schemaName;
+				break;
+			case PostgreSqlStorageOptions postgreSqlStorageOptions:
+				postgreSqlStorageOptions.SchemaName = schemaName;
+				break;
+			case RedisStorageOptions redisStorageOptions:
+				redisStorageOptions.Prefix = schemaName;
+				break;
+		}
 	}
 }
