@@ -45,45 +45,43 @@ public class StateMaintainer
 						return existing;
 					}
 
-					var storageOptions = c.ConnectionString.ToDbVendorSelector()
-						.SelectDialect<object>(
-							() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
-							() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),
-							() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
-						);
-
-					return makeJobStorage(c.ConnectionString, c, storageOptions);
+					return makeJobStorage(c);
 				}).ToArray();
 		}
 	}
 
-	private ConfigurationAndStorage makeJobStorage(string connectionString, StoredConfiguration configuration, object storageOptions)
+	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration)
 	{
-		var options = copyOptions(storageOptions);
-
-		if (options is SqlServerStorageOptions o1)
-			if (string.IsNullOrEmpty(configuration.SchemaName))
-				o1.SchemaName = DefaultSchemaName.SqlServer();
-			else
-				o1.SchemaName = configuration.SchemaName;
-
-		if (options is PostgreSqlStorageOptions o2)
-			if (string.IsNullOrEmpty(configuration.SchemaName))
-				o2.SchemaName = DefaultSchemaName.Postgres();
-			else
-				o2.SchemaName = configuration.SchemaName;
-
-		if (options is RedisStorageOptions o3)
-			if (string.IsNullOrEmpty(configuration.SchemaName))
-				o3.Prefix = DefaultSchemaName.Redis();
-			else
-				o3.Prefix = configuration.SchemaName;
-
+		var options = getStorageOptions(configuration);
+		options = copyOptions(options);
+		assignSchemaName(configuration.SchemaName, options);
 		return new ConfigurationAndStorage
 		{
-			JobStorageCreator = () => _hangfire.MakeJobStorage(connectionString, options),
+			JobStorageCreator = () => _hangfire.MakeJobStorage(configuration.ConnectionString, options),
 			Configuration = configuration
 		};
+	}
+
+	private object getStorageOptions(StoredConfiguration configuration) =>
+		configuration.ConnectionString.ToDbVendorSelector()
+			.SelectDialect<object>(
+				() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
+				() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),
+				() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
+			);
+
+	private static void assignSchemaName(string schemaName, object options)
+	{
+		if (string.IsNullOrEmpty(schemaName))
+			schemaName = DefaultSchemaName.For(options);
+
+		(options switch
+		{
+			SqlServerStorageOptions => options.GetType().GetProperty("SchemaName"),
+			PostgreSqlStorageOptions => options.GetType().GetProperty("SchemaName"),
+			RedisStorageOptions => options.GetType().GetProperty("Prefix"),
+			_ => null
+		})?.SetValue(options, schemaName);
 	}
 
 	private static object copyOptions(object options)
@@ -94,7 +92,8 @@ public class StateMaintainer
 		{
 			SqlServerStorageOptions => JsonConvert.DeserializeObject<SqlServerStorageOptions>(JsonConvert.SerializeObject(options)),
 			PostgreSqlStorageOptions => JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(JsonConvert.SerializeObject(options)),
-			RedisStorageOptions => JsonConvert.DeserializeObject<RedisStorageOptions>(JsonConvert.SerializeObject(options))
+			RedisStorageOptions => JsonConvert.DeserializeObject<RedisStorageOptions>(JsonConvert.SerializeObject(options)),
+			_ => null
 		};
 	}
 }
