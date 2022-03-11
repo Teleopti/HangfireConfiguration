@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseRedisOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis$$something"});
+			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "something"});
 
 			system.WorkerServerStarter.Start();
 

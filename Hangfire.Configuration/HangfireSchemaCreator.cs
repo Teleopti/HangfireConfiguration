@@ -1,4 +1,3 @@
-using System;
 using Dapper;
 using Npgsql;
 
@@ -14,14 +13,12 @@ namespace Hangfire.Configuration
 
 		public void CreateHangfireStorageSchema(string schemaName, string connectionString)
 		{
-			bool wasCalled_REMOVEMELATER=false;
 			connectionString.ToDbVendorSelector().ExecuteDialect(
 				() =>
 				{
 					using var conn = connectionString.CreateConnection();
 					conn.Open();
 					SqlServer.SqlServerObjectsInstaller.Install(conn, schemaName, true);
-					wasCalled_REMOVEMELATER = true;
 				},
 				() =>
 				{
@@ -31,12 +28,8 @@ namespace Hangfire.Configuration
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn);
 					else
 						PostgreSql.PostgreSqlObjectsInstaller.Install((NpgsqlConnection) conn, schemaName);
-					wasCalled_REMOVEMELATER = true;
 				}
 			);
-			//hack to get ShouldThrowOnCreateWhenInvalidConnectionString green
-			if (!wasCalled_REMOVEMELATER)
-				throw new Exception("Invalid connectionstring");
 		}
 
 		public bool HangfireStorageSchemaExists(string schemaName, string connectionString)

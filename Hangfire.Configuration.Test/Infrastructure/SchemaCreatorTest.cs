@@ -57,15 +57,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			Assert.AreEqual(expected, conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'"));
 		}
-
-		[Test]
-		public void ShouldThrowOnCreateWhenInvalidConnectionString()
-		{
-			var creator = new HangfireSchemaCreator();
-
-			Assert.Throws<Exception>(() => creator.CreateHangfireStorageSchema("HangfireTestSchema", "InvalidConnectionString"));
-		}
-
+		
 		[Test]
 		public void ShouldIndicateThatSchemaExists()
 		{

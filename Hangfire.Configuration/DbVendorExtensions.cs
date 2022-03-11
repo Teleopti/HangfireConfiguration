@@ -38,12 +38,12 @@ internal static class DbVendorExtensions
 
 	//TODO: remove me when naming convention is gone
 	private const string redisStart = "redis$$";
-	public static string TrimRedisPrefix(this string connectionString) =>
-		connectionString.ToDbVendorSelector().SelectDialect(
-			() => connectionString,
-			() => connectionString,
-			() => connectionString.Substring(redisStart.Length)) 
-		?? connectionString;
+	public static string TrimRedisPrefix(this string connectionString)
+	{
+		if (connectionString != null && connectionString.StartsWith(redisStart))
+			return connectionString.Substring(redisStart.Length);
+		return connectionString;
+	}
 	//
 
 	public static string ApplicationName(this string connectionString) =>
@@ -76,17 +76,17 @@ internal static class DbVendorExtensions
         
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
-			if (isRedis())
-				return redis();
+		//	if (isRedis())
+		//		return redis();
 			if (isSqlServer())
 				return sqlServer();
 			if (isPostgreSql())
 				return postgres();
-			return default;
+			return redis();
 		}
 
-		private bool isRedis() => 
-			_connectionString != null && _connectionString.StartsWith(redisStart);
+	//	private bool isRedis() => 
+	//		_connectionString != null && _connectionString.StartsWith(redisStart);
 
 		private bool isSqlServer()
 		{
