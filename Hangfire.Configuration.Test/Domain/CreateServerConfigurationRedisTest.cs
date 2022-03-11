@@ -19,7 +19,7 @@ public class CreateServerConfigurationRedisTest
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
 		Assert.AreEqual("AwesomeServer:425", storedConfiguration.ConnectionString);
 	}
-	
+
 	[Test]
 	public void ShouldStoreName()
 	{
@@ -34,7 +34,7 @@ public class CreateServerConfigurationRedisTest
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
 		Assert.AreEqual("matte", storedConfiguration.Name);
 	}
-	
+
 	[Test]
 	public void ShouldDefaultToNonActive()
 	{
@@ -47,5 +47,35 @@ public class CreateServerConfigurationRedisTest
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
 		Assert.False(storedConfiguration.Active);
+	}
+
+	[Test]
+	public void ShouldCreateWithSchemaName()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = "my-prefix:"
+		});
+
+		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		Assert.AreEqual("my-prefix:", storedConfiguration.SchemaName);
+	}
+
+	[Test]
+	public void ShouldCreateWithDefaultPrefixAsSchemaName()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = null
+		});
+
+		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		Assert.AreEqual(DefaultSchemaName.Redis(), storedConfiguration.SchemaName);
 	}
 }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
@@ -12,5 +13,7 @@ namespace Hangfire.Configuration.Test
 				.GetField("DefaultSchema", BindingFlags.Static | BindingFlags.Public).GetValue(null) as string;
 
 		public static string Postgres() => new PostgreSqlStorageOptions().SchemaName;
+
+		public static string Redis() => new RedisStorageOptions().Prefix;
 	}
 }

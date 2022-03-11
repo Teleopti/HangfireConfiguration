@@ -73,6 +73,12 @@ public class StateMaintainer
 			else
 				o2.SchemaName = configuration.SchemaName;
 
+		if (options is RedisStorageOptions o3)
+			if (string.IsNullOrEmpty(configuration.SchemaName))
+				o3.Prefix = DefaultSchemaName.Redis();
+			else
+				o3.Prefix = configuration.SchemaName;
+
 		return new ConfigurationAndStorage
 		{
 			JobStorageCreator = () => _hangfire.MakeJobStorage(connectionString, options),

@@ -255,5 +255,21 @@ namespace Hangfire.Configuration.Test.Domain
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.AreEqual("namedConfiguration", storedConfiguration.Name);
         }
+        
+        [Test]
+        public void ShouldCreateWithDefaultSchemaName()
+        {
+	        var system = new SystemUnderTest();
+
+	        system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+	        {
+		        StorageConnectionString = "Data Source=.",
+		        SchemaCreatorConnectionString = "Data Source=.",
+		        SchemaName = null
+	        });
+
+	        var storedConfiguration = system.ConfigurationStorage.Data.Last();
+	        Assert.AreEqual(DefaultSchemaName.SqlServer(), storedConfiguration.SchemaName);
+        }
     }
 }

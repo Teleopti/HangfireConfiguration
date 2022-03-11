@@ -267,5 +267,21 @@ namespace Hangfire.Configuration.Test.Domain
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
             Assert.AreEqual("namedConfiguration", storedConfiguration.Name);
         }
+        
+        [Test]
+        public void ShouldCreateWithDefaultSchemaName()
+        {
+	        var system = new SystemUnderTest();
+
+	        system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+	        {
+		        StorageConnectionString = "Host=localhost",
+		        SchemaCreatorConnectionString = "Host=localhost",
+		        SchemaName = null
+	        });
+
+	        var storedConfiguration = system.ConfigurationStorage.Data.Last();
+	        Assert.AreEqual(DefaultSchemaName.Postgres(), storedConfiguration.SchemaName);
+        }
     }
 }

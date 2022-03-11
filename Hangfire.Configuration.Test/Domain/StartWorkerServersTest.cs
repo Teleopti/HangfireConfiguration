@@ -221,7 +221,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.SqlServer(),
-                (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
+                system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
         }
 
         [Test]

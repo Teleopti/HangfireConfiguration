@@ -21,7 +21,10 @@ namespace Hangfire.Configuration
 					var schemaName = x.SchemaName;
 					if (x.ConnectionString != null)
 					{
-						schemaName ??= x.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
+						schemaName ??= x.SelectDialect(
+							DefaultSchemaName.SqlServer, 
+							DefaultSchemaName.Postgres,
+							DefaultSchemaName.Redis);
 					}
 
 					return new ViewModel

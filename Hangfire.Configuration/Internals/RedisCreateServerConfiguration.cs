@@ -13,7 +13,8 @@ internal class RedisCreateServerConfiguration : ICreateServerConfiguration
 	{
 		_storage.WriteConfiguration(new StoredConfiguration
 		{
-			ConnectionString =config.Server,
+			SchemaName = config.SchemaName ?? DefaultSchemaName.Redis(),
+			ConnectionString = config.Server,
 			Name = config.Name,
 			Active = false
 		});

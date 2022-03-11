@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class StartPublishersPostgresTest
+	public class StartPublishersPostgresTest
     {
         [Test]
         public void ShouldConfigureAndStartWithAutoUpdatedConnectionString()

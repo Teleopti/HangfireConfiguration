@@ -108,7 +108,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             var storedConfiguration = new StoredConfiguration
             {
-	            ConnectionString = new SqlConnectionStringBuilder { DataSource = "." }.ToString(),
+	            ConnectionString = "Data Source=.",
 	            SchemaName = null
             };
 
@@ -119,6 +119,40 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.AreEqual(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
         }
         
+        [Test]
+        public void ShouldBuildWithDefaultSchemaNameForPostgres()
+        {
+	        var system = new SystemUnderTest();
+	        var storedConfiguration = new StoredConfiguration
+	        {
+		        ConnectionString = "Host=localhost",
+		        SchemaName = null
+	        };
+
+	        system.ConfigurationStorage.Has(storedConfiguration);
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+	        Assert.AreEqual(DefaultSchemaName.Postgres(), result.Single().SchemaName);
+        }
+         
+        [Test]
+        public void ShouldBuildWithDefaultSchemaNameForRedis()
+        {
+	        var system = new SystemUnderTest();
+	        var storedConfiguration = new StoredConfiguration
+	        {
+		        ConnectionString = "redis-roger",
+		        SchemaName = null
+	        };
+
+	        system.ConfigurationStorage.Has(storedConfiguration);
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+	        Assert.AreEqual(DefaultSchemaName.Redis(), result.Single().SchemaName);
+        }
+
         [Test]
         public void ShouldBuildWithConfigurationName()
         {
