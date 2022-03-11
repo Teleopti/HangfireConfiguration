@@ -1,5 +1,4 @@
 using System;
-using System.Data.SqlClient;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
@@ -10,16 +9,18 @@ namespace Hangfire.Configuration.Test.Infrastructure;
 public class DatabaseTestBase
 {
 	protected readonly string ConnectionString;
+	private readonly bool _isSqlServer;
 
 	public DatabaseTestBase(string connectionString)
 	{
 		ConnectionString = connectionString;
+		_isSqlServer = ConnectionString.Equals(ConnectionStrings.SqlServer);
 	}
 
 	[SetUp]
 	public void Setup()
 	{
-		if(isSqlServer())
+		if(_isSqlServer)
 			DatabaseTestSetup.SetupSqlServer(ConnectionString);
 		else
 			DatabaseTestSetup.SetupPostgres(ConnectionString);
@@ -27,11 +28,6 @@ public class DatabaseTestBase
 	
 	protected T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
 	{
-		return isSqlServer() ? sqlServer() : postgres();
-	}
-
-	private bool isSqlServer()
-	{
-		return ConnectionString.Equals(ConnectionStrings.SqlServer);
+		return _isSqlServer ? sqlServer() : postgres();
 	}
 }
