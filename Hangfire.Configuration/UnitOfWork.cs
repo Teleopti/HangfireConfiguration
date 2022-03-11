@@ -7,114 +7,113 @@ using Dapper;
 using Hangfire.Configuration.Internals;
 using Npgsql;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public interface IUnitOfWork : IDbVendorSelector
 {
-    public interface IUnitOfWork : IDbVendorSelector
-    {
-	    int Execute(string sql);
-        int Execute(string sql, object param);
-        IEnumerable<T> Query<T>(string sql);
-        IEnumerable<T> Query<T>(string sql, object param);
-    }
+	int Execute(string sql);
+	int Execute(string sql, object param);
+	IEnumerable<T> Query<T>(string sql);
+	IEnumerable<T> Query<T>(string sql, object param);
+}
 
-    internal abstract class UnitOfWorkBase : IUnitOfWork
-    {
-	    protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
+internal abstract class UnitOfWorkBase : IUnitOfWork
+{
+	protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
-        private static readonly Policy _connectionRetry = Policy.Handle<TimeoutException>()
-            .Or<SqlException>(DetectTransientSqlException.IsTransient)
-            .OrInner<SqlException>(DetectTransientSqlException.IsTransient)
-            .WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
+	private static readonly Policy _connectionRetry = Policy.Handle<TimeoutException>()
+		.Or<SqlException>(DetectTransientSqlException.IsTransient)
+		.OrInner<SqlException>(DetectTransientSqlException.IsTransient)
+		.WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
 
-        public string ConnectionString { get; set; }
+	public string ConnectionString { get; set; }
 
-        public int Execute(string sql)
-        {
-            var result = default(int);
-            operation((c, t) => { c.Execute(sql, null, t); });
-            return result;
-        }
+	public int Execute(string sql)
+	{
+		var result = default(int);
+		operation((c, t) => { c.Execute(sql, null, t); });
+		return result;
+	}
 
-        public int Execute(string sql, object param)
-        {
-            var result = default(int);
-            operation((c, t) => { result = c.Execute(sql, param, t); });
-            return result;
-        }
+	public int Execute(string sql, object param)
+	{
+		var result = default(int);
+		operation((c, t) => { result = c.Execute(sql, param, t); });
+		return result;
+	}
         
-        public IEnumerable<T> Query<T>(string sql)
-        {
-	        var result = default(IEnumerable<T>);
-	        operation((c, t) => { result = c.Query<T>(sql, null, t); });
-	        return result;
-        }
+	public IEnumerable<T> Query<T>(string sql)
+	{
+		var result = default(IEnumerable<T>);
+		operation((c, t) => { result = c.Query<T>(sql, null, t); });
+		return result;
+	}
         
-        public IEnumerable<T> Query<T>(string sql, object param)
-        {
-            var result = default(IEnumerable<T>);
-            operation((c, t) => { result = c.Query<T>(sql, param, t); });
-            return result;
-        }
+	public IEnumerable<T> Query<T>(string sql, object param)
+	{
+		var result = default(IEnumerable<T>);
+		operation((c, t) => { result = c.Query<T>(sql, param, t); });
+		return result;
+	}
 
-        protected void OpenWithRetry(IDbConnection connection)
-        {
-            _connectionRetry.Execute(() => connection.Open());
-        }
+	protected void OpenWithRetry(IDbConnection connection)
+	{
+		_connectionRetry.Execute(() => connection.Open());
+	}
 
-        public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
-        {
-	        return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
-        }
-    }
+	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
+	{
+		return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
+	}
+}
 
-    internal class UnitOfWork : UnitOfWorkBase
-    {
-        protected override void operation(Action<IDbConnection, IDbTransaction> action)
-        {
-	        this.ExecuteDialect(
-		        () =>
-		        {
-			        using var conn = new SqlConnection(ConnectionString);
-			        OpenWithRetry(conn);
-			        action.Invoke(conn, null);
-		        }
-		        , () =>
-		        {
-			        using var conn = new NpgsqlConnection(ConnectionString);
-			        conn.Open();
-			        action.Invoke(conn, null);
-		        }
-			);
-        }
-    }
+internal class UnitOfWork : UnitOfWorkBase
+{
+	protected override void operation(Action<IDbConnection, IDbTransaction> action)
+	{
+		this.ExecuteDialect(
+			() =>
+			{
+				using var conn = new SqlConnection(ConnectionString);
+				OpenWithRetry(conn);
+				action.Invoke(conn, null);
+			}
+			, () =>
+			{
+				using var conn = new NpgsqlConnection(ConnectionString);
+				conn.Open();
+				action.Invoke(conn, null);
+			}
+		);
+	}
+}
 
-    internal class UnitOfWorkTransaction : UnitOfWorkBase, IDisposable
-    {
-        private readonly IDbConnection _connection;
-        private readonly IDbTransaction _transaction;
+internal class UnitOfWorkTransaction : UnitOfWorkBase, IDisposable
+{
+	private readonly IDbConnection _connection;
+	private readonly IDbTransaction _transaction;
 
-		public UnitOfWorkTransaction(string connectionString)
-		{
-			ConnectionString = connectionString;
-			_connection = connectionString.CreateConnection();
-            OpenWithRetry(_connection);
-            _transaction = _connection.BeginTransaction();
-        }
+	public UnitOfWorkTransaction(string connectionString)
+	{
+		ConnectionString = connectionString;
+		_connection = connectionString.CreateConnection();
+		OpenWithRetry(_connection);
+		_transaction = _connection.BeginTransaction();
+	}
 
-		protected override void operation(Action<IDbConnection, IDbTransaction> action)
-        {
-            action.Invoke(_connection, _transaction);
-        }
+	protected override void operation(Action<IDbConnection, IDbTransaction> action)
+	{
+		action.Invoke(_connection, _transaction);
+	}
 
-        public void Commit()
-        {
-            _transaction.Commit();
-        }
+	public void Commit()
+	{
+		_transaction.Commit();
+	}
 
-        public void Dispose()
-        {
-            _transaction.Dispose();
-            _connection.Dispose();
-        }
-    }
+	public void Dispose()
+	{
+		_transaction.Dispose();
+		_connection.Dispose();
+	}
 }

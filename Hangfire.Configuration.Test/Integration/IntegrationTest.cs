@@ -1,31 +1,33 @@
+using Hangfire.Configuration.Test.Infrastructure;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Integration
+namespace Hangfire.Configuration.Test.Integration;
+
+[Parallelizable(ParallelScope.None)]
+public class IntegrationTest : DatabaseTestBase
 {
-	[Parallelizable(ParallelScope.None)]
-	public class IntegrationTest
+	public IntegrationTest(string connectionString) : base(connectionString)
 	{
-		[Test]
-		public void ShouldStartServerWithWorkers()
+	}
+
+	[Test]
+	public void ShouldStartServerWithWorkers()
+	{
+		var system = new SystemUnderInfraTest();
+		system.WithOptions(new ConfigurationOptions
 		{
-			DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer);
-			
-			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions
+			ConnectionString = ConnectionString,
+			UpdateConfigurations = new[]
 			{
-				ConnectionString = ConnectionStrings.SqlServer,
-				UpdateConfigurations = new []
+				new UpdateStorageConfiguration
 				{
-					new UpdateStorageConfiguration
-					{
-						ConnectionString = ConnectionStrings.SqlServer,
-						Name = DefaultConfigurationName.Name()
-					}
+					ConnectionString = ConnectionString,
+					Name = DefaultConfigurationName.Name()
 				}
-			});
-			system
-				.BuildWorkerServerStarter(null)
-				.Start(null);
-		}
+			}
+		});
+		system
+			.BuildWorkerServerStarter(null)
+			.Start();
 	}
 }
