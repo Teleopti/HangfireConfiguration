@@ -32,15 +32,6 @@ public class DatabaseTestBase
 
 	private bool isSqlServer()
 	{
-		// fix/break out when/if redis tests are needed
-		try
-		{
-			new SqlConnectionStringBuilder(ConnectionString);
-			return true;
-		}
-		catch (Exception)
-		{
-			return false;
-		}
+		return ConnectionString.Equals(ConnectionStrings.SqlServer);
 	}
 }
