@@ -28,7 +28,7 @@ namespace Hangfire.Configuration
 		{
 			var sql = unitOfWork.SelectDialect(
 				$@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
-				$@"SELECT * FROM {SqlServerObjectsInstaller.SchemaName}.configuration");
+				$@"LOCK TABLE {SqlServerObjectsInstaller.SchemaName}.configuration");
 			unitOfWork.Execute(sql);
 		}
 
