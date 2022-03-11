@@ -59,14 +59,6 @@ public class StateMaintainer
 
 					var storageConnectionString = connectionString.TrimRedisPrefix();
 
-					// suggests some tests are weird?
-					// defaults to sql server when what it really is is unknown
-					if (storageOptions == null)
-					{
-						storageConnectionString = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "_"}.ToString();
-						storageOptions = _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions();
-					}
-
 					return makeJobStorage(storageConnectionString, c, storageOptions);
 				}).ToArray();
 		}

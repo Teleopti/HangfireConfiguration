@@ -55,8 +55,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "ActiveSchema"});
+            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "Data Source=."});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true, 
+	            SchemaName = "ActiveSchema",
+	            ConnectionString = "Data Source=."
+            });
 
             system.PublisherStarter.Start();
 
@@ -67,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldPassDefaultStorageOptionsToHangfire()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true });
+			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true, ConnectionString = "Data Source=."});
 
 			system.PublisherStarter.Start();
 
@@ -88,7 +93,11 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseStorageOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true });
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
+				Active = true,
+				ConnectionString = "Data Source=."
+			});
 			var options = new SqlServerStorageOptions
 			{
 				QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -102,7 +111,8 @@ namespace Hangfire.Configuration.Test.Domain
 				UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
 			};
 
-			system.PublisherStarter.Start(null, options);
+			system.Options.UseStorageOptions(options);
+			system.PublisherStarter.Start();
 
 			var storage = system.Hangfire.CreatedStorages.Single();
 			Assert.AreEqual(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
@@ -120,7 +130,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true, 
+	            SchemaName = "SchemaName",
+	            ConnectionString = "Data Source=."
+            });
 
             system.PublisherStarter.Start();
 
@@ -131,8 +146,18 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName1"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, SchemaName = "SchemaName2"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true, 
+	            SchemaName = "SchemaName1",
+	            ConnectionString = "Data Source=."
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true, 
+	            SchemaName = "SchemaName2",
+	            ConnectionString = "Data Source=."
+            });
 
             system.PublisherStarter.Start();
 

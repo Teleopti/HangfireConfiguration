@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             system.Hangfire.StartedServers.Single().builder
 	            .Should().Be.SameInstanceAs(system.ApplicationBuilder);
@@ -103,7 +103,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(2, system.Hangfire.StartedServers.Count());
         }
@@ -128,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.NotNull(system.Hangfire.StartedServers.Single().storage);
         }
@@ -139,7 +139,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual( @"Data Source=.;Initial Catalog=fakedb;", (system.Hangfire.StartedServers.Single().storage).ConnectionString);
         }
@@ -148,10 +148,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorageWithOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = "Data Source=."});
 
-            system.WorkerServerStarter.Start(null, null,
-                new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.Options.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
+            system.WorkerServerStarter.Start();
 
             Assert.False((system.Hangfire.StartedServers.Single().storage).SqlServerOptions.PrepareSchemaIfNecessary);
         }
@@ -160,20 +160,29 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName", 
+	            ConnectionString = "Data Source=."
+            });
 
-            system.WorkerServerStarter.Start(null, null, new SqlServerStorageOptions {SchemaName = "Ignored"});
+            system.Options.UseStorageOptions(new SqlServerStorageOptions { SchemaName = "Ignored" });
+            system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
         }
 
         [Test]
         public void ShouldUseSchemaNameFromConfiguration2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName", 
+	            ConnectionString = "Data Source=."
+            });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual("SchemaName", (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
         }
@@ -182,13 +191,21 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName1"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName2"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName1",
+	            ConnectionString = "Data Source=."
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName2",
+	            ConnectionString = "Data Source=."
+            });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName1", (system.Hangfire.StartedServers.First().storage).SqlServerOptions.SchemaName);
-            Assert.AreEqual("SchemaName2", (system.Hangfire.StartedServers.Last().storage).SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName1", system.Hangfire.StartedServers.First().storage.SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName2", system.Hangfire.StartedServers.Last().storage.SqlServerOptions.SchemaName);
         }
 
         [Test]
@@ -197,7 +214,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = null, ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.SqlServer(),
                 (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
@@ -209,7 +226,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "", ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.SqlServer(),
                 (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
@@ -219,7 +236,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            ConnectionString = @"Data Source=."
+            });
 
             var options = new SqlServerStorageOptions
             {
@@ -252,9 +272,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Active = true, 
+	            ConnectionString = @"Data Source=."
+            });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             var options = new SqlServerStorageOptions();
             var storage = system.Hangfire.StartedServers.Single().storage;

@@ -58,7 +58,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration { Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
 	            Active = true, 
@@ -97,7 +97,11 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseStorageOptions()
 		{
 		    var system = new SystemUnderTest();
-		    system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=fakedb;"});
+		    system.ConfigurationStorage.Has(new StoredConfiguration
+		    {
+			    Active = true, 
+			    ConnectionString = @"Host=localhost;Database=fakedb;"
+		    });
 		    var options = new PostgreSqlStorageOptions
 		    {
 		        QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -105,7 +109,8 @@ namespace Hangfire.Configuration.Test.Domain
 		        PrepareSchemaIfNecessary = !new PostgreSqlStorageOptions().PrepareSchemaIfNecessary,
 		    };
 
-		    system.PublisherStarter.Start(null, options);
+		    system.Options.UseStorageOptions(options);
+		    system.PublisherStarter.Start();
 
 		    var storage = system.Hangfire.CreatedStorages.Single();
 		    Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);

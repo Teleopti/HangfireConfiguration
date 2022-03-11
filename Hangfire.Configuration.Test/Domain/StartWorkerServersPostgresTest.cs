@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             system.Hangfire.StartedServers
 	            .Should().Not.Be.Empty();
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             system.Hangfire.StartedServers.Single().builder
 	            .Should().Be.SameInstanceAs(system.ApplicationBuilder);
@@ -103,7 +103,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(2, system.Hangfire.StartedServers.Count());
         }
@@ -128,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.NotNull(system.Hangfire.StartedServers.Single().storage);
         }
@@ -139,7 +139,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=fakedb;"});
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(@"Host=localhost;Database=fakedb;", (system.Hangfire.StartedServers.Single().storage).ConnectionString);
         }
@@ -148,10 +148,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorageWithOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration{ ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
 
-            system.WorkerServerStarter.Start(null, null,
-                new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
+            system.Options.UseStorageOptions(new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
+            system.WorkerServerStarter.Start();
 
             Assert.False(system.Hangfire.StartedServers.Single().storage.PostgresOptions.PrepareSchemaIfNecessary);
         }
@@ -160,35 +160,52 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName", ConnectionString = @"Host=localhost;Database=fakedb;"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName", 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
 
-            system.WorkerServerStarter.Start(null, null, new PostgreSqlStorageOptions { SchemaName = "Ignored"});
+            system.Options.UseStorageOptions(new PostgreSqlStorageOptions { SchemaName = "Ignored" });
+            system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", (system.Hangfire.StartedServers.Single().storage).PostgresOptions.SchemaName);
+            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
         }
 
         [Test]
         public void ShouldUseSchemaNameFromConfiguration2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName", ConnectionString = @"Host=localhost;Database=fakedb;"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName", 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", (system.Hangfire.StartedServers.Single().storage).PostgresOptions.SchemaName);
+            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
         }
 
         [Test]
         public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName1", ConnectionString = @"Host=localhost;Database=fakedb;"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "SchemaName2", ConnectionString = @"Host=localhost;Database=fakedb;"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName1", 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = "SchemaName2", 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName1", (system.Hangfire.StartedServers.First().storage).PostgresOptions.SchemaName);
-            Assert.AreEqual("SchemaName2", (system.Hangfire.StartedServers.Last().storage).PostgresOptions.SchemaName);
+            Assert.AreEqual("SchemaName1", system.Hangfire.StartedServers.First().storage.PostgresOptions.SchemaName);
+            Assert.AreEqual("SchemaName2", system.Hangfire.StartedServers.Last().storage.PostgresOptions.SchemaName);
         }
 
         [Test]
@@ -197,7 +214,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = null, ConnectionString = @"Host=localhost;Database=fakedb;"});
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.Postgres(),
                 system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
@@ -209,7 +226,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "", ConnectionString = @"Host=localhost;Database=fakedb;" });
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.Postgres(),
                 system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
@@ -251,9 +268,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=active;"});
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            ConnectionString = @"Host=localhost;Database=active;"
+            });
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             var options = new PostgreSqlStorageOptions();
             var storage = system.Hangfire.StartedServers.Single().storage;
