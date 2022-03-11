@@ -244,7 +244,6 @@ namespace Hangfire.Configuration.Test.Domain
             {
 	            ConnectionString = @"Data Source=."
             });
-
             var options = new SqlServerStorageOptions
             {
 	            QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -257,8 +256,9 @@ namespace Hangfire.Configuration.Test.Domain
 	            DisableGlobalLocks = !new SqlServerStorageOptions().DisableGlobalLocks,
 	            UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
             };
-
-			system.WorkerServerStarter.Start(null, null, options);
+            system.Options.UseStorageOptions(options);
+            
+			system.WorkerServerStarter.Start();
 
 			var storage = system.Hangfire.StartedServers.Single().storage;
 			Assert.AreEqual(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);

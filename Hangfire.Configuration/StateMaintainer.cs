@@ -45,18 +45,14 @@ public class StateMaintainer
 						return existing;
 					}
 
-					// THIS IS WRONG! CONFIG = sql DOES NOT MEAN STORAGE = sql!
-					// !BOOOOOOOOOOOOOOOOOOOOO!!!!!
-					var connectionString = c.ConnectionString ?? options.ConnectionString;
-
-					var storageOptions = connectionString.ToDbVendorSelector()
+					var storageOptions = c.ConnectionString.ToDbVendorSelector()
 						.SelectDialect<object>(
 							() => _state.StorageOptionsSqlServer ?? new SqlServerStorageOptions(),
 							() => _state.StorageOptionsPostgreSql ?? new PostgreSqlStorageOptions(),
 							() => _state.StorageOptionsRedis ?? new RedisStorageOptions()
 						);
 
-					return makeJobStorage(connectionString, c, storageOptions);
+					return makeJobStorage(c.ConnectionString, c, storageOptions);
 				}).ToArray();
 		}
 	}

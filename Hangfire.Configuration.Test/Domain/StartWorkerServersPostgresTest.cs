@@ -236,8 +236,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {});
-
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            ConnectionString = @"Host=localhost"
+            });
             var options = new PostgreSqlStorageOptions
 			{
                 QueuePollInterval = TimeSpan.FromSeconds(1.0),
@@ -250,7 +252,9 @@ namespace Hangfire.Configuration.Test.Domain
                 TransactionSynchronisationTimeout = TimeSpan.FromMinutes(4),
 				UseNativeDatabaseTransactions = true
             };
-            system.WorkerServerStarter.Start(new ConfigurationOptions{ConnectionString = @"Host=localhost;Database=fakedb;"}, null, options);
+            system.Options.UseStorageOptions(options);
+
+            system.WorkerServerStarter.Start();
 
             var storage = system.Hangfire.StartedServers.Single().storage;
             Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
