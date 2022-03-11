@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
 			creator.CreateHangfireStorageSchema("", ConnectionString);
 
-			var expected = DefaultSchemaName;
+			var expected = SelectDialect(() => "HangFire", () => "hangfire");
 			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			Assert.AreEqual(expected, conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'"));
 		}

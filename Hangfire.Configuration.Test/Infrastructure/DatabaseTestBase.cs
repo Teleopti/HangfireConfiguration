@@ -10,30 +10,16 @@ namespace Hangfire.Configuration.Test.Infrastructure;
 public class DatabaseTestBase
 {
 	protected readonly string ConnectionString;
-	protected readonly string DefaultSchemaName;
-	private readonly bool _isSqlServer;
 
 	public DatabaseTestBase(string connectionString)
 	{
-		// fix/break out when/if redis tests are needed
-		try
-		{
-			new SqlConnectionStringBuilder(connectionString);
-			_isSqlServer = true;
-			DefaultSchemaName = "HangFire";
-		}
-		catch (Exception)
-		{
-			_isSqlServer = false;
-			DefaultSchemaName = "hangfire";
-		}
 		ConnectionString = connectionString;
 	}
 
 	[SetUp]
 	public void Setup()
 	{
-		if(_isSqlServer)
+		if(isSqlServer())
 			DatabaseTestSetup.SetupSqlServer(ConnectionString);
 		else
 			DatabaseTestSetup.SetupPostgres(ConnectionString);
@@ -41,6 +27,20 @@ public class DatabaseTestBase
 	
 	protected T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres)
 	{
-		return _isSqlServer ? sqlServer() : postgres();
+		return isSqlServer() ? sqlServer() : postgres();
+	}
+
+	private bool isSqlServer()
+	{
+		// fix/break out when/if redis tests are needed
+		try
+		{
+			new SqlConnectionStringBuilder(ConnectionString);
+			return true;
+		}
+		catch (Exception)
+		{
+			return false;
+		}
 	}
 }
