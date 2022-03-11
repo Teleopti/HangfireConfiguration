@@ -34,7 +34,7 @@ namespace Hangfire.Configuration
 
 		public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null)
 		{
-			var sqlServer = $@"
+			const string sqlServer = $@"
 SELECT 
     Id, 
     Name, 
@@ -45,7 +45,7 @@ SELECT
 	MaxWorkersPerServer
 FROM 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration";
-			var postgreSql = $@"
+			const string postgreSql = $@"
 SELECT 
     Id, 
     Name, 

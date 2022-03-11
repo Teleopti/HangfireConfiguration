@@ -12,7 +12,7 @@ namespace Hangfire.Configuration
         private readonly StateMaintainer _stateMaintainer;
         private readonly INow _now;
         private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
-        private readonly int _sampleLimit = 6;
+        private const int _sampleLimit = 6;
 
         internal ServerCountSampleRecorder(
             IKeyValueStore store,

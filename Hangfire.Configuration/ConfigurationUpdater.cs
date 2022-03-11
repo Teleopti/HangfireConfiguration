@@ -70,10 +70,8 @@ namespace Hangfire.Configuration
 			var legacyConfiguration = ordered.FirstOrDefault(isLegacy);
 			if (legacyConfiguration != null)
 			{
-				if (legacyConfiguration.Name == null)
-					legacyConfiguration.Name = DefaultConfigurationName.Name();
-				if (legacyConfiguration.Active == null)
-					legacyConfiguration.Active = true;
+				legacyConfiguration.Name ??= DefaultConfigurationName.Name();
+				legacyConfiguration.Active ??= true;
 				_storage.WriteConfiguration(legacyConfiguration, connection);
 				return true;
 			}

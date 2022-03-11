@@ -30,7 +30,7 @@ internal abstract class UnitOfWorkBase : IUnitOfWork
 
 	public int Execute(string sql)
 	{
-		var result = default(int);
+		const int result = default;
 		operation((c, t) => { c.Execute(sql, null, t); });
 		return result;
 	}
@@ -58,7 +58,7 @@ internal abstract class UnitOfWorkBase : IUnitOfWork
 
 	protected void OpenWithRetry(IDbConnection connection)
 	{
-		_connectionRetry.Execute(() => connection.Open());
+		_connectionRetry.Execute(connection.Open);
 	}
 
 	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)

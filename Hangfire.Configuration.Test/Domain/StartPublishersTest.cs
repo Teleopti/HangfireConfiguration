@@ -171,7 +171,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            var connectionString = "Data Source=fake;Integrated Security=SSPI;Initial Catalog=db;";
+            const string connectionString = "Data Source=fake;Integrated Security=SSPI;Initial Catalog=db;";
 			system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = connectionString });
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});

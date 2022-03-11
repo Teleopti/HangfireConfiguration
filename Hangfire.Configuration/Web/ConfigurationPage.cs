@@ -158,7 +158,7 @@ namespace Hangfire.Configuration.Web
                     </div>");
             }
 
-            WriteLiteral($@"</fieldset></div>");
+            WriteLiteral(@"</fieldset></div>");
         }
 
         private void WriteCreateConfiguration(IEnumerable<ViewModel> configurations)

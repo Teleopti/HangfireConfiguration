@@ -141,7 +141,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(@"Host=localhost;Database=fakedb;", (system.Hangfire.StartedServers.Single().storage).ConnectionString);
+            Assert.AreEqual(@"Host=localhost;Database=fakedb;", system.Hangfire.StartedServers.Single().storage.ConnectionString);
         }
 
         [Test]

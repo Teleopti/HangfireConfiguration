@@ -22,7 +22,7 @@ namespace Hangfire.Configuration.Internals
 
 			var serverCount = _serverCountDeterminer.DetermineServerCount(monitor, options);
 
-			var workerCount = Convert.ToInt32(Math.Ceiling(goal / ((decimal) serverCount)));
+			var workerCount = Convert.ToInt32(Math.Ceiling(goal / (decimal) serverCount));
 
 			if (configuration.MaxWorkersPerServer.HasValue)
 			{

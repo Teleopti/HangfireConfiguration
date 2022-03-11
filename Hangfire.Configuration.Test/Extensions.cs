@@ -26,7 +26,7 @@ namespace Hangfire.Configuration.Test
 
         internal static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> act)
         {
-            foreach (T item in source)
+            foreach (var item in source)
             {
                 act(item);
             }

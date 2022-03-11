@@ -15,21 +15,17 @@ namespace Hangfire.Configuration.Test.Web
 		[Test]
 		public async Task ShouldFindConfigurationInterface()
 		{
-			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
-			{
-				var response = await s.TestClient.GetAsync("/config");
-				Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-			}
+			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			var response = await s.TestClient.GetAsync("/config");
+			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		}
 
 		[Test]
 		public async Task ShouldNotFindConfigurationInterface()
 		{
-			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
-			{
-				var response = await s.TestClient.GetAsync("/configIncorrect");
-				Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-			}
+			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			var response = await s.TestClient.GetAsync("/configIncorrect");
+			Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 		}
 
 		[Test]
@@ -42,20 +38,18 @@ namespace Hangfire.Configuration.Test.Web
 				GoalWorkerCount = 3
 			});
 
-			using (var s = new ServerUnderTest(system))
-			{
-				var response = await s.TestClient.PostAsync(
-						"/config/saveWorkerGoalCount",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 1,
-							workers = 10
-						})));
+			using var s = new ServerUnderTest(system);
+			var response = await s.TestClient.PostAsync(
+				"/config/saveWorkerGoalCount",
+				new StringContent(JsonConvert.SerializeObject(new
+				{
+					configurationId = 1,
+					workers = 10
+				})));
 
-				Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
-				Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-			}
+			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+			Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+			Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
 		}
 
 		[Test]
@@ -69,21 +63,19 @@ namespace Hangfire.Configuration.Test.Web
 				GoalWorkerCount = 3
 			});
 
-			using (var s = new ServerUnderTest(system))
-			{
-				var response = await s.TestClient.PostAsync(
-						"/config/saveWorkerGoalCount",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 1,
-							workers = 11
-						})));
+			using var s = new ServerUnderTest(system);
+			var response = await s.TestClient.PostAsync(
+				"/config/saveWorkerGoalCount",
+				new StringContent(JsonConvert.SerializeObject(new
+				{
+					configurationId = 1,
+					workers = 11
+				})));
 
-				Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
-				var message = await response.Content.ReadAsStringAsync();
-				message.Should().Not.Be.Empty();
-				message.Should().Not.Contain("<");
-			}
+			Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+			var message = await response.Content.ReadAsStringAsync();
+			message.Should().Not.Be.Empty();
+			message.Should().Not.Contain("<");
 		}
 
 		[Test]
@@ -91,18 +83,16 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using (var s = new ServerUnderTest(system))
-			{
-				await s.TestClient.PostAsync(
-						"/config/saveWorkerGoalCount",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							workers = 10
-						})));
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/saveWorkerGoalCount",
+				new StringContent(JsonConvert.SerializeObject(new
+				{
+					workers = 10
+				})));
 
-				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
-				Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-			}
+			Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+			Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
 		}
 
 		[Test]
@@ -114,17 +104,15 @@ namespace Hangfire.Configuration.Test.Web
 				Id = 2
 			});
 
-			using (var s = new ServerUnderTest(system))
-			{
-				await s.TestClient.PostAsync(
-						"/config/activateServer",
-						new StringContent(JsonConvert.SerializeObject(new
-						{
-							configurationId = 2
-						})));
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/activateServer",
+				new StringContent(JsonConvert.SerializeObject(new
+				{
+					configurationId = 2
+				})));
 
-				Assert.True(system.ConfigurationStorage.Data.Single().Active);
-			}
+			Assert.True(system.ConfigurationStorage.Data.Single().Active);
 		}
 
 		[Test]
@@ -132,26 +120,24 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using (var s = new ServerUnderTest(system))
-			{
-				await s.TestClient.PostAsync(
-						"/config/createNewServerConfiguration",
-						new StringContent(JsonConvert.SerializeObject(
-							new
-							{
-								server = ".",
-								database = "database",
-								user = "user",
-								password = "password",
-								schemaName = "TestSchema",
-								schemaCreatorUser = "schemaCreatorUser",
-								schemaCreatorPassword = "schemaCreatorPassword"
-							})));
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/createNewServerConfiguration",
+				new StringContent(JsonConvert.SerializeObject(
+					new
+					{
+						server = ".",
+						database = "database",
+						user = "user",
+						password = "password",
+						schemaName = "TestSchema",
+						schemaCreatorUser = "schemaCreatorUser",
+						schemaCreatorPassword = "schemaCreatorPassword"
+					})));
 
-				Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
-				system.ConfigurationStorage.Data.Single().ConnectionString
-					.Should().Contain("database");
-			}
+			Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
+			system.ConfigurationStorage.Data.Single().ConnectionString
+				.Should().Contain("database");
 		}
 
 		[Test]
@@ -159,35 +145,31 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using (var s = new ServerUnderTest(system))
-			{
-				await s.TestClient.PostAsync(
-						"/config/createNewServerConfiguration",
-						new StringContent(JsonConvert.SerializeObject(
-							new
-							{
-								server = ".",
-								name = "name",
-								database = "database",
-								user = "user",
-								password = "password",
-								schemaName = "TestSchema",
-								schemaCreatorUser = "schemaCreatorUser",
-								schemaCreatorPassword = "schemaCreatorPassword"
-							})));
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/createNewServerConfiguration",
+				new StringContent(JsonConvert.SerializeObject(
+					new
+					{
+						server = ".",
+						name = "name",
+						database = "database",
+						user = "user",
+						password = "password",
+						schemaName = "TestSchema",
+						schemaCreatorUser = "schemaCreatorUser",
+						schemaCreatorPassword = "schemaCreatorPassword"
+					})));
 
-				Assert.AreEqual("name", system.ConfigurationStorage.Data.Single().Name);
-			}
+			Assert.AreEqual("name", system.ConfigurationStorage.Data.Single().Name);
 		}
 
 		[Test]
 		public async Task ShouldNotFindUnknownAction()
 		{
-			using (var s = new ServerUnderTest(new SystemUnderTest(), "/config"))
-			{
-				var response = await s.TestClient.GetAsync("/config/unknownAction");
-				Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-			}
+			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			var response = await s.TestClient.GetAsync("/config/unknownAction");
+			Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 		}
 
 		[Test]

@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using System.Linq;
 using NUnit.Framework;
 

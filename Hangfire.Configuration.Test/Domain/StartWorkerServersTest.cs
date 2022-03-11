@@ -141,7 +141,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start();
 
-            Assert.AreEqual( @"Data Source=.;Initial Catalog=fakedb;", (system.Hangfire.StartedServers.Single().storage).ConnectionString);
+            Assert.AreEqual( @"Data Source=.;Initial Catalog=fakedb;", system.Hangfire.StartedServers.Single().storage.ConnectionString);
         }
 
         [Test]
@@ -153,7 +153,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.Options.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
             system.WorkerServerStarter.Start();
 
-            Assert.False((system.Hangfire.StartedServers.Single().storage).SqlServerOptions.PrepareSchemaIfNecessary);
+            Assert.False(system.Hangfire.StartedServers.Single().storage.SqlServerOptions.PrepareSchemaIfNecessary);
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.WorkerServerStarter.Start();
 
             Assert.AreEqual(DefaultSchemaName.SqlServer(),
-                (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
+                system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
         }
 
         [Test]

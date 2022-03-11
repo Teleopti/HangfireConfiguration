@@ -1,5 +1,4 @@
 using System.Linq;
-using Hangfire.SqlServer;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -17,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
             var run = new ConcurrencyRunner();
             run.InParallel(() =>
                 {
-                    var actual = system.WorkerServerQueries.QueryAllWorkerServers(null, (SqlServerStorageOptions)null).Count();
+                    var actual = system.WorkerServerQueries.QueryAllWorkerServers(null, null).Count();
                     Assert.AreEqual(storageCount, actual);
                 })
                 .Times(100)

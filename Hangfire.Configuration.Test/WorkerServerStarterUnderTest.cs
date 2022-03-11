@@ -1,5 +1,4 @@
 using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 
@@ -25,9 +24,6 @@ namespace Hangfire.Configuration.Test
 	        _instance.Start();
         }
 
-        public void Start(IBackgroundProcess[] additionalProcesses) => 
-	        _instance.Start(additionalProcesses);
-
         public void Start(
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
@@ -39,14 +35,8 @@ namespace Hangfire.Configuration.Test
 	        BackgroundJobServerOptions serverOptions,
 	        PostgreSqlStorageOptions storageOptions) =>
 	        Start(options, serverOptions, storageOptions, null);
-        
+
         public void Start(
-	        ConfigurationOptions options,
-	        BackgroundJobServerOptions serverOptions,
-	        RedisStorageOptions storageOptions) =>
-	        Start(options, serverOptions, storageOptions, null);
-        
-		public void Start(
             ConfigurationOptions options,
             BackgroundJobServerOptions serverOptions,
             SqlServerStorageOptions storageOptions,
@@ -75,20 +65,5 @@ namespace Hangfire.Configuration.Test
 				_options.UseStorageOptions(storageOptions);
 			_instance.Start(backgroundProcess?.AsArray());
 		}
-		
-		public void Start(
-			ConfigurationOptions options,
-			BackgroundJobServerOptions serverOptions,
-			RedisStorageOptions storageOptions,
-			IBackgroundProcess backgroundProcess)
-		{
-			if (options != null)
-				_options.UseOptions(options);
-			if (serverOptions != null)
-				_options.UseServerOptions(serverOptions);
-			if (storageOptions != null)
-				_options.UseStorageOptions(storageOptions);
-			_instance.Start(backgroundProcess?.AsArray());
-		}
-	}
+    }
 }

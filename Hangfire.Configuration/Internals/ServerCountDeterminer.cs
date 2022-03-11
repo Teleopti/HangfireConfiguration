@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Internals
         private static int serverCountFromHangfire(IMonitoringApi monitor)
         {
             var runningServerCount = _retry.Execute(() => monitor.Servers().Count);
-            var startingServer = 1;
+            const int startingServer = 1;
             return runningServerCount + startingServer;
         }
 
