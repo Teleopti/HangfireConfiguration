@@ -184,7 +184,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", (system.Hangfire.StartedServers.Single().storage).SqlServerOptions.SchemaName);
+            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
         }
 
         [Test]
@@ -212,7 +212,11 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseDefaultSchemaName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = null, ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            SchemaName = null, 
+	            ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;"
+            });
 
             system.WorkerServerStarter.Start();
 
@@ -320,6 +324,32 @@ namespace Hangfire.Configuration.Test.Domain
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.AreEqual(new[] {20, 100}, actual);
+        }
+        
+        [Test]
+        public void ShouldUseSchemaNameFromConfigurationOfTwoServersWithOptions()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        SchemaName = "schema1",
+		        ConnectionString = "Data Source=."
+	        });
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        SchemaName = "schema2",
+		        ConnectionString = "Data Source=."
+	        });
+
+	        system.Options.UseStorageOptions(new SqlServerStorageOptions{CommandTimeout = TimeSpan.FromMinutes(1)});
+	        system.WorkerServerStarter.Start();
+
+	        var options1 = system.Hangfire.StartedServers.First().storage.SqlServerOptions;
+	        var options2 = system.Hangfire.StartedServers.Last().storage.SqlServerOptions;
+	        options1.SchemaName.Should().Be.EqualTo("schema1");
+	        options1.CommandTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
+	        options2.SchemaName.Should().Be.EqualTo("schema2");
+	        options2.CommandTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
         }
     }
 }

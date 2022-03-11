@@ -89,11 +89,13 @@ public class StateMaintainer
 
 	private static object copyOptions(object options)
 	{
+		if (options == null)
+			return null;
 		return options switch
 		{
 			SqlServerStorageOptions => JsonConvert.DeserializeObject<SqlServerStorageOptions>(JsonConvert.SerializeObject(options)),
 			PostgreSqlStorageOptions => JsonConvert.DeserializeObject<PostgreSqlStorageOptions>(JsonConvert.SerializeObject(options)),
-			_ => options
+			RedisStorageOptions => JsonConvert.DeserializeObject<RedisStorageOptions>(JsonConvert.SerializeObject(options))
 		};
 	}
 }

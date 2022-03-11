@@ -309,13 +309,47 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetGoalWorkerCountForTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 20, ConnectionString = @"Host=localhost;Database=fakedb;"});
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 100, ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            GoalWorkerCount = 20, 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            GoalWorkerCount = 100, 
+	            ConnectionString = @"Host=localhost;Database=fakedb;"
+            });
 
             system.WorkerServerStarter.Start(new ConfigurationOptions(), null, (PostgreSqlStorageOptions)null);
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.AreEqual(new[] {20, 100}, actual);
+        }
+
+        [Test]
+        public void ShouldUseSchemaNameFromConfigurationOfTwoServersWithOptions()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        SchemaName = "schema1",
+		        ConnectionString = "Host=localhost"
+	        });
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        SchemaName = "schema2",
+		        ConnectionString = "Host=localhost"
+	        });
+
+	        system.Options.UseStorageOptions(new PostgreSqlStorageOptions{DistributedLockTimeout = TimeSpan.FromMinutes(1)});
+	        system.WorkerServerStarter.Start();
+
+	        var options1 = system.Hangfire.StartedServers.First().storage.PostgresOptions;
+	        var options2 = system.Hangfire.StartedServers.Last().storage.PostgresOptions;
+	        options1.SchemaName.Should().Be.EqualTo("schema1");
+	        options1.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
+	        options2.SchemaName.Should().Be.EqualTo("schema2");
+	        options2.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
         }
     }
 }

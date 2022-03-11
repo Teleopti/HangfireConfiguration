@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Hangfire.Pro.Redis;
 using NUnit.Framework;
-using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -11,21 +9,21 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseRedisOptions()
 		{
 			var system = new SystemUnderTest();
-			var options = new RedisStorageOptions();
 			system.WorkerServerStarter.Start(new ConfigurationOptions
 			{
-				UpdateConfigurations = new []
+				UpdateConfigurations = new[]
 				{
 					new UpdateStorageConfiguration
 					{
+						Name = "redis",
 						ConnectionString = "redis$$connstring",
-						Name = DefaultConfigurationName.Name()
 					}
 				}
-			}, null, options);
+			});
 
-			system.Hangfire.StartedServers.Single().storage.RedisOptions
-				.Should().Be.SameInstanceAs(options);
+			var configuration = system.ConfigurationStorage.Data.Single();
+			Assert.AreEqual("redis", configuration.Name);
+			Assert.AreEqual("redis$$connstring", configuration.ConnectionString);
 		}
 	}
 }
