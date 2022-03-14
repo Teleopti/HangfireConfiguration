@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain;
@@ -63,12 +64,73 @@ public class CreateServerConfigurationRedisTest
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();
 		Assert.AreEqual("my-prefix:", storedConfiguration.SchemaName);
 	}
+	
+	[Test]
+	public void ShouldThrowIfSchemaNameExists()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = "my-prefix:"
+		});
+		Assert.Throws<ArgumentException>(() =>
+		{
+			system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+			{
+				DatabaseProvider = "redis",
+				SchemaName = "my-prefix:"
+			});
+		});
+	}
+	
+	[Test]
+	public void ShouldThrowIfSchemaNameExists_CaseAndTrimUnsensitive()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = "    MY-prefix:"
+		});
+		Assert.Throws<ArgumentException>(() =>
+		{
+			system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+			{
+				DatabaseProvider = "redis",
+				SchemaName = "my-prefix:"
+			});
+		});
+	}
 
 	[Test]
 	public void ShouldCreateWithDefaultPrefixAsSchemaName()
 	{
 		var system = new SystemUnderTest();
 
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = null
+		});
+
+		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		Assert.AreEqual(DefaultSchemaName.Redis(), storedConfiguration.SchemaName);
+	}
+	
+	[Test]
+	public void ShouldCreateWithDefaultPrefixAsSchemaNameWhenConfigurationAlreadyExists()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		{
+			DatabaseProvider = "redis",
+			SchemaName = "something"
+		});
+		
 		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 		{
 			DatabaseProvider = "redis",
