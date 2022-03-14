@@ -1,12 +1,11 @@
 using System.Linq;
-using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
 using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public class StateMaintainer
+internal class StateMaintainer
 {
 	private readonly IHangfire _hangfire;
 	private readonly IConfigurationStorage _storage;

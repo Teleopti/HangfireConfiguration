@@ -1,4 +1,5 @@
 using System.Linq;
+using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {

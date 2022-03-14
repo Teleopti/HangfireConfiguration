@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration.Internals
 {
-	public class ConfigurationUpdater
+	internal class ConfigurationUpdater
 	{
 		private readonly IConfigurationStorage _storage;
 		private readonly State _state;

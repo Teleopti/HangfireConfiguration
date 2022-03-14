@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Hangfire.Common;
+using Hangfire.Configuration.Internals;
 using Hangfire.Server;
 
 namespace Hangfire.Configuration
