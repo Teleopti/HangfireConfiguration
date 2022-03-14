@@ -182,12 +182,12 @@ namespace Hangfire.Configuration.Web
 				</select><br>
 				<label for='server'>Server: </label><br>
                 <input type='text' id='server' name='server'><br>
-				<div id='relationalDb'>
+				<div id='database'>
 					<label for='database'>Database (existing): </label><br>
 					<input type='text' id='database' name='database'><br>
-					<label for='schemaName'>Schema (optional): </label><br>
-					<input type='text' id='schemaName' name='schemaName'>
 				</div>
+				<label for='schemaName'>Schema (optional): </label><br>
+				<input type='text' id='schemaName' name='schemaName'>
              </fieldset>
 			<div id='applicationUser'>
              <fieldset>

@@ -2,11 +2,11 @@ var provider = document.getElementById('databaseProvider')
 if(provider){
 	provider.addEventListener('change', function(){
 		if(provider.value==='redis'){
-			document.getElementById('relationalDb').style.display='none';
+			document.getElementById('database').style.display='none';
 			document.getElementById('patchuser').style.display='none';
 			document.getElementById('applicationUser').style.display='none';
 		} else {
-			document.getElementById('relationalDb').style.display='block';
+			document.getElementById('database').style.display='block';
 			document.getElementById('patchuser').style.display='block';
 			document.getElementById('applicationUser').style.display='block';
 		}
