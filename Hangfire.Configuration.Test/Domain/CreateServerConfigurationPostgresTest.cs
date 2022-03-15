@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
 			});
 
             var storedConfiguration = system.ConfigurationStorage.Data.Last();
-            Assert.AreEqual(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=testUser;Password=awesomePassword;", storedConfiguration.ConnectionString);
+            Assert.AreEqual(@"Host=AwesomeServer;Database=TestDatabase;Username=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
             Assert.AreEqual("awesomeSchema", storedConfiguration.SchemaName);
         }
 
@@ -131,7 +131,7 @@ namespace Hangfire.Configuration.Test.Domain
 				});
 
             system.SchemaCreator.ConnectionTriedWith
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=testUser;Password=awesomePassword;");
+	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=testUser;Password=awesomePassword");
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace Hangfire.Configuration.Test.Domain
 				});
 
             system.SchemaCreator.ConnectionTriedWith
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=createUser;Password=createPassword;");
+	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=createUser;Password=createPassword");
         }
 
         [Test]
@@ -170,27 +170,8 @@ namespace Hangfire.Configuration.Test.Domain
 				});
 
             system.SchemaCreator.Schemas.Last().ConnectionString
-	            .Should().Contain(@"Host=AwesomeServer;Database=""TestDatabase"";User ID=createUser;Password=createPassword;");
+	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=createUser;Password=createPassword");
             Assert.AreEqual("schema", system.SchemaCreator.Schemas.Last().SchemaName);
-        }
-
-        [Test]
-        public void ShouldSaveNewServerConfigurationUsingConnectionStrings()
-        {
-            var system = new SystemUnderTest();
-
-            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
-            {
-                StorageConnectionString = "storage",
-                SchemaCreatorConnectionString = "creator",
-                SchemaName = "schema",
-                DatabaseProvider = "PostgreSql"
-			});
-
-            var storedConfiguration = system.ConfigurationStorage.Data.Last();
-            Assert.AreEqual("creator", system.SchemaCreator.Schemas.Last().ConnectionString);
-            Assert.AreEqual("storage", storedConfiguration.ConnectionString);
-            Assert.AreEqual("schema", storedConfiguration.SchemaName);
         }
 
         [Test]
@@ -220,13 +201,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenDefaultSchemaNameAlreadyExists()
         {
             var system = new SystemUnderTest();
-            var connection = new NpgsqlConnectionStringBuilder {Host = "_", Database = "existingDatabase"}.ToString();
-            system.SchemaCreator.Has(DefaultSchemaName.Postgres(), connection);
+            system.SchemaCreator.Has(DefaultSchemaName.Postgres(), "Host=_;Database=existingDatabase");
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
-                    SchemaCreatorConnectionString = connection,
+	                Server = "_",
+	                Database = "existingDatabase",
                     SchemaName = null,
                     DatabaseProvider = "PostgreSql"
 				}));
@@ -236,18 +217,20 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCreateSchemaWithSameNameInDifferentDatabase()
         {
             var system = new SystemUnderTest();
-            system.SchemaCreator.Has("schemaName", "connectionOne");
+            system.SchemaCreator.Has("schemaName", "Host=_;Database=one");
 
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
-                SchemaCreatorConnectionString = "connectionTwo",
+	            Server = "_",
+	            Database = "two",
                 SchemaName = "schemaName",
                 DatabaseProvider = "PostgreSql"
 			});
 
             Assert.AreEqual(2, system.SchemaCreator.Schemas.Count());
             Assert.AreEqual("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
-            Assert.AreEqual("connectionTwo", system.SchemaCreator.Schemas.Last().ConnectionString);
+            system.SchemaCreator.Schemas.Last().ConnectionString
+	            .Should().StartWith("Host=_;Database=two");
         }
 
         [Test]
@@ -258,8 +241,6 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Name = "namedConfiguration",
-                StorageConnectionString = "storage",
-                SchemaCreatorConnectionString = "creator",
                 SchemaName = "schema",
                 DatabaseProvider = "PostgreSql"
 			});
@@ -275,9 +256,10 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 	        {
-		        StorageConnectionString = "Host=localhost",
-		        SchemaCreatorConnectionString = "Host=localhost",
-		        SchemaName = null
+		        Server = "_",
+		        Database = "db",
+		        SchemaName = null,
+		        DatabaseProvider = "PostgreSql"
 	        });
 
 	        var storedConfiguration = system.ConfigurationStorage.Data.Last();

@@ -168,24 +168,6 @@ namespace Hangfire.Configuration.Test.Domain
         }
 
         [Test]
-        public void ShouldSaveNewServerConfigurationUsingConnectionStrings()
-        {
-            var system = new SystemUnderTest();
-
-            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
-            {
-                StorageConnectionString = "storage",
-                SchemaCreatorConnectionString = "creator",
-                SchemaName = "schema"
-            });
-
-            var storedConfiguration = system.ConfigurationStorage.Data.Last();
-            Assert.AreEqual("creator", system.SchemaCreator.Schemas.Last().ConnectionString);
-            Assert.AreEqual("storage", storedConfiguration.ConnectionString);
-            Assert.AreEqual("schema", storedConfiguration.SchemaName);
-        }
-
-        [Test]
         public void ShouldThrowWhenSchemaAlreadyExists()
         {
             var system = new SystemUnderTest();
@@ -210,14 +192,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenDefaultSchemaNameAlreadyExists()
         {
             var system = new SystemUnderTest();
-            var connection = new SqlConnectionStringBuilder {DataSource = "_", InitialCatalog = "existingDatabase"}.ToString();
-            
-            system.SchemaCreator.Has(DefaultSchemaName.SqlServer(), connection);
+            system.SchemaCreator.Has(DefaultSchemaName.SqlServer(), "Data Source=_;Initial Catalog=existingDatabase");
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreateServerConfiguration
                 {
-                    SchemaCreatorConnectionString = connection,
+	                Server = "_",
+	                Database = "existingDatabase",
                     SchemaName = null
                 }));
         }
@@ -226,17 +207,19 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCreateSchemaWithSameNameInDifferentDatabase()
         {
             var system = new SystemUnderTest();
-            system.SchemaCreator.Has("schemaName", "connectionOne");
+            system.SchemaCreator.Has("schemaName", "Data Source=_;Initial Catalog=one");
 
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
-                SchemaCreatorConnectionString = "connectionTwo",
+	            Server = "_",
+	            Database = "two",
                 SchemaName = "schemaName"
             });
 
             Assert.AreEqual(2, system.SchemaCreator.Schemas.Count());
             Assert.AreEqual("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
-            Assert.AreEqual("connectionTwo", system.SchemaCreator.Schemas.Last().ConnectionString);
+            system.SchemaCreator.Schemas.Last().ConnectionString
+	            .Should().StartWith("Data Source=_;Initial Catalog=two");
         }
 
         [Test]
@@ -247,8 +230,6 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
             {
                 Name = "namedConfiguration",
-                StorageConnectionString = "storage",
-                SchemaCreatorConnectionString = "creator",
                 SchemaName = "schema"
             });
 
@@ -263,8 +244,6 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
 	        {
-		        StorageConnectionString = "Data Source=.",
-		        SchemaCreatorConnectionString = "Data Source=.",
 		        SchemaName = null
 	        });
 

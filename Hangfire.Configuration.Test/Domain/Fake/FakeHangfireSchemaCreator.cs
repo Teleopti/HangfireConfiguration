@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
         {
             return Schemas
                 .Where(x => string.Equals(x.SchemaName, schemaName, StringComparison.InvariantCultureIgnoreCase))
-                .Where(x => x.ConnectionString == connectionString)
+                .Where(x => connectionString.StartsWith(x.ConnectionString))
                 .Any();
         }
     }

@@ -1,3 +1,5 @@
+using Npgsql;
+
 namespace Hangfire.Configuration.Internals;
 
 internal class PostgresCreateServerConfiguration : CreateServerConfigurationRelationalDb
@@ -8,12 +10,23 @@ internal class PostgresCreateServerConfiguration : CreateServerConfigurationRela
 
 	protected override string CreateStorageConnectionString(CreateServerConfiguration config)
 	{
-		return config.StorageConnectionString ?? $@"Host={config.Server};Database=""{config.Database}"";User ID={config.User};Password={config.Password};";
+		return new NpgsqlConnectionStringBuilder
+		{
+			Host = config.Server,
+			Database = config.Database,
+			Username = config.User,
+			Password = config.Password,
+		}.ToString();
 	}
 
 	protected override string CreateCreatorConnectionString(CreateServerConfiguration config)
 	{
-		return config.SchemaCreatorConnectionString ??
-		       $@"Host={config.Server};Database=""{config.Database}"";User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword};";
+		return new NpgsqlConnectionStringBuilder
+		{
+			Host = config.Server,
+			Database = config.Database,
+			Username = config.SchemaCreatorUser,
+			Password = config.SchemaCreatorPassword,
+		}.ToString();
 	}
 }

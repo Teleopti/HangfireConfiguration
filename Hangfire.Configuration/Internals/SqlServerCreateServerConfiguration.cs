@@ -1,3 +1,5 @@
+using System.Data.SqlClient;
+
 namespace Hangfire.Configuration.Internals;
 
 internal class SqlServerCreateServerConfiguration : CreateServerConfigurationRelationalDb
@@ -8,12 +10,23 @@ internal class SqlServerCreateServerConfiguration : CreateServerConfigurationRel
 
 	protected override string CreateStorageConnectionString(CreateServerConfiguration config)
 	{
-		return config.StorageConnectionString ?? $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.User};Password={config.Password}";
+		return new SqlConnectionStringBuilder
+		{
+			DataSource = config.Server ?? "",
+			InitialCatalog = config.Database ?? "",
+			UserID = config.User ?? "",
+			Password = config.Password ?? "",
+		}.ToString();
 	}
 
 	protected override string CreateCreatorConnectionString(CreateServerConfiguration config)
 	{
-		return config.SchemaCreatorConnectionString ??
-		       $"Data Source={config.Server};Initial Catalog={config.Database};User ID={config.SchemaCreatorUser};Password={config.SchemaCreatorPassword}";
+		return new SqlConnectionStringBuilder
+		{
+			DataSource = config.Server ?? "",
+			InitialCatalog = config.Database ?? "",
+			UserID = config.SchemaCreatorUser ?? "",
+			Password = config.SchemaCreatorPassword ?? "",
+		}.ToString();
 	}
 }

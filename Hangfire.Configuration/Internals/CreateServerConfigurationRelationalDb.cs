@@ -7,7 +7,8 @@ internal abstract class CreateServerConfigurationRelationalDb : ICreateServerCon
 	private readonly IConfigurationStorage _storage;
 	private readonly IHangfireSchemaCreator _creator;
 
-	protected CreateServerConfigurationRelationalDb(IConfigurationStorage storage,
+	protected CreateServerConfigurationRelationalDb(
+		IConfigurationStorage storage,
 		IHangfireSchemaCreator creator)
 	{
 		_storage = storage;
