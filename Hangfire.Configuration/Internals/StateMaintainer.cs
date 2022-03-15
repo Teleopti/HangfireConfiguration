@@ -13,11 +13,7 @@ internal class StateMaintainer
 	private readonly State _state;
 	private readonly object _lock = new();
 
-	internal StateMaintainer(
-		IHangfire hangfire,
-		IConfigurationStorage storage,
-		ConfigurationUpdater configurationUpdater,
-		State state)
+	internal StateMaintainer(IHangfire hangfire, IConfigurationStorage storage, ConfigurationUpdater configurationUpdater, State state)
 	{
 		_hangfire = hangfire;
 		_storage = storage;
@@ -47,42 +43,29 @@ internal class StateMaintainer
 						return existing;
 					}
 
-					return makeJobStorage(c, options);
+					return makeJobStorage(c);
 				}).ToArray();
 		}
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration, ConfigurationOptions configurationOptions)
+	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration)
 	{
-		var storageOptions = getStorageOptions(configuration, configurationOptions);
-		assignSchemaName(configuration.SchemaName, storageOptions);
+		var options = getStorageOptions(configuration);
+		assignSchemaName(configuration.SchemaName, options);
 		return new ConfigurationAndStorage
 		{
-			JobStorageCreator = () => _hangfire.MakeJobStorage(configuration.ConnectionString, storageOptions),
+			JobStorageCreator = () => _hangfire.MakeJobStorage(configuration.ConnectionString, options),
 			Configuration = configuration
 		};
 	}
 
-	private object getStorageOptions(StoredConfiguration configuration, ConfigurationOptions options)
-	{
-		if (options.StorageOptionsFactory != null)
-		{
-			var made = options.StorageOptionsFactory.Make(configuration);
-			if (made is SqlServerStorageOptions sqlServerStorageOptions)
-				return sqlServerStorageOptions.DeepCopy();
-			if (made is PostgreSqlStorageOptions postgreSqlStorageOptions)
-				return postgreSqlStorageOptions.DeepCopy();
-			if (made is RedisStorageOptions redisStorageOptions)
-				return redisStorageOptions.DeepCopy();
-			return null;
-		}
-
-		return configuration.ConnectionString.ToDbVendorSelector()
+	private object getStorageOptions(StoredConfiguration configuration) =>
+		configuration.ConnectionString.ToDbVendorSelector()
 			.SelectDialect<object>(
 				() => _state.StorageOptionsSqlServer.DeepCopy() ?? new SqlServerStorageOptions(),
 				() => _state.StorageOptionsPostgreSql.DeepCopy() ?? new PostgreSqlStorageOptions(),
-				() => _state.StorageOptionsRedis.DeepCopy() ?? new RedisStorageOptions());
-	}
+				() => _state.StorageOptionsRedis.DeepCopy() ?? new RedisStorageOptions()
+			);
 
 	private static void assignSchemaName(string schemaName, object options)
 	{
