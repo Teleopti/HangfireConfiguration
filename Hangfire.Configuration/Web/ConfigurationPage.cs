@@ -42,8 +42,7 @@ namespace Hangfire.Configuration.Web
                 writeConfiguration(configuration);
             WriteLiteral("</div>");
 
-            if (_options.AllowNewServerCreation)
-                WriteCreateConfiguration(configurations);
+            WriteCreateConfiguration(configurations);
 
             WriteLiteral($@"<script src='{_basePath}/script'></script>");
             WriteLiteral("</body>");
@@ -55,8 +54,7 @@ namespace Hangfire.Configuration.Web
             WriteLiteral(@"
                 <fieldset>
                     <legend>Information</legend>");
-            if (_options.AllowNewServerCreation)
-                writeStorageActivationInformation();
+            writeStorageActivationInformation();
             writeWorkerGoalCountInformation();
             writeMaxWorkersPerServerInformation();
             WriteLiteral(@"</fieldset>");

@@ -7,7 +7,6 @@ namespace Hangfire.Configuration
         public string ConnectionString { get; set; }
 
         public bool PrepareSchemaIfNecessary { get; set; }
-        public bool AllowNewServerCreation { get; set; }
         public bool AllowMultipleActive { get; set; }
         
         public IEnumerable<UpdateStorageConfiguration> UpdateConfigurations { get; set; }
