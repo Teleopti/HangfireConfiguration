@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             
-            system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",

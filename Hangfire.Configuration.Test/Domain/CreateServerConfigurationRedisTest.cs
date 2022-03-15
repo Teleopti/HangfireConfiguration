@@ -10,10 +10,9 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
 		{
-			Server = "AwesomeServer:425",
-			DatabaseProvider = "redis"
+			Server = "AwesomeServer:425"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
@@ -25,9 +24,8 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
 		{
-			DatabaseProvider = "redis",
 			Name = "matte"
 		});
 
@@ -40,9 +38,9 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
 		{
-			DatabaseProvider = "redis"
+			Server = "redis"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
@@ -54,9 +52,8 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
 		{
-			DatabaseProvider = "redis",
 			SchemaName = "my-prefix:"
 		});
 
@@ -69,9 +66,8 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateServerConfiguration
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
 		{
-			DatabaseProvider = "redis",
 			SchemaName = null
 		});
 

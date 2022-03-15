@@ -135,9 +135,10 @@ namespace Hangfire.Configuration.Test.Web
 						schemaCreatorPassword = "schemaCreatorPassword"
 					})));
 
-			Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
-			system.ConfigurationStorage.Data.Single().ConnectionString
-				.Should().Contain("database");
+			var storedConfiguration = system.ConfigurationStorage.Data.Single();
+			Assert.AreEqual(1, storedConfiguration.Id);
+			storedConfiguration.ConnectionString.Should().Contain("Data Source=.;Initial Catalog=database");
+			storedConfiguration.SchemaName.Should().Be("TestSchema");
 		}
 
 		[Test]
@@ -191,6 +192,55 @@ namespace Hangfire.Configuration.Test.Web
 				})));
 
 			Assert.False(system.ConfigurationStorage.Data.Single().Active);
+		}
+		
+		[Test]
+		public async Task ShouldCreateNewServerConfigurationForPostgres()
+		{
+			var system = new SystemUnderTest();
+
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/createNewServerConfiguration",
+				new StringContent(JsonConvert.SerializeObject(
+					new
+					{
+						server = "localhost",
+						database = "database",
+						user = "user",
+						password = "password",
+						schemaName = "TestSchema",
+						schemaCreatorUser = "schemaCreatorUser",
+						schemaCreatorPassword = "schemaCreatorPassword",
+						databaseProvider = "PostgreSql"
+					})));
+
+			var storedConfiguration = system.ConfigurationStorage.Data.Single();
+			Assert.AreEqual(1, storedConfiguration.Id);
+			storedConfiguration.ConnectionString.Should().Contain("Host=localhost;Database=database");
+			storedConfiguration.SchemaName.Should().Be("TestSchema");
+		}
+		
+		[Test]
+		public async Task ShouldCreateNewServerConfigurationForRedis()
+		{
+			var system = new SystemUnderTest();
+
+			using var s = new ServerUnderTest(system);
+			await s.TestClient.PostAsync(
+				"/config/createNewServerConfiguration",
+				new StringContent(JsonConvert.SerializeObject(
+					new
+					{
+						server = "gurka",
+						schemaName = "gurka:",
+						databaseProvider = "redis"
+					})));
+
+			var storedConfiguration = system.ConfigurationStorage.Data.Single();
+			Assert.AreEqual(1, storedConfiguration.Id);
+			storedConfiguration.ConnectionString.Should().Be("gurka");
+			storedConfiguration.SchemaName.Should().Be("gurka:");
 		}
 	}
 }
