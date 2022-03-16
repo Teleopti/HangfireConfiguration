@@ -5,6 +5,7 @@ using Microsoft.Owin.Builder;
 #endif
 using System;
 using System.Linq;
+using Hangfire.Configuration.Internals;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
 
@@ -69,6 +70,7 @@ namespace Hangfire.Configuration.Test
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
         protected override INow BuildNow() => _now;
+        protected override ITryConnectToRedis TryConnectToRedis() => new ByPassTryConnectToRedis();
 
         public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
         {

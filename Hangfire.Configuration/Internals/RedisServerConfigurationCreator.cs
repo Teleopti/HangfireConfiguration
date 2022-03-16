@@ -1,19 +1,19 @@
-using StackExchange.Redis;
-
 namespace Hangfire.Configuration.Internals;
 
 internal class RedisServerConfigurationCreator
 {
 	private readonly IConfigurationStorage _storage;
+	private readonly ITryConnectToRedis _tryConnectToRedis;
 
-	public RedisServerConfigurationCreator(IConfigurationStorage storage)
+	public RedisServerConfigurationCreator(IConfigurationStorage storage, ITryConnectToRedis tryConnectToRedis)
 	{
 		_storage = storage;
+		_tryConnectToRedis = tryConnectToRedis;
 	}
 
 	public void Create(CreateRedisWorkerServer command)
 	{
-		ConnectionMultiplexer.Connect(command.Server);
+		_tryConnectToRedis.TryConnect(command.Server);
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{

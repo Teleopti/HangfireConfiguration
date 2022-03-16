@@ -11,15 +11,18 @@ namespace Hangfire.Configuration
 	{
 		private readonly IConfigurationStorage _storage;
 		private readonly IHangfireSchemaCreator _creator;
+		private readonly ITryConnectToRedis _tryConnectToRedis;
 		private readonly State _state;
 
 		internal ConfigurationApi(
 			IConfigurationStorage storage,
 			IHangfireSchemaCreator creator,
+			ITryConnectToRedis tryConnectToRedis,
 			State state)
 		{
 			_storage = storage;
 			_creator = creator;
+			_tryConnectToRedis = tryConnectToRedis;
 			_state = state;
 		}
 
@@ -116,7 +119,7 @@ namespace Hangfire.Configuration
 
 		public void CreateServerConfiguration(CreateRedisWorkerServer command)
 		{
-			new RedisServerConfigurationCreator(_storage)
+			new RedisServerConfigurationCreator(_storage, _tryConnectToRedis)
 				.Create(command);
 		}
 

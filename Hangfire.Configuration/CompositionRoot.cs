@@ -36,7 +36,9 @@ namespace Hangfire.Configuration
 
         public ConfigurationApi BuildConfigurationApi() =>
             new(BuildConfigurationStorage(),
-                BuildHangfireSchemaCreator(), _state);
+                BuildHangfireSchemaCreator(), 
+                TryConnectToRedis(),
+                _state);
 
         public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
 
@@ -48,6 +50,8 @@ namespace Hangfire.Configuration
         protected virtual IHangfire BuildHangfire(object appBuilder) =>
             new RealHangfire(appBuilder);
 
+        protected virtual ITryConnectToRedis TryConnectToRedis() => new TryConnectToRedis();
+        
         protected virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() =>
             new HangfireSchemaCreator();
 
