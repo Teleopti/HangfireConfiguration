@@ -24,9 +24,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             storage.WriteConfiguration(new StoredConfiguration
             {
-                ConnectionString = "connection string",
-                SchemaName = "schema name",
-                Active = false
+	            ConnectionString = "connection string",
+	            SchemaName = "schema name",
+	            Active = false
             });
 
             var configuration = storage.ReadConfigurations().Single();
@@ -41,10 +41,10 @@ namespace Hangfire.Configuration.Test.Infrastructure
             var storage = new ConfigurationStorage(ConnectionString);
             storage.WriteConfiguration(new StoredConfiguration
             {
-                ConnectionString = "connectionString",
-                SchemaName = "schemaName",
-                GoalWorkerCount = 3,
-                Active = true
+	            ConnectionString = "connectionString",
+	            SchemaName = "schemaName",
+	            GoalWorkerCount = 3,
+	            Active = true
             });
 
             var result = storage.ReadConfigurations().Single();
@@ -83,7 +83,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             storage.WriteConfiguration(new StoredConfiguration
             {
-                Name = "name",
+	            Name = "name",
             });
 
             var configuration = storage.ReadConfigurations().Single();

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {
@@ -8,6 +10,7 @@ namespace Hangfire.Configuration
 	{
 		private readonly UnitOfWork _unitOfWork;
 
+		// for testing
 		public ConfigurationStorage(string connectionString) : this(new UnitOfWork {ConnectionString = connectionString})
 		{
 		}
@@ -17,22 +20,28 @@ namespace Hangfire.Configuration
 			_unitOfWork = unitOfWork;
 		}
 
-		public void UnitOfWork(Action<IUnitOfWork> action)
+		private readonly ThreadLocal<UnitOfWorkTransaction> _currentTransaction = new();
+		
+		private IUnitOfWork getUnitOfWork() => _currentTransaction.Value as IUnitOfWork ?? _unitOfWork;
+
+		public void Transaction(Action action)
 		{
-			using var transaction = new UnitOfWorkTransaction(_unitOfWork.ConnectionString);
-			action.Invoke(transaction);
-			transaction.Commit();
+			_currentTransaction.Value = new UnitOfWorkTransaction(_unitOfWork.ConnectionString);
+			action.Invoke();
+			_currentTransaction.Value.Commit();
+			_currentTransaction.Value = null;
 		}
 
-		public void LockConfiguration(IUnitOfWork unitOfWork)
+		public void LockConfiguration()
 		{
+			var unitOfWork = getUnitOfWork();
 			var sql = unitOfWork.SelectDialect(
 				$@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
 				$@"LOCK TABLE {SqlServerObjectsInstaller.SchemaName}.configuration");
 			unitOfWork.Execute(sql);
 		}
 
-		public IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null)
+		public IEnumerable<StoredConfiguration> ReadConfigurations()
 		{
 			const string sqlServer = $@"
 SELECT 
@@ -57,27 +66,22 @@ SELECT
 FROM 
     {SqlServerObjectsInstaller.SchemaName}.configuration 
 ORDER BY Id";
-			unitOfWork = getUnitOfWork(unitOfWork);
-			return unitOfWork.SelectDialect(
-				() => unitOfWork.Query<StoredConfiguration>(sqlServer).ToArray(),
-				() => unitOfWork.Query<StoredConfiguration>(postgreSql).ToArray());
+			var unitOfWork = getUnitOfWork();
+			var sql = unitOfWork.SelectDialect(sqlServer, postgreSql);
+			return unitOfWork.Query<StoredConfiguration>(sql).ToArray();
 		}
 
-		public void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null)
+		public void WriteConfiguration(StoredConfiguration configuration)
 		{
 			if (configuration.Id != null)
-				update(configuration, getUnitOfWork(unitOfWork));
+				update(configuration);
 			else
-				insert(configuration, getUnitOfWork(unitOfWork));
+				insert(configuration);
 		}
 
-		private IUnitOfWork getUnitOfWork(IUnitOfWork unitOfWork)
+		private void insert(StoredConfiguration configuration)
 		{
-			return (unitOfWork ?? _unitOfWork);
-		}
-
-		private static void insert(StoredConfiguration configuration, IUnitOfWork unitOfWork)
-		{
+			var unitOfWork = getUnitOfWork();
 			var sql = unitOfWork.SelectDialect($@"
 INSERT INTO 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
@@ -116,8 +120,9 @@ INSERT INTO
 			unitOfWork.Execute(sql, configuration);
 		}
 
-		private static void update(StoredConfiguration configuration, IUnitOfWork unitOfWork)
+		private void update(StoredConfiguration configuration)
 		{
+			var unitOfWork = getUnitOfWork();
 			var sql = unitOfWork.SelectDialect($@"
 UPDATE 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 

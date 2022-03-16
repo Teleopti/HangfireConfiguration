@@ -27,12 +27,12 @@ namespace Hangfire.Configuration.Internals
 				return false;
 
 			var isUpdated = false;
-			_storage.UnitOfWork(c =>
+			_storage.Transaction(() =>
 			{
-				_storage.LockConfiguration(c);
-				var @fixed = fixExistingConfigurations(c);
+				_storage.LockConfiguration();
+				var @fixed = fixExistingConfigurations();
 				if (updateConfigurationsEnabled(options))
-					isUpdated = runConfigurationUpdates(received, c);
+					isUpdated = runConfigurationUpdates(received);
 				isUpdated = @fixed || isUpdated;
 			});
 			return isUpdated;
@@ -61,9 +61,9 @@ namespace Hangfire.Configuration.Internals
 			stored.SchemaName == received.SchemaName &&
 			received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
 
-		private bool fixExistingConfigurations(IUnitOfWork connection)
+		private bool fixExistingConfigurations()
 		{
-			var stored = _storage.ReadConfigurations(connection);
+			var stored = _storage.ReadConfigurations();
 
 			var ordered = stored.OrderBy(x => x.Id).ToArray();
 
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Internals
 			{
 				legacyConfiguration.Name ??= DefaultConfigurationName.Name();
 				legacyConfiguration.Active ??= true;
-				_storage.WriteConfiguration(legacyConfiguration, connection);
+				_storage.WriteConfiguration(legacyConfiguration);
 				return true;
 			}
 
@@ -80,16 +80,16 @@ namespace Hangfire.Configuration.Internals
 			if (markedConfiguration != null)
 			{
 				markedConfiguration.Name = DefaultConfigurationName.Name();
-				_storage.WriteConfiguration(markedConfiguration, connection);
+				_storage.WriteConfiguration(markedConfiguration);
 				return true;
 			}
 
 			return false;
 		}
 
-		private bool runConfigurationUpdates(IEnumerable<UpdateStorageConfiguration> received, IUnitOfWork connection)
+		private bool runConfigurationUpdates(IEnumerable<UpdateStorageConfiguration> received)
 		{
-			var stored = _storage.ReadConfigurations(connection);
+			var stored = _storage.ReadConfigurations();
 
 			received.ForEach(update =>
 			{
@@ -106,7 +106,7 @@ namespace Hangfire.Configuration.Internals
 					configuration.ConnectionString = update.ConnectionString;
 
 				configuration.SchemaName = update.SchemaName;
-				_storage.WriteConfiguration(configuration, connection);
+				_storage.WriteConfiguration(configuration);
 			});
 
 			return true;

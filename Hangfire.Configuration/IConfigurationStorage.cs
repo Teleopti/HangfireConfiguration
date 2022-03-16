@@ -5,9 +5,9 @@ namespace Hangfire.Configuration;
 
 public interface IConfigurationStorage
 {
-	IEnumerable<StoredConfiguration> ReadConfigurations(IUnitOfWork unitOfWork = null);
-	void WriteConfiguration(StoredConfiguration configuration, IUnitOfWork unitOfWork = null);
+	IEnumerable<StoredConfiguration> ReadConfigurations();
+	void WriteConfiguration(StoredConfiguration configuration);
 
-	void UnitOfWork(Action<IUnitOfWork> action);
-	void LockConfiguration(IUnitOfWork unitOfWork);
+	void Transaction(Action action);
+	void LockConfiguration();
 }

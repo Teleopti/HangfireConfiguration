@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Polly;
 using Dapper;
-using Hangfire.Configuration.Internals;
-using Npgsql;
+using Polly;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public interface IUnitOfWork : IDbVendorSelector
+internal interface IUnitOfWork : IDbVendorSelector
 {
 	int Execute(string sql);
 	int Execute(string sql, object param);
@@ -41,14 +39,14 @@ internal abstract class UnitOfWorkBase : IUnitOfWork
 		operation((c, t) => { result = c.Execute(sql, param, t); });
 		return result;
 	}
-        
+
 	public IEnumerable<T> Query<T>(string sql)
 	{
 		var result = default(IEnumerable<T>);
 		operation((c, t) => { result = c.Query<T>(sql, null, t); });
 		return result;
 	}
-        
+
 	public IEnumerable<T> Query<T>(string sql, object param)
 	{
 		var result = default(IEnumerable<T>);
@@ -71,18 +69,16 @@ internal class UnitOfWork : UnitOfWorkBase
 {
 	protected override void operation(Action<IDbConnection, IDbTransaction> action)
 	{
-		this.ExecuteDialect(
-			() =>
+		this.ExecuteDialect(() =>
 			{
-				using var conn = new SqlConnection(ConnectionString);
-				OpenWithRetry(conn);
-				action.Invoke(conn, null);
-			}
-			, () =>
+				using var connection = ConnectionString.CreateConnection();
+				OpenWithRetry(connection);
+				action.Invoke(connection, null);
+			}, () =>
 			{
-				using var conn = new NpgsqlConnection(ConnectionString);
-				conn.Open();
-				action.Invoke(conn, null);
+				using var connection = ConnectionString.CreateConnection();
+				connection.Open();
+				action.Invoke(connection, null);
 			}
 		);
 	}

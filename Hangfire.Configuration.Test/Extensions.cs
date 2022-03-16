@@ -11,7 +11,6 @@ namespace Hangfire.Configuration.Test
         public static T Copy<T>(this T instance)
         {
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(instance));
-
         }
 
         public static void Times(this int times, Action action)
