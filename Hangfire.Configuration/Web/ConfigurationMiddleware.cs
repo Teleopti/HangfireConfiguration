@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Hangfire.Configuration.Internals;
 using Newtonsoft.Json.Linq;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;

@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.IO;
 using System.Reflection;
 using Dapper;
+using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
-public interface IDbVendorSelector
+internal interface IDbVendorSelector
 {
 	T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis);
 }

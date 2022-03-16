@@ -1,4 +1,5 @@
 using System;
+using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration;
 

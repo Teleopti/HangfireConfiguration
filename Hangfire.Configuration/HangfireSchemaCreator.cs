@@ -1,4 +1,5 @@
 using Dapper;
+using Hangfire.Configuration.Internals;
 using Npgsql;
 
 namespace Hangfire.Configuration

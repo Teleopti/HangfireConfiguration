@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using Npgsql;
 
-namespace Hangfire.Configuration;
+namespace Hangfire.Configuration.Internals;
 
 internal static class DbVendorExtensions
 {
