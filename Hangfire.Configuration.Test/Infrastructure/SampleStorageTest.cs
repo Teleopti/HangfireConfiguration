@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldReadEmpty()
 		{
 			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+			system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
 			var sample = system.KeyValueStore.ServerCountSamples();
 
@@ -40,7 +40,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldUpdate()
 		{
 			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+			system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
 			system.KeyValueStore.ServerCountSamples(new ServerCountSamples
 				{Samples = new[] {new ServerCountSample {Count = 1}}});

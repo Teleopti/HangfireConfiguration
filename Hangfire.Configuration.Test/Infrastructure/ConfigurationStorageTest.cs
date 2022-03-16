@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldReadEmptyConfiguration()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
 
             Assert.IsEmpty(storage.ReadConfigurations());
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldWrite()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
 
             storage.WriteConfiguration(new StoredConfiguration
@@ -43,7 +43,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldRead()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration
             {
@@ -66,7 +66,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldUpdate()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration());
 
@@ -88,7 +88,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldWriteName()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
 
             storage.WriteConfiguration(new StoredConfiguration
@@ -104,7 +104,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
         public void ShouldUpdateName()
         {
 	        var system = new SystemUnderInfraTest();
-	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration());
 

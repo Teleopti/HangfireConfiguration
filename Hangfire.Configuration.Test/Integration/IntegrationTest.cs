@@ -14,7 +14,7 @@ public class IntegrationTest : DatabaseTestBase
 	public void ShouldStartServerWithWorkers()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptions
 		{
 			ConnectionString = ConnectionString,
 			UpdateConfigurations = new[]

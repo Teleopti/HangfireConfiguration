@@ -19,7 +19,7 @@ public class AutoUpdateConcurrencyTest : DatabaseTestBase
 		Parallel.ForEach(Enumerable.Range(1, 10), _ =>
 		{
 			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions
+			system.UseOptions(new ConfigurationOptions
 			{
 				ConnectionString = ConnectionString,
 				UpdateConfigurations = new[]
@@ -37,7 +37,7 @@ public class AutoUpdateConcurrencyTest : DatabaseTestBase
 		});
 
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		var storage = system.ConfigurationStorage;
 		storage.ReadConfigurations()
 			.Should().Have.Count.EqualTo(1);

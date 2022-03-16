@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldReadValueMatchingKey()
 		{
 			var system = new SystemUnderInfraTest();
-			system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+			system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 			system.KeyValueStore.Write("firstKey", "1");
 			system.KeyValueStore.Write("secondKey", "2");
 

@@ -13,7 +13,7 @@ public class ConfigurationStorageMaxWorkersPerServerTest : DatabaseTestBase
 	public void ShouldWriteMaxWorkersPerServer()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
 		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
 
@@ -24,7 +24,7 @@ public class ConfigurationStorageMaxWorkersPerServerTest : DatabaseTestBase
 	public void ShouldUpdateMaxWorkersPerServer()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
 		var existing = system.ConfigurationStorage.ReadConfigurations().Single();
 

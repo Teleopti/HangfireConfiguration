@@ -13,7 +13,7 @@ public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
 	public void ShouldReadEmptyGoalWorkerCount()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		var storage = system.ConfigurationStorage;
 		
 		Assert.IsEmpty(storage.ReadConfigurations());
@@ -23,7 +23,7 @@ public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
 	public void ShouldWriteGoalWorkerCount()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		var storage = system.ConfigurationStorage;
 
 		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
@@ -35,7 +35,7 @@ public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
 	public void ShouldReadGoalWorkerCount()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		var storage = system.ConfigurationStorage;
 		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 
@@ -48,7 +48,7 @@ public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
 	public void ShouldWriteNullGoalWorkerCount()
 	{
 		var system = new SystemUnderInfraTest();
-		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		var storage = system.ConfigurationStorage;
 		storage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = 1});
 

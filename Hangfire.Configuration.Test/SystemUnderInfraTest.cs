@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test
 			return new FakeHangfire(null, new FakeMonitoringApi());
 		}
 
-		public void WithOptions(ConfigurationOptions configurationOptions) =>
+		public void UseOptions(ConfigurationOptions configurationOptions) =>
 			BuildOptions().UseOptions(configurationOptions);
 	}
 }
