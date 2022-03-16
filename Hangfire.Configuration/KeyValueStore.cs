@@ -5,40 +5,40 @@ namespace Hangfire.Configuration
 {
     public class KeyValueStore : IKeyValueStore
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly Connector _connector;
 
         private string schema => SqlServerObjectsInstaller.SchemaName;
 
-        internal KeyValueStore(UnitOfWork unitOfWork)
+        internal KeyValueStore(Connector connector)
         {
-            _unitOfWork = unitOfWork;
+            _connector = connector;
         }
 
         public void Write(string key, string value)
         {
-	        var updateSqlQuery = _unitOfWork.SelectDialect(
+	        var updateSqlQuery = _connector.SelectDialect(
 		        $"UPDATE [{schema}].KeyValueStore SET [Value] = @Value WHERE [Key] = @Key", 
 		        $"UPDATE {schema}.KeyValueStore SET Value = @Value WHERE Key = @Key");
-	        var insertSqlQuery = _unitOfWork.SelectDialect(
+	        var insertSqlQuery = _connector.SelectDialect(
 		        $"INSERT INTO [{schema}].KeyValueStore ([Key], [Value]) VALUES (@Key, @Value)", 
 		        $"INSERT INTO {schema}.KeyValueStore (Key, Value) VALUES (@Key, @Value)");
 	        
-			var updated = _unitOfWork.Execute(
+			var updated = _connector.Execute(
 		        updateSqlQuery,
 		        new {Key = key, Value = value});
 
 	        if (updated == 0)
-		        _unitOfWork.Execute(
+		        _connector.Execute(
 			        insertSqlQuery,
 			        new {Key = key, Value = value});
         }
 
         public string Read(string key)
         {
-	        var sqlQuery = _unitOfWork.SelectDialect(
+	        var sqlQuery = _connector.SelectDialect(
 		        $"SELECT [Value] FROM [{schema}].KeyValueStore WHERE [Key] = @Key", 
 		        $"SELECT Value FROM {schema}.KeyValueStore WHERE Key = @Key");
-			return _unitOfWork
+			return _connector
 		        .Query<string>(sqlQuery, new { Key = key })
 		        .SingleOrDefault();
         }

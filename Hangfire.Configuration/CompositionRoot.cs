@@ -13,18 +13,16 @@ namespace Hangfire.Configuration
 
         private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
 
-        private UnitOfWork buildUnitOfWork() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
+        private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
 
         private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
         
-        protected ServerCountSampleRecorder buildServerCountSampleRecorder()
-        {
-            return new ServerCountSampleRecorder(
+        protected ServerCountSampleRecorder buildServerCountSampleRecorder() => 
+            new ServerCountSampleRecorder(
                 BuildKeyValueStore(), 
                 _state,
                 builderStateMaintainer(null), 
                 BuildNow());
-        }
         
         
         // outer services
@@ -54,10 +52,10 @@ namespace Hangfire.Configuration
             new HangfireSchemaCreator();
 
         protected virtual IConfigurationStorage BuildConfigurationStorage() =>
-            new ConfigurationStorage(buildUnitOfWork());
+            new ConfigurationStorage(buildConnector());
 
         protected virtual IKeyValueStore BuildKeyValueStore() =>
-            new KeyValueStore(buildUnitOfWork());
+            new KeyValueStore(buildConnector());
 
         protected virtual INow BuildNow() => new Now();
     }

@@ -7,7 +7,7 @@ using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
-internal interface IUnitOfWork : IDbVendorSelector
+internal interface IConnector : IDbVendorSelector
 {
 	int Execute(string sql);
 	int Execute(string sql, object param);
@@ -15,7 +15,7 @@ internal interface IUnitOfWork : IDbVendorSelector
 	IEnumerable<T> Query<T>(string sql, object param);
 }
 
-internal abstract class UnitOfWorkBase : IUnitOfWork
+internal abstract class ConnectorBase : IConnector
 {
 	protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
@@ -65,7 +65,7 @@ internal abstract class UnitOfWorkBase : IUnitOfWork
 	}
 }
 
-internal class UnitOfWork : UnitOfWorkBase
+internal class Connector : ConnectorBase
 {
 	protected override void operation(Action<IDbConnection, IDbTransaction> action)
 	{
@@ -84,12 +84,12 @@ internal class UnitOfWork : UnitOfWorkBase
 	}
 }
 
-internal class UnitOfWorkTransaction : UnitOfWorkBase, IDisposable
+internal class ConnectorTransaction : ConnectorBase, IDisposable
 {
 	private readonly IDbConnection _connection;
 	private readonly IDbTransaction _transaction;
 
-	public UnitOfWorkTransaction(string connectionString)
+	public ConnectorTransaction(string connectionString)
 	{
 		ConnectionString = connectionString;
 		_connection = connectionString.CreateConnection();

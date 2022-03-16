@@ -8,25 +8,25 @@ namespace Hangfire.Configuration
 {
 	public class ConfigurationStorage : IConfigurationStorage
 	{
-		private readonly UnitOfWork _unitOfWork;
+		private readonly Connector _connector;
 
 		// for testing
-		public ConfigurationStorage(string connectionString) : this(new UnitOfWork {ConnectionString = connectionString})
+		public ConfigurationStorage(string connectionString) : this(new Connector {ConnectionString = connectionString})
 		{
 		}
 
-		internal ConfigurationStorage(UnitOfWork unitOfWork)
+		internal ConfigurationStorage(Connector connector)
 		{
-			_unitOfWork = unitOfWork;
+			_connector = connector;
 		}
 
-		private readonly ThreadLocal<UnitOfWorkTransaction> _currentTransaction = new();
+		private readonly ThreadLocal<ConnectorTransaction> _currentTransaction = new();
 		
-		private IUnitOfWork getUnitOfWork() => _currentTransaction.Value as IUnitOfWork ?? _unitOfWork;
+		private IConnector currentConnector() => _currentTransaction.Value as IConnector ?? _connector;
 
 		public void Transaction(Action action)
 		{
-			_currentTransaction.Value = new UnitOfWorkTransaction(_unitOfWork.ConnectionString);
+			_currentTransaction.Value = new ConnectorTransaction(_connector.ConnectionString);
 			action.Invoke();
 			_currentTransaction.Value.Commit();
 			_currentTransaction.Value = null;
@@ -34,11 +34,11 @@ namespace Hangfire.Configuration
 
 		public void LockConfiguration()
 		{
-			var unitOfWork = getUnitOfWork();
-			var sql = unitOfWork.SelectDialect(
+			var c = currentConnector();
+			var sql = c.SelectDialect(
 				$@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
 				$@"LOCK TABLE {SqlServerObjectsInstaller.SchemaName}.configuration");
-			unitOfWork.Execute(sql);
+			c.Execute(sql);
 		}
 
 		public IEnumerable<StoredConfiguration> ReadConfigurations()
@@ -66,9 +66,9 @@ SELECT
 FROM 
     {SqlServerObjectsInstaller.SchemaName}.configuration 
 ORDER BY Id";
-			var unitOfWork = getUnitOfWork();
-			var sql = unitOfWork.SelectDialect(sqlServer, postgreSql);
-			return unitOfWork.Query<StoredConfiguration>(sql).ToArray();
+			var c = currentConnector();
+			var sql = c.SelectDialect(sqlServer, postgreSql);
+			return c.Query<StoredConfiguration>(sql).ToArray();
 		}
 
 		public void WriteConfiguration(StoredConfiguration configuration)
@@ -81,8 +81,8 @@ ORDER BY Id";
 
 		private void insert(StoredConfiguration configuration)
 		{
-			var unitOfWork = getUnitOfWork();
-			var sql = unitOfWork.SelectDialect($@"
+			var c = currentConnector();
+			var sql = c.SelectDialect($@"
 INSERT INTO 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
     (
@@ -117,13 +117,13 @@ INSERT INTO
     @Active,
     @MaxWorkersPerServer
 );");
-			unitOfWork.Execute(sql, configuration);
+			c.Execute(sql, configuration);
 		}
 
 		private void update(StoredConfiguration configuration)
 		{
-			var unitOfWork = getUnitOfWork();
-			var sql = unitOfWork.SelectDialect($@"
+			var c = currentConnector();
+			var sql = c.SelectDialect($@"
 UPDATE 
     [{SqlServerObjectsInstaller.SchemaName}].Configuration 
 SET 
@@ -147,7 +147,7 @@ SET
 WHERE 
     Id = @Id;");
 
-			unitOfWork.Execute(sql, configuration);
+			c.Execute(sql, configuration);
 		}
 	}
 }
