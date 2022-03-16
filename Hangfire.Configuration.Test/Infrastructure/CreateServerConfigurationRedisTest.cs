@@ -5,6 +5,7 @@ using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
+[Parallelizable(ParallelScope.None)]
 public class CreateServerConfigurationRedisTest
 {
 	private Process redis;
@@ -18,8 +19,7 @@ public class CreateServerConfigurationRedisTest
 	[TearDown]
 	public void Teardown()
 	{
-		if(!redis.HasExited)
-			redis.Kill();
+		redis.Kill();
 	}
 
 	[Test]
