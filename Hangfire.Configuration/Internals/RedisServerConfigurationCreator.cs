@@ -1,3 +1,5 @@
+using StackExchange.Redis;
+
 namespace Hangfire.Configuration.Internals;
 
 internal class RedisServerConfigurationCreator
@@ -11,6 +13,8 @@ internal class RedisServerConfigurationCreator
 
 	public void Create(CreateRedisWorkerServer command)
 	{
+		ConnectionMultiplexer.Connect(command.Server);
+
 		_storage.WriteConfiguration(new StoredConfiguration
 		{
 			SchemaName = command.SchemaName ?? DefaultSchemaName.Redis(),
