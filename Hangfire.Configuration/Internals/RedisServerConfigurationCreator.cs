@@ -9,7 +9,7 @@ internal class RedisServerConfigurationCreator
 		_storage = storage;
 	}
 
-	public void Create(CreateRedisServerConfigurationCommand command)
+	public void Create(CreateRedisWorkerServer command)
 	{
 		_storage.WriteConfiguration(new StoredConfiguration
 		{

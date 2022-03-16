@@ -181,7 +181,7 @@ namespace Hangfire.Configuration.Web
 			var provider = parsed.SelectToken("databaseProvider")?.Value<string>();
 			if (provider == "PostgreSql")
 			{
-				_configurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+				_configurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
 				{
 					Name = parsed.SelectToken("name")?.Value<string>(),
 					Server = parsed.SelectToken("server").Value<string>(),
@@ -197,7 +197,7 @@ namespace Hangfire.Configuration.Web
 
 			if (provider == "redis")
 			{
-				_configurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+				_configurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 				{
 					Name = parsed.SelectToken("name")?.Value<string>(),
 					Server = parsed.SelectToken("server").Value<string>(),
@@ -206,7 +206,7 @@ namespace Hangfire.Configuration.Web
 				return;
 			}
 
-			_configurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+			_configurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
 			{
 				Name = parsed.SelectToken("name")?.Value<string>(),
 				Server = parsed.SelectToken("server").Value<string>(),

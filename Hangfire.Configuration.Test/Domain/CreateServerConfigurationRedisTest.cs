@@ -10,7 +10,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
 			Server = "AwesomeServer:425"
 		});
@@ -24,7 +24,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
 			Name = "matte"
 		});
@@ -38,7 +38,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
 			Server = "redis"
 		});
@@ -52,7 +52,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
 			SchemaName = "my-prefix:"
 		});
@@ -66,7 +66,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisServerConfigurationCommand
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
 			SchemaName = null
 		});

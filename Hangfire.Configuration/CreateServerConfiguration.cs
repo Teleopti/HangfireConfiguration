@@ -1,13 +1,13 @@
 namespace Hangfire.Configuration
 {
-	public class CreateRedisServerConfigurationCommand
+	public class CreateRedisWorkerServer
 	{
 		public string Name { get; set; }
 		public string Server { get; set; }
 		public string SchemaName { get; set; }
 	}
 
-	public class CreatePostgreSqlServerConfigurationCommand
+	public class CreatePostgresWorkerServer
 	{
 		public string Name { get; set; }
 
@@ -21,7 +21,7 @@ namespace Hangfire.Configuration
 		public string SchemaName { get; set; }
 	}
 
-	public class CreateSqlServerServerConfigurationCommand
+	public class CreateSqlServerWorkerServer
 	{
 		public string Name { get; set; }
 

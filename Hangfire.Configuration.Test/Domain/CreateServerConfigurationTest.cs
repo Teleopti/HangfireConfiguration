@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             }, null, (SqlServerStorageOptions)null);
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
                 Server = "newServer",
                 SchemaName = "newSchemaName",
@@ -79,7 +79,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             }, null, (SqlServerStorageOptions)null);
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
                 Server = "newServer",
                 Database = "database",
@@ -102,7 +102,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.SchemaCreator.TryConnectFailsWith = new Exception();
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
                     Server = "Server",
                     Database = "TestDatabase",
@@ -117,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -153,7 +153,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -171,7 +171,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenSchemaAlreadyExists()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
                 Server = "server",
                 Database = "existingDatabase",
@@ -179,7 +179,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var e = Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
                     Server = "server",
                     Database = "existingDatabase",
@@ -195,7 +195,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.SchemaCreator.Has(DefaultSchemaName.SqlServer(), "Data Source=_;Initial Catalog=existingDatabase");
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreateSqlServerServerConfigurationCommand
+                new CreateSqlServerWorkerServer
                 {
 	                Server = "_",
 	                Database = "existingDatabase",
@@ -209,7 +209,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.SchemaCreator.Has("schemaName", "Data Source=_;Initial Catalog=one");
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
 	            Server = "_",
 	            Database = "two",
@@ -227,7 +227,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
             {
                 Name = "namedConfiguration",
                 SchemaName = "schema"
@@ -242,7 +242,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
 	        var system = new SystemUnderTest();
 
-	        system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerServerConfigurationCommand
+	        system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
 	        {
 		        SchemaName = null
 	        });

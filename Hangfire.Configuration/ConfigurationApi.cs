@@ -62,7 +62,7 @@ namespace Hangfire.Configuration
 			return configuration;
 		}
 
-		public void CreateServerConfiguration(CreateSqlServerServerConfigurationCommand command)
+		public void CreateServerConfiguration(CreateSqlServerWorkerServer command)
 		{
 			var storage = new SqlConnectionStringBuilder
 			{
@@ -88,7 +88,7 @@ namespace Hangfire.Configuration
 				);
 		}
 
-		public void CreateServerConfiguration(CreatePostgreSqlServerConfigurationCommand command)
+		public void CreateServerConfiguration(CreatePostgresWorkerServer command)
 		{
 			var storage = new NpgsqlConnectionStringBuilder
 			{
@@ -114,7 +114,7 @@ namespace Hangfire.Configuration
 				);
 		}
 
-		public void CreateServerConfiguration(CreateRedisServerConfigurationCommand command)
+		public void CreateServerConfiguration(CreateRedisWorkerServer command)
 		{
 			new RedisServerConfigurationCreator(_storage)
 				.Create(command);

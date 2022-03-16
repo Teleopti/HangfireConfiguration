@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "AwesomeServer",
                 Database = "TestDatabase",
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             }, null, (PostgreSqlStorageOptions)null);
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "newServer",
                 SchemaName = "newSchemaName",
@@ -79,7 +79,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             }, null, (PostgreSqlStorageOptions)null);
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "newServer",
                 Database = "database",
@@ -102,7 +102,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.SchemaCreator.TryConnectFailsWith = new Exception();
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
                     Server = "Server",
                     Database = "TestDatabase",
@@ -117,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -135,7 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -153,7 +153,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
                     Server = "AwesomeServer",
                     Database = "TestDatabase",
@@ -171,7 +171,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenSchemaAlreadyExists()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "server",
                 Database = "existingDatabase",
@@ -179,7 +179,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var e = Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
                     Server = "server",
                     Database = "existingDatabase",
@@ -195,7 +195,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.SchemaCreator.Has(DefaultSchemaName.Postgres(), "Host=_;Database=existingDatabase");
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
-                new CreatePostgreSqlServerConfigurationCommand
+                new CreatePostgresWorkerServer
                 {
 	                Server = "_",
 	                Database = "existingDatabase",
@@ -209,7 +209,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.SchemaCreator.Has("schemaName", "Host=_;Database=one");
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
 	            Server = "_",
 	            Database = "two",
@@ -227,7 +227,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+            system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Name = "namedConfiguration",
                 SchemaName = "schema"
@@ -242,7 +242,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
 	        var system = new SystemUnderTest();
 
-	        system.ConfigurationApi.CreateServerConfiguration(new CreatePostgreSqlServerConfigurationCommand
+	        system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
 	        {
 		        Server = "_",
 		        Database = "db",
