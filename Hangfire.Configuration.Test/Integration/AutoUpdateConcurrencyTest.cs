@@ -36,7 +36,10 @@ public class AutoUpdateConcurrencyTest : DatabaseTestBase
 				.Start();
 		});
 
-		new ConfigurationStorage(ConnectionString).ReadConfigurations()
+		var system = new SystemUnderInfraTest();
+		system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
+		storage.ReadConfigurations()
 			.Should().Have.Count.EqualTo(1);
 	}
 }

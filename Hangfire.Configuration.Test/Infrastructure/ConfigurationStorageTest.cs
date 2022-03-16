@@ -12,7 +12,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldReadEmptyConfiguration()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
 
             Assert.IsEmpty(storage.ReadConfigurations());
         }
@@ -20,7 +22,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWrite()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
 
             storage.WriteConfiguration(new StoredConfiguration
             {
@@ -38,7 +42,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldRead()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration
             {
 	            ConnectionString = "connectionString",
@@ -59,7 +65,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldUpdate()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration());
 
             var existing = storage.ReadConfigurations().Single();
@@ -79,7 +87,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldWriteName()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
 
             storage.WriteConfiguration(new StoredConfiguration
             {
@@ -93,7 +103,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
         [Test]
         public void ShouldUpdateName()
         {
-            var storage = new ConfigurationStorage(ConnectionString);
+	        var system = new SystemUnderInfraTest();
+	        system.WithOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
             storage.WriteConfiguration(new StoredConfiguration());
 
             var existing = storage.ReadConfigurations().Single();

@@ -10,11 +10,6 @@ namespace Hangfire.Configuration
 	{
 		private readonly Connector _connector;
 
-		// for testing
-		public ConfigurationStorage(string connectionString) : this(new Connector {ConnectionString = connectionString})
-		{
-		}
-
 		internal ConfigurationStorage(Connector connector)
 		{
 			_connector = connector;
