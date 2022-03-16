@@ -7,12 +7,17 @@ namespace Hangfire.Configuration.Test
 		public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
 		public IConfigurationStorage ConfigurationStorage => base.BuildConfigurationStorage();
 
-		protected override IHangfire BuildHangfire(object appBuilder) =>
-			new FakeHangfire(null, new FakeMonitoringApi());
+		public void UseRealHangfire() => _realHangfire = true;
+		private bool _realHangfire;
 
-		public void WithOptions(ConfigurationOptions configurationOptions)
+		protected override IHangfire BuildHangfire(object appBuilder)
 		{
-			BuildOptions().UseOptions(configurationOptions);
+			if (_realHangfire)
+				return base.BuildHangfire(appBuilder);
+			return new FakeHangfire(null, new FakeMonitoringApi());
 		}
+
+		public void WithOptions(ConfigurationOptions configurationOptions) =>
+			BuildOptions().UseOptions(configurationOptions);
 	}
 }
