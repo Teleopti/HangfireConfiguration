@@ -1,27 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
 [Parallelizable(ParallelScope.None)]
+[InstallRedis]
 public class CreateServerConfigurationRedisTest
 {
-	private Process redis;
-	
-	[SetUp]
-	public void Setup()
-	{
-		redis = Process.Start($"{Environment.GetEnvironmentVariable("USERPROFILE")}/.nuget/packages/redis-64/3.0.503/tools/redis-server.exe");
-	}
-	
-	[TearDown]
-	public void Teardown()
-	{
-		redis.Kill();
-	}
-
 	[Test]
 	public void ShouldThrowIfUnknownServer()
 	{

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Hangfire.Server;
@@ -9,30 +8,9 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
-public class QueueWorkTest_Redis
+[InstallRedis]
+public class QueueWorkRedisTest
 {
-	public class FakeJobService
-	{
-		public static void Reset() => WasRun = false;
-		public static bool WasRun = false;
-		public static void RunTheJob() => WasRun = true;
-	}
-	
-	private Process redis;
-	
-	[SetUp]
-	public void Setup()
-	{
-		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer);
-		redis = Process.Start($"{Environment.GetEnvironmentVariable("USERPROFILE")}/.nuget/packages/redis-64/3.0.503/tools/redis-server.exe");
-	}
-	
-	[TearDown]
-	public void Teardown()
-	{
-		redis.Kill();
-	}
-	
 	[Test]
 	public void ShouldRunEnqueuedJobOnWorker()
 	{
@@ -76,5 +54,18 @@ public class QueueWorkTest_Redis
 				new CancellationToken(),
 				new CancellationToken()
 			));
+	}
+	
+	public class FakeJobService
+	{
+		public static void Reset() => WasRun = false;
+		public static bool WasRun;
+		public static void RunTheJob() => WasRun = true;
+	}
+
+	[SetUp]
+	public void Setup()
+	{
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer);
 	}
 }
