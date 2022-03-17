@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Web
 			_configurationApi = _configuration.ConfigurationApi();
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = _options.ConnectionString.CreateConnection())
-					SqlServerObjectsInstaller.Install(c);
+					DatabaseSchemaInstaller.Install(c);
 		}
 
 #if NETSTANDARD2_0

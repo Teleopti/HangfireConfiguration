@@ -7,7 +7,7 @@ namespace Hangfire.Configuration
     {
         private readonly Connector _connector;
 
-        private string schema => SqlServerObjectsInstaller.SchemaName;
+        private string schema => DatabaseSchemaInstaller.SchemaName;
 
         internal KeyValueStore(Connector connector)
         {

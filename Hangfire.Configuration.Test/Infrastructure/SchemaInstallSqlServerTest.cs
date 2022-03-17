@@ -49,7 +49,7 @@ INSERT INTO
 		install();
 
 		Assert.AreEqual(99, read().Single().GoalWorkerCount);
-		Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
+		Assert.AreEqual(DatabaseSchemaInstaller.SchemaVersion, version());
 	}
 
 	[Test]
@@ -79,16 +79,16 @@ INSERT INTO
 		install();
 
 		Assert.AreEqual(52, read().Single().GoalWorkerCount);
-		Assert.AreEqual(SqlServerObjectsInstaller.SchemaVersion, version());
+		Assert.AreEqual(DatabaseSchemaInstaller.SchemaVersion, version());
 	}
 
 	private void install(int? schemaVersion = null)
 	{
 		using var c = new SqlConnection(ConnectionStrings.SqlServer);
 		if (schemaVersion.HasValue)
-			SqlServerObjectsInstaller.Install(c, schemaVersion.Value);
+			DatabaseSchemaInstaller.Install(c, schemaVersion.Value);
 		else
-			SqlServerObjectsInstaller.Install(c);
+			DatabaseSchemaInstaller.Install(c);
 	}
 
 	private static int version()

@@ -39,8 +39,8 @@ public static class DatabaseTestSetup
 	private static void installSchema(DbConnection connection, int? schemaVersion)
 	{
 		if (schemaVersion is > 0)
-			SqlServerObjectsInstaller.Install(connection, schemaVersion.Value);
+			DatabaseSchemaInstaller.Install(connection, schemaVersion.Value);
 		else
-			SqlServerObjectsInstaller.Install(connection);
+			DatabaseSchemaInstaller.Install(connection);
 	}
 }

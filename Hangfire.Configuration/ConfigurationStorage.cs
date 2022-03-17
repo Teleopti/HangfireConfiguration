@@ -31,8 +31,8 @@ namespace Hangfire.Configuration
 		{
 			var c = currentConnector();
 			var sql = c.SelectDialect(
-				$@"SELECT * FROM [{SqlServerObjectsInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
-				$@"LOCK TABLE {SqlServerObjectsInstaller.SchemaName}.configuration");
+				$@"SELECT * FROM [{DatabaseSchemaInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
+				$@"LOCK TABLE {DatabaseSchemaInstaller.SchemaName}.configuration");
 			c.Execute(sql);
 		}
 
@@ -48,7 +48,7 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration";
+    [{DatabaseSchemaInstaller.SchemaName}].Configuration";
 			const string postgreSql = $@"
 SELECT 
     Id, 
@@ -59,7 +59,7 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    {SqlServerObjectsInstaller.SchemaName}.configuration 
+    {DatabaseSchemaInstaller.SchemaName}.configuration 
 ORDER BY Id";
 			var c = currentConnector();
 			var sql = c.SelectDialect(sqlServer, postgreSql);
@@ -79,7 +79,7 @@ ORDER BY Id";
 			var c = currentConnector();
 			var sql = c.SelectDialect($@"
 INSERT INTO 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
+    [{DatabaseSchemaInstaller.SchemaName}].Configuration 
     (
         Name,
     [ConnectionString], 
@@ -96,7 +96,7 @@ MaxWorkersPerServer
     @MaxWorkersPerServer
 );", $@"
 INSERT INTO 
-    {SqlServerObjectsInstaller.SchemaName}.Configuration 
+    {DatabaseSchemaInstaller.SchemaName}.Configuration 
 (
     Name,
     ConnectionString, 
@@ -120,7 +120,7 @@ INSERT INTO
 			var c = currentConnector();
 			var sql = c.SelectDialect($@"
 UPDATE 
-    [{SqlServerObjectsInstaller.SchemaName}].Configuration 
+    [{DatabaseSchemaInstaller.SchemaName}].Configuration 
 SET 
     Name = @Name,
     ConnectionString = @ConnectionString, 
@@ -131,7 +131,7 @@ SET
 WHERE 
     Id = @Id;", $@"
 UPDATE 
-    {SqlServerObjectsInstaller.SchemaName}.Configuration 
+    {DatabaseSchemaInstaller.SchemaName}.Configuration 
 SET 
     Name = @Name,
     ConnectionString = @ConnectionString, 
