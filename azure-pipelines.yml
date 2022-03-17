@@ -4,6 +4,7 @@ name: 1.$(Date:yMM).$(Date:%d).$(Rev:r)
 pool:
   name: twfm-devops-vmss
 steps:
+- template: sql_make_me_admin.yml@twfm-devops
 - pwsh: |
     Set-Service postgresql-x64-14 -StartupType manual
     Start-Service -Name postgresql-x64-14
