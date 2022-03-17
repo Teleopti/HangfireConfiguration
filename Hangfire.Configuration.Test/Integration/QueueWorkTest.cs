@@ -11,19 +11,24 @@ namespace Hangfire.Configuration.Test.Integration;
 
 public class QueueWorkTest : DatabaseTestBase
 {
-	public class FakeJobService
-	{
-		public static void Reset() => WasRun = false;
-		public static bool WasRun = false;
-		public static void RunTheJob() => WasRun = true;
-	}
-
 	public QueueWorkTest(string connectionString) : base(connectionString)
 	{
 	}
+
+	[Test]
+	public void ShouldRunEnqueuedJobOnWorker_SqlServerStorage()
+	{
+		enqueuedJobOnWorker(ConnectionStrings.SqlServer);
+	}
 	
 	[Test]
-	public void ShouldRunEnqueuedJobOnWorker()
+	[InstallRedis]
+	public void ShouldRunEnqueuedJobOnWorker_RedisStorage()
+	{
+		enqueuedJobOnWorker("localhost");
+	}
+	
+	private void enqueuedJobOnWorker(string storageConnstring)
 	{
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions
@@ -33,7 +38,7 @@ public class QueueWorkTest : DatabaseTestBase
 			{
 				new UpdateStorageConfiguration
 				{
-					ConnectionString = ConnectionString,
+					ConnectionString = storageConnstring,
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -66,4 +71,10 @@ public class QueueWorkTest : DatabaseTestBase
 			));
 	}
 
+	public class FakeJobService
+	{
+		public static void Reset() => WasRun = false;
+		public static bool WasRun = false;
+		public static void RunTheJob() => WasRun = true;
+	}
 }

@@ -6,12 +6,12 @@ namespace Hangfire.Configuration.Test.Infrastructure;
 [Parallelizable(ParallelScope.None)]
 [TestFixture(ConnectionStrings.SqlServer)]
 [TestFixture(ConnectionStrings.Postgres)]
-public class DatabaseTestBase
+public abstract class DatabaseTestBase
 {
 	protected readonly string ConnectionString;
 	private readonly bool _isSqlServer;
 
-	public DatabaseTestBase(string connectionString)
+	protected DatabaseTestBase(string connectionString)
 	{
 		ConnectionString = connectionString;
 		_isSqlServer = ConnectionString.Equals(ConnectionStrings.SqlServer);
