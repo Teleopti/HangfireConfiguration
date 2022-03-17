@@ -9,6 +9,7 @@ using SharpTestsEx;
 namespace Hangfire.Configuration.Test.Integration;
 
 [InstallRedis]
+[Parallelizable(ParallelScope.None)]
 public class QueueWorkRedisTest
 {
 	[Test]
