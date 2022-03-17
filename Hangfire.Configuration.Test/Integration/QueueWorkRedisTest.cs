@@ -14,7 +14,6 @@ public class QueueWorkRedisTest
 	[Test]
 	public void ShouldRunEnqueuedJobOnWorker()
 	{
-	
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions
 		{
