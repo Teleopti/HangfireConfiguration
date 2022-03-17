@@ -4,7 +4,7 @@ namespace Hangfire.Configuration
 	{
 		public string Name { get; set; }
 		public string Server { get; set; }
-		public string SchemaName { get; set; }
+		public string Prefix { get; set; }
 	}
 
 	public class CreatePostgresWorkerServer

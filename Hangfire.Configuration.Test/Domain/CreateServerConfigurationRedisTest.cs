@@ -54,7 +54,7 @@ public class CreateServerConfigurationRedisTest
 
 		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			SchemaName = "my-prefix:"
+			Prefix = "my-prefix:"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();
@@ -68,7 +68,7 @@ public class CreateServerConfigurationRedisTest
 
 		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			SchemaName = null
+			Prefix = null
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();

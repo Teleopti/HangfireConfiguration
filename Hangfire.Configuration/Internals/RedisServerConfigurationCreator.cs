@@ -17,7 +17,7 @@ internal class RedisServerConfigurationCreator
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{
-			SchemaName = command.SchemaName ?? DefaultSchemaName.Redis(),
+			SchemaName = command.Prefix ?? DefaultSchemaName.Redis(),
 			ConnectionString = command.Server,
 			Name = command.Name,
 			Active = false

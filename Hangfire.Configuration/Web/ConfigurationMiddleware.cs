@@ -202,7 +202,7 @@ namespace Hangfire.Configuration.Web
 				{
 					Name = parsed.SelectToken("name")?.Value<string>(),
 					Server = parsed.SelectToken("server").Value<string>(),
-					SchemaName = parsed.SelectToken("schemaName").Value<string>(),
+					Prefix = parsed.SelectToken("schemaName").Value<string>(),
 				});
 				return;
 			}
