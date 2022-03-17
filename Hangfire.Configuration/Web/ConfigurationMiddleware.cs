@@ -201,7 +201,7 @@ namespace Hangfire.Configuration.Web
 				_configurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 				{
 					Name = parsed.SelectToken("name")?.Value<string>(),
-					Server = parsed.SelectToken("server").Value<string>(),
+					Configuration = parsed.SelectToken("server").Value<string>(),
 					Prefix = parsed.SelectToken("schemaName").Value<string>(),
 				});
 				return;

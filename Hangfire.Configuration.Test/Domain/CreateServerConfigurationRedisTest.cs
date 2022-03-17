@@ -12,7 +12,7 @@ public class CreateServerConfigurationRedisTest
 
 		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			Server = "AwesomeServer:425"
+			Configuration = "AwesomeServer:425"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
@@ -40,7 +40,7 @@ public class CreateServerConfigurationRedisTest
 
 		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			Server = "redis"
+			Configuration = "redis"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();

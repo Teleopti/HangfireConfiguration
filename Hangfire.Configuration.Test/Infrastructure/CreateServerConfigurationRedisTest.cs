@@ -31,7 +31,7 @@ public class CreateServerConfigurationRedisTest
 		{
 			system.BuildConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
 			{
-				Server = "UnknownServer"
+				Configuration = "UnknownServer"
 			});
 		});
 	}
@@ -45,7 +45,7 @@ public class CreateServerConfigurationRedisTest
 		{
 			system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 			{
-				Server = "localhost"
+				Configuration = "localhost"
 			});
 		});
 	}
