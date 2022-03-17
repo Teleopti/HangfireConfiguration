@@ -2,24 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Hangfire.Configuration.Test.Infrastructure;
 using Hangfire.Server;
 using NUnit.Framework;
 using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
-[Parallelizable(ParallelScope.None)]
-public class DoStuffTest
+public class QueueWorkTest : DatabaseTestBase
 {
-	public string ConnectionString => ConnectionStrings.SqlServer;
-
-	public static bool JobWasRun = false;
-	public static void TheJob() => JobWasRun = true;
-
-	[Test]
-	public void DoTheFoo()
+	public class FakeJobService
 	{
-		DatabaseTestSetup.SetupSqlServer(ConnectionString);
+		public static void Reset() => WasRun = false;
+		public static bool WasRun = false;
+		public static void RunTheJob() => WasRun = true;
+	}
+
+	public QueueWorkTest(string connectionString) : base(connectionString)
+	{
+	}
+	
+	[Test]
+	public void ShouldRunEnqueuedJobOnWorker()
+	{
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions
 		{
@@ -34,15 +39,15 @@ public class DoStuffTest
 			}
 		});
 		system.UseRealHangfire();
+		FakeJobService.Reset();
+
 		var storage = system.BuildPublishersQuerier()
 			.QueryPublishers().Single().JobStorage;
 		var client = new BackgroundJobClient(storage);
-		client.Enqueue(() => TheJob());
-		JobWasRun.Should().Be.False();
-
+		client.Enqueue(() => FakeJobService.RunTheJob());
 		emulateWorkerIteration(storage);
 
-		JobWasRun.Should().Be.True();
+		FakeJobService.WasRun.Should().Be.True();
 	}
 
 	private static void emulateWorkerIteration(JobStorage storage)
@@ -60,4 +65,5 @@ public class DoStuffTest
 				new CancellationToken()
 			));
 	}
+
 }
