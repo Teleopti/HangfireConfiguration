@@ -16,7 +16,7 @@
 		<PackageReference Include="Hangfire.SqlServer" Version="1.7.24" />
 		<PackageReference Include="Polly" Version="7.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-		<PackageReference Include="StackExchange.Redis" Version="2.5.43" />
+		<PackageReference Include="StackExchange.Redis" Version="2.5.43" PrivateAssets="All" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
 		<PackageReference Include="Microsoft.Owin" Version="4.0.1" />
