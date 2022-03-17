@@ -39,8 +39,8 @@ public static class DatabaseTestSetup
 	private static void installSchema(DbConnection connection, int? schemaVersion)
 	{
 		if (schemaVersion is > 0)
-			DatabaseSchemaInstaller.Install(connection, schemaVersion.Value);
+			HangfireConfigurationSchemaInstaller.Install(connection, schemaVersion.Value);
 		else
-			DatabaseSchemaInstaller.Install(connection);
+			HangfireConfigurationSchemaInstaller.Install(connection);
 	}
 }

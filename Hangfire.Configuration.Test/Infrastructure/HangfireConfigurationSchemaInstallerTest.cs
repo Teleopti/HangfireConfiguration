@@ -7,9 +7,9 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class DatabaseSchemaInstallerTest : DatabaseTestBase
+	public class HangfireConfigurationSchemaInstallerTest : DatabaseTestBase
 	{
-		public DatabaseSchemaInstallerTest(string connectionString) : base(connectionString)
+		public HangfireConfigurationSchemaInstallerTest(string connectionString) : base(connectionString)
 		{
 		}
 
@@ -17,9 +17,9 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldUpgradeFrom0ToLatest()
 		{
 			using var c = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
-			DatabaseSchemaInstaller.Install(c);
+			HangfireConfigurationSchemaInstaller.Install(c);
 
-			Assert.AreEqual(DatabaseSchemaInstaller.SchemaVersion, version());
+			Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
 		}
 
 		private int version()

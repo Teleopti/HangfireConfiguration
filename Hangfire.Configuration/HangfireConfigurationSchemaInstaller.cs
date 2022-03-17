@@ -7,17 +7,17 @@ using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {
-    public static class DatabaseSchemaInstaller
+    public static class HangfireConfigurationSchemaInstaller
     {
         public const string SchemaName = "HangfireConfiguration";
         public const int SchemaVersion = 5;
 
         private static readonly string sqlServerScript = getStringResource(
-            typeof(DatabaseSchemaInstaller).GetTypeInfo().Assembly,
+            typeof(HangfireConfigurationSchemaInstaller).GetTypeInfo().Assembly,
 			"Hangfire.Configuration.InstallSqlServer.sql");
 
         private static readonly string postgreSqlScript = getStringResource(
-	        typeof(DatabaseSchemaInstaller).GetTypeInfo().Assembly,
+	        typeof(HangfireConfigurationSchemaInstaller).GetTypeInfo().Assembly,
 	        "Hangfire.Configuration.InstallPostgreSql.sql");
 
 		public static void Install(DbConnection connection) =>

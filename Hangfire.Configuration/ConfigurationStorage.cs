@@ -31,8 +31,8 @@ namespace Hangfire.Configuration
 		{
 			var c = currentConnector();
 			var sql = c.SelectDialect(
-				$@"SELECT * FROM [{DatabaseSchemaInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
-				$@"LOCK TABLE {DatabaseSchemaInstaller.SchemaName}.configuration");
+				$@"SELECT * FROM [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
+				$@"LOCK TABLE {HangfireConfigurationSchemaInstaller.SchemaName}.configuration");
 			c.Execute(sql);
 		}
 
@@ -48,7 +48,7 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    [{DatabaseSchemaInstaller.SchemaName}].Configuration";
+    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration";
 			const string postgreSql = $@"
 SELECT 
     Id, 
@@ -59,7 +59,7 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    {DatabaseSchemaInstaller.SchemaName}.configuration 
+    {HangfireConfigurationSchemaInstaller.SchemaName}.configuration 
 ORDER BY Id";
 			var c = currentConnector();
 			var sql = c.SelectDialect(sqlServer, postgreSql);
@@ -79,7 +79,7 @@ ORDER BY Id";
 			var c = currentConnector();
 			var sql = c.SelectDialect($@"
 INSERT INTO 
-    [{DatabaseSchemaInstaller.SchemaName}].Configuration 
+    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration 
     (
         Name,
     [ConnectionString], 
@@ -96,7 +96,7 @@ MaxWorkersPerServer
     @MaxWorkersPerServer
 );", $@"
 INSERT INTO 
-    {DatabaseSchemaInstaller.SchemaName}.Configuration 
+    {HangfireConfigurationSchemaInstaller.SchemaName}.Configuration 
 (
     Name,
     ConnectionString, 
@@ -120,7 +120,7 @@ INSERT INTO
 			var c = currentConnector();
 			var sql = c.SelectDialect($@"
 UPDATE 
-    [{DatabaseSchemaInstaller.SchemaName}].Configuration 
+    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration 
 SET 
     Name = @Name,
     ConnectionString = @ConnectionString, 
@@ -131,7 +131,7 @@ SET
 WHERE 
     Id = @Id;", $@"
 UPDATE 
-    {DatabaseSchemaInstaller.SchemaName}.Configuration 
+    {HangfireConfigurationSchemaInstaller.SchemaName}.Configuration 
 SET 
     Name = @Name,
     ConnectionString = @ConnectionString, 
