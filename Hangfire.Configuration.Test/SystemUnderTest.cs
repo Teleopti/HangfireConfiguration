@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test
 			
             ConfigurationStorage = new FakeConfigurationStorage();
             KeyValueStore = new FakeKeyValueStore();
-            SchemaCreator = new FakeHangfireSchemaCreator();
+            SchemaInstaller = new FakeSchemaInstaller();
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
             _now = new FakeNow {Time = "2020-12-01 09:00".Utc()};
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Test
         public FakeMonitoringApi Monitor { get; }
         public FakeConfigurationStorage ConfigurationStorage { get; }
         public FakeKeyValueStore KeyValueStore { get; }
-        public FakeHangfireSchemaCreator SchemaCreator { get; }
+        public FakeSchemaInstaller SchemaInstaller { get; }
         public FakeHangfire Hangfire { get; }
         private FakeNow _now;
 
@@ -68,7 +68,7 @@ namespace Hangfire.Configuration.Test
         protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
         protected override IKeyValueStore BuildKeyValueStore() => KeyValueStore;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
-        protected override IHangfireSchemaCreator BuildHangfireSchemaCreator() => SchemaCreator;
+        protected override ISchemaInstaller BuildHangfireSchemaCreator() => SchemaInstaller;
         protected override INow BuildNow() => _now;
         protected override ITryConnectToRedis TryConnectToRedis() => new ByPassTryConnectToRedis();
 

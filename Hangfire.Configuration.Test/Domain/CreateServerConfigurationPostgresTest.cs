@@ -99,7 +99,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenConnectionFails()
         {
             var system = new SystemUnderTest();
-            system.SchemaCreator.TryConnectFailsWith = new Exception();
+            system.SchemaInstaller.TryConnectFailsWith = new Exception();
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreatePostgresWorkerServer
@@ -125,7 +125,7 @@ namespace Hangfire.Configuration.Test.Domain
                     Password = "awesomePassword"
                 });
 
-            system.SchemaCreator.ConnectionTriedWith
+            system.SchemaInstaller.ConnectionTriedWith
 	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=testUser;Password=awesomePassword");
         }
 
@@ -143,7 +143,7 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaCreatorPassword = "createPassword"
                 });
 
-            system.SchemaCreator.ConnectionTriedWith
+            system.SchemaInstaller.ConnectionTriedWith
 	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=createUser;Password=createPassword");
         }
 
@@ -162,9 +162,9 @@ namespace Hangfire.Configuration.Test.Domain
                     SchemaName = "schema"
                 });
 
-            system.SchemaCreator.Schemas.Last().ConnectionString
+            system.SchemaInstaller.InstalledSchemas.Last().ConnectionString
 	            .Should().Contain(@"Host=AwesomeServer;Database=TestDatabase;Username=createUser;Password=createPassword");
-            Assert.AreEqual("schema", system.SchemaCreator.Schemas.Last().SchemaName);
+            Assert.AreEqual("schema", system.SchemaInstaller.InstalledSchemas.Last().SchemaName);
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldThrowWhenDefaultSchemaNameAlreadyExists()
         {
             var system = new SystemUnderTest();
-            system.SchemaCreator.Has(DefaultSchemaName.Postgres(), "Host=_;Database=existingDatabase");
+            system.SchemaInstaller.Has(DefaultSchemaName.Postgres(), "Host=_;Database=existingDatabase");
 
             Assert.Throws<Exception>(() => system.ConfigurationApi.CreateServerConfiguration(
                 new CreatePostgresWorkerServer
@@ -207,7 +207,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCreateSchemaWithSameNameInDifferentDatabase()
         {
             var system = new SystemUnderTest();
-            system.SchemaCreator.Has("schemaName", "Host=_;Database=one");
+            system.SchemaInstaller.Has("schemaName", "Host=_;Database=one");
 
             system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
@@ -216,9 +216,9 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "schemaName"
             });
 
-            Assert.AreEqual(2, system.SchemaCreator.Schemas.Count());
-            Assert.AreEqual("schemaName", system.SchemaCreator.Schemas.Last().SchemaName);
-            system.SchemaCreator.Schemas.Last().ConnectionString
+            Assert.AreEqual(2, system.SchemaInstaller.InstalledSchemas.Count());
+            Assert.AreEqual("schemaName", system.SchemaInstaller.InstalledSchemas.Last().SchemaName);
+            system.SchemaInstaller.InstalledSchemas.Last().ConnectionString
 	            .Should().StartWith("Host=_;Database=two");
         }
 

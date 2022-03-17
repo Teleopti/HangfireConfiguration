@@ -7,16 +7,16 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class SchemaCreatorTest : DatabaseTestBase
+	public class SchemaInstallerTest : DatabaseTestBase
 	{
-		public SchemaCreatorTest(string connectionString) : base(connectionString)
+		public SchemaInstallerTest(string connectionString) : base(connectionString)
 		{
 		}
 
 		[Test]
 		public void ShouldConnect()
 		{
-			var creator = new HangfireSchemaCreator();
+			var creator = new SchemaInstaller();
 
 			creator.TryConnect(ConnectionString);
 		}
@@ -24,12 +24,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		[Test]
 		public void ShouldThrowExceptionWhenNoDatabase()
 		{
-			var creator = new HangfireSchemaCreator();
+			var creator = new SchemaInstaller();
 
 			var connectionString = SelectDialect(
 				() => new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = "Does_Not_Exist" }.ToString(),
-				() => new NpgsqlConnectionStringBuilder(ConnectionString) { Database = "Does_Not_Exist" }.ToString());
-			
+				() => new NpgsqlConnectionStringBuilder(ConnectionString) {Database = "Does_Not_Exist"}.ToString());
+
 			var exception = Assert.Catch(() => creator.TryConnect(connectionString));
 			exception.Message.Should().Contain("Does_Not_Exist");
 		}
@@ -37,31 +37,31 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		[Test]
 		public void ShouldCreateSchema()
 		{
-			var creator = new HangfireSchemaCreator();
+			var creator = new SchemaInstaller();
 
-			creator.CreateHangfireStorageSchema("hangfiretestschema", ConnectionString);
+			creator.InstallHangfireStorageSchema("hangfiretestschema", ConnectionString);
 
 			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			Assert.AreEqual("hangfiretestschema", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'hangfiretestschema'"));
 		}
 
 		[Test]
-		public void ShouldCreateSchemaWithDefaultSchema()
+		public void ShouldCreateSchemaWithDefaultSchemaName()
 		{
-			var creator = new HangfireSchemaCreator();
+			var creator = new SchemaInstaller();
 
-			creator.CreateHangfireStorageSchema("", ConnectionString);
+			creator.InstallHangfireStorageSchema("", ConnectionString);
 
 			var expected = SelectDialect(() => "HangFire", () => "hangfire");
 			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
 			Assert.AreEqual(expected, conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'"));
 		}
-		
+
 		[Test]
 		public void ShouldIndicateThatSchemaExists()
 		{
-			var creator = new HangfireSchemaCreator();
-			creator.CreateHangfireStorageSchema("schema", ConnectionString);
+			var creator = new SchemaInstaller();
+			creator.InstallHangfireStorageSchema("schema", ConnectionString);
 
 			var result = creator.HangfireStorageSchemaExists("schema", ConnectionString);
 
@@ -71,11 +71,24 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		[Test]
 		public void ShouldIndicateThatSchemaDoesNotExists()
 		{
-			var creator = new HangfireSchemaCreator();
+			var creator = new SchemaInstaller();
 
 			var result = creator.HangfireStorageSchemaExists("nonExistingSchema", ConnectionString);
 
 			Assert.False(result);
+		}
+
+		[Test]
+		public void ShouldInstallConfigurationSchema()
+		{
+			var creator = new SchemaInstaller();
+
+			creator.InstallHangfireConfigurationSchema(ConnectionString);
+
+			var expected = "hangfireconfiguration";
+			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
+			var actual = conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'");
+			Assert.AreEqual(expected.ToLower(), actual.ToLower());
 		}
 	}
 }

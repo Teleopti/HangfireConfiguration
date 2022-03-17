@@ -5,14 +5,14 @@ namespace Hangfire.Configuration.Internals;
 internal class SqlDialectsServerConfigurationCreator
 {
 	private readonly IConfigurationStorage _storage;
-	private readonly IHangfireSchemaCreator _creator;
+	private readonly ISchemaInstaller _installer;
 
 	public SqlDialectsServerConfigurationCreator(
 		IConfigurationStorage storage,
-		IHangfireSchemaCreator creator)
+		ISchemaInstaller installer)
 	{
 		_storage = storage;
-		_creator = creator;
+		_installer = installer;
 	}
 
 	public void Create(
@@ -21,17 +21,17 @@ internal class SqlDialectsServerConfigurationCreator
 		string schemaName,
 		string name)
 	{
-		_creator.TryConnect(storageConnectionString);
+		_installer.TryConnect(storageConnectionString);
 
-		_creator.TryConnect(creatorConnectionString);
+		_installer.TryConnect(creatorConnectionString);
 
 		schemaName ??= creatorConnectionString.ToDbVendorSelector()
 			.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
 
-		if (_creator.HangfireStorageSchemaExists(schemaName, creatorConnectionString))
+		if (_installer.HangfireStorageSchemaExists(schemaName, creatorConnectionString))
 			throw new Exception("Schema already exists.");
 
-		_creator.CreateHangfireStorageSchema(schemaName, creatorConnectionString);
+		_installer.InstallHangfireStorageSchema(schemaName, creatorConnectionString);
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{

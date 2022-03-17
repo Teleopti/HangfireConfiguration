@@ -52,8 +52,8 @@ namespace Hangfire.Configuration
 
         protected virtual ITryConnectToRedis TryConnectToRedis() => new TryConnectToRedis();
         
-        protected virtual IHangfireSchemaCreator BuildHangfireSchemaCreator() =>
-            new HangfireSchemaCreator();
+        protected virtual ISchemaInstaller BuildHangfireSchemaCreator() =>
+            new SchemaInstaller();
 
         protected virtual IConfigurationStorage BuildConfigurationStorage() =>
             new ConfigurationStorage(buildConnector());

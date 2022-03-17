@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Hangfire.Configuration.Test.Infrastructure;
 
 [Parallelizable(ParallelScope.None)]
-public class SchemaInstallSqlServerTest
+public class HangfireConfigurationSchemaInstallerSqlServerTest
 {
 	[Test]
 	public void ShouldInstallSchemaVersion1()

@@ -10,18 +10,18 @@ namespace Hangfire.Configuration
 	public class ConfigurationApi
 	{
 		private readonly IConfigurationStorage _storage;
-		private readonly IHangfireSchemaCreator _creator;
+		private readonly ISchemaInstaller _installer;
 		private readonly ITryConnectToRedis _tryConnectToRedis;
 		private readonly State _state;
 
 		internal ConfigurationApi(
 			IConfigurationStorage storage,
-			IHangfireSchemaCreator creator,
+			ISchemaInstaller installer,
 			ITryConnectToRedis tryConnectToRedis,
 			State state)
 		{
 			_storage = storage;
-			_creator = creator;
+			_installer = installer;
 			_tryConnectToRedis = tryConnectToRedis;
 			_state = state;
 		}
@@ -82,7 +82,7 @@ namespace Hangfire.Configuration
 				Password = command.SchemaCreatorPassword ?? "",
 			}.ToString();
 
-			new SqlDialectsServerConfigurationCreator(_storage, _creator)
+			new SqlDialectsServerConfigurationCreator(_storage, _installer)
 				.Create(
 					storage,
 					creator,
@@ -108,7 +108,7 @@ namespace Hangfire.Configuration
 				Password = command.SchemaCreatorPassword,
 			}.ToString();
 
-			new SqlDialectsServerConfigurationCreator(_storage, _creator)
+			new SqlDialectsServerConfigurationCreator(_storage, _installer)
 				.Create(
 					storage,
 					creator,
@@ -156,5 +156,10 @@ namespace Hangfire.Configuration
 
 		public void WriteConfiguration(StoredConfiguration configuration) =>
 			_storage.WriteConfiguration(configuration);
+
+		public void UpgradeWorkerServers(UpgradeWorkerServers upgradeWorkerServers)
+		{
+			_installer.InstallHangfireConfigurationSchema(_state.ReadOptions().ConnectionString);
+		}
 	}
 }

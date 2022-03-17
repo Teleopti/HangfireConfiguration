@@ -4,14 +4,18 @@ using System.Linq;
 
 namespace Hangfire.Configuration.Test.Domain.Fake
 {
-    public class FakeHangfireSchemaCreator : IHangfireSchemaCreator
+    public class FakeSchemaInstaller : ISchemaInstaller
     {
         public Exception TryConnectFailsWith;
         public IEnumerable<string> ConnectionTriedWith = Enumerable.Empty<string>();
-        public IEnumerable<(string SchemaName, string ConnectionString)> Schemas = Enumerable.Empty<(string SchemaName, string ConnectionString)>();
+        
+        public IEnumerable<(string SchemaName, string ConnectionString)> InstalledSchemas = 
+	        Enumerable.Empty<(string SchemaName, string ConnectionString)>();
 
+        public string InstalledHangfireConfigurationSchema;
+        
         public void Has(string schemaName, string connectionString) =>
-            Schemas = Schemas.Append((schemaName, connectionString)).ToArray();
+            InstalledSchemas = InstalledSchemas.Append((schemaName, connectionString)).ToArray();
         
         public void TryConnect(string connectionString)
         {
@@ -20,16 +24,21 @@ namespace Hangfire.Configuration.Test.Domain.Fake
                 throw TryConnectFailsWith;
         }
 
-        public void CreateHangfireStorageSchema(string schemaName, string connectionString)
+        public void InstallHangfireConfigurationSchema(string connectionString)
         {
-            Schemas = Schemas
+	        InstalledHangfireConfigurationSchema = connectionString;
+        }
+
+        public void InstallHangfireStorageSchema(string schemaName, string connectionString)
+        {
+            InstalledSchemas = InstalledSchemas
                 .Append((schemaName, connectionString))
                 .ToArray();
         }
 
         public bool HangfireStorageSchemaExists(string schemaName, string connectionString)
         {
-            return Schemas
+            return InstalledSchemas
                 .Where(x => string.Equals(x.SchemaName, schemaName, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => connectionString.StartsWith(x.ConnectionString))
                 .Any();

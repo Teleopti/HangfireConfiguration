@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Hangfire.Configuration
 {
-	public class HangfireSchemaCreator : IHangfireSchemaCreator
+	public class SchemaInstaller : ISchemaInstaller
 	{
 		public void TryConnect(string connectionString)
 		{
@@ -12,7 +12,13 @@ namespace Hangfire.Configuration
 			conn.Open();
 		}
 
-		public void CreateHangfireStorageSchema(string schemaName, string connectionString)
+		public void InstallHangfireConfigurationSchema(string connectionString)
+		{
+			using var conn = connectionString.CreateConnection();
+			HangfireConfigurationSchemaInstaller.Install(conn);
+		}
+
+		public void InstallHangfireStorageSchema(string schemaName, string connectionString)
 		{
 			connectionString.ToDbVendorSelector().ExecuteDialect(
 				() =>
