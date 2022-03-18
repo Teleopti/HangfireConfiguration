@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
@@ -156,7 +157,6 @@ public class UpgradeWorkerServersTest
 		upgraded.ConnectionString.Should().Contain("Password=pass");
 	}
 
-
 	[Test]
 	public void ShouldNotUpgradeRedis()
 	{
@@ -169,5 +169,56 @@ public class UpgradeWorkerServersTest
 		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
 
 		system.SchemaInstaller.InstalledSchemas.Should().Be.Empty();
+	}
+
+	[Test]
+	public void ShouldThrowOnFailingUpgrade()
+	{
+		var system = new SystemUnderTest();
+		system.SchemaInstaller.InstallHangfireConfigurationSchemaFailsWith = new Exception("boom!");
+
+		var exception = Assert.Catch(() => system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers()));
+
+		exception.Message.Should().Be("boom!");
+	}
+
+	[Test]
+	public void ShouldInstallStorageSchemaEvenIfConfigurationSchemaFails()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(new StoredConfiguration
+		{
+			ConnectionString = "Host=host;Database=datta"
+		});
+		system.SchemaInstaller.InstallHangfireConfigurationSchemaFailsWith = new Exception("boom!");
+
+		Assert.Catch(() => system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers()));
+
+		system.SchemaInstaller.InstalledSchemas.Single().ConnectionString
+			.Should().Be("Host=host;Database=datta");
+	}
+
+	[Test]
+	public void ShouldInstallSecondStorageSchemaEvenIfFirstStorageSchemaFails()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(
+			new StoredConfiguration
+			{
+				ConnectionString = "Host=host;Database=data1",
+				SchemaName = "schema1"
+			},
+			new StoredConfiguration
+			{
+				ConnectionString = "Host=host;Database=data2",
+				SchemaName = "schema2"
+			});
+		system.SchemaInstaller.InstallHangfireStorageSchemaFailsWith = (new Exception("boom!"), "schema1");
+
+		var exception = Assert.Catch(() => system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers()));
+
+		system.SchemaInstaller.InstalledSchemas.Single().SchemaName
+			.Should().Be("schema2");
+		exception.Message.Should().Be("boom!");
 	}
 }
