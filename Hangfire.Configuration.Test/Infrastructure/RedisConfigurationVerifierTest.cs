@@ -5,7 +5,7 @@ namespace Hangfire.Configuration.Test.Infrastructure;
 
 [Parallelizable(ParallelScope.None)]
 [InstallRedis]
-public class CreateServerConfigurationRedisTest
+public class RedisConfigurationVerifierTest
 {
 	[Test]
 	public void ShouldThrowIfUnknownServer()
@@ -14,24 +14,18 @@ public class CreateServerConfigurationRedisTest
 
 		Assert.Throws<RedisConnectionException>(() =>
 		{
-			system.BuildConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
-			{
-				Configuration = "UnknownServer,ConnectTimeout=100"
-			});
+			system.RedisConfigurationVerifier.TryConnect("UnknownServer,ConnectTimeout=100");
 		});
 	}
 	
 	[Test]
 	public void ShouldNotThrowIfPresentServer()
 	{
-		var system = new SystemUnderTest();
+		var system = new SystemUnderInfraTest();
 
 		Assert.DoesNotThrow(() =>
 		{
-			system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
-			{
-				Configuration = "localhost"
-			});
+			system.RedisConfigurationVerifier.TryConnect("localhost,ConnectTimeout=100");
 		});
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Hangfire.Configuration.Test.Domain.Fake;
+﻿using Hangfire.Configuration.Internals;
+using Hangfire.Configuration.Test.Domain.Fake;
 
 namespace Hangfire.Configuration.Test
 {
@@ -6,6 +7,7 @@ namespace Hangfire.Configuration.Test
 	{
 		public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
 		public IConfigurationStorage ConfigurationStorage => base.BuildConfigurationStorage();
+		public IRedisConfigurationVerifier RedisConfigurationVerifier => base.BuildRedisConfigurationVerifier();
 
 		public void UseRealHangfire() => _realHangfire = true;
 		private bool _realHangfire;
