@@ -11,7 +11,7 @@ public class InstallRedisAttribute : Attribute, ITestAction
 	
 	public void BeforeTest(ITest test)
 	{
-		redis = Process.Start($"{Environment.GetEnvironmentVariable("USERPROFILE")}/.nuget/packages/redis-64/3.0.503/tools/redis-server.exe");
+		redis = Process.Start("redis-server.exe");
 	}
 
 	public void AfterTest(ITest test)
