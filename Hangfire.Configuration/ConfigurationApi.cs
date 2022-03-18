@@ -86,7 +86,7 @@ namespace Hangfire.Configuration
 				.Create(
 					storage,
 					creator,
-					command.SchemaName,
+					command.SchemaName ?? DefaultSchemaName.SqlServer(),
 					command.Name
 				);
 		}
@@ -112,7 +112,7 @@ namespace Hangfire.Configuration
 				.Create(
 					storage,
 					creator,
-					command.SchemaName,
+					command.SchemaName ?? DefaultSchemaName.Postgres(),
 					command.Name
 				);
 		}
@@ -151,15 +151,30 @@ namespace Hangfire.Configuration
 			_storage.WriteConfiguration(inactivate);
 		}
 
+		public void UpgradeWorkerServers(UpgradeWorkerServers command)
+		{
+			_installer.InstallHangfireConfigurationSchema(_state.ReadOptions().ConnectionString);
+			var configurations = _storage.ReadConfigurations();
+			configurations
+				.Where(x => !string.IsNullOrEmpty(x.ConnectionString))
+				.Where(x => x.ConnectionString.ToDbVendorSelector().SelectDialect(true, true, false))
+				.ForEach(x =>
+				{
+					var schemaName = x.SchemaName ?? x.ConnectionString.ToDbVendorSelector()
+						.SelectDialect(DefaultSchemaName.SqlServer(), DefaultSchemaName.Postgres());
+
+					var connectionString = x.ConnectionString;
+					if (command.SchemaUpgraderUser != null)
+						connectionString = connectionString.SetUserNameAndPassword(command.SchemaUpgraderUser, command.SchemaUpgraderPassword);
+
+					_installer.InstallHangfireStorageSchema(schemaName, connectionString);
+				});
+		}
+
 		public IEnumerable<StoredConfiguration> ReadConfigurations() =>
 			_storage.ReadConfigurations();
 
 		public void WriteConfiguration(StoredConfiguration configuration) =>
 			_storage.WriteConfiguration(configuration);
-
-		public void UpgradeWorkerServers(UpgradeWorkerServers upgradeWorkerServers)
-		{
-			_installer.InstallHangfireConfigurationSchema(_state.ReadOptions().ConnectionString);
-		}
 	}
 }

@@ -25,9 +25,6 @@ internal class SqlDialectsServerConfigurationCreator
 
 		_installer.TryConnect(creatorConnectionString);
 
-		schemaName ??= creatorConnectionString.ToDbVendorSelector()
-			.SelectDialect(DefaultSchemaName.SqlServer, DefaultSchemaName.Postgres);
-
 		if (_installer.HangfireStorageSchemaExists(schemaName, creatorConnectionString))
 			throw new Exception("Schema already exists.");
 

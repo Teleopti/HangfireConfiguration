@@ -70,7 +70,7 @@ internal class StateMaintainer
 	private static void assignSchemaName(string schemaName, object options)
 	{
 		if (string.IsNullOrEmpty(schemaName))
-			schemaName = DefaultSchemaName.For(options);
+			schemaName = DefaultSchemaName.ForStorageOptions(options);
 
 		switch (options)
 		{

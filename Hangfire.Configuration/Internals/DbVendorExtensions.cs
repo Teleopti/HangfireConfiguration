@@ -7,10 +7,10 @@ namespace Hangfire.Configuration.Internals;
 
 internal static class DbVendorExtensions
 {
-	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) => 
+	public static IDbVendorSelector ToDbVendorSelector(this string connectionString) =>
 		new connectionStringDialectSelector(connectionString);
-	
-	public static IDbVendorSelector ToDbVendorSelector(this DbConnection dbConnection) => 
+
+	public static IDbVendorSelector ToDbVendorSelector(this DbConnection dbConnection) =>
 		ToDbVendorSelector(dbConnection.ConnectionString);
 
 	public static void ExecuteDialect(this IDbVendorSelector selector, Action sqlServer, Action postgres, Action redis = null)
@@ -29,11 +29,11 @@ internal static class DbVendorExtensions
 			return true;
 		});
 	}
-	
-	public static T SelectDialect<T>(this IDbVendorSelector selector, Func<T> sqlServer, Func<T> postgres) => 
+
+	public static T SelectDialect<T>(this IDbVendorSelector selector, Func<T> sqlServer, Func<T> postgres) =>
 		selector.SelectDialect(sqlServer, postgres, () => default);
 
-	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) => 
+	public static T SelectDialect<T>(this IDbVendorSelector selector, T sqlServer, T postgres, T redis = default) =>
 		selector.SelectDialect(() => sqlServer, () => postgres, () => redis);
 
 	public static string ApplicationName(this string connectionString) =>
@@ -47,6 +47,25 @@ internal static class DbVendorExtensions
 			() => new NpgsqlConnectionStringBuilder(connectionString) {ApplicationName = applicationName}.ToString(),
 			() => connectionString);
 
+
+	public static string SetUserNameAndPassword(this string connectionString, string userName, string password)
+	{
+		return new connectionStringDialectSelector(connectionString).SelectDialect(
+			() =>
+			{
+				var ret = new SqlConnectionStringBuilder(connectionString) {UserID = userName, Password = password};
+				ret.Remove("Integrated security");
+				return ret.ToString();
+			},
+			() =>
+			{
+				var ret = new NpgsqlConnectionStringBuilder(connectionString) {Username = userName, Password = password};
+				ret.Remove("Integrated security");
+				return ret.ToString();
+			}
+		);
+	}
+
 	public static DbConnection CreateConnection(this string connectionString)
 	{
 		var connection = connectionString.ToDbVendorSelector().SelectDialect<DbConnection>(
@@ -54,16 +73,16 @@ internal static class DbVendorExtensions
 		connection.ConnectionString = connectionString;
 		return connection;
 	}
-		
+
 	private class connectionStringDialectSelector : IDbVendorSelector
 	{
 		private readonly string _connectionString;
-        
+
 		public connectionStringDialectSelector(string connectionString)
 		{
 			_connectionString = connectionString;
 		}
-        
+
 		public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
 		{
 			if (isSqlServer())
@@ -72,7 +91,7 @@ internal static class DbVendorExtensions
 				return postgres();
 			return redis();
 		}
-		
+
 		private bool isSqlServer()
 		{
 			try
@@ -85,7 +104,7 @@ internal static class DbVendorExtensions
 				return false;
 			}
 		}
-        
+
 		private bool isPostgreSql()
 		{
 			try

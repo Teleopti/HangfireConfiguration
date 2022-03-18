@@ -7,7 +7,7 @@ namespace Hangfire.Configuration.Internals;
 
 internal static class DefaultSchemaName
 {
-	public static string For(object options) =>
+	public static string ForStorageOptions(object options) =>
 		options switch
 		{
 			SqlServerStorageOptions => SqlServer(),
