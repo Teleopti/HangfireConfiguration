@@ -2,65 +2,67 @@ using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration
 {
-    public class CompositionRoot
-    {
-        // internal services
-        private readonly State _state = new();
+	public class CompositionRoot
+	{
+		// internal services
+		private readonly State _state = new();
 
-        private StateMaintainer builderStateMaintainer(object appBuilder) =>
-            new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
-                buildConfigurationUpdater(), _state);
+		private StateMaintainer builderStateMaintainer(object appBuilder) =>
+			new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
+				buildConfigurationUpdater(), _state);
 
-        private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
+		private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
 
-        private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
+		private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
 
-        private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
-        
-        protected ServerCountSampleRecorder buildServerCountSampleRecorder() => 
-            new ServerCountSampleRecorder(
-                BuildKeyValueStore(), 
-                _state,
-                builderStateMaintainer(null), 
-                BuildNow());
-        
-        
-        // outer services
-        public Options BuildOptions() => new(_state);
+		private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
 
-        public WorkerServerStarter BuildWorkerServerStarter(object appBuilder) =>
-            new(BuildHangfire(appBuilder), buildWorkerDeterminer(),
-                builderStateMaintainer(appBuilder), _state, buildServerCountSampleRecorder());
+		protected ServerCountSampleRecorder buildServerCountSampleRecorder() =>
+			new(
+				BuildKeyValueStore(),
+				_state,
+				builderStateMaintainer(null),
+				BuildNow());
 
-        public PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
 
-        public ConfigurationApi BuildConfigurationApi() =>
-            new(BuildConfigurationStorage(),
-                BuildHangfireSchemaCreator(), 
-                TryConnectToRedis(),
-                _state);
+		// outer services
+		public Options BuildOptions() => new(_state);
 
-        public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
+		public WorkerServerStarter BuildWorkerServerStarter(object appBuilder) =>
+			new(BuildHangfire(appBuilder), buildWorkerDeterminer(),
+				builderStateMaintainer(appBuilder), _state, buildServerCountSampleRecorder());
 
-        public WorkerServerQueries BuildWorkerServersQuerier() => new(builderStateMaintainer(null), _state);
+		public PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
 
-        public ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
+		public ConfigurationApi BuildConfigurationApi() =>
+			new(BuildConfigurationStorage(),
+				_state,
+				new SqlDialectsServerConfigurationCreator(BuildConfigurationStorage(), BuildSchemaInstaller()),
+				new RedisServerConfigurationCreator(BuildConfigurationStorage(), BuildTryToConnectToRedis()),
+				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
+			);
 
-        // boundary
-        protected virtual IHangfire BuildHangfire(object appBuilder) =>
-            new RealHangfire(appBuilder);
+		public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
 
-        protected virtual ITryConnectToRedis TryConnectToRedis() => new TryConnectToRedis();
-        
-        protected virtual ISchemaInstaller BuildHangfireSchemaCreator() =>
-            new SchemaInstaller();
+		public WorkerServerQueries BuildWorkerServersQuerier() => new(builderStateMaintainer(null), _state);
 
-        protected virtual IConfigurationStorage BuildConfigurationStorage() =>
-            new ConfigurationStorage(buildConnector());
+		public ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
 
-        protected virtual IKeyValueStore BuildKeyValueStore() =>
-            new KeyValueStore(buildConnector());
+		// boundary
+		protected virtual IHangfire BuildHangfire(object appBuilder) =>
+			new RealHangfire(appBuilder);
 
-        protected virtual INow BuildNow() => new Now();
-    }
+		protected virtual ISchemaInstaller BuildSchemaInstaller() =>
+			new SchemaInstaller();
+
+		protected virtual IConfigurationStorage BuildConfigurationStorage() =>
+			new ConfigurationStorage(buildConnector());
+
+		protected virtual IKeyValueStore BuildKeyValueStore() =>
+			new KeyValueStore(buildConnector());
+
+		protected virtual INow BuildNow() => new Now();
+		
+		protected virtual ITryConnectToRedis BuildTryToConnectToRedis() => new TryConnectToRedis();
+	}
 }

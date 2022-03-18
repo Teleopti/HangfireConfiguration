@@ -10,20 +10,23 @@ namespace Hangfire.Configuration
 	public class ConfigurationApi
 	{
 		private readonly IConfigurationStorage _storage;
-		private readonly ISchemaInstaller _installer;
-		private readonly ITryConnectToRedis _tryConnectToRedis;
 		private readonly State _state;
+		private readonly SqlDialectsServerConfigurationCreator _sqlDialectCreator;
+		private readonly RedisServerConfigurationCreator _redisCreator;
+		private readonly WorkerServerUpgrader _upgrader;
 
 		internal ConfigurationApi(
 			IConfigurationStorage storage,
-			ISchemaInstaller installer,
-			ITryConnectToRedis tryConnectToRedis,
-			State state)
+			State state,
+			SqlDialectsServerConfigurationCreator sqlDialectCreator,
+			RedisServerConfigurationCreator redisCreator,
+			WorkerServerUpgrader upgrader)
 		{
 			_storage = storage;
-			_installer = installer;
-			_tryConnectToRedis = tryConnectToRedis;
 			_state = state;
+			_sqlDialectCreator = sqlDialectCreator;
+			_redisCreator = redisCreator;
+			_upgrader = upgrader;
 		}
 
 		public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
@@ -82,13 +85,12 @@ namespace Hangfire.Configuration
 				Password = command.SchemaCreatorPassword ?? "",
 			}.ToString();
 
-			new SqlDialectsServerConfigurationCreator(_storage, _installer)
-				.Create(
-					storage,
-					creator,
-					command.SchemaName ?? DefaultSchemaName.SqlServer(),
-					command.Name
-				);
+			_sqlDialectCreator.Create(
+				storage,
+				creator,
+				command.SchemaName ?? DefaultSchemaName.SqlServer(),
+				command.Name
+			);
 		}
 
 		public void CreateServerConfiguration(CreatePostgresWorkerServer command)
@@ -108,20 +110,16 @@ namespace Hangfire.Configuration
 				Password = command.SchemaCreatorPassword,
 			}.ToString();
 
-			new SqlDialectsServerConfigurationCreator(_storage, _installer)
-				.Create(
-					storage,
-					creator,
-					command.SchemaName ?? DefaultSchemaName.Postgres(),
-					command.Name
-				);
+			_sqlDialectCreator.Create(
+				storage,
+				creator,
+				command.SchemaName ?? DefaultSchemaName.Postgres(),
+				command.Name
+			);
 		}
 
-		public void CreateServerConfiguration(CreateRedisWorkerServer command)
-		{
-			new RedisServerConfigurationCreator(_storage, _tryConnectToRedis)
-				.Create(command);
-		}
+		public void CreateServerConfiguration(CreateRedisWorkerServer command) =>
+			_redisCreator.Create(command);
 
 		public void ActivateServer(int configurationId)
 		{
@@ -151,25 +149,8 @@ namespace Hangfire.Configuration
 			_storage.WriteConfiguration(inactivate);
 		}
 
-		public void UpgradeWorkerServers(UpgradeWorkerServers command)
-		{
-			_installer.InstallHangfireConfigurationSchema(_state.ReadOptions().ConnectionString);
-			var configurations = _storage.ReadConfigurations();
-			configurations
-				.Where(x => !string.IsNullOrEmpty(x.ConnectionString))
-				.Where(x => x.ConnectionString.ToDbVendorSelector().SelectDialect(true, true, false))
-				.ForEach(x =>
-				{
-					var schemaName = x.SchemaName ?? x.ConnectionString.ToDbVendorSelector()
-						.SelectDialect(DefaultSchemaName.SqlServer(), DefaultSchemaName.Postgres());
-
-					var connectionString = x.ConnectionString;
-					if (command.SchemaUpgraderUser != null)
-						connectionString = connectionString.SetUserNameAndPassword(command.SchemaUpgraderUser, command.SchemaUpgraderPassword);
-
-					_installer.InstallHangfireStorageSchema(schemaName, connectionString);
-				});
-		}
+		public void UpgradeWorkerServers(UpgradeWorkerServers command) =>
+			_upgrader.Upgrade(command);
 
 		public IEnumerable<StoredConfiguration> ReadConfigurations() =>
 			_storage.ReadConfigurations();

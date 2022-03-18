@@ -68,9 +68,9 @@ namespace Hangfire.Configuration.Test
         protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
         protected override IKeyValueStore BuildKeyValueStore() => KeyValueStore;
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
-        protected override ISchemaInstaller BuildHangfireSchemaCreator() => SchemaInstaller;
+        protected override ISchemaInstaller BuildSchemaInstaller() => SchemaInstaller;
         protected override INow BuildNow() => _now;
-        protected override ITryConnectToRedis TryConnectToRedis() => new ByPassTryConnectToRedis();
+        protected override ITryConnectToRedis BuildTryToConnectToRedis() => new ByPassTryConnectToRedis();
 
         public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
         {
