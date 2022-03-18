@@ -5,7 +5,6 @@ using Microsoft.Owin.Builder;
 #endif
 using System;
 using System.Linq;
-using Hangfire.Configuration.Internals;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.SqlServer;
 

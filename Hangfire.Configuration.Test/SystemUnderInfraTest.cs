@@ -1,5 +1,4 @@
-﻿using Hangfire.Configuration.Internals;
-using Hangfire.Configuration.Test.Domain.Fake;
+﻿using Hangfire.Configuration.Test.Domain.Fake;
 
 namespace Hangfire.Configuration.Test
 {

@@ -4,7 +4,7 @@ namespace Hangfire.Configuration.Internals;
 
 internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
-	public void TryConnect(string configuration)
+	public void VerifyConfiguration(string configuration)
 	{
 		ConnectionMultiplexer.Connect(configuration);
 	}

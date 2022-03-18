@@ -1,12 +1,10 @@
-﻿using Hangfire.Configuration.Internals;
-
-namespace Hangfire.Configuration.Test.Domain.Fake;
+﻿namespace Hangfire.Configuration.Test.Domain.Fake;
 
 public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	private bool _hasBeenCalled;
 	
-	public void TryConnect(string configuration)
+	public void VerifyConfiguration(string configuration)
 	{
 		_hasBeenCalled = true;
 	}
