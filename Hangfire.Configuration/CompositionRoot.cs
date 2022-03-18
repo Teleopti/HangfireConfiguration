@@ -63,6 +63,6 @@ namespace Hangfire.Configuration
 
 		protected virtual INow BuildNow() => new Now();
 		
-		protected virtual ITryConnectToRedis BuildTryToConnectToRedis() => new TryConnectToRedis();
+		protected virtual IRedisConfigurationVerifier BuildTryToConnectToRedis() => new RedisConfigurationVerifier();
 	}
 }

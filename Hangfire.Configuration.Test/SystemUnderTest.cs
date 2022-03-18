@@ -70,7 +70,7 @@ namespace Hangfire.Configuration.Test
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override ISchemaInstaller BuildSchemaInstaller() => SchemaInstaller;
         protected override INow BuildNow() => _now;
-        protected override ITryConnectToRedis BuildTryToConnectToRedis() => new ByPassTryConnectToRedis();
+        protected override IRedisConfigurationVerifier BuildTryToConnectToRedis() => new ByPassRedisConfigurationVerifier();
 
         public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
         {

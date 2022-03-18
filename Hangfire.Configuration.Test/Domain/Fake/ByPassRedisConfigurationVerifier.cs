@@ -2,7 +2,7 @@
 
 namespace Hangfire.Configuration.Test.Domain.Fake;
 
-public class ByPassTryConnectToRedis : ITryConnectToRedis
+public class ByPassRedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void TryConnect(string configuration)
 	{

@@ -2,7 +2,7 @@ using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class TryConnectToRedis : ITryConnectToRedis
+internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void TryConnect(string configuration)
 	{
