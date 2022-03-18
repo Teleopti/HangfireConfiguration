@@ -1,27 +1,18 @@
-﻿using System;
-using Hangfire.Configuration.Internals;
+﻿using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration.Test.Domain.Fake;
 
 public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
 {
-	private Exception _ex;
-	private bool _hasSucceded;
+	private bool _hasBeenCalled;
 	
 	public void TryConnect(string configuration)
 	{
-		if (_ex != null)
-			throw _ex;
-		_hasSucceded = true;
+		_hasBeenCalled = true;
 	}
 
-	public void Throws(Exception ex)
+	public bool HasBeenCalled()
 	{
-		_ex = ex;
-	}
-
-	public bool HasSucceded()
-	{
-		return _hasSucceded;
+		return _hasBeenCalled;
 	}
 }

@@ -78,21 +78,6 @@ public class CreateServerConfigurationRedisTest
 	}
 	
 	[Test]
-	public void ShouldThrowIfCannotConnectToNewConfiguration()
-	{
-		var system = new SystemUnderTest();
-		var expected = new Exception();
-		system.RedisConfigurationVerifier.Throws(expected);
-
-		var ex = Assert.Catch(() =>
-			system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
-			{
-				Configuration = "AwesomeServer"
-			}));
-		ex.Should().Be.SameInstanceAs(expected);
-	}
-	
-	[Test]
 	public void ShouldCallVerifier()
 	{
 		var system = new SystemUnderTest();
@@ -102,6 +87,6 @@ public class CreateServerConfigurationRedisTest
 			Configuration = "AwesomeServer"
 		});
 
-		system.RedisConfigurationVerifier.HasSucceded().Should().Be.True();
+		system.RedisConfigurationVerifier.HasBeenCalled().Should().Be.True();
 	}
 }
