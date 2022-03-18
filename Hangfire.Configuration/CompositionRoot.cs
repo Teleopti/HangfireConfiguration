@@ -38,7 +38,7 @@ namespace Hangfire.Configuration
 			new(BuildConfigurationStorage(),
 				_state,
 				new SqlDialectsServerConfigurationCreator(BuildConfigurationStorage(), BuildSchemaInstaller()),
-				new RedisServerConfigurationCreator(BuildConfigurationStorage(), BuildTryToConnectToRedis()),
+				new RedisServerConfigurationCreator(BuildConfigurationStorage(), BuildRedisConfigurationVerifier()),
 				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 			);
 
@@ -63,6 +63,6 @@ namespace Hangfire.Configuration
 
 		protected virtual INow BuildNow() => new Now();
 		
-		protected virtual IRedisConfigurationVerifier BuildTryToConnectToRedis() => new RedisConfigurationVerifier();
+		protected virtual IRedisConfigurationVerifier BuildRedisConfigurationVerifier() => new RedisConfigurationVerifier();
 	}
 }

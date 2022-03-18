@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
@@ -73,5 +75,33 @@ public class CreateServerConfigurationRedisTest
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();
 		Assert.AreEqual(DefaultSchemaName.Redis(), storedConfiguration.SchemaName);
+	}
+	
+	[Test]
+	public void ShouldThrowIfCannotConnectToNewConfiguration()
+	{
+		var system = new SystemUnderTest();
+		var expected = new Exception();
+		system.RedisConfigurationVerifier.Throws(expected);
+
+		var ex = Assert.Catch(() =>
+			system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
+			{
+				Configuration = "AwesomeServer"
+			}));
+		ex.Should().Be.SameInstanceAs(expected);
+	}
+	
+	[Test]
+	public void ShouldCallVerifier()
+	{
+		var system = new SystemUnderTest();
+	
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
+		{
+			Configuration = "AwesomeServer"
+		});
+
+		system.RedisConfigurationVerifier.HasSucceded().Should().Be.True();
 	}
 }

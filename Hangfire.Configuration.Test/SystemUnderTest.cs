@@ -27,7 +27,8 @@ namespace Hangfire.Configuration.Test
             Monitor = new FakeMonitoringApi();
             Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
             _now = new FakeNow {Time = "2020-12-01 09:00".Utc()};
-
+            RedisConfigurationVerifier = new FakeRedisConfigurationVerifier();
+            
             Options = BuildOptions();
             Options.UseOptions(new ConfigurationOptions
             {
@@ -54,6 +55,7 @@ namespace Hangfire.Configuration.Test
         public FakeKeyValueStore KeyValueStore { get; }
         public FakeSchemaInstaller SchemaInstaller { get; }
         public FakeHangfire Hangfire { get; }
+        public FakeRedisConfigurationVerifier RedisConfigurationVerifier;
         private FakeNow _now;
 
         public Options Options { get; }
@@ -70,7 +72,7 @@ namespace Hangfire.Configuration.Test
         protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
         protected override ISchemaInstaller BuildSchemaInstaller() => SchemaInstaller;
         protected override INow BuildNow() => _now;
-        protected override IRedisConfigurationVerifier BuildTryToConnectToRedis() => new ByPassRedisConfigurationVerifier();
+        protected override IRedisConfigurationVerifier BuildRedisConfigurationVerifier() => RedisConfigurationVerifier;
 
         public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
         {
