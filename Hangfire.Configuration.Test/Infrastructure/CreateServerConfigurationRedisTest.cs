@@ -14,9 +14,10 @@ public class CreateServerConfigurationRedisTest
 
 		Assert.Throws<RedisConnectionException>(() =>
 		{
+			
 			system.BuildConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
 			{
-				Configuration = "UnknownServer"
+				Configuration = "UnknownServer,ConnectTimeout=100"
 			});
 		});
 	}
