@@ -1,16 +1,22 @@
-﻿namespace Hangfire.Configuration.Test.Domain.Fake;
+﻿using System;
+
+namespace Hangfire.Configuration.Test.Domain.Fake;
 
 public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
 {
-	private bool _hasBeenCalled;
+	private bool _throws;
 	
 	public void VerifyConfiguration(string configuration)
 	{
-		_hasBeenCalled = true;
+		if (_throws)
+			throw new Exception();
+		WasSucessfullyVerifiedWith = configuration;
 	}
 
-	public bool HasBeenCalled()
+	public void Throws()
 	{
-		return _hasBeenCalled;
+		_throws = true;
 	}
+
+	public string WasSucessfullyVerifiedWith { get; private set; }
 }

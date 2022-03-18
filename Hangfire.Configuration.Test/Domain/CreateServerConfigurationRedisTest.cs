@@ -86,6 +86,21 @@ public class CreateServerConfigurationRedisTest
 			Configuration = "AwesomeServer"
 		});
 
-		system.RedisConfigurationVerifier.HasBeenCalled().Should().Be.True();
+		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
+			.Should().Be.EqualTo("AwesomeServer");
+	}
+	
+	[Test]
+	public void ShouldNotCreateServerConfigurationIfVerifierThrows()
+	{
+		var system = new SystemUnderTest();
+		system.RedisConfigurationVerifier.Throws();
+
+		Assert.Catch(() =>
+			system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
+			{
+				Configuration = "someconfig"
+			}));
+		system.ConfigurationStorage.Data.Should().Be.Empty();
 	}
 }
