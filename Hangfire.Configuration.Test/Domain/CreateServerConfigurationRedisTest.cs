@@ -83,11 +83,11 @@ public class CreateServerConfigurationRedisTest
 	
 		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			Configuration = "AwesomeServer"
+			Configuration = "AwesomeServer", Prefix = "prefix"
 		});
 
 		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
-			.Should().Be.EqualTo("AwesomeServer");
+			.Should().Be.EqualTo(("AwesomeServer", "prefix"));
 	}
 	
 	[Test]
