@@ -2,5 +2,5 @@ namespace Hangfire.Configuration;
 
 public interface IRedisConfigurationVerifier
 {
-	void VerifyConfiguration(string configuration, string prefix);
+	void VerifyConfiguration(string configuration);
 }

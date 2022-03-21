@@ -14,7 +14,7 @@ public class RedisConfigurationVerifierTest
 
 		Assert.Throws<RedisConnectionException>(() =>
 		{
-			system.RedisConfigurationVerifier.VerifyConfiguration("UnknownServer,ConnectTimeout=100", null);
+			system.RedisConfigurationVerifier.VerifyConfiguration("UnknownServer,ConnectTimeout=100");
 		});
 	}
 	
@@ -25,7 +25,7 @@ public class RedisConfigurationVerifierTest
 
 		Assert.DoesNotThrow(() =>
 		{
-			system.RedisConfigurationVerifier.VerifyConfiguration("localhost,ConnectTimeout=100", null);
+			system.RedisConfigurationVerifier.VerifyConfiguration("localhost,ConnectTimeout=100");
 		});
 	}
 }

@@ -13,7 +13,7 @@ internal class RedisServerConfigurationCreator
 
 	public void Create(CreateRedisWorkerServer command)
 	{
-		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration, command.Prefix);
+		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration);
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{

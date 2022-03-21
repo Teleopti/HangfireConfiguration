@@ -6,11 +6,11 @@ public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	private bool _throws;
 	
-	public void VerifyConfiguration(string configuration, string prefix)
+	public void VerifyConfiguration(string configuration)
 	{
 		if (_throws)
 			throw new Exception();
-		WasSucessfullyVerifiedWith = (configuration, prefix);
+		WasSucessfullyVerifiedWith = configuration;
 	}
 
 	public void Throws()
@@ -18,5 +18,5 @@ public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
 		_throws = true;
 	}
 
-	public (string, string) WasSucessfullyVerifiedWith { get; private set; }
+	public string WasSucessfullyVerifiedWith { get; private set; }
 }
