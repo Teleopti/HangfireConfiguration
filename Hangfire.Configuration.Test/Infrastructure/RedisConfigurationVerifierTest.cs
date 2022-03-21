@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
@@ -27,5 +28,15 @@ public class RedisConfigurationVerifierTest
 		{
 			system.RedisConfigurationVerifier.VerifyConfiguration("localhost,ConnectTimeout=100", null);
 		});
+	}
+
+	[Test]
+	public void ShouldThrowIfKeyWithPrefixAlreadyExists()
+	{
+		var redis = ConnectionMultiplexer.Connect("localhost");
+		redis.GetDatabase().StringSet("someprefix:foo", "bar");
+		var system = new SystemUnderInfraTest();
+
+		Assert.Throws<ArgumentException>(() => { system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "someprefix:"); });
 	}
 }
