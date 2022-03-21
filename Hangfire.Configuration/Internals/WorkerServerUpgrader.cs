@@ -27,7 +27,8 @@ internal class WorkerServerUpgrader
 
 		try
 		{
-			_installer.InstallHangfireConfigurationSchema(_options.ConfigurationOptions().ConnectionString);
+			var connectionString = setCredentials(command, _options.ConfigurationOptions().ConnectionString);
+			_installer.InstallHangfireConfigurationSchema(connectionString);
 		}
 		catch (Exception e)
 		{
@@ -44,9 +45,7 @@ internal class WorkerServerUpgrader
 				var schemaName = x.SchemaName ?? x.ConnectionString.ToDbVendorSelector()
 					.SelectDialect(DefaultSchemaName.SqlServer(), DefaultSchemaName.Postgres());
 
-				var connectionString = x.ConnectionString;
-				if (command.SchemaUpgraderUser != null)
-					connectionString = connectionString.SetUserNameAndPassword(command.SchemaUpgraderUser, command.SchemaUpgraderPassword);
+				var connectionString = setCredentials(command, x.ConnectionString);
 
 				try
 				{
@@ -69,4 +68,12 @@ internal class WorkerServerUpgrader
 		if (exceptions.Any())
 			throw new AggregateException(exceptions);
 	}
+
+	private static string setCredentials(UpgradeWorkerServers command, string connectionString) =>
+		connectionString
+			.SetCredentials(
+				command.SchemaUpgraderUser == null,
+				command.SchemaUpgraderUser,
+				command.SchemaUpgraderPassword
+			);
 }

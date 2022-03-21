@@ -65,6 +65,31 @@ internal static class DbVendorExtensions
 			}
 		);
 	}
+	
+	public static string SetCredentials(this string connectionString, bool useIntegratedSecurity, string userName, string password)
+	{
+		return new connectionStringDialectSelector(connectionString).SelectDialect(
+			() =>
+			{
+				if (useIntegratedSecurity)
+				{
+					var ret = new SqlConnectionStringBuilder(connectionString) { IntegratedSecurity = true };
+					ret.Remove("User Id");
+					ret.Remove("Password");
+					return ret.ToString();
+				}
+				return SetUserNameAndPassword(connectionString, userName, password);
+			},
+			() =>
+			{
+				if (useIntegratedSecurity)
+				{
+					return new NpgsqlConnectionStringBuilder(connectionString) 
+						{ IntegratedSecurity = true, Username = null, Password = null}.ToString();
+				}
+				return SetUserNameAndPassword(connectionString, userName, password);
+			});
+	}
 
 	public static DbConnection CreateConnection(this string connectionString)
 	{

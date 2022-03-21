@@ -11,12 +11,12 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeConfigurationSchema()
 	{
 		var system = new SystemUnderTest();
-		system.Options.UseOptions(new ConfigurationOptions {ConnectionString = "config.conn.string"});
+		system.Options.UseOptions(new ConfigurationOptions {ConnectionString = "Host=local;Database=d"});
 
 		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
 
 		system.SchemaInstaller.InstalledHangfireConfigurationSchema
-			.Should().Be("config.conn.string");
+			.Should().Contain("Host=local;Database=d");
 	}
 
 	[Test]
@@ -31,7 +31,7 @@ public class UpgradeWorkerServersTest
 		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
 
 		system.SchemaInstaller.InstalledSchemas
-			.Single().ConnectionString.Should().Be("Data Source=.;Initial Catalog=db");
+			.Single().ConnectionString.Should().Contain("Data Source=.;Initial Catalog=db");
 	}
 
 	[Test]
@@ -195,7 +195,7 @@ public class UpgradeWorkerServersTest
 		Assert.Catch(() => system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers()));
 
 		system.SchemaInstaller.InstalledSchemas.Single().ConnectionString
-			.Should().Be("Host=host;Database=datta");
+			.Should().Contain("Host=host;Database=datta");
 	}
 
 	[Test]
@@ -220,5 +220,52 @@ public class UpgradeWorkerServersTest
 		system.SchemaInstaller.InstalledSchemas.Single().SchemaName
 			.Should().Be("schema2");
 		exception.Message.Should().Be("boom!");
+	}
+	
+	[Test]
+	public void ShouldUpgradeUsingIntegratedSecurityWithoutCredentials()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(new StoredConfiguration
+		{
+			ConnectionString = "Data Source=.;Initial Catalog=db"
+		});
+
+		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
+
+		var upgraded = system.SchemaInstaller.InstalledSchemas.Single();
+		upgraded.ConnectionString.Should().Contain("Integrated Security=True");
+	}
+	
+	[Test]
+	public void ShouldUpgradeUsingIntegratedSecurityWithoutCredentialsPostgres()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(new StoredConfiguration
+		{
+			ConnectionString = "Host=localhost;Database=db"
+		});
+
+		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
+
+		var upgraded = system.SchemaInstaller.InstalledSchemas.Single();
+		upgraded.ConnectionString.Should().Contain("Integrated Security=True");
+	}
+
+	[Test]
+	public void ShouldUpgradeConfigurationSchemaWithCredentials()
+	{
+		var system = new SystemUnderTest();
+		system.Options.UseOptions(new ConfigurationOptions {ConnectionString = "Data Source=."});
+
+		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers
+		{
+			SchemaUpgraderUser = "user",
+			SchemaUpgraderPassword = "pass"
+		});
+
+		var upgraded = system.SchemaInstaller.InstalledHangfireConfigurationSchema; 
+		upgraded.Should().Contain("User ID=user");
+		upgraded.Should().Contain("Password=pass");
 	}
 }
