@@ -13,11 +13,12 @@ internal class RedisServerConfigurationCreator
 
 	public void Create(CreateRedisWorkerServer command)
 	{
-		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration, command.Prefix);
+		var prefix = command.Prefix ?? DefaultSchemaName.Redis();
+		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration, prefix);
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{
-			SchemaName = command.Prefix ?? DefaultSchemaName.Redis(),
+			SchemaName = prefix,
 			ConnectionString = command.Configuration,
 			Name = command.Name,
 			Active = false

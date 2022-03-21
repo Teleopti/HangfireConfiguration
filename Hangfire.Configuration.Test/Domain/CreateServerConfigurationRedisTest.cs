@@ -89,6 +89,20 @@ public class CreateServerConfigurationRedisTest
 		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
 			.Should().Be.EqualTo(("AwesomeServer", "prefix"));
 	}
+
+	[Test]
+	public void ShouldCallVerifierWithCorrectPrefixWhenNotSet()
+	{
+		var system = new SystemUnderTest();
+	
+		system.ConfigurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
+		{
+			Configuration = "AwesomeServer"
+		});
+
+		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
+			.Should().Be.EqualTo(("AwesomeServer", DefaultSchemaName.Redis()));
+	}
 	
 	[Test]
 	public void ShouldNotCreateServerConfigurationIfVerifierThrows()
