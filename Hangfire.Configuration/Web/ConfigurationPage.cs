@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Dashboard;
 
@@ -33,8 +32,6 @@ namespace Hangfire.Configuration.Web
             WriteLiteral("<body>");
             WriteLiteral("<h2>Hangfire configuration</h2>");
 
-            writeInformationHeader();
-
             configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
             
             WriteLiteral("<div class='flex-grid'>");
@@ -47,50 +44,6 @@ namespace Hangfire.Configuration.Web
             WriteLiteral($@"<script src='{_basePath}/script'></script>");
             WriteLiteral("</body>");
             WriteLiteral("</html>");
-        }
-        
-        private void writeInformationHeader()
-        {
-            WriteLiteral(@"
-                <fieldset>
-                    <legend>Information</legend>");
-            writeStorageActivationInformation();
-            writeWorkerGoalCountInformation();
-            writeMaxWorkersPerServerInformation();
-            WriteLiteral(@"</fieldset>");
-        }
-        
-        private void writeStorageActivationInformation()
-        {
-            WriteLiteral(@"
-                <h3>Activate configuration</h3>
-                 <p>
-                    When active configuration is changed, the jobs will eventually be put on queue for the active configuration.<br>
-                    An active configuration can receive new jobs, while inactive will continue processing the old jobs already queued.
-                </p>");
-        }
-        
-        private void writeWorkerGoalCountInformation()
-        {
-            WriteLiteral(@"
-                <h3>Worker goal count</h3>
-                <p>
-                    Configuration value to set the goal number of workers to dynamically scale
-                    workers per server.<br>On start up of each Hangfire server, the server will be assigned a number of workers approximate
-                    for equal distribution of the goal workers count.<br>This is an approximation for reasons like: the number of existing servers is
-                    not exact, rounding, minimum 1 worker assigned.<br>As the servers randomly reset, the goal will eventually be
-                    met.<br>Default goal is 10 if no value is specified
-                 </p>");
-        }
-        
-        private void writeMaxWorkersPerServerInformation()
-        {
-	        WriteLiteral(@"
-                <h3>Max workers per server</h3>
-                <p>
-                    Configuration value to set maximum number of workers for each Hangfire server.
-                    <br>When a value is configured the number of workers on each server will not exceed the set value 
-                </p>");
         }
 
         private void writeConfiguration(ViewModel configuration)
