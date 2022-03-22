@@ -39,7 +39,11 @@ internal class WorkerServerUpgrader
 
 		var exs = configurations
 			.Where(x => !string.IsNullOrEmpty(x.ConnectionString))
-			.Where(x => x.ConnectionString.ToDbVendorSelector().SelectDialect(true, true, false))
+			.Where(x =>
+			{
+				var hasSchema = x.ConnectionString.ToDbVendorSelector().SelectDialect(true, true, false);
+				return hasSchema;
+			})
 			.Select(x =>
 			{
 				var schemaName = x.SchemaName ?? x.ConnectionString.ToDbVendorSelector()
