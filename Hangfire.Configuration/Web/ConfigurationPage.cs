@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Web
                 writeConfiguration(configuration);
             WriteLiteral("</div>");
 
-            WriteCreateConfiguration(configurations);
+            writeCreateConfiguration();
 
             WriteLiteral($@"<script src='{_basePath}/script'></script>");
             WriteLiteral("</body>");
@@ -159,11 +159,8 @@ namespace Hangfire.Configuration.Web
             WriteLiteral(@"</fieldset></div>");
         }
 
-        private void WriteCreateConfiguration(IEnumerable<ViewModel> configurations)
+        private void writeCreateConfiguration()
         {
-            if (configurations.Count() >= 2)
-                return;
-
             WriteLiteral(
                 @"
 <fieldset>
