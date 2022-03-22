@@ -128,17 +128,6 @@ namespace Hangfire.Configuration
 			var activate = configurations.Single(x => x.Id == configurationId);
 			activate.Active = true;
 			_storage.WriteConfiguration(activate);
-
-			if (!_state.ReadOptions().AllowMultipleActive)
-			{
-				configurations
-					.Where(x => x.Id != configurationId)
-					.ForEach(inactivate =>
-					{
-						inactivate.Active = false;
-						_storage.WriteConfiguration(inactivate);
-					});
-			}
 		}
 
 		public void InactivateServer(int configurationId)

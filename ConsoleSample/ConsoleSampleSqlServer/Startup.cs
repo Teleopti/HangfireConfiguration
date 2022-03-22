@@ -90,7 +90,6 @@ namespace ConsoleSample
 			var options = new ConfigurationOptions
             {
                 ConnectionString = configurationConnectionString,
-                AllowMultipleActive = true,
                 PrepareSchemaIfNecessary = true,
                 UpdateConfigurations = new []
                 {

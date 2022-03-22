@@ -9,10 +9,6 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateMultipleConfigurations()
         {
             var system = new SystemUnderTest();
-            system.Options.UseOptions(new ConfigurationOptions
-            {
-                AllowMultipleActive = true
-            });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
@@ -36,10 +32,6 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Options.UseOptions(new ConfigurationOptions
-            {
-                AllowMultipleActive = true
-            });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
@@ -62,10 +54,6 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldInactivateConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Options.UseOptions(new ConfigurationOptions
-            {
-                AllowMultipleActive = true
-            });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,
@@ -78,15 +66,10 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.AreEqual(false, configuration.Active);
         }
 
-
         [Test]
         public void ShouldInactivateGivenConfiguration()
         {
             var system = new SystemUnderTest();
-            system.Options.UseOptions(new ConfigurationOptions
-            {
-                AllowMultipleActive = true
-            });
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
                 Id = 1,

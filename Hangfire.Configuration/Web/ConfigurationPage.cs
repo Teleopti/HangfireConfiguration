@@ -98,7 +98,7 @@ namespace Hangfire.Configuration.Web
                     </div>");
             }
 
-            if (_options.AllowMultipleActive && configuration.Active == true)
+            if (configuration.Active == true)
             {
                 WriteLiteral($@"
                     <div>
