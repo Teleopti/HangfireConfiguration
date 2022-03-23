@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
 			                Name = DefaultConfigurationName.Name()
 		                }
 	                }
-                }, (SqlServerStorageOptions)null);
+                }, null);
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
