@@ -17,7 +17,7 @@ namespace Hangfire.Configuration
 
 		private readonly ThreadLocal<ConnectorTransaction> _currentTransaction = new();
 		
-		private IConnector currentConnector() => _currentTransaction.Value as IConnector ?? _connector;
+		private ConnectorBase currentConnector() => (ConnectorBase)_currentTransaction.Value ?? _connector;
 
 		public void Transaction(Action action)
 		{

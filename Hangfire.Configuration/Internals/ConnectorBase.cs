@@ -7,7 +7,7 @@ using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
-internal abstract class ConnectorBase : IConnector
+internal abstract class ConnectorBase : IDbVendorSelector
 {
 	protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
