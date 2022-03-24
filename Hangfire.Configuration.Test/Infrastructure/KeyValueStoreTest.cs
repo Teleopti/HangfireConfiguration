@@ -2,7 +2,7 @@
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class KeyValueStoreTest : DatabaseTestBase
+	public class KeyValueStoreTest : DatabaseTest
 	{
 		public KeyValueStoreTest(string connectionString) : base(connectionString)
 		{

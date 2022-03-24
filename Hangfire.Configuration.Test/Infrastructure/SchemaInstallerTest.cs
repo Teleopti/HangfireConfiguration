@@ -7,7 +7,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class SchemaInstallerTest : DatabaseTestBase
+	public class SchemaInstallerTest : DatabaseTest
 	{
 		public SchemaInstallerTest(string connectionString) : base(connectionString)
 		{

@@ -7,7 +7,7 @@ using SharpTestsEx;
 namespace Hangfire.Configuration.Test.Integration;
 
 [Parallelizable(ParallelScope.None)]
-public class AutoUpdateConcurrencyTest : DatabaseTestBase
+public class AutoUpdateConcurrencyTest : DatabaseTest
 {
 	public AutoUpdateConcurrencyTest(string connectionString) : base(connectionString)
 	{

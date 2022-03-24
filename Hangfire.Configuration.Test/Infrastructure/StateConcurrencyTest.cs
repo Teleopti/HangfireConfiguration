@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-    public class StateConcurrencyTest : DatabaseTestBase
+    public class StateConcurrencyTest : DatabaseTest
     {
         [Test]
         public void ShouldReturnCorrectNumberOfWorkServersConcurrently()

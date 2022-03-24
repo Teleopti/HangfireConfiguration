@@ -4,7 +4,7 @@ using NUnit.Framework;
 namespace Hangfire.Configuration.Test.Integration;
 
 [Parallelizable(ParallelScope.None)]
-public class IntegrationTest : DatabaseTestBase
+public class IntegrationTest : DatabaseTest
 {
 	public IntegrationTest(string connectionString) : base(connectionString)
 	{

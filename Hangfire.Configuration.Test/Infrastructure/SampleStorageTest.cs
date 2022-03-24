@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class SampleStorageTest : DatabaseTestBase
+	public class SampleStorageTest : DatabaseTest
 	{
 		public SampleStorageTest(string connectionString) : base(connectionString)
 		{

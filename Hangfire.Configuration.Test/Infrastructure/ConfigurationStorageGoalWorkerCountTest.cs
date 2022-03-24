@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class ConfigurationStorageGoalWorkerCountTest : DatabaseTestBase
+public class ConfigurationStorageGoalWorkerCountTest : DatabaseTest
 {
 	public ConfigurationStorageGoalWorkerCountTest(string connectionString) : base(connectionString)
 	{

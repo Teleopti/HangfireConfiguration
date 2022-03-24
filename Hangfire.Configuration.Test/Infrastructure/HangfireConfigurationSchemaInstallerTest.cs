@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
-	public class HangfireConfigurationSchemaInstallerTest : DatabaseTestBase
+	public class HangfireConfigurationSchemaInstallerTest : DatabaseTest
 	{
 		public HangfireConfigurationSchemaInstallerTest(string connectionString) : base(connectionString)
 		{

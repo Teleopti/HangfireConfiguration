@@ -9,7 +9,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
-public class QueueWorkTest : DatabaseTestBase
+public class QueueWorkTest : DatabaseTest
 {
 	public QueueWorkTest(string connectionString) : base(connectionString)
 	{
