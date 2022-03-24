@@ -27,7 +27,7 @@ public class IntegrationTest : DatabaseTestBase
 			}
 		});
 		system
-			.BuildWorkerServerStarter(null)
+			.BuildWorkerServerStarter()
 			.Start();
 	}
 }

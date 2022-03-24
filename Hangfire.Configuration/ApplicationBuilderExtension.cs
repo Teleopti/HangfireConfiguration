@@ -30,6 +30,8 @@ namespace Hangfire.Configuration
 #else
 		public static HangfireConfiguration UseHangfireConfiguration(this IAppBuilder builder, ConfigurationOptions options) =>
 #endif
-		HangfireConfiguration.UseHangfireConfiguration(builder, options);
+			new HangfireConfiguration()
+				.UseApplicationBuilder(builder)
+				.UseOptions(options);
 	}
 }

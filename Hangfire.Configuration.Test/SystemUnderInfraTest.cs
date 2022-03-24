@@ -2,7 +2,7 @@
 
 namespace Hangfire.Configuration.Test
 {
-	public class SystemUnderInfraTest : CompositionRoot
+	public class SystemUnderInfraTest : HangfireConfiguration
 	{
 		public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
 		public IConfigurationStorage ConfigurationStorage => base.BuildConfigurationStorage();

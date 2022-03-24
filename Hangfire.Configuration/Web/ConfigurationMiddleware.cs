@@ -38,7 +38,10 @@ namespace Hangfire.Configuration.Web
 #endif
 		{
 			_options = options;
-			_configuration = HangfireConfiguration.UseHangfireConfiguration(null, _options, properties);
+			_configuration = (properties?.ContainsKey("HangfireConfiguration") ?? false)
+			    ? (HangfireConfiguration) properties["HangfireConfiguration"]
+			    : new HangfireConfiguration();
+			_configuration.UseOptions(_options);
 			_configurationApi = _configuration.ConfigurationApi();
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = _options.ConnectionString.CreateConnection())

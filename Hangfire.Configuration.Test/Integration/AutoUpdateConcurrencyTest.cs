@@ -32,7 +32,7 @@ public class AutoUpdateConcurrencyTest : DatabaseTestBase
 				}
 			});
 			system
-				.BuildWorkerServerStarter(null)
+				.BuildWorkerServerStarter()
 				.Start();
 		});
 

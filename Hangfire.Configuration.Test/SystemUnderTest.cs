@@ -10,7 +10,7 @@ using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
-    public class SystemUnderTest : CompositionRoot
+    public class SystemUnderTest : HangfireConfiguration
     {
         public SystemUnderTest()
         {
@@ -19,7 +19,8 @@ namespace Hangfire.Configuration.Test
 #else
             ApplicationBuilder = new AppBuilder();
 #endif
-			
+	        UseApplicationBuilder(ApplicationBuilder);
+	        
             ConfigurationStorage = new FakeConfigurationStorage();
             KeyValueStore = new FakeKeyValueStore();
             SchemaInstaller = new FakeSchemaInstaller();
@@ -34,8 +35,7 @@ namespace Hangfire.Configuration.Test
 	            ConnectionString = "unknown-storage"
             });
 			ConfigurationApi = BuildConfigurationApi();
-            WorkerServerStarter =
-                new WorkerServerStarterUnderTest(BuildWorkerServerStarter(ApplicationBuilder), Options);
+            WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), Options);
             PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
             PublisherQueries = new PublisherQueriesUnderTest(BuildPublishersQuerier(), Options);
             WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(), Options);

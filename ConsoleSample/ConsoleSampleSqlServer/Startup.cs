@@ -30,6 +30,8 @@ namespace ConsoleSample
 
     public class Startup
     {
+	    public static HangfireConfiguration HangfireConfiguration;
+	    
 #if !NET472
         public void ConfigureServices(IServiceCollection services)
         {
@@ -106,12 +108,12 @@ namespace ConsoleSample
             Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
             app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
-            var hangfireConfiguration = app
+            HangfireConfiguration = app
                     .UseHangfireConfiguration(options)
                     .UseStorageOptions(storageOptions)
                 ;
 
-            hangfireConfiguration
+            HangfireConfiguration
                 .QueryAllWorkerServers()
                 .Select((configurationInfo, i) => (configurationInfo, i))
                 .ForEach(s =>
@@ -121,7 +123,7 @@ namespace ConsoleSample
                         s.configurationInfo.JobStorage);
                 });
 
-            hangfireConfiguration
+            HangfireConfiguration
                 .UseStorageOptions(storageOptions) //Needed???? already set above
                 .UseServerOptions(new BackgroundJobServerOptions
                 {

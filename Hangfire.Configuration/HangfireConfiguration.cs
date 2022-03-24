@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
 using Hangfire.Server;
 using Hangfire.SqlServer;
@@ -15,94 +17,135 @@ namespace Hangfire.Configuration
 {
     public class HangfireConfiguration
     {
-        private readonly object _builder;
-        private readonly CompositionRoot _compositionRoot;
-
-        private HangfireConfiguration(object builder, ConfigurationOptions options,
-            IDictionary<string, object> properties)
-        {
-            _builder = builder;
-            _compositionRoot = (properties?.ContainsKey("CompositionRoot") ?? false)
-                ? (CompositionRoot) properties["CompositionRoot"]
-                : new CompositionRoot();
-            _compositionRoot
-                .BuildOptions()
-                .UseOptions(options);
-        }
-
-        public static HangfireConfiguration Current { get; private set; }
-
-        public static HangfireConfiguration UseHangfireConfiguration(ConfigurationOptions options) =>
-            UseHangfireConfiguration(null, options);
-
 #if NETSTANDARD2_0
-        public static HangfireConfiguration UseHangfireConfiguration(IApplicationBuilder builder,
-            ConfigurationOptions options) =>
+	    public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
 #else
-        public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options) =>
+        public HangfireConfiguration UseApplicationBuilder(IAppBuilder builder)
 #endif
-            UseHangfireConfiguration(builder, options, builder?.Properties);
-
-#if NETSTANDARD2_0
-        public static HangfireConfiguration UseHangfireConfiguration(IApplicationBuilder builder,
-            ConfigurationOptions options, IDictionary<string, object> properties) =>
-#else
-        public static HangfireConfiguration UseHangfireConfiguration(IAppBuilder builder, ConfigurationOptions options, IDictionary<string, object> properties) =>
-#endif
-            Current = new HangfireConfiguration(builder, options, properties);
-
+	    {
+		    _builder = builder;
+		    return this;
+	    }
+	    
+	    public HangfireConfiguration UseOptions(ConfigurationOptions options)
+	    {
+		    BuildOptions().UseOptions(options);
+		    return this;
+	    }
+	    
         public HangfireConfiguration UseStorageOptions(SqlServerStorageOptions storageOptions)
         {
-            _compositionRoot.BuildOptions().UseStorageOptions(storageOptions);
+            BuildOptions().UseStorageOptions(storageOptions);
             return this;
         }
 
         public HangfireConfiguration UseStorageOptions(PostgreSqlStorageOptions storageOptions)
         {
-	        _compositionRoot.BuildOptions().UseStorageOptions(storageOptions);
+	        BuildOptions().UseStorageOptions(storageOptions);
 	        return this;
         }
 
 		public HangfireConfiguration UseServerOptions(BackgroundJobServerOptions serverOptions)
         {
-            _compositionRoot.BuildOptions().UseServerOptions(serverOptions);
+            BuildOptions().UseServerOptions(serverOptions);
             return this;
         }
 
         public HangfireConfiguration StartPublishers()
         {
-            _compositionRoot
-                .BuildPublisherStarter()
-                .Start();
+            BuildPublisherStarter().Start();
             return this;
         }
 
         public HangfireConfiguration StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses)
         {
-            _compositionRoot
-                .BuildWorkerServerStarter(_builder)
+            BuildWorkerServerStarter()
                 .Start(additionalProcesses.ToArray());
             return this;
         }
 
         public IEnumerable<ConfigurationInfo> QueryAllWorkerServers()
         {
-            return _compositionRoot
-                .BuildWorkerServersQuerier()
+            return BuildWorkerServersQuerier()
                 .QueryAllWorkerServers();
         }
 
         public IEnumerable<ConfigurationInfo> QueryPublishers()
         {
-            return _compositionRoot
-                .BuildPublishersQuerier()
+            return BuildPublishersQuerier()
                 .QueryPublishers();
         }
 
         public ConfigurationApi ConfigurationApi() =>
-            _compositionRoot.BuildConfigurationApi();
+            BuildConfigurationApi();
 
         internal ViewModelBuilder ViewModelBuilder() =>
-            _compositionRoot.BuildViewModelBuilder();
+            BuildViewModelBuilder();
+        
+        
+        
+        
+        // internal services
+		private readonly State _state = new();
+
+		private StateMaintainer builderStateMaintainer(object appBuilder) =>
+			new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
+				buildConfigurationUpdater(), _state);
+
+		private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
+
+		private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
+
+		private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
+
+		protected ServerCountSampleRecorder buildServerCountSampleRecorder() =>
+			new(
+				BuildKeyValueStore(),
+				_state,
+				builderStateMaintainer(null),
+				BuildNow());
+
+
+		// outer services
+		public Options BuildOptions() => new(_state);
+		private object _builder;
+
+		public WorkerServerStarter BuildWorkerServerStarter() =>
+			new(BuildHangfire(_builder), buildWorkerDeterminer(),
+				builderStateMaintainer(_builder), _state, buildServerCountSampleRecorder());
+
+		public PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
+
+		public ConfigurationApi BuildConfigurationApi() =>
+			new(BuildConfigurationStorage(),
+				_state,
+				new SqlDialectsServerConfigurationCreator(BuildConfigurationStorage(), BuildSchemaInstaller()),
+				new RedisServerConfigurationCreator(BuildConfigurationStorage(), BuildRedisConfigurationVerifier()),
+				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
+			);
+
+		public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
+
+		public WorkerServerQueries BuildWorkerServersQuerier() => new(builderStateMaintainer(null), _state);
+
+		public ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
+
+		// boundary
+		protected virtual IHangfire BuildHangfire(object appBuilder) =>
+			new RealHangfire(appBuilder);
+
+		protected virtual ISchemaInstaller BuildSchemaInstaller() =>
+			new SchemaInstaller();
+
+		protected virtual IConfigurationStorage BuildConfigurationStorage() =>
+			new ConfigurationStorage(buildConnector());
+
+		protected virtual IKeyValueStore BuildKeyValueStore() =>
+			new KeyValueStore(buildConnector());
+
+		protected virtual INow BuildNow() => new Now();
+		
+		protected virtual IRedisConfigurationVerifier BuildRedisConfigurationVerifier() => new RedisConfigurationVerifier();
+
     }
 }

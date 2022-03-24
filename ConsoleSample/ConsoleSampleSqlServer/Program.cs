@@ -27,18 +27,18 @@ namespace ConsoleSample
                 .Build())
             {
                 host.Start();
-                MainLoop();
+                mainLoop(Startup.HangfireConfiguration);
             }
 #else
             using (WebApp.Start<Startup>(NodeAddress))
-                MainLoop();
+                mainLoop(Startup.HangfireConfiguration);
 #endif
 
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();
         }
 
-        private static void MainLoop()
+        private static void mainLoop(HangfireConfiguration hangfireConfiguration)
         {
             Console.WriteLine("Started.");
             Console.WriteLine("'stop' to exit.");
@@ -60,7 +60,7 @@ namespace ConsoleSample
                         for (var i = 0; i < workCount; i++)
                         {
                             var number = i;
-                            var client = new BackgroundJobClient(HangfireConfiguration.Current.QueryPublishers().First().JobStorage);
+                            var client = new BackgroundJobClient(hangfireConfiguration.QueryPublishers().First().JobStorage);
                             client.Enqueue<Services>(x => x.Random(number));
                         }
 

@@ -16,18 +16,18 @@ namespace Hangfire.Configuration.Test
 		private readonly HttpClient _client;
 		private readonly string _urlPathMatch;
 
-		public ServerUnderTest(CompositionRoot compositionRoot, string urlPathMatch = null)
+		public ServerUnderTest(HangfireConfiguration hangfireConfiguration, string urlPathMatch = null)
 		{
 			_urlPathMatch = urlPathMatch ?? "/config";
 			
-			var (server, client) = createServer(compositionRoot);
+			var (server, client) = createServer(hangfireConfiguration);
 
 			_server = server;
 			_client = client;
 		}
 
 #if !NET472
-		private (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot)
+		private (IDisposable server, HttpClient client) createServer(HangfireConfiguration hangfireConfiguration)
 		{
 			var server = new HostBuilder()
 				.ConfigureWebHost(webHost =>
@@ -35,8 +35,8 @@ namespace Hangfire.Configuration.Test
 					webHost.UseTestServer();
 					webHost.Configure(app =>
 					{
-						app.Properties.Add("CompositionRoot", compositionRoot);
-						app.UseHangfireConfigurationUI(_urlPathMatch, compositionRoot.BuildOptions().ConfigurationOptions());
+						app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
+						app.UseHangfireConfigurationUI(_urlPathMatch, hangfireConfiguration.BuildOptions().ConfigurationOptions());
 					});
 				})
 				.StartAsync()
@@ -46,12 +46,12 @@ namespace Hangfire.Configuration.Test
 		}
 
 #else
-		private (IDisposable server, HttpClient client) createServer(CompositionRoot compositionRoot)
+		private (IDisposable server, HttpClient client) createServer(HangfireConfiguration hangfireConfiguration)
 		{
 			var server = TestServer.Create(app =>
 			{
-				app.Properties.Add("CompositionRoot", compositionRoot);
-				app.UseHangfireConfigurationUI(_urlPathMatch, compositionRoot.BuildOptions().ConfigurationOptions());
+				app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
+				app.UseHangfireConfigurationUI(_urlPathMatch, hangfireConfiguration.BuildOptions().ConfigurationOptions());
 			});
 
 			return (server, server.HttpClient);
