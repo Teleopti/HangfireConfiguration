@@ -79,7 +79,7 @@ namespace Hangfire.Configuration
 		internal ViewModelBuilder ViewModelBuilder() =>
 			BuildViewModelBuilder();
 
-		internal Options Options() => 
+		public Options Options() => 
 			BuildOptions();
 		
 		// internal services

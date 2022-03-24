@@ -41,8 +41,7 @@ namespace Hangfire.Configuration.Web
 			    ? (HangfireConfiguration) properties["HangfireConfiguration"]
 			    : new HangfireConfiguration();
 			
-			if (options != null)
-				_configuration.UseOptions(options);
+			_configuration.UseOptions(options);
 			_options = _configuration.Options().ConfigurationOptions();
 			
 			_configurationApi = _configuration.ConfigurationApi();
