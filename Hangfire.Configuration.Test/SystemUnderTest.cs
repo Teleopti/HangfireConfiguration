@@ -37,8 +37,8 @@ namespace Hangfire.Configuration.Test
 			ConfigurationApi = BuildConfigurationApi();
             WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), Options);
             PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
-            PublisherQueries = new PublisherQueriesUnderTest(BuildPublishersQuerier(), Options);
-            WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServersQuerier(), Options);
+            PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), Options);
+            WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServerQueries(), Options);
             ViewModelBuilder = BuildViewModelBuilder();
             ServerCountSampleRecorder = buildServerCountSampleRecorder();
         }

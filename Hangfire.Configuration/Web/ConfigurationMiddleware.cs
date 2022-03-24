@@ -21,9 +21,9 @@ namespace Hangfire.Configuration.Web
 	public class ConfigurationMiddleware : OwinMiddleware
 #endif
 	{
-		private readonly ConfigurationOptions _options;
 		private readonly HangfireConfiguration _configuration;
 		private readonly ConfigurationApi _configurationApi;
+		private readonly ConfigurationOptions _options;
 
 		public ConfigurationMiddleware(
 #if NETSTANDARD2_0
@@ -37,11 +37,14 @@ namespace Hangfire.Configuration.Web
 			: base(next)
 #endif
 		{
-			_options = options;
 			_configuration = (properties?.ContainsKey("HangfireConfiguration") ?? false)
 			    ? (HangfireConfiguration) properties["HangfireConfiguration"]
 			    : new HangfireConfiguration();
-			_configuration.UseOptions(_options);
+			
+			if (options != null)
+				_configuration.UseOptions(options);
+			_options = _configuration.Options().ConfigurationOptions();
+			
 			_configurationApi = _configuration.ConfigurationApi();
 			if (_options.PrepareSchemaIfNecessary)
 				using (var c = _options.ConnectionString.CreateConnection())

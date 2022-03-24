@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldWrite()
 		{
 			var system = new SystemUnderInfraTest();
-			system.BuildOptions().UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+			system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
 			system.KeyValueStore.ServerCountSamples(new ServerCountSamples
 			{

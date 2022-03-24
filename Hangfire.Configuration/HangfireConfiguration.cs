@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
@@ -7,86 +6,85 @@ using Hangfire.Server;
 using Hangfire.SqlServer;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Builder;
-
 #else
 using Owin;
-
 #endif
 
 namespace Hangfire.Configuration
 {
-    public class HangfireConfiguration
-    {
+	public class HangfireConfiguration
+	{
+		
 #if NETSTANDARD2_0
-	    public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
+		public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
 #else
         public HangfireConfiguration UseApplicationBuilder(IAppBuilder builder)
 #endif
-	    {
-		    _builder = builder;
-		    return this;
-	    }
-	    
-	    public HangfireConfiguration UseOptions(ConfigurationOptions options)
-	    {
-		    BuildOptions().UseOptions(options);
-		    return this;
-	    }
-	    
-        public HangfireConfiguration UseStorageOptions(SqlServerStorageOptions storageOptions)
-        {
-            BuildOptions().UseStorageOptions(storageOptions);
-            return this;
-        }
+		{
+			_builder = builder;
+			return this;
+		}
 
-        public HangfireConfiguration UseStorageOptions(PostgreSqlStorageOptions storageOptions)
-        {
-	        BuildOptions().UseStorageOptions(storageOptions);
-	        return this;
-        }
+		public HangfireConfiguration UseOptions(ConfigurationOptions options)
+		{
+			BuildOptions().UseOptions(options);
+			return this;
+		}
+
+		public HangfireConfiguration UseStorageOptions(SqlServerStorageOptions storageOptions)
+		{
+			BuildOptions().UseStorageOptions(storageOptions);
+			return this;
+		}
+
+		public HangfireConfiguration UseStorageOptions(PostgreSqlStorageOptions storageOptions)
+		{
+			BuildOptions().UseStorageOptions(storageOptions);
+			return this;
+		}
 
 		public HangfireConfiguration UseServerOptions(BackgroundJobServerOptions serverOptions)
-        {
-            BuildOptions().UseServerOptions(serverOptions);
-            return this;
-        }
+		{
+			BuildOptions().UseServerOptions(serverOptions);
+			return this;
+		}
 
-        public HangfireConfiguration StartPublishers()
-        {
-            BuildPublisherStarter().Start();
-            return this;
-        }
+		public HangfireConfiguration StartPublishers()
+		{
+			BuildPublisherStarter().Start();
+			return this;
+		}
 
-        public HangfireConfiguration StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses)
-        {
-            BuildWorkerServerStarter()
-                .Start(additionalProcesses.ToArray());
-            return this;
-        }
+		public HangfireConfiguration StartWorkerServers()
+		{
+			BuildWorkerServerStarter().Start();
+			return this;
+		}
 
-        public IEnumerable<ConfigurationInfo> QueryAllWorkerServers()
-        {
-            return BuildWorkerServersQuerier()
-                .QueryAllWorkerServers();
-        }
+		public HangfireConfiguration StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses)
+		{
+			BuildWorkerServerStarter().Start(additionalProcesses.ToArray());
+			return this;
+		}
 
-        public IEnumerable<ConfigurationInfo> QueryPublishers()
-        {
-            return BuildPublishersQuerier()
-                .QueryPublishers();
-        }
+		public IEnumerable<ConfigurationInfo> QueryAllWorkerServers() =>
+			BuildWorkerServerQueries().QueryAllWorkerServers();
 
-        public ConfigurationApi ConfigurationApi() =>
-            BuildConfigurationApi();
+		public IEnumerable<ConfigurationInfo> QueryPublishers() =>
+			BuildPublisherQueries().QueryPublishers();
 
-        internal ViewModelBuilder ViewModelBuilder() =>
-            BuildViewModelBuilder();
-        
-        
-        
-        
-        // internal services
+		public ConfigurationApi ConfigurationApi() =>
+			BuildConfigurationApi();
+
+		internal ViewModelBuilder ViewModelBuilder() =>
+			BuildViewModelBuilder();
+
+		internal Options Options() => 
+			BuildOptions();
+		
+		// internal services
 		private readonly State _state = new();
+		private object _builder;
 
 		private StateMaintainer builderStateMaintainer(object appBuilder) =>
 			new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
@@ -107,16 +105,15 @@ namespace Hangfire.Configuration
 
 
 		// outer services
-		public Options BuildOptions() => new(_state);
-		private object _builder;
+		protected Options BuildOptions() => new(_state);
 
-		public WorkerServerStarter BuildWorkerServerStarter() =>
+		protected WorkerServerStarter BuildWorkerServerStarter() =>
 			new(BuildHangfire(_builder), buildWorkerDeterminer(),
 				builderStateMaintainer(_builder), _state, buildServerCountSampleRecorder());
 
-		public PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
+		protected PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
 
-		public ConfigurationApi BuildConfigurationApi() =>
+		protected ConfigurationApi BuildConfigurationApi() =>
 			new(BuildConfigurationStorage(),
 				_state,
 				new SqlDialectsServerConfigurationCreator(BuildConfigurationStorage(), BuildSchemaInstaller()),
@@ -124,11 +121,12 @@ namespace Hangfire.Configuration
 				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 			);
 
-		public PublisherQueries BuildPublishersQuerier() => new(_state, builderStateMaintainer(null));
+		protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer(null));
 
-		public WorkerServerQueries BuildWorkerServersQuerier() => new(builderStateMaintainer(null), _state);
+		protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(null), _state);
 
-		public ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
+		protected ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
+
 
 		// boundary
 		protected virtual IHangfire BuildHangfire(object appBuilder) =>
@@ -144,8 +142,8 @@ namespace Hangfire.Configuration
 			new KeyValueStore(buildConnector());
 
 		protected virtual INow BuildNow() => new Now();
-		
+
 		protected virtual IRedisConfigurationVerifier BuildRedisConfigurationVerifier() => new RedisConfigurationVerifier();
 
-    }
+	}
 }

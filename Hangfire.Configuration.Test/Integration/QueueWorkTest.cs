@@ -46,8 +46,7 @@ public class QueueWorkTest : DatabaseTestBase
 		system.UseRealHangfire();
 		FakeJobService.Reset();
 
-		var storage = system.BuildPublishersQuerier()
-			.QueryPublishers().Single().JobStorage;
+		var storage = system.QueryPublishers().Single().JobStorage;
 		var client = new BackgroundJobClient(storage);
 		client.Enqueue(() => FakeJobService.RunTheJob());
 		emulateWorkerIteration(storage);

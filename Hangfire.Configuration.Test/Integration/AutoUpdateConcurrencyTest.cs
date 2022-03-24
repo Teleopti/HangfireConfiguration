@@ -31,9 +31,7 @@ public class AutoUpdateConcurrencyTest : DatabaseTestBase
 					}
 				}
 			});
-			system
-				.BuildWorkerServerStarter()
-				.Start();
+			system.StartWorkerServers();
 		});
 
 		var system = new SystemUnderInfraTest();
