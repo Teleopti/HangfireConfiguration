@@ -46,9 +46,10 @@ namespace Hangfire.Configuration
 
 		private static string hidePassword(StoredConfiguration x)
 		{
-			var connstring = x.SelectDialect(
-				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) { Password = "******" }.ToString(),
-				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) { Password = "******" }.ToString(),
+			const string hiddenPassword = "******";
+			return x.SelectDialect(
+				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) { Password = hiddenPassword }.ToString(),
+				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) { Password = hiddenPassword }.ToString(),
 				() =>
 				{
 					var splitByComma = x.ConnectionString.Split(',');
@@ -59,14 +60,13 @@ namespace Hangfire.Configuration
 						{
 							if (string.Equals(splitByEqual[0].Trim(), "password", StringComparison.OrdinalIgnoreCase))
 							{
-								splitByComma[i] = "password = ******";
+								splitByComma[i] = "password = " + hiddenPassword;
 							}
 						}
 					}
 
 					return string.Join(",", splitByComma);
 				});
-			return connstring;
 		}
 	}
 }
