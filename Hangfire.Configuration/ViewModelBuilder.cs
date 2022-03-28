@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
+using Npgsql;
 
 namespace Hangfire.Configuration
 {
@@ -19,6 +22,7 @@ namespace Hangfire.Configuration
 				.Select(x =>
 				{
 					var schemaName = x.SchemaName;
+					var connstring = hidePassword(x);
 					if (x.ConnectionString != null)
 					{
 						schemaName ??= x.SelectDialect(
@@ -31,13 +35,38 @@ namespace Hangfire.Configuration
 					{
 						Id = x.Id,
 						Name = x.Name,
-						ConnectionString = x.ConnectionString,
+						ConnectionString = connstring,
 						SchemaName = schemaName,
 						Active = x.Active,
 						Workers = x.GoalWorkerCount,
 						MaxWorkersPerServer = x.MaxWorkersPerServer
 					};
 				}).ToArray();
+		}
+
+		private static string hidePassword(StoredConfiguration x)
+		{
+			var connstring = x.SelectDialect(
+				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) { Password = "******" }.ToString(),
+				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) { Password = "******" }.ToString(),
+				() =>
+				{
+					var splitByComma = x.ConnectionString.Split(',');
+					for (var i = 0; i < splitByComma.Length; i++)
+					{
+						var splitByEqual = splitByComma[i].Split('=');
+						if (splitByEqual.Length == 2)
+						{
+							if (string.Equals(splitByEqual[0].Trim(), "password", StringComparison.OrdinalIgnoreCase))
+							{
+								splitByComma[i] = "password = ******";
+							}
+						}
+					}
+
+					return string.Join(",", splitByComma);
+				});
+			return connstring;
 		}
 	}
 }

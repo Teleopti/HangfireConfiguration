@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -175,6 +176,123 @@ namespace Hangfire.Configuration.Test.Domain
             var result = system.ViewModelBuilder.BuildServerConfigurations();
 
             Assert.AreEqual(5, result.Single().MaxWorkersPerServer);
+        }
+
+        [Test]
+        public void ShouldHideSqlServerPassword()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "Data Source=.;Initial Catalog=foo;User Id=me;Password=thePassword;"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Not.Contain("thePassword");
+	        result.ConnectionString.Should().Contain("******");
+        }
+
+        [Test]
+        public void ShouldKeepConnstringAsIsIfSqlServerIntegratedSecurity()
+        {
+	        var system = new SystemUnderTest();
+	        var connstring = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = connstring
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Be.EqualTo(connstring);
+        }
+        
+        [Test]
+        public void ShouldHidePostgresPassword()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "Host=.;Database=foo;User Id=me;Password=thePassword;"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Not.Contain("thePassword");
+	        result.ConnectionString.Should().Contain("******");
+        }
+        
+        [Test]
+        public void ShouldKeepConnstringAsIsIfPostgresIntegratedSecurity()
+        {
+	        var system = new SystemUnderTest();
+	        var connstring = "Host=.;Database=a;Integrated Security=true;";
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = connstring
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Be.EqualTo(connstring);
+        }
+        
+        [Test]
+        public void ShouldLeaveRedisConnectionStringAsIsIfNoPassword()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "localhost"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Be.EqualTo("localhost");
+        }
+        
+        [Test]
+        public void ShouldHideRedisPassword()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "localhost,password=thePassword"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Not.Contain("thePassword");
+	        result.ConnectionString.Should().Contain("******");
+        }
+        
+        [Test]
+        public void ShouldHideRedisPasswordCasingAndSpaces()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "localhost, paSsword=thePassword"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Not.Contain("thePassword");
+        }
+        
+        [Test]
+        public void ShouldNotReplacePasswordIfStringExistsOnOtherPlacesInConnectionString()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "localhost,password=o"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().StartWith("localhost");
         }
     }
 }
