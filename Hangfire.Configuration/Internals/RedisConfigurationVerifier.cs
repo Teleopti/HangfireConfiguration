@@ -8,11 +8,11 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
-		var redis = ConnectionMultiplexer.Connect(configuration+",allowAdmin=true");
+		var redis = ConnectionMultiplexer.Connect(configuration+",allowAdmin=true"); //keep as singleton?
 
 		foreach (var endPoint in redis.GetEndPoints())
 		{
-			if(redis.GetServer(endPoint).Keys(pattern: $"{prefix}*").Any())
+			if(redis.GetServer(endPoint).Keys(pattern: $"{prefix}*").Any()) //too slow... fix in some other way
 				throw new ArgumentException($"Prefix '{prefix}' already in use!");
 			
 			// no coverage, not applicable to our test redis server
