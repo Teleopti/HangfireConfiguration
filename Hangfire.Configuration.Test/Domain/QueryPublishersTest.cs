@@ -167,5 +167,17 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.AreEqual("name", configurationInfo.Name);
         }
+        
+        [Test]
+        public void ShouldNotReturnNullActive()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, Id = 1});
+	        system.ConfigurationStorage.Has(new StoredConfiguration {Active = null, Id = 2});
+	        system.PublisherStarter.Start();
+
+	        system.PublisherQueries.QueryPublishers().Single().ConfigurationId
+		        .Should().Be(1);
+        }
     }
 }

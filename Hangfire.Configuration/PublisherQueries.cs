@@ -7,19 +7,19 @@ namespace Hangfire.Configuration
     public class PublisherQueries
     {
         private readonly State _state;
-        private readonly StateMaintainer _creator;
+        private readonly StateMaintainer _stateMaintainer;
 
-        internal PublisherQueries(State state, StateMaintainer creator)
+        internal PublisherQueries(State state, StateMaintainer stateMaintainer)
         {
             _state = state;
-            _creator = creator;
+            _stateMaintainer = stateMaintainer;
         }
 
         public IEnumerable<ConfigurationInfo> QueryPublishers()
         {
-            _creator.Refresh();
+            _stateMaintainer.Refresh();
             return _state.Configurations
-                .Where(x => x.Configuration.Active.Value)
+                .Where(x => x.Configuration.Active.GetValueOrDefault())
                 .Select(x => x.ToConfigurationInfo())
                 .ToArray();
         }
