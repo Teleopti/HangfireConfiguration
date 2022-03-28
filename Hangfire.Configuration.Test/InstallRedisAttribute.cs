@@ -20,5 +20,5 @@ public class InstallRedisAttribute : Attribute, ITestAction
 		redis.Kill();
 	}
 
-	public ActionTargets Targets { get; }
+	public ActionTargets Targets => ActionTargets.Test;
 }

@@ -29,14 +29,24 @@ public class RedisConfigurationVerifierTest
 			system.RedisConfigurationVerifier.VerifyConfiguration("localhost,ConnectTimeout=100", null);
 		});
 	}
-
+	
 	[Test]
-	public void ShouldThrowIfKeyWithPrefixAlreadyExists()
+	public void ShouldNotThrowIfPrefixAndServerAlreadyNotExists()
 	{
-		using(var redis = ConnectionMultiplexer.Connect("localhost"))
-			redis.GetDatabase().StringSet("someprefix:foo", "bar");
 		var system = new SystemUnderInfraTest();
 
-		Assert.Throws<ArgumentException>(() => { system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "someprefix:"); });
+		system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "another:"); // bit of a hack - simulates an earlier entry
+
+		Assert.DoesNotThrow(() => { system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "prefixet:"); });
+	}
+	
+	[Test]
+	public void ShouldThrowIfPrefixAndServerAlreadyExists()
+	{
+		var system = new SystemUnderInfraTest();
+
+		system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "prefixet:"); // bit of a hack - simulates an earlier entry
+
+		Assert.Throws<ArgumentException>(() => { system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "prefixet:"); });
 	}
 }

@@ -11,14 +11,14 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 		using var redis = ConnectionMultiplexer.Connect(configuration + ",allowAdmin=true");
 		foreach (var endPoint in redis.GetEndPoints())
 		{
-			if (redis.GetServer(endPoint).Keys(pattern: $"{prefix}*").Any()) //too slow... fix in some other way
-				throw new ArgumentException($"Prefix '{prefix}' already in use!");
-
 			// no coverage, not applicable to our test redis server
 			var memPolicy = redis.GetServer(endPoint).Info("memory")[0].SingleOrDefault(x => x.Key == "maxmemory_policy");
 			if (memPolicy.Value != null && memPolicy.Value != "noeviction")
 				throw new ArgumentException($"maxmemory_policy must be set to 'noeviction' (but was {memPolicy.Value})!");
 			//
 		}
+
+		if (!redis.GetDatabase().StringSet(prefix + "dbmarker", "keep", null, When.NotExists))
+			throw new ArgumentException($"Prefix '{prefix}' already in use!");
 	}
 }
