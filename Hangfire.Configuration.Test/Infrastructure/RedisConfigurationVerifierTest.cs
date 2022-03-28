@@ -33,8 +33,8 @@ public class RedisConfigurationVerifierTest
 	[Test]
 	public void ShouldThrowIfKeyWithPrefixAlreadyExists()
 	{
-		var redis = ConnectionMultiplexer.Connect("localhost");
-		redis.GetDatabase().StringSet("someprefix:foo", "bar");
+		using(var redis = ConnectionMultiplexer.Connect("localhost"))
+			redis.GetDatabase().StringSet("someprefix:foo", "bar");
 		var system = new SystemUnderInfraTest();
 
 		Assert.Throws<ArgumentException>(() => { system.RedisConfigurationVerifier.VerifyConfiguration("localhost", "someprefix:"); });
