@@ -294,5 +294,19 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        result.ConnectionString.Should().StartWith("localhost");
         }
+        
+        [Test]
+        public void ShouldHandleRedisConnstringContainsEqualSign()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        ConnectionString = "myserver,password=thåström=great"
+	        });
+
+	        var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+	        result.ConnectionString.Should().Not.Contain("great");
+        }
     }
 }

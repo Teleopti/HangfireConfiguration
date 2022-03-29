@@ -56,7 +56,7 @@ namespace Hangfire.Configuration
 					for (var i = 0; i < splitByComma.Length; i++)
 					{
 						var splitByEqual = splitByComma[i].Split('=');
-						if (splitByEqual.Length == 2)
+						if (splitByEqual.Length > 1)
 						{
 							if (string.Equals(splitByEqual[0].Trim(), "password", StringComparison.OrdinalIgnoreCase))
 							{
