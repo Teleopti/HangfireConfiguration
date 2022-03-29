@@ -8,6 +8,9 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
+		if (!prefix.EndsWith(":") || prefix.EndsWith("::"))
+			throw new ArgumentException("Prefix must end with a single ':'!");
+		
 		using var redis = ConnectionMultiplexer.Connect(configuration + ",allowAdmin=true");
 		foreach (var endPoint in redis.GetEndPoints())
 		{
