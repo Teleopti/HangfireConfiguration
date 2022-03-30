@@ -108,7 +108,7 @@ namespace Hangfire.Configuration.Test.Domain
 			                    Name = DefaultConfigurationName.Name()
 		                    }
 	                    }
-                    }, new PostgreSqlStorageOptions());
+                    });
 
             system.ConfigurationStorage.Data.Single().ConnectionString
 	            .Should().Contain("Hangfire");
@@ -124,7 +124,8 @@ namespace Hangfire.Configuration.Test.Domain
 				ConnectionString = "Host=loscalhost;Database=fakedb;"
             });
 
-            system.PublisherQueries.QueryPublishers(null, new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
+            system.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
+            system.PublisherQueries.QueryPublishers();
 
 			Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
         }

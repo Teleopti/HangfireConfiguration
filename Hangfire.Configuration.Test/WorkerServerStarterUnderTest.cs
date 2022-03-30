@@ -1,6 +1,4 @@
-using Hangfire.PostgreSql;
 using Hangfire.Server;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
@@ -18,52 +16,16 @@ namespace Hangfire.Configuration.Test
         public void Start() => 
 	        _instance.Start();
 
+        public void Start(IBackgroundProcess additionalProcess) => 
+	        _instance.Start(additionalProcess.AsArray());
+
+        public void Start(IBackgroundProcess[] additionalProcesses) => 
+	        _instance.Start(additionalProcesses);
+
         public void Start(ConfigurationOptions options)
         {
 	        _options.UseOptions(options);
 	        _instance.Start();
         }
-
-        public void Start(
-            ConfigurationOptions options,
-            BackgroundJobServerOptions serverOptions,
-            SqlServerStorageOptions storageOptions) =>
-            Start(options, serverOptions, storageOptions, null);
-
-        public void Start(
-	        ConfigurationOptions options,
-	        BackgroundJobServerOptions serverOptions,
-	        PostgreSqlStorageOptions storageOptions) =>
-	        Start(options, serverOptions, storageOptions, null);
-
-        public void Start(
-            ConfigurationOptions options,
-            BackgroundJobServerOptions serverOptions,
-            SqlServerStorageOptions storageOptions,
-            IBackgroundProcess backgroundProcess)
-        {
-            if (options != null)
-                _options.UseOptions(options);
-            if (serverOptions != null)
-                _options.UseServerOptions(serverOptions);
-            if (storageOptions != null)
-                _options.UseStorageOptions(storageOptions);
-            _instance.Start(backgroundProcess?.AsArray());
-        }
-
-		public void Start(
-			ConfigurationOptions options,
-			BackgroundJobServerOptions serverOptions,
-			PostgreSqlStorageOptions storageOptions,
-			IBackgroundProcess backgroundProcess)
-		{
-			if (options != null)
-				_options.UseOptions(options);
-			if (serverOptions != null)
-				_options.UseServerOptions(serverOptions);
-			if (storageOptions != null)
-				_options.UseStorageOptions(storageOptions);
-			_instance.Start(backgroundProcess?.AsArray());
-		}
     }
 }

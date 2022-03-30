@@ -22,7 +22,7 @@ namespace Hangfire.Configuration.Test.Domain
 		                Name = DefaultConfigurationName.Name()
 	                }
                 }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
             Assert.AreEqual("host", host);
@@ -33,7 +33,8 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions(), null, (PostgreSqlStorageOptions)null);
+            system.UseOptions(new ConfigurationOptions());
+            system.WorkerServerStarter.Start();
 
             Assert.IsEmpty(system.ConfigurationStorage.Data);
         }
@@ -53,7 +54,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
             Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
@@ -74,7 +75,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
             Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
@@ -97,7 +98,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
@@ -120,7 +121,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
@@ -143,7 +144,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
@@ -165,7 +166,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).Last();
             Assert.AreEqual("autoupdated", new NpgsqlConnectionStringBuilder(actual.ConnectionString).Host);
@@ -188,7 +189,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var updatedConnectionString = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString);
             Assert.AreEqual("newDataSource", updatedConnectionString.Host);
@@ -211,7 +212,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
             Assert.AreEqual(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
@@ -237,7 +238,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
             Assert.AreEqual(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
@@ -258,7 +259,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
@@ -279,7 +280,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
@@ -304,7 +305,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.True(system.ConfigurationStorage.Data.Single().Active);
         }
@@ -326,7 +327,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.False(system.ConfigurationStorage.Data.First().Active);
             Assert.True(system.ConfigurationStorage.Data.Last().Active);
@@ -348,7 +349,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            SchemaName = "schemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
@@ -370,7 +371,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            SchemaName = "schemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
         }
@@ -389,7 +390,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             system.PublisherQueries.QueryPublishers(new ConfigurationOptions
             {
@@ -421,7 +422,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
             system.ConfigurationStorage.Data = Enumerable.Empty<StoredConfiguration>();
             
             system.PublisherQueries.QueryPublishers(new ConfigurationOptions
@@ -455,7 +456,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }
@@ -476,7 +477,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
 
             Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
         }

@@ -169,7 +169,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.HasGoalWorkerCount(8);
 
-            system.Options.UseOptions(new ConfigurationOptions {UseWorkerDeterminer = false});
+            system.UseOptions(new ConfigurationOptions {UseWorkerDeterminer = false});
             system.Options.UseServerOptions(new BackgroundJobServerOptions {WorkerCount = 52});
             system.WorkerServerStarter.Start();
 

@@ -13,21 +13,21 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.PublisherStarter.Start(
-                new ConfigurationOptions
-                {
-	                UpdateConfigurations = new []
-	                {
-		                new UpdateStorageConfiguration
-		                {
-			                ConnectionString = new NpgsqlConnectionStringBuilder
-			                {
-				                Host = "Hangfire"
-			                }.ToString(),
-			                Name = DefaultConfigurationName.Name()
-		                }
-	                }
-                });
+            system.UseOptions(new ConfigurationOptions
+            {
+	            UpdateConfigurations = new[]
+	            {
+		            new UpdateStorageConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder
+			            {
+				            Host = "Hangfire"
+			            }.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
+            });
+            system.PublisherStarter.Start();
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
@@ -109,7 +109,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        PrepareSchemaIfNecessary = !new PostgreSqlStorageOptions().PrepareSchemaIfNecessary,
 		    };
 
-		    system.Options.UseStorageOptions(options);
+		    system.UseStorageOptions(options);
 		    system.PublisherStarter.Start();
 
 		    var storage = system.Hangfire.CreatedStorages.Single();

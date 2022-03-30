@@ -17,7 +17,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null,(SqlServerStorageOptions) null);
+            system.WorkerServerStarter.Start();
 
             system.Hangfire.StartedServers
 	            .Should().Not.Be.Empty();
@@ -44,7 +44,8 @@ namespace Hangfire.Configuration.Test.Domain
                 TimeZoneResolver = new DefaultTimeZoneResolver()
             };
 
-            system.WorkerServerStarter.Start(null, serverOptions, (SqlServerStorageOptions)null);
+            system.UseServerOptions(serverOptions);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
             Assert.AreEqual(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
@@ -67,7 +68,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, new BackgroundJobServerOptions {ServerName = "server!"}, (SqlServerStorageOptions)null);
+            system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
+            system.WorkerServerStarter.Start();
 
             Assert.Null(system.Hangfire.StartedServers.Single().options.ServerName);
         }
@@ -91,7 +93,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             var backgroundProcess = new Worker();
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null, backgroundProcess);
+            system.WorkerServerStarter.Start(new []{backgroundProcess});
 
             Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
         }
@@ -115,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null, new Worker());
+            system.WorkerServerStarter.Start(new Worker());
 
             system.Hangfire.StartedServers.First().backgroundProcesses
 	            .Should().Not.Be.Empty();
@@ -150,7 +152,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = "Data Source=."});
 
-            system.Options.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
+            system.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
             system.WorkerServerStarter.Start();
 
             Assert.False(system.Hangfire.StartedServers.Single().storage.SqlServerOptions.PrepareSchemaIfNecessary);
@@ -166,7 +168,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            ConnectionString = "Data Source=."
             });
 
-            system.Options.UseStorageOptions(new SqlServerStorageOptions { SchemaName = "Ignored" });
+            system.UseStorageOptions(new SqlServerStorageOptions { SchemaName = "Ignored" });
             system.WorkerServerStarter.Start();
 
             Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
@@ -256,7 +258,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            DisableGlobalLocks = !new SqlServerStorageOptions().DisableGlobalLocks,
 	            UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
             };
-            system.Options.UseStorageOptions(options);
+            system.UseStorageOptions(options);
             
 			system.WorkerServerStarter.Start();
 
@@ -304,7 +306,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Data Source=.;Initial Catalog=active;" });
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null, new Worker());
+            system.WorkerServerStarter.Start(new Worker());
 
             Assert.IsEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == @"Data Source=.;Initial Catalog=inactive;")
 				.backgroundProcesses);
@@ -320,7 +322,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 20});
             system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 100});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" }, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.AreEqual(new[] {20, 100}, actual);
@@ -341,7 +343,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        ConnectionString = "Data Source=."
 	        });
 
-	        system.Options.UseStorageOptions(new SqlServerStorageOptions{CommandTimeout = TimeSpan.FromMinutes(1)});
+	        system.UseStorageOptions(new SqlServerStorageOptions{CommandTimeout = TimeSpan.FromMinutes(1)});
 	        system.WorkerServerStarter.Start();
 
 	        var options1 = system.Hangfire.StartedServers.First().storage.SqlServerOptions;

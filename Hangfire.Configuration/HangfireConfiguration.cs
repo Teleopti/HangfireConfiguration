@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
+using Hangfire.Pro.Redis;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if NETSTANDARD2_0
@@ -38,6 +39,12 @@ namespace Hangfire.Configuration
 		}
 
 		public HangfireConfiguration UseStorageOptions(PostgreSqlStorageOptions storageOptions)
+		{
+			BuildOptions().UseStorageOptions(storageOptions);
+			return this;
+		}
+
+		public HangfireConfiguration UseStorageOptions(RedisStorageOptions storageOptions)
 		{
 			BuildOptions().UseStorageOptions(storageOptions);
 			return this;

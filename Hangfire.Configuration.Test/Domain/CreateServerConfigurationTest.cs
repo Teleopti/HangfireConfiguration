@@ -45,7 +45,7 @@ public class CreateServerConfigurationTest
 					SchemaName = "defaultSchemaName"
 				}
 			}
-		}, null, (SqlServerStorageOptions)null);
+		});
 		system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
 		{
 			Server = "newServer",

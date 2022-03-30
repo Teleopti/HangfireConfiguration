@@ -11,7 +11,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeConfigurationSchema()
 	{
 		var system = new SystemUnderTest();
-		system.Options.UseOptions(new ConfigurationOptions {ConnectionString = "Host=local;Database=d"});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = "Host=local;Database=d"});
 
 		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers());
 
@@ -256,7 +256,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeConfigurationSchemaWithCredentials()
 	{
 		var system = new SystemUnderTest();
-		system.Options.UseOptions(new ConfigurationOptions {ConnectionString = "Data Source=."});
+		system.UseOptions(new ConfigurationOptions {ConnectionString = "Data Source=."});
 
 		system.ConfigurationApi.UpgradeWorkerServers(new UpgradeWorkerServers
 		{

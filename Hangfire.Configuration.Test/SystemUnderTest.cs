@@ -6,7 +6,6 @@ using Microsoft.Owin.Builder;
 using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
 {
@@ -36,9 +35,9 @@ namespace Hangfire.Configuration.Test
             });
 			ConfigurationApi = BuildConfigurationApi();
             WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), Options);
-            PublisherStarter = new PublisherStarterUnderTest(BuildPublisherStarter(), Options);
+            PublisherStarter = BuildPublisherStarter();
             PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), Options);
-            WorkerServerQueries = new WorkerServerQueriesUnderTest(BuildWorkerServerQueries(), Options);
+            WorkerServerQueries = BuildWorkerServerQueries();
             ViewModelBuilder = BuildViewModelBuilder();
             ServerCountSampleRecorder = buildServerCountSampleRecorder();
         }
@@ -60,9 +59,9 @@ namespace Hangfire.Configuration.Test
         public Options Options { get; }
         public ConfigurationApi ConfigurationApi { get; }
         public WorkerServerStarterUnderTest WorkerServerStarter { get; }
-        public PublisherStarterUnderTest PublisherStarter { get; }
+        public PublisherStarter PublisherStarter { get; }
         public PublisherQueriesUnderTest PublisherQueries { get; }
-        public WorkerServerQueriesUnderTest WorkerServerQueries { get; }
+        public WorkerServerQueries WorkerServerQueries { get; }
         public ViewModelBuilder ViewModelBuilder { get; }
         public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
@@ -101,19 +100,13 @@ namespace Hangfire.Configuration.Test
 
         public void StartWorkerServer()
         {
-	        WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+	        WorkerServerStarter.Start();
         }
 
         public SystemUnderTest WithServerCountSample(ServerCountSample sample)
         {
             KeyValueStore.Has(sample);
             return this;
-        }
-
-        public SystemUnderTest WithOptions(ConfigurationOptions options)
-        {
-	        Options.UseOptions(options);
-	        return this;
         }
 
         public SystemUnderTest WithGoalWorkerCount(int goal)

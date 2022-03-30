@@ -108,7 +108,7 @@ namespace Hangfire.Configuration.Test.Domain
 			                    Name = DefaultConfigurationName.Name()
 		                    }
 	                    }
-                    }, new SqlServerStorageOptions());
+                    });
 
             system.ConfigurationStorage.Data.Single().ConnectionString
 	            .Should().Contain("Hangfire");
@@ -124,7 +124,8 @@ namespace Hangfire.Configuration.Test.Domain
 				ConnectionString = "Data Source=.;Initial Catalog=fakedb;"
             });
 
-            system.PublisherQueries.QueryPublishers(null, new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.UseStorageOptions(new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.PublisherQueries.QueryPublishers();
 
 			Assert.False(system.Hangfire.CreatedStorages.Single().SqlServerOptions.PrepareSchemaIfNecessary);
         }

@@ -24,23 +24,5 @@ namespace Hangfire.Configuration.Test
 		        _options.UseOptions(options);
 	        return _instance.QueryPublishers();
         }
-        
-        public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, SqlServerStorageOptions storageOptions)
-        {
-            if (options != null)
-                _options.UseOptions(options);
-            if (storageOptions != null)
-                _options.UseStorageOptions(storageOptions);
-            return _instance.QueryPublishers();
-        }
-
-        public IEnumerable<ConfigurationInfo> QueryPublishers(ConfigurationOptions options, PostgreSqlStorageOptions storageOptions)
-        {
-	        if (options != null)
-		        _options.UseOptions(options);
-	        if (storageOptions != null)
-		        _options.UseStorageOptions(storageOptions);
-	        return _instance.QueryPublishers();
-        }
-	}
+    }
 }

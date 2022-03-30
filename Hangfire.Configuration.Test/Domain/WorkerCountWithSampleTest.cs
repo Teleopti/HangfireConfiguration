@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(10);
             system.KeyValueStore.Has(new ServerCountSample {Count = 1});
 
-            system.Options.UseOptions(new ConfigurationOptionsForTest
+            system.UseOptions(new ConfigurationOptionsForTest
             {
                 MinimumServerCount = 2
 			});

@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+            system.WorkerServerStarter.Start();
 
             system.Hangfire.StartedServers.Single().backgroundProcesses
 	            .OfType<ServerCountSampleRecorder>()
@@ -27,12 +27,10 @@ namespace Hangfire.Configuration.Test.Domain
 	        var options = new ConfigurationOptions();
 	        options.WorkerDeterminerOptions.UseServerCountSampling = false;
 	        var system = new SystemUnderTest();
-	        system
-		        .WithOptions(options)
-		        .WithConfiguration(new StoredConfiguration())
-		        ;
+	        system.UseOptions(options);
+	        system.WithConfiguration(new StoredConfiguration());
 
-	        system.WorkerServerStarter.Start(null, null, (SqlServerStorageOptions)null);
+	        system.WorkerServerStarter.Start();
 
 	        Assert.IsEmpty(system.Hangfire.StartedServers.Single().backgroundProcesses
 		        .OfType<ServerCountSampleRecorder>());

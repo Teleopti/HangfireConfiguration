@@ -44,7 +44,8 @@ namespace Hangfire.Configuration.Test.Domain
                 TimeZoneResolver = new DefaultTimeZoneResolver()
             };
 
-            system.WorkerServerStarter.Start(null, serverOptions, (PostgreSqlStorageOptions)null);
+            system.UseServerOptions(serverOptions);
+            system.WorkerServerStarter.Start();
 
             Assert.AreEqual(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
             Assert.AreEqual(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
@@ -67,7 +68,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, new BackgroundJobServerOptions {ServerName = "server!"}, (PostgreSqlStorageOptions)null);
+            system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
+            system.WorkerServerStarter.Start();
 
             Assert.Null(system.Hangfire.StartedServers.Single().options.ServerName);
         }
@@ -91,7 +93,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             var backgroundProcess = new Worker();
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null, backgroundProcess);
+            system.WorkerServerStarter.Start(backgroundProcess);
 
             Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
         }
@@ -115,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration());
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null, new Worker());
+            system.WorkerServerStarter.Start(new Worker());
 
             system.Hangfire.StartedServers.First().backgroundProcesses
 	            .Should().Not.Be.Empty();
@@ -150,7 +152,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
 
-            system.Options.UseStorageOptions(new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
+            system.UseStorageOptions(new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
             system.WorkerServerStarter.Start();
 
             Assert.False(system.Hangfire.StartedServers.Single().storage.PostgresOptions.PrepareSchemaIfNecessary);
@@ -166,7 +168,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            ConnectionString = @"Host=localhost;Database=fakedb;"
             });
 
-            system.Options.UseStorageOptions(new PostgreSqlStorageOptions { SchemaName = "Ignored" });
+            system.UseStorageOptions(new PostgreSqlStorageOptions { SchemaName = "Ignored" });
             system.WorkerServerStarter.Start();
 
             Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
@@ -252,7 +254,7 @@ namespace Hangfire.Configuration.Test.Domain
                 TransactionSynchronisationTimeout = TimeSpan.FromMinutes(4),
 				UseNativeDatabaseTransactions = true
             };
-            system.Options.UseStorageOptions(options);
+            system.UseStorageOptions(options);
 
             system.WorkerServerStarter.Start();
 
@@ -300,7 +302,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=inactive;" });
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
 
-            system.WorkerServerStarter.Start(null, null, (PostgreSqlStorageOptions)null, new Worker());
+            system.WorkerServerStarter.Start(new Worker());
 
             Assert.IsEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == @"Host=localhost;Database=inactive;")
                 .backgroundProcesses);
@@ -324,7 +326,8 @@ namespace Hangfire.Configuration.Test.Domain
 	            ConnectionString = @"Host=localhost;Database=fakedb;"
             });
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions(), null, (PostgreSqlStorageOptions)null);
+            system.UseOptions(new ConfigurationOptions());
+            system.WorkerServerStarter.Start();
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
             Assert.AreEqual(new[] {20, 100}, actual);
@@ -345,7 +348,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        ConnectionString = "Host=localhost"
 	        });
 
-	        system.Options.UseStorageOptions(new PostgreSqlStorageOptions{DistributedLockTimeout = TimeSpan.FromMinutes(1)});
+	        system.UseStorageOptions(new PostgreSqlStorageOptions{DistributedLockTimeout = TimeSpan.FromMinutes(1)});
 	        system.WorkerServerStarter.Start();
 
 	        var options1 = system.Hangfire.StartedServers.First().storage.PostgresOptions;

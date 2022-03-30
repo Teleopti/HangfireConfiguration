@@ -13,18 +13,18 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.PublisherStarter.Start(
-                new ConfigurationOptions
-                {
-	                UpdateConfigurations = new []
-	                {
-		                new UpdateStorageConfiguration
-		                {
-			                ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
-			                Name = DefaultConfigurationName.Name()
-		                }
-	                }
-                }, null);
+            system.UseOptions(new ConfigurationOptions
+            {
+	            UpdateConfigurations = new[]
+	            {
+		            new UpdateStorageConfiguration
+		            {
+			            ConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
+            });
+            system.PublisherStarter.Start();
 
             Assert.NotNull(system.Hangfire.LastCreatedStorage);
         }
@@ -111,7 +111,7 @@ namespace Hangfire.Configuration.Test.Domain
 				UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
 			};
 
-			system.Options.UseStorageOptions(options);
+			system.UseStorageOptions(options);
 			system.PublisherStarter.Start();
 
 			var storage = system.Hangfire.CreatedStorages.Single();

@@ -34,7 +34,7 @@ namespace Hangfire.Configuration.Test.Domain
 				MaxStateHistoryLength = 44,
 				CheckCertificateRevocation = false
 			};
-			system.Options.UseStorageOptions(options);
+			system.UseStorageOptions(options);
 
 			system.WorkerServerStarter.Start();
 

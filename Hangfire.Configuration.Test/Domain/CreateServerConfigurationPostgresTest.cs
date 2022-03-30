@@ -45,7 +45,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            SchemaName = "defaultSchemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
             system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "newServer",
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test.Domain
 			            SchemaName = "defaultSchemaName"
 		            }
 	            }
-            }, null, (PostgreSqlStorageOptions)null);
+            });
             system.ConfigurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
             {
                 Server = "newServer",

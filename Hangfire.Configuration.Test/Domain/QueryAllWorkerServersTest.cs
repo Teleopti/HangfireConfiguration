@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.Options.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptions
             {
 	            UpdateConfigurations = new []
 	            {
@@ -60,7 +60,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
-            system.Options.UseStorageOptions(new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
+            system.UseStorageOptions(new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
             system.WorkerServerQueries.QueryAllWorkerServers();
 
             Assert.False(system.Hangfire.CreatedStorages.Single().SqlServerOptions.PrepareSchemaIfNecessary);
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
 	        var system = new SystemUnderTest();
 	        system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString =  @"Host=localhost;Database=fakedb;" });
 
-	        system.Options.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
+	        system.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
 	        system.WorkerServerQueries.QueryAllWorkerServers();
 
 	        Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);

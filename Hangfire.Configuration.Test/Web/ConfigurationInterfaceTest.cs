@@ -56,7 +56,7 @@ namespace Hangfire.Configuration.Test.Web
 		public async Task ShouldReturn500WithErrorMessageWhenSaveTooManyWorkerGoalCount()
 		{
 			var system = new SystemUnderTest();
-			system.Options.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
+			system.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
 			system.ConfigurationStorage.Has(new StoredConfiguration
 			{
 				Id = 1,
