@@ -99,17 +99,5 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.AreEqual("name", workerServer.Name);
         }
-
-        [Test]
-        public void ShouldOrderActiveConfigurationsBeforeUnactive()
-        {
-	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration {Name = "Active", Active = true});
-	        system.ConfigurationStorage.Has(new StoredConfiguration {Name = "NonActive", Active = false});
-	        system.ConfigurationStorage.Has(new StoredConfiguration {Name = "Active", Active = true});
-
-	        system.WorkerServerQueries.QueryAllWorkerServers().Select(x => x.Name)
-		        .Should().Have.SameSequenceAs("Active", "Active", "NonActive");
-        }
     }
 }

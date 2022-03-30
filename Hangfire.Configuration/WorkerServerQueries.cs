@@ -19,7 +19,6 @@ namespace Hangfire.Configuration
         {
             _stateMaintainer.Refresh();
             return _state.Configurations
-	            .OrderByDescending(x => x.Configuration.Active)
                 .Select(x => x.ToConfigurationInfo())
                 .ToArray();
         }
