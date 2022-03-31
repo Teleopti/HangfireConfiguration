@@ -34,6 +34,7 @@ internal class StateMaintainer
 		lock (_lock)
 		{
 			_state.Configurations = configurations
+				.OrderBy(x => x.Id)
 				.Select(c =>
 				{
 					var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);

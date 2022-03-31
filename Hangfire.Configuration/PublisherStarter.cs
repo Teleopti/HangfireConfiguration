@@ -18,7 +18,7 @@ namespace Hangfire.Configuration
 		{
 			_stateMaintainer.Refresh();
 			_state.Configurations
-				.Where(x => x.Configuration.Active.GetValueOrDefault())
+				.Where(x => x.IsPublisher())
 				.ForEach(x =>
 				{
 					//

@@ -22,4 +22,5 @@ public class ConfigurationInfo
 	public IBackgroundJobClient BackgroundJobClient => _state.BackgroundJobClient;
 	public IRecurringJobManager RecurringJobManager => _state.RecurringJobManager;
 	public IMonitoringApi MonitoringApi => _state.MonitoringApi;
+	public bool Publisher => _state.IsPublisher();
 }

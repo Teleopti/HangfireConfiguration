@@ -16,8 +16,8 @@ namespace Hangfire.Configuration
 		}
 
 		private readonly ThreadLocal<ConnectorTransaction> _currentTransaction = new();
-		
-		private ConnectorBase currentConnector() => (ConnectorBase)_currentTransaction.Value ?? _connector;
+
+		private ConnectorBase currentConnector() => (ConnectorBase) _currentTransaction.Value ?? _connector;
 
 		public void Transaction(Action action)
 		{
@@ -59,8 +59,7 @@ SELECT
     Active,
 	MaxWorkersPerServer
 FROM 
-    {HangfireConfigurationSchemaInstaller.SchemaName}.configuration 
-ORDER BY Id";
+    {HangfireConfigurationSchemaInstaller.SchemaName}.configuration";
 			var c = currentConnector();
 			var sql = c.SelectDialect(sqlServer, postgreSql);
 			return c.Query<StoredConfiguration>(sql).ToArray();
@@ -80,14 +79,14 @@ ORDER BY Id";
 			var sql = c.SelectDialect($@"
 INSERT INTO 
     [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration 
-    (
-        Name,
-    [ConnectionString], 
-[SchemaName], 
-GoalWorkerCount, 
-Active,
-MaxWorkersPerServer
-    ) VALUES (
+(
+    Name,
+    ConnectionString, 
+	SchemaName, 
+	GoalWorkerCount, 
+	Active,
+	MaxWorkersPerServer
+) VALUES (
     @Name,
     @ConnectionString, 
     @SchemaName, 

@@ -84,11 +84,54 @@ public class QueryResultTest
 	{
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
-		
+
 		var result1 = system.QueryAllWorkerServers().Single();
 		var result2 = system.QueryAllWorkerServers().Single();
 
 		result1.MonitoringApi.Should()
 			.Be.SameInstanceAs(result2.MonitoringApi);
+	}
+
+	[Test]
+	public void ShouldReturnServersInOrderOfId()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {Id = 2});
+		system.WithConfiguration(new StoredConfiguration {Id = 1});
+		system.WithConfiguration(new StoredConfiguration {Id = 3});
+
+		var result = system.QueryAllWorkerServers();
+
+		result.Select(x => x.ConfigurationId)
+			.Should().Have.SameSequenceAs(1, 2, 3);
+	}
+
+	[Test]
+	public void ShouldReturnPublishersInOrderOfId()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {Id = 2, Active = true});
+		system.WithConfiguration(new StoredConfiguration {Id = 1, Active = true});
+		system.WithConfiguration(new StoredConfiguration {Id = 3, Active = true});
+
+		var result = system.QueryPublishers();
+
+		result.Select(x => x.ConfigurationId)
+			.Should().Have.SameSequenceAs(1, 2, 3);
+	}
+
+	[Test]
+	public void ShouldIncludePublisherFlag()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {Id = 1, Active = false});
+		system.WithConfiguration(new StoredConfiguration {Id = 2, Active = null});
+		system.WithConfiguration(new StoredConfiguration {Id = 3, Active = true});
+
+		var result = system.QueryAllWorkerServers();
+
+		result.ElementAt(0).Publisher.Should().Be.False();
+		result.ElementAt(1).Publisher.Should().Be.False();
+		result.ElementAt(2).Publisher.Should().Be.True();
 	}
 }

@@ -33,4 +33,6 @@ internal class ConfigurationState
 	internal IBackgroundJobClient BackgroundJobClient => _backgroundJobClient.Value;
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
 	internal IMonitoringApi MonitoringApi => _monitoringApi.Value;
+
+	internal bool IsPublisher() => Configuration.Active.GetValueOrDefault();
 }
