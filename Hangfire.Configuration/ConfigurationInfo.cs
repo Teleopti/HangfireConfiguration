@@ -12,6 +12,7 @@ public class ConfigurationInfo
 		_state = state;
 		// storage should be created when querying
 		// because... compatibility?
+		// well, there's red tests without it
 		_state.EnsureJobStorageInitialized();
 	}
 

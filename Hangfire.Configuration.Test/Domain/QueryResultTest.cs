@@ -76,6 +76,7 @@ public class QueryResultTest
 		var result = system.QueryAllWorkerServers().Single();
 
 		result.MonitoringApi.Should().Be.OfType<FakeMonitoringApi>();
+		result.MonitoringApi.Should().Be(system.Monitor);
 	}
 
 	[Test]
@@ -83,7 +84,7 @@ public class QueryResultTest
 	{
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
-
+		
 		var result1 = system.QueryAllWorkerServers().Single();
 		var result2 = system.QueryAllWorkerServers().Single();
 

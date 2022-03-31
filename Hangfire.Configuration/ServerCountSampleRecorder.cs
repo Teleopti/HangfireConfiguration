@@ -44,7 +44,7 @@ namespace Hangfire.Configuration
 
             if (noRecentSample)
             {
-                var serverCount = _state.Configurations.First().JobStorage.GetMonitoringApi().Servers().Count;
+                var serverCount = _state.Configurations.First().MonitoringApi.Servers().Count;
 
                 samples.Samples = samples
                     .Samples
