@@ -1,4 +1,5 @@
 using Hangfire.Configuration.Internals;
+using Hangfire.Storage;
 
 namespace Hangfire.Configuration;
 
@@ -18,4 +19,6 @@ public class ConfigurationInfo
 	public string Name => _state.Configuration.Name;
 	public JobStorage JobStorage => _state.JobStorage;
 	public IBackgroundJobClient BackgroundJobClient => _state.BackgroundJobClient;
+	public IRecurringJobManager RecurringJobManager => _state.RecurringJobManager;
+	public IMonitoringApi MonitoringApi => _state.MonitoringApi;
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -17,7 +18,7 @@ public class QueryResultTest
 
 		storage1.Should().Be.SameInstanceAs(storage2);
 	}
-	
+
 	[Test]
 	public void ShouldReturnBackgroundJobClient()
 	{
@@ -26,7 +27,7 @@ public class QueryResultTest
 
 		var publisher = system.QueryPublishers().Single();
 
-		publisher.BackgroundJobClient.Should().Not.Be.Null();
+		publisher.BackgroundJobClient.Should().Be.OfType<BackgroundJobClient>();
 	}
 
 	[Test]
@@ -40,5 +41,53 @@ public class QueryResultTest
 
 		publisher1.BackgroundJobClient.Should()
 			.Be.SameInstanceAs(publisher2.BackgroundJobClient);
+	}
+
+	[Test]
+	public void ShouldReturnRecurringJobManager()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result = system.QueryAllWorkerServers().Single();
+
+		result.RecurringJobManager.Should().Be.OfType<RecurringJobManager>();
+	}
+
+	[Test]
+	public void ShouldReturnSameRecurringJobManager()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result1 = system.QueryAllWorkerServers().Single();
+		var result2 = system.QueryAllWorkerServers().Single();
+
+		result1.RecurringJobManager.Should()
+			.Be.SameInstanceAs(result2.RecurringJobManager);
+	}
+
+	[Test]
+	public void ShouldReturnMonitoringApi()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result = system.QueryAllWorkerServers().Single();
+
+		result.MonitoringApi.Should().Be.OfType<FakeMonitoringApi>();
+	}
+
+	[Test]
+	public void ShouldReturnSameMonitoringApi()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result1 = system.QueryAllWorkerServers().Single();
+		var result2 = system.QueryAllWorkerServers().Single();
+
+		result1.MonitoringApi.Should()
+			.Be.SameInstanceAs(result2.MonitoringApi);
 	}
 }
