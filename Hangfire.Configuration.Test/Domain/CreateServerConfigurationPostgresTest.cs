@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Hangfire.PostgreSql;
 using Npgsql;
 using NUnit.Framework;
 using SharpTestsEx;

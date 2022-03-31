@@ -1,6 +1,5 @@
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
-using Hangfire.SqlServer;
 using NUnit.Framework;
 using SharpTestsEx;
 

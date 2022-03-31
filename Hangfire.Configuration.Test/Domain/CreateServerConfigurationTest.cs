@@ -1,7 +1,6 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Hangfire.SqlServer;
 using NUnit.Framework;
 using SharpTestsEx;
 
