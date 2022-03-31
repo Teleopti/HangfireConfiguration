@@ -137,7 +137,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Data Source=.;Initial Catalog=1;" });
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Data Source=.;Initial Catalog=2;" });
             system.PublisherQueries.QueryPublishers();
-            system.ConfigurationStorage.Data = system.ConfigurationStorage.Data.Where(x => x.Id == 2).ToArray();
+            system.ConfigurationStorage.Remove(1);
             system.ConfigurationApi.ActivateServer(2);
             
             var storage = system.PublisherQueries.QueryPublishers();

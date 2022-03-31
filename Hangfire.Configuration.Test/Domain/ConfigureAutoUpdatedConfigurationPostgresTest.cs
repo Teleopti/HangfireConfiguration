@@ -423,7 +423,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             });
-            system.ConfigurationStorage.Data = Enumerable.Empty<StoredConfiguration>();
+            system.ConfigurationStorage.Clear();
             
             system.PublisherQueries.QueryPublishers(new ConfigurationOptions
             {
