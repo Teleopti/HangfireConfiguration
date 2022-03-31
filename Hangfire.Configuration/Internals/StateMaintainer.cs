@@ -43,20 +43,19 @@ internal class StateMaintainer
 						return existing;
 					}
 
-					return makeJobStorage(c);
+					return buildConfigurationState(c);
 				}).ToArray();
 		}
 	}
 
-	private ConfigurationAndStorage makeJobStorage(StoredConfiguration configuration)
+	private ConfigurationState buildConfigurationState(StoredConfiguration configuration)
 	{
 		var options = getStorageOptions(configuration);
 		assignSchemaName(configuration.SchemaName, options);
-		return new ConfigurationAndStorage
-		{
-			JobStorageCreator = () => _hangfire.MakeJobStorage(configuration.ConnectionString, options),
-			Configuration = configuration
-		};
+		return new ConfigurationState(
+			configuration,
+			() => _hangfire.MakeJobStorage(configuration.ConnectionString, options)
+		);
 	}
 
 	private object getStorageOptions(StoredConfiguration configuration) =>

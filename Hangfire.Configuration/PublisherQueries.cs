@@ -20,7 +20,7 @@ namespace Hangfire.Configuration
             _stateMaintainer.Refresh();
             return _state.Configurations
                 .Where(x => x.Configuration.Active.GetValueOrDefault())
-                .Select(x => x.ToConfigurationInfo())
+                .Select(x => new ConfigurationInfo(x))
                 .ToArray();
         }
     }

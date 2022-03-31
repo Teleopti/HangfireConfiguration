@@ -1,3 +1,4 @@
+using Hangfire.Configuration.Internals;
 using Hangfire.PostgreSql;
 using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
