@@ -31,7 +31,7 @@ label {
 }
 
 form input {
-    width: 200px;
+    width: 500px;
     height: 26px;
     border: 1px solid #ccc;
     -webkit-border-radius: 4px;
@@ -39,8 +39,12 @@ form input {
     border-radius: 4px;
 }
 
-select {
+form input.small {
 	width: 200px;
+}
+
+select {
+	width: 500px;
 	height: 26px;
 	border: 1px solid #ccc;
 	-webkit-border-radius: 4px;
