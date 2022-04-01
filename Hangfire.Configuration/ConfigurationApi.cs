@@ -128,6 +128,8 @@ namespace Hangfire.Configuration
 			var activate = configurations.Single(x => x.Id == configurationId);
 			activate.Active = true;
 			_storage.WriteConfiguration(activate);
+
+			_state.PublisherQueryCache = null;
 		}
 
 		public void InactivateServer(int configurationId)

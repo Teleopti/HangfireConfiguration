@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,13 +10,17 @@ public class FakeConfigurationStorage : IConfigurationStorage
 	public IEnumerable<StoredConfiguration> Data => _data.Values;
 	public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 	public int? MaxWorkersPerServer => Data.FirstOrDefault()?.MaxWorkersPerServer;
-
-	private readonly IDictionary<int, StoredConfiguration> _data = new Dictionary<int, StoredConfiguration>();
+	public int ReadConfigurationsQueryCount;
+ 
+	private readonly ConcurrentDictionary<int, StoredConfiguration> _data = new();
 	private int _nextId = 1;
 	private int nextId() => _nextId++;
 
-	public IEnumerable<StoredConfiguration> ReadConfigurations() =>
-		Data.Select(x => x.Copy()).ToArray();
+	public IEnumerable<StoredConfiguration> ReadConfigurations()
+	{
+		ReadConfigurationsQueryCount++;
+		return Data.Select(x => x.Copy()).ToArray();
+	}
 
 	public void WriteConfiguration(StoredConfiguration configuration)
 	{
@@ -24,7 +29,7 @@ public class FakeConfigurationStorage : IConfigurationStorage
 		if (_data.ContainsKey(configuration.Id.Value))
 			_data[configuration.Id.Value] = configuration;
 		else
-			_data.Add(configuration.Id.Value, configuration);
+			_data.TryAdd(configuration.Id.Value, configuration);
 	}
 
 	public void Transaction(Action action) =>
@@ -49,7 +54,7 @@ public class FakeConfigurationStorage : IConfigurationStorage
 	}
 
 	public void Remove(int id) =>
-		_data.Remove(id);
+		_data.TryRemove(id, out _);
 
 	public void Clear() =>
 		_data.Clear();

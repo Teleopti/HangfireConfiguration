@@ -129,7 +129,7 @@ namespace Hangfire.Configuration
 				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 			);
 
-		protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer(null));
+		protected PublisherQueries BuildPublisherQueries() => new(BuildOptions(), _state, builderStateMaintainer(null), BuildNow());
 
 		protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(null), _state);
 

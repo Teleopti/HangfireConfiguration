@@ -25,7 +25,6 @@ internal class StateMaintainer
 	{
 		var options = _state.ReadOptions();
 
-		// maybe not reload all the time
 		var configurations = _storage.ReadConfigurations();
 		var configurationChanged = _configurationUpdater.Update(options, configurations);
 		if (configurationChanged)

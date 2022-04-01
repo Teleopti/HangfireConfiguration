@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.PostgreSql;
@@ -17,6 +18,9 @@ internal class State
 	public IEnumerable<ConfigurationState> Configurations = Enumerable.Empty<ConfigurationState>();
 	public bool ConfigurationUpdaterRan { get; set; }
 
-	public ConfigurationOptions ReadOptions() => 
+	public ConfigurationOptions ReadOptions() =>
 		Options ?? new ConfigurationOptions();
+
+	public DateTime? PublisherQueryCacheTimeout { get; set; }
+	public ConfigurationInfo[] PublisherQueryCache { get; set; }
 }
