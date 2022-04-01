@@ -9,8 +9,10 @@ using Hangfire.Configuration.Test.Domain.Fake;
 
 namespace Hangfire.Configuration.Test
 {
-    public class SystemUnderTest : HangfireConfiguration
+	public class SystemUnderTest : HangfireConfiguration
     {
+	    private readonly FakeNow _now;
+
         public SystemUnderTest()
         {
 #if !NET472
@@ -32,7 +34,6 @@ namespace Hangfire.Configuration.Test
             {
 	            ConnectionString = "unknown-storage"
             });
-			ConfigurationApi = BuildConfigurationApi();
             WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
             PublisherStarter = BuildPublisherStarter();
             PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), BuildOptions());
@@ -52,10 +53,8 @@ namespace Hangfire.Configuration.Test
         public FakeKeyValueStore KeyValueStore { get; }
         public FakeSchemaInstaller SchemaInstaller { get; }
         public FakeHangfire Hangfire { get; }
-        public FakeRedisConfigurationVerifier RedisConfigurationVerifier;
-        private FakeNow _now;
-
-        public ConfigurationApi ConfigurationApi { get; }
+        public FakeRedisConfigurationVerifier RedisConfigurationVerifier { get; }
+        
         public WorkerServerStarterUnderTest WorkerServerStarter { get; }
         public PublisherStarter PublisherStarter { get; }
         public PublisherQueriesUnderTest PublisherQueries { get; }
@@ -80,12 +79,6 @@ namespace Hangfire.Configuration.Test
         {
             Monitor.AnnounceServer(serverId);
             return this;
-        }
-
-        public class FakeNow : INow
-        {
-            public DateTime Time;
-            public DateTime UtcDateTime() => Time;
         }
 
         public SystemUnderTest Now(string time) => Now(time.Utc());

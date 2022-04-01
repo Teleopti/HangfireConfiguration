@@ -18,7 +18,7 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = 11
             });
 
-            var result = system.ConfigurationApi.ReadConfigurations() as StoredConfiguration[];
+            var result = system.ConfigurationApi().ReadConfigurations() as StoredConfiguration[];
 
             Assert.AreEqual(13, result.Single().Id);
             Assert.AreEqual("connection", result.Single().ConnectionString);
@@ -32,7 +32,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.WriteConfiguration(new StoredConfiguration
+            system.ConfigurationApi().WriteConfiguration(new StoredConfiguration
             {
                 Id = 22,
                 ConnectionString = "connection",
@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = 44
             });
 
-            var result = system.ConfigurationApi.ReadConfigurations().Single();
+            var result = system.ConfigurationApi().ReadConfigurations().Single();
             Assert.AreEqual(22, result.Id);
             Assert.AreEqual("connection", result.ConnectionString);
             Assert.AreEqual("SchemaName", result.SchemaName);

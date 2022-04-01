@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Web
 		[Test]
 		public async Task ShouldFindConfigurationInterface()
 		{
-			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			using var s = new WebServerUnderTest(new SystemUnderTest(), "/config");
 			var response = await s.TestClient.GetAsync("/config");
 			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		}
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Web
 		[Test]
 		public async Task ShouldNotFindConfigurationInterface()
 		{
-			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			using var s = new WebServerUnderTest(new SystemUnderTest(), "/config");
 			var response = await s.TestClient.GetAsync("/configIncorrect");
 			Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 		}
@@ -38,7 +38,7 @@ namespace Hangfire.Configuration.Test.Web
 				GoalWorkerCount = 3
 			});
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			var response = await s.TestClient.PostAsync(
 				"/config/saveWorkerGoalCount",
 				new StringContent(JsonConvert.SerializeObject(new
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Web
 				GoalWorkerCount = 3
 			});
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			var response = await s.TestClient.PostAsync(
 				"/config/saveWorkerGoalCount",
 				new StringContent(JsonConvert.SerializeObject(new
@@ -83,7 +83,7 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/saveWorkerGoalCount",
 				new StringContent(JsonConvert.SerializeObject(new
@@ -104,7 +104,7 @@ namespace Hangfire.Configuration.Test.Web
 				Id = 2
 			});
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/activateServer",
 				new StringContent(JsonConvert.SerializeObject(new
@@ -120,7 +120,7 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/createNewServerConfiguration",
 				new StringContent(JsonConvert.SerializeObject(
@@ -146,7 +146,7 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/createNewServerConfiguration",
 				new StringContent(JsonConvert.SerializeObject(
@@ -168,7 +168,7 @@ namespace Hangfire.Configuration.Test.Web
 		[Test]
 		public async Task ShouldNotFindUnknownAction()
 		{
-			using var s = new ServerUnderTest(new SystemUnderTest(), "/config");
+			using var s = new WebServerUnderTest(new SystemUnderTest(), "/config");
 			var response = await s.TestClient.GetAsync("/config/unknownAction");
 			Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 		}
@@ -183,7 +183,7 @@ namespace Hangfire.Configuration.Test.Web
 				Active = true
 			});
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/inactivateServer",
 				new StringContent(JsonConvert.SerializeObject(new
@@ -199,7 +199,7 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/createNewServerConfiguration",
 				new StringContent(JsonConvert.SerializeObject(
@@ -226,7 +226,7 @@ namespace Hangfire.Configuration.Test.Web
 		{
 			var system = new SystemUnderTest();
 
-			using var s = new ServerUnderTest(system);
+			using var s = new WebServerUnderTest(system);
 			await s.TestClient.PostAsync(
 				"/config/createNewServerConfiguration",
 				new StringContent(JsonConvert.SerializeObject(

@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
 		{
 			var system = new SystemUnderTest();
 
-			system.ConfigurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
+			system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test.Domain
 				Active = false
 			});
 
-			system.ConfigurationApi.ActivateServer(1);
+			system.ConfigurationApi().ActivateServer(1);
 
 			var storedConfiguration = system.ConfigurationStorage.Data.Single();
 			Assert.AreEqual(true, storedConfiguration.Active);

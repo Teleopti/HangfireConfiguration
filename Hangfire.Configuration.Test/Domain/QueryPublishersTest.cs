@@ -82,8 +82,8 @@ namespace Hangfire.Configuration.Test.Domain
             system.PublisherStarter.Start();
             var activatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
             var inactivatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => x.Active.Value).Id.Value;
-            system.ConfigurationApi.ActivateServer(activatedId);
-            system.ConfigurationApi.InactivateServer(inactivatedId);
+            system.ConfigurationApi().ActivateServer(activatedId);
+            system.ConfigurationApi().InactivateServer(inactivatedId);
 
             var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
@@ -138,7 +138,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Data Source=.;Initial Catalog=2;" });
             system.PublisherQueries.QueryPublishers();
             system.ConfigurationStorage.Remove(1);
-            system.ConfigurationApi.ActivateServer(2);
+            system.ConfigurationApi().ActivateServer(2);
             
             var storage = system.PublisherQueries.QueryPublishers();
             

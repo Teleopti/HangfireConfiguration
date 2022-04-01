@@ -20,8 +20,8 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            system.ConfigurationApi.ActivateServer(1);
-            system.ConfigurationApi.ActivateServer(2);
+            system.ConfigurationApi().ActivateServer(1);
+            system.ConfigurationApi().ActivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
             Assert.AreEqual(true, configurations.ElementAt(0).Active);
@@ -43,7 +43,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = false
             });
 
-            system.ConfigurationApi.ActivateServer(2);
+            system.ConfigurationApi().ActivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
             Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
@@ -60,7 +60,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = true
             });
 
-            system.ConfigurationApi.InactivateServer(1);
+            system.ConfigurationApi().InactivateServer(1);
 
             var configuration = system.ConfigurationStorage.Data.Single();
             Assert.AreEqual(false, configuration.Active);
@@ -81,7 +81,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Active = true
             });
 
-            system.ConfigurationApi.InactivateServer(2);
+            system.ConfigurationApi().InactivateServer(2);
 
             var configurations = system.ConfigurationStorage.Data;
             Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);

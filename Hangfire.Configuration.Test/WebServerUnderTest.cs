@@ -10,13 +10,13 @@ using Microsoft.Owin.Testing;
 
 namespace Hangfire.Configuration.Test
 {
-	public class ServerUnderTest : IDisposable
+	public class WebServerUnderTest : IDisposable
 	{
 		private readonly IDisposable _server;
 		private readonly HttpClient _client;
 		private readonly string _urlPathMatch;
 
-		public ServerUnderTest(HangfireConfiguration hangfireConfiguration, string urlPathMatch = null)
+		public WebServerUnderTest(HangfireConfiguration hangfireConfiguration, string urlPathMatch = null)
 		{
 			_urlPathMatch = urlPathMatch ?? "/config";
 			

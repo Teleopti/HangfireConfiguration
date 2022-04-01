@@ -14,7 +14,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
+            system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
             Assert.AreEqual(workers, system.ConfigurationStorage.Workers);
         }
@@ -28,7 +28,7 @@ namespace Hangfire.Configuration.Test.Domain
                 GoalWorkerCount = 1
             });
 
-            system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
+            system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
 
             Assert.Null(system.ConfigurationStorage.Workers);
         }
@@ -45,7 +45,7 @@ namespace Hangfire.Configuration.Test.Domain
                 Id = 2
             });
 
-            system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
+            system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount
             {
                 ConfigurationId = 2,
                 Workers = 5
@@ -59,7 +59,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            var e = Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 101}));
+            var e = Assert.Throws<Exception>(() => system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 101}));
             Assert.AreEqual("Invalid goal worker count.", e.Message);
         }
 
@@ -75,7 +75,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             try
             {
-                system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {ConfigurationId = 1, Workers = 101});
+                system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {ConfigurationId = 1, Workers = 101});
             }
             catch (Exception)
             {
@@ -89,7 +89,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             system.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 5});
-            Assert.Throws<Exception>(() => system.ConfigurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 6}));
+            Assert.Throws<Exception>(() => system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 6}));
         }
     }
 }
