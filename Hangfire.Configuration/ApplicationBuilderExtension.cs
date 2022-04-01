@@ -17,10 +17,12 @@ namespace Hangfire.Configuration
 		{
 			builder.Map(pathMatch, subApp =>
 			{
+				if (options != null)
+					builder.Properties["HangfireConfigurationOptions"] = options;
 #if NETSTANDARD2_0
-				subApp.UseMiddleware<ConfigurationMiddleware>(options, builder.Properties);
+				subApp.UseMiddleware<ConfigurationMiddleware>(builder.Properties);
 #else
-				subApp.Use(typeof(ConfigurationMiddleware), options, builder.Properties);
+				subApp.Use(typeof(ConfigurationMiddleware), builder.Properties);
 #endif
 			});
 		}

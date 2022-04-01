@@ -28,15 +28,14 @@ namespace Hangfire.Configuration.Test
             _now = new FakeNow {Time = "2020-12-01 09:00".Utc()};
             RedisConfigurationVerifier = new FakeRedisConfigurationVerifier();
             
-            Options = BuildOptions();
-            Options.UseOptions(new ConfigurationOptions
+            UseOptions(new ConfigurationOptions
             {
 	            ConnectionString = "unknown-storage"
             });
 			ConfigurationApi = BuildConfigurationApi();
-            WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), Options);
+            WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
             PublisherStarter = BuildPublisherStarter();
-            PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), Options);
+            PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), BuildOptions());
             WorkerServerQueries = BuildWorkerServerQueries();
             ViewModelBuilder = BuildViewModelBuilder();
             ServerCountSampleRecorder = buildServerCountSampleRecorder();
@@ -56,7 +55,6 @@ namespace Hangfire.Configuration.Test
         public FakeRedisConfigurationVerifier RedisConfigurationVerifier;
         private FakeNow _now;
 
-        public Options Options { get; }
         public ConfigurationApi ConfigurationApi { get; }
         public WorkerServerStarterUnderTest WorkerServerStarter { get; }
         public PublisherStarter PublisherStarter { get; }

@@ -86,8 +86,9 @@ namespace Hangfire.Configuration
 		internal ViewModelBuilder ViewModelBuilder() =>
 			BuildViewModelBuilder();
 
-		public Options Options() => 
+		internal Options Options() => 
 			BuildOptions();
+		
 		
 		// internal services
 		private readonly State _state = new();

@@ -170,7 +170,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.HasGoalWorkerCount(8);
 
             system.UseOptions(new ConfigurationOptions {UseWorkerDeterminer = false});
-            system.Options.UseServerOptions(new BackgroundJobServerOptions {WorkerCount = 52});
+            system.UseServerOptions(new BackgroundJobServerOptions {WorkerCount = 52});
             system.WorkerServerStarter.Start();
 
             Assert.AreEqual(52, system.Hangfire.StartedServers.Single().options.WorkerCount);

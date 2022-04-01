@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Test
 					webHost.Configure(app =>
 					{
 						app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
-						app.UseHangfireConfigurationUI(_urlPathMatch, hangfireConfiguration.Options().ConfigurationOptions());
+						app.UseHangfireConfigurationUI(_urlPathMatch, null);
 					});
 				})
 				.StartAsync()
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test
 			var server = TestServer.Create(app =>
 			{
 				app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
-				app.UseHangfireConfigurationUI(_urlPathMatch, hangfireConfiguration.Options().ConfigurationOptions());
+				app.UseHangfireConfigurationUI(_urlPathMatch, null);
 			});
 
 			return (server, server.HttpClient);
