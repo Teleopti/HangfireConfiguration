@@ -9,7 +9,7 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
-		if(!Regex.IsMatch(prefix, @"(?<=^\{)([^\{\}]+)(?=\}:$)"))
+		if(!Regex.IsMatch(prefix, @"^\{([^\{\}]+)\}:$"))
 			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
 		
 		using var redis = ConnectionMultiplexer.Connect(configuration + ",allowAdmin=true");
