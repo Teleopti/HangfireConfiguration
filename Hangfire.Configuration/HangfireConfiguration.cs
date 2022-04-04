@@ -15,6 +15,16 @@ namespace Hangfire.Configuration
 {
 	public class HangfireConfiguration
 	{
+		private readonly State _state;
+		private object _builder;
+
+		public HangfireConfiguration()
+		{
+			_state = new State
+			{
+				PublisherQueryCache = new PublisherQueryCache(BuildNow())
+			};
+		}
 		
 #if NETSTANDARD2_0
 		public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
@@ -90,10 +100,6 @@ namespace Hangfire.Configuration
 			BuildOptions();
 		
 		
-		// internal services
-		private readonly State _state = new();
-		private object _builder;
-
 		private StateMaintainer builderStateMaintainer(object appBuilder) =>
 			new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
 				buildConfigurationUpdater(), _state);
@@ -129,7 +135,7 @@ namespace Hangfire.Configuration
 				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 			);
 
-		protected PublisherQueries BuildPublisherQueries() => new(BuildOptions(), _state, builderStateMaintainer(null), BuildNow());
+		protected PublisherQueries BuildPublisherQueries() => new(BuildOptions(), _state, builderStateMaintainer(null));
 
 		protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(null), _state);
 

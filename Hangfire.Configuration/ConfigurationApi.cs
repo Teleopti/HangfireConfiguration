@@ -129,7 +129,7 @@ namespace Hangfire.Configuration
 			activate.Active = true;
 			_storage.WriteConfiguration(activate);
 
-			_state.PublisherQueryCache = null;
+			_state.PublisherQueryCache.Invalidate();
 		}
 
 		public void InactivateServer(int configurationId)

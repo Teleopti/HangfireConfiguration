@@ -4,7 +4,6 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-[Ignore("WIP")]
 public class QueryPublishersCacheTest
 {
 	[Test]
@@ -65,50 +64,18 @@ public class QueryPublishersCacheTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
-	public void ShouldWorkConcurrently()
+	public void ShouldInvalidateOnActivateServer()
 	{
-		var runner = new ConcurrencyRunner();
 		var system = new SystemUnderTest();
-		var startTime = "2022-04-01 14:00".Utc();
-		system.Now(startTime);
-		system.ConfigurationApi().WriteConfiguration(new StoredConfiguration());
-		var loops = 1000;
+		system.ConfigurationStorage.Has(new StoredConfiguration {Name = "first", Active = true});
 
-		runner.InParallel(() =>
-		{
-			loops.Times(i =>
-			{
-				//
-				system.ConfigurationApi().WriteConfiguration(new StoredConfiguration {Name = i.ToString(), Active = true});
-			});
-		});
-		runner.InParallel(() =>
-		{
-			loops.Times(i =>
-			{
-				//
-				system.Now(startTime.AddMinutes(i));
-			});
-		});
-		runner.InParallel(() =>
-		{
-			loops.Times(i =>
-			{
-				// active server may invalidate?
-				var api = system.ConfigurationApi();
-				var id = api.ReadConfigurations().Select(x => x.Id.Value).Last();
-				api.ActivateServer(id);
-			});
-		});
+		system.QueryPublishers();
+		system.ConfigurationApi().WriteConfiguration(new StoredConfiguration {Name = "new", Active = true});
+		var newId = system.ConfigurationApi().ReadConfigurations().Max(x => x.Id.Value);
+		system.ConfigurationApi().ActivateServer(newId);
+		var newResult = system.QueryPublishers();
 
-		loops.Times(() =>
-		{
-			//
-			system.QueryPublishers()
-				.Should().Not.Be.Empty();
-		});
-
-		runner.Wait();
+		newResult.ElementAt(0).Name.Should().Be("first");
+		newResult.ElementAt(1).Name.Should().Be("new");
 	}
 }
