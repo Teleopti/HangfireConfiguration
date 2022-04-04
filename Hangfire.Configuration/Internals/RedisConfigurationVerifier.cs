@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Internals;
@@ -8,8 +9,8 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
-		if (!prefix.EndsWith(":") || prefix.EndsWith("::"))
-			throw new ArgumentException("Prefix must end with a single ':'!");
+		if(!Regex.IsMatch(prefix, @"(?<=^\{)([^\{\}]+)(?=\}:$)"))
+			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
 		
 		using var redis = ConnectionMultiplexer.Connect(configuration + ",allowAdmin=true");
 		foreach (var endPoint in redis.GetEndPoints())
