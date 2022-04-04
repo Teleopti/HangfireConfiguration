@@ -59,7 +59,6 @@ public class RedisConfigurationVerifierTest
 	[TestCase("{pre}fix}:")]
 	public void ShouldThrowIfPrefixIsNotCorrect(string prefix)
 	{
-		//not sure this test is correct, just here to avoid _potential_ risk if having prefix "something:" and "something:a"
 		var system = new SystemUnderInfraTest();
 
 		Assert.Throws<ArgumentException>(() =>
