@@ -27,9 +27,13 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			var creator = new SchemaInstaller();
 
 			var connectionString = SelectDialect(
-				() => new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = "Does_Not_Exist" }.ToString(),
+				() =>
+				{
+					var forceNamedPipesToGetExpectedException = "np:" + new SqlConnectionStringBuilder(ConnectionString).DataSource; 
+					return new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = "Does_Not_Exist", DataSource = forceNamedPipesToGetExpectedException }.ToString();
+				},
 				() => new NpgsqlConnectionStringBuilder(ConnectionString) {Database = "Does_Not_Exist"}.ToString());
-
+			
 			var exception = Assert.Catch(() => creator.TryConnect(connectionString));
 			exception.Message.Should().Contain("Does_Not_Exist");
 		}
