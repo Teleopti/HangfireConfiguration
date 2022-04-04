@@ -8,10 +8,8 @@ using Newtonsoft.Json.Linq;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-
 #else
 using Microsoft.Owin;
-
 #endif
 
 namespace Hangfire.Configuration.Web
@@ -32,7 +30,6 @@ namespace Hangfire.Configuration.Web
 #else
 			OwinMiddleware next,
 #endif
-			// ConfigurationOptions options,
 			IDictionary<string, object> properties)
 #if !NETSTANDARD2_0
 			: base(next)
@@ -73,7 +70,6 @@ namespace Hangfire.Configuration.Web
 			var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
 			if (syncIoFeature != null)
 				syncIoFeature.AllowSynchronousIO = true;
-
 #else
 		private async Task handleRequest(IOwinContext context)
 		{
