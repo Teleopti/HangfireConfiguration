@@ -27,7 +27,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			var creator = new SchemaInstaller();
 
 			var connectionString = SelectDialect(
-				() => new SqlConnectionStringBuilder(ConnectionString) { InitialCatalog = "Does_Not_Exist" }.ToString(),
+				() =>
+				{
+					// tcp: is also more common in production cloud anyway, so may be a better example
+					var iDoubtThisWillFixTheRealRandomIssue = "tcp:localhost";
+					return new SqlConnectionStringBuilder(ConnectionString) {InitialCatalog = "Does_Not_Exist", DataSource = iDoubtThisWillFixTheRealRandomIssue}.ToString();
+				},
 				() => new NpgsqlConnectionStringBuilder(ConnectionString) {Database = "Does_Not_Exist"}.ToString());
 
 			var exception = Assert.Catch(() => creator.TryConnect(connectionString));
