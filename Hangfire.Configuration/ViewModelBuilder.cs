@@ -26,7 +26,7 @@ namespace Hangfire.Configuration
 					if (x.ConnectionString != null)
 					{
 						schemaName ??= x.SelectDialect(
-							DefaultSchemaName.SqlServer, 
+							DefaultSchemaName.SqlServer,
 							DefaultSchemaName.Postgres,
 							DefaultSchemaName.Redis);
 					}
@@ -48,24 +48,14 @@ namespace Hangfire.Configuration
 		{
 			const string hiddenPassword = "******";
 			return x.SelectDialect(
-				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) { Password = hiddenPassword }.ToString(),
-				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) { Password = hiddenPassword }.ToString(),
+				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
+				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
 				() =>
 				{
-					var splitByComma = x.ConnectionString.Split(',');
-					for (var i = 0; i < splitByComma.Length; i++)
-					{
-						var splitByEqual = splitByComma[i].Split('=');
-						if (splitByEqual.Length > 1)
-						{
-							if (string.Equals(splitByEqual[0].Trim(), "password", StringComparison.OrdinalIgnoreCase))
-							{
-								splitByComma[i] = "password = " + hiddenPassword;
-							}
-						}
-					}
-
-					return string.Join(",", splitByComma);
+					var parsed = StackExchange.Redis.ConfigurationOptions.Parse(x.ConnectionString);
+					if (parsed.Password != null)
+						parsed.Password = hiddenPassword;
+					return parsed.ToString();
 				});
 		}
 	}
