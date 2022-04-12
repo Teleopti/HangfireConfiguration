@@ -1,50 +1,71 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
-    margin-left: 20px
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-size: 14px;
+	padding-left: calc(50% - 500px);
+}
+
+.configuration {
+	width: 1000px
 }
 
 h2 {
-    font-size: 30px;
-    font-weight: 500
+	font-size: 30px;
+	font-weight: 500
 }
 
 h3 {
-    font-weight: 700;
-    margin: 0;
+	font-weight: 700;
+	margin: 0;
 }
 
 div {
-    padding-top: 3px
+	padding-top: 3px
 }
 
 p {
-    margin-top: 0;
+	margin-top: 0;
+}
+
+legend {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+legend .active {
+	color: green;
+}
+
+legend .inactive {
+	color: red;
+}
+
+fieldset {
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	border: 1px solid rgba(66, 139, 202, 1);
+}
+
+fieldset fieldset {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	border: 0;
+	padding-left: 0;
+	padding-right: 10px;
+	margin: 0;
 }
 
 label {
-    margin-right: 10px;
-    color: #888;
-    font-size: 12px;
-    display: inline-block;
-    margin-top: 8px;
+	margin-right: 10px;
+	color: #888;
+	font-size: 12px;
+	display: inline-block;
+	margin-top: 8px;
 }
 
-form input {
-    width: 500px;
-    height: 26px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-}
-
-form input.small {
-	width: 200px;
-}
-
-select {
-	width: 500px;
+form input, form select {
+	width: 400px;
 	height: 26px;
 	border: 1px solid #ccc;
 	-webkit-border-radius: 4px;
@@ -52,58 +73,17 @@ select {
 	border-radius: 4px;
 }
 
+form input.small {
+	width: 250px;
+}
+
 button {
-    height: 26px;
-    padding: 1px 5px;
-    font-size: 12px;
-    line-height: 1.5;
-    border-radius: 3px;
-    color: #fff;
-    background-color: #337ab7;
-    border: 1px solid transparent;
-}
-
-fieldset {
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    border: 1px solid rgba(66, 139, 202, 1);
-}
-
-fieldset fieldset {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    border: 0;
-    border-right: 1px solid rgba(66, 139, 202, .25);
-    padding: 0 10px;
-    margin: 0;
-}
-
-fieldset fieldset:first-child {
-    padding-left: 0;
-}
-
-fieldset fieldset:last-child {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0;
-    border: 0;
-}
-
-fieldset fieldset p{
-    margin-block-end: 0;
-}
-
-legend {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.flex-grid {
-    display: flex;
-}
-
-.col {
-    flex: 1;
+	height: 26px;
+	padding: 1px 5px;
+	font-size: 12px;
+	line-height: 1.5;
+	border-radius: 3px;
+	color: #fff;
+	background-color: #337ab7;
+	border: 1px solid transparent;
 }

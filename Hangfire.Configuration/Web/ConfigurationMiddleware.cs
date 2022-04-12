@@ -256,7 +256,7 @@ namespace Hangfire.Configuration.Web
 			try
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.OK;
-				context.Response.ContentType = "text/html";
+				context.Response.ContentType = "text/html; charset=utf-8";
 				await action.Invoke();
 			}
 			catch (Exception ex)

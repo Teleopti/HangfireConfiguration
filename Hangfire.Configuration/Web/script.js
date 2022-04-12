@@ -3,11 +3,11 @@ if(provider){
 	provider.addEventListener('change', function(){
 		if(provider.value==='redis'){
 			document.getElementById('database').style.display='none';
-			document.getElementById('patchuser').style.display='none';
+			document.getElementById('creatorUser').style.display='none';
 			document.getElementById('applicationUser').style.display='none';
 		} else {
 			document.getElementById('database').style.display='block';
-			document.getElementById('patchuser').style.display='block';
+			document.getElementById('creatorUser').style.display='block';
 			document.getElementById('applicationUser').style.display='block';
 		}
 	});
