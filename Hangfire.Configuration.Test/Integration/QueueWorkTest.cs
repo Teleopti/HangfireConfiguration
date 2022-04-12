@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 using Hangfire.Configuration.Test.Infrastructure;
-using Hangfire.Server;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -46,28 +42,11 @@ public class QueueWorkTest : DatabaseTest
 		system.UseRealHangfire();
 		FakeJobService.Reset();
 
-		var storage = system.QueryPublishers().Single().JobStorage;
-		var client = new BackgroundJobClient(storage);
-		client.Enqueue(() => FakeJobService.RunTheJob());
-		emulateWorkerIteration(storage);
+		var publisher = system.QueryPublishers().Single();
+		publisher.BackgroundJobClient.Enqueue(() => FakeJobService.RunTheJob());
+		WorkerEmulation.SingleIteration(publisher.JobStorage);
 
 		FakeJobService.WasRun.Should().Be.True();
-	}
-
-	private static void emulateWorkerIteration(JobStorage storage)
-	{
-		// will hang if nothing to work with
-		// if (NumberOfEnqueuedJobs() > 0)
-		new Worker().Execute(
-			new BackgroundProcessContext(
-				"fake server",
-				storage,
-				new Dictionary<string, object>(),
-				Guid.NewGuid(),
-				new CancellationToken(),
-				new CancellationToken(),
-				new CancellationToken()
-			));
 	}
 
 	public class FakeJobService
