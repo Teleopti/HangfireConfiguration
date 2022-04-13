@@ -1,6 +1,5 @@
 ﻿#if NETSTANDARD2_0
 using Microsoft.AspNetCore.Builder;
-using Npgsql.TypeHandlers.DateTimeHandlers;
 #else
 using Owin;
 #endif
