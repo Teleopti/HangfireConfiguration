@@ -31,14 +31,14 @@ namespace ConsoleSample
 	public class Startup
 	{
 		public static HangfireConfiguration HangfireConfiguration;
-		
-#if !NET472
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddHangfire(x => { });
-        }
 
-        public void Configure(IApplicationBuilder app)
+#if !NET472
+		public void ConfigureServices(IServiceCollection services)
+		{
+			services.AddHangfire(x => { });
+		}
+
+		public void Configure(IApplicationBuilder app)
 #else
 		public void Configuration(IAppBuilder app)
 #endif
@@ -51,13 +51,13 @@ namespace ConsoleSample
 				.UseRecommendedSerializerSettings();
 
 #if !NET472
-            app.UseDeveloperExceptionPage();
+			app.UseDeveloperExceptionPage();
 #else
 			app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions { ShowExceptionDetails = true });
 #endif
 
-			var configurationConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
-			var defaultHangfireConnectionString = @"User ID=postgres;Password=postgres;Host=localhost;Database=""hangfire.sample"";";
+			var configurationConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
+			var defaultHangfireConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
 			var defaultHangfireSchema = "hangfirecustomschemaname";
 
 			app.Use((context, next) =>
@@ -69,7 +69,7 @@ namespace ConsoleSample
 				// simulate a hosting site with a static file handler
 				if (context.Request.Path.Value.Split('/').Last().Contains("."))
 				{
-					context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+					context.Response.StatusCode = (int) HttpStatusCode.NotFound;
 					return Task.CompletedTask;
 				}
 
@@ -88,11 +88,11 @@ namespace ConsoleSample
 			{
 				ConnectionString = configurationConnectionString,
 				PrepareSchemaIfNecessary = true,
-				UpdateConfigurations = new []
+				UpdateConfigurations = new[]
 				{
 					new UpdateStorageConfiguration
 					{
-						ConnectionString =defaultHangfireConnectionString,
+						ConnectionString = defaultHangfireConnectionString,
 						Name = DefaultConfigurationName.Name(),
 						SchemaName = defaultHangfireSchema
 					}
@@ -109,8 +109,26 @@ namespace ConsoleSample
 				;
 
 			HangfireConfiguration
+				.UseStorageOptions(storageOptions) //Needed???? already set above
+				.UseServerOptions(new BackgroundJobServerOptions
+				{
+					Queues = new[] {"critical", "default"},
+				})
+				.StartPublishers()
+				.StartWorkerServers(new[] {new CustomBackgroundProcess()});
+
+#if NET6_0
+
+			HangfireConfiguration
 				.QueryAllWorkerServers()
-				.Select((configurationInfo, i) => (configurationInfo: configurationInfo, i: i))
+				.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
+
+			app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
+
+#else
+			HangfireConfiguration
+				.QueryAllWorkerServers()
+				.Select((configurationInfo, i) => (configurationInfo, i))
 				.ForEach(s =>
 				{
 					Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
@@ -118,14 +136,7 @@ namespace ConsoleSample
 						s.configurationInfo.JobStorage);
 				});
 
-			HangfireConfiguration
-				.UseStorageOptions(storageOptions) //Needed???? already set above
-				.UseServerOptions(new BackgroundJobServerOptions
-				{
-					Queues = new[] { "critical", "default" },
-				})
-				.StartPublishers()
-				.StartWorkerServers(new[] { new CustomBackgroundProcess() });
+#endif
 		}
 	}
 }

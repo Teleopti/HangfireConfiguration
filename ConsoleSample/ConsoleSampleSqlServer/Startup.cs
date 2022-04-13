@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Common;
 using Hangfire.Configuration;
+using Hangfire.Configuration.Web;
 using Hangfire.Server;
 using Hangfire.SqlServer;
 #if !NET472
@@ -19,62 +20,62 @@ using Owin;
 
 namespace ConsoleSample
 {
-    public class CustomBackgroundProcess : IBackgroundProcess
-    {
-        public void Execute(BackgroundProcessContext context)
-        {
-            Console.WriteLine("20 second tick!");
-            context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
-        }
-    }
+	public class CustomBackgroundProcess : IBackgroundProcess
+	{
+		public void Execute(BackgroundProcessContext context)
+		{
+			Console.WriteLine("20 second tick!");
+			context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
+		}
+	}
 
-    public class Startup
-    {
-	    public static HangfireConfiguration HangfireConfiguration;
-	    
+	public class Startup
+	{
+		public static HangfireConfiguration HangfireConfiguration;
+
 #if !NET472
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddHangfire(x => { });
-        }
+		public void ConfigureServices(IServiceCollection services)
+		{
+			services.AddHangfire(x => { });
+		}
 
-        public void Configure(IApplicationBuilder app)
+		public void Configure(IApplicationBuilder app)
 #else
-        public void Configuration(IAppBuilder app)
+		public void Configuration(IAppBuilder app)
 #endif
 
-        {
-            GlobalConfiguration.Configuration
-                .UseColouredConsoleLogProvider()
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings();
+		{
+			GlobalConfiguration.Configuration
+				.UseColouredConsoleLogProvider()
+				.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+				.UseSimpleAssemblyNameTypeSerializer()
+				.UseRecommendedSerializerSettings();
 
 #if !NET472
-            app.UseDeveloperExceptionPage();
+			app.UseDeveloperExceptionPage();
 #else
-            app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
+			app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions {ShowExceptionDetails = true});
 #endif
 
 			var configurationConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
 			var defaultHangfireConnectionString = @"Server=.\;Database=Hangfire.Sample;Trusted_Connection=True;";
 			var defaultHangfireSchema = "hangfirecustomschemaname";
 
-            app.Use((context, next) =>
-            {
-                // simulate a hosting site with content security policy
-                context.Response.Headers.Append("Content-Security-Policy",
-                    "script-src 'self'; frame-ancestors 'self';");
+			app.Use((context, next) =>
+			{
+				// simulate a hosting site with content security policy
+				context.Response.Headers.Append("Content-Security-Policy",
+					"script-src 'self'; frame-ancestors 'self';");
 
-                // simulate a hosting site with a static file handler
-                if (context.Request.Path.Value.Split('/').Last().Contains("."))
-                {
-                    context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                    return Task.CompletedTask;
-                }
+				// simulate a hosting site with a static file handler
+				if (context.Request.Path.Value.Split('/').Last().Contains("."))
+				{
+					context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+					return Task.CompletedTask;
+				}
 
-                return next.Invoke();
-            });
+				return next.Invoke();
+			});
 
 			var storageOptions = new SqlServerStorageOptions
 			{
@@ -90,47 +91,58 @@ namespace ConsoleSample
 			};
 
 			var options = new ConfigurationOptions
-            {
-                ConnectionString = configurationConnectionString,
-                PrepareSchemaIfNecessary = true,
-                UpdateConfigurations = new []
-                {
-	                new UpdateStorageConfiguration
-	                {
-		                ConnectionString =defaultHangfireConnectionString,
-		                Name = DefaultConfigurationName.Name(),
-		                SchemaName = defaultHangfireSchema
-	                }
-                }
-            };
+			{
+				ConnectionString = configurationConnectionString,
+				PrepareSchemaIfNecessary = true,
+				UpdateConfigurations = new[]
+				{
+					new UpdateStorageConfiguration
+					{
+						ConnectionString = defaultHangfireConnectionString,
+						Name = DefaultConfigurationName.Name(),
+						SchemaName = defaultHangfireSchema
+					}
+				}
+			};
 
-            Console.WriteLine();
-            Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
-            app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
+			Console.WriteLine();
+			Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
+			app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
-            HangfireConfiguration = app
-                    .UseHangfireConfiguration(options)
-                    .UseStorageOptions(storageOptions)
-                ;
+			HangfireConfiguration = app
+					.UseHangfireConfiguration(options)
+					.UseStorageOptions(storageOptions)
+				;
 
-            HangfireConfiguration
-                .QueryAllWorkerServers()
-                .Select((configurationInfo, i) => (configurationInfo, i))
-                .ForEach(s =>
-                {
-                    Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
-                    app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(),
-                        s.configurationInfo.JobStorage);
-                });
+			HangfireConfiguration
+				.UseStorageOptions(storageOptions) //Needed???? already set above
+				.UseServerOptions(new BackgroundJobServerOptions
+				{
+					Queues = new[] {"critical", "default"},
+				})
+				.StartPublishers()
+				.StartWorkerServers(new[] {new CustomBackgroundProcess()});
 
-            HangfireConfiguration
-                .UseStorageOptions(storageOptions) //Needed???? already set above
-                .UseServerOptions(new BackgroundJobServerOptions
-                {
-                    Queues = new[] {"critical", "default"},
-                })
-                .StartPublishers()
-                .StartWorkerServers(new[] {new CustomBackgroundProcess()});
-        }
-    }
+#if NET6_0
+
+			HangfireConfiguration
+				.QueryAllWorkerServers()
+				.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
+
+			app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
+
+#else
+			HangfireConfiguration
+				.QueryAllWorkerServers()
+				.Select((configurationInfo, i) => (configurationInfo, i))
+				.ForEach(s =>
+				{
+					Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
+					app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(),
+						s.configurationInfo.JobStorage);
+				});
+
+#endif
+		}
+	}
 }

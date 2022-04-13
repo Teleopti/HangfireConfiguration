@@ -1,5 +1,6 @@
 ﻿#if NETSTANDARD2_0
 using Microsoft.AspNetCore.Builder;
+using Npgsql.TypeHandlers.DateTimeHandlers;
 #else
 using Owin;
 #endif
@@ -35,5 +36,23 @@ namespace Hangfire.Configuration
 			new HangfireConfiguration()
 				.UseApplicationBuilder(builder)
 				.UseOptions(options);
+
+#if NETSTANDARD2_0
+		public static void UseDynamicHangfireDashboards(
+			this IApplicationBuilder builder,
+			string pathMatch,
+			ConfigurationOptions options,
+			DashboardOptions dashboardOptions)
+		{
+			builder.Map(pathMatch, subApp =>
+			{
+				subApp.UseMiddleware<DynamicHangfireDashboardsMiddleware>(
+					options,
+					dashboardOptions
+				);
+			});
+		}
+#endif
+		
 	}
 }
