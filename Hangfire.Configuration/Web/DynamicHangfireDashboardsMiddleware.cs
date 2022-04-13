@@ -32,12 +32,9 @@ public class DynamicHangfireDashboardsMiddleware
 		var configurationId = int.Parse(matches.Groups[1].Value);
 		var resource = matches.Groups[2].Value;
 
-		var configurations = _configuration
+		var configuration = _configuration
 			.QueryAllWorkerServers()
-			.OrderByDescending(x => x.Publisher)
-			.ThenByDescending(x => x.ConfigurationId)
-			.ToArray();
-		var configuration = configurations.Single(x => x.ConfigurationId == configurationId);
+			.Single(x => x.ConfigurationId == configurationId);
 
 		var originalPath = context.Request.Path;
 		var originalPathBase = context.Request.PathBase;
