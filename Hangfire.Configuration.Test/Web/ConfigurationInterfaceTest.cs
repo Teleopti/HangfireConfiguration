@@ -179,6 +179,11 @@ namespace Hangfire.Configuration.Test.Web
 			var system = new SystemUnderTest();
 			system.ConfigurationStorage.Has(new StoredConfiguration
 			{
+				Id = 17,
+				Active = true
+			});
+			system.ConfigurationStorage.Has(new StoredConfiguration
+			{
 				Id = 3,
 				Active = true
 			});
@@ -191,7 +196,7 @@ namespace Hangfire.Configuration.Test.Web
 					configurationId = 3
 				})));
 
-			Assert.False(system.ConfigurationStorage.Data.Single().Active);
+			Assert.False(system.ConfigurationStorage.Data.Single(x => x.Id == 3).Active);
 		}
 		
 		[Test]
