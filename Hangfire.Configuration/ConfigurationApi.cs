@@ -135,10 +135,10 @@ namespace Hangfire.Configuration
 		public void InactivateServer(int configurationId)
 		{
 			var configurations = _storage.ReadConfigurations();
-			if (configurations.Count(x => x.Active==true) == 1)
-				throw new ArgumentException("You must have at least one active configuration!");
 			var inactivate = configurations.Single(x => x.Id == configurationId);
 			inactivate.Active = false;
+			if (!configurations.Any(x => x.Active==true))
+				throw new ArgumentException("You must have at least one active configuration!");
 			_storage.WriteConfiguration(inactivate);
 		}
 

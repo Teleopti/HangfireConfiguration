@@ -102,6 +102,27 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
         }
+        
+        [Test]
+        public void ShouldNotThrowDueToLastConfigurationWhenUnActivatingNonActive()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        Id = 1,
+		        Active = true
+	        });
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        Id = 2,
+		        Active = false
+	        });
+
+	        system.ConfigurationApi().InactivateServer(2);
+	        
+	        var configurations = system.ConfigurationStorage.Data;
+	        Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
+        }
 
         [Test]
         public void ShouldInactivateGivenConfiguration()
