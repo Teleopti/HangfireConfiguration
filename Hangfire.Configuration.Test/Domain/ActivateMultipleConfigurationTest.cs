@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 
@@ -56,14 +57,32 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration
             {
-                Id = 1,
-                Active = true
+	            Id = 1,
+	            Active = true
+            });
+            system.ConfigurationStorage.Has(new StoredConfiguration
+            {
+	            Id = 2,
+	            Active = true
             });
 
             system.ConfigurationApi().InactivateServer(1);
 
-            var configuration = system.ConfigurationStorage.Data.Single();
-            Assert.AreEqual(false, configuration.Active);
+            var configurations = system.ConfigurationStorage.Data;
+            Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
+        }
+        
+        [Test]
+        public void ShouldNotInactivateLastConfiguration()
+        {
+	        var system = new SystemUnderTest();
+	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        {
+		        Id = 1,
+		        Active = true
+	        });
+
+	        Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
         }
 
         [Test]
