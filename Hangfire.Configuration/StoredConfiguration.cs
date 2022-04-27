@@ -1,9 +1,6 @@
-using System;
-using Hangfire.Configuration.Internals;
-
 namespace Hangfire.Configuration;
 
-public class StoredConfiguration : IDbVendorSelector
+public class StoredConfiguration
 {
 	public int? Id { get; set; }
 	public string Name { get; set; }
@@ -12,9 +9,4 @@ public class StoredConfiguration : IDbVendorSelector
 	public int? GoalWorkerCount { get; set; }
 	public bool? Active { get; set; }
 	public int? MaxWorkersPerServer { get; set; }
-	
-	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis)
-	{
-		return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres, redis);
-	}
 }

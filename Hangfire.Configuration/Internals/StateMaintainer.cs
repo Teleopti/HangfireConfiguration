@@ -1,7 +1,5 @@
 using System.Linq;
-using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
-using Hangfire.SqlServer;
+using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 
@@ -13,7 +11,11 @@ internal class StateMaintainer
 	private readonly State _state;
 	private readonly object _lock = new();
 
-	internal StateMaintainer(IHangfire hangfire, IConfigurationStorage storage, ConfigurationUpdater configurationUpdater, State state)
+	internal StateMaintainer(
+		IHangfire hangfire, 
+		IConfigurationStorage storage, 
+		ConfigurationUpdater configurationUpdater, 
+		State state)
 	{
 		_hangfire = hangfire;
 		_storage = storage;
@@ -50,38 +52,27 @@ internal class StateMaintainer
 
 	private ConfigurationState buildConfigurationState(StoredConfiguration configuration)
 	{
-		var options = getStorageOptions(configuration);
-		assignSchemaName(configuration.SchemaName, options);
+		var provider = configuration.ConnectionString.GetProvider();
+		var options = getStorageOptions(provider, configuration);
+		assignSchemaName(provider, configuration.SchemaName, options);
 		return new ConfigurationState(
 			configuration,
 			() => _hangfire.MakeJobStorage(configuration.ConnectionString, options)
 		);
 	}
 
-	private object getStorageOptions(StoredConfiguration configuration) =>
-		configuration.ConnectionString.ToDbVendorSelector()
-			.SelectDialect<object>(
-				() => _state.StorageOptionsSqlServer.DeepCopy() ?? new SqlServerStorageOptions(),
-				() => _state.StorageOptionsPostgreSql.DeepCopy() ?? new PostgreSqlStorageOptions(),
-				() => _state.StorageOptionsRedis.DeepCopy() ?? new RedisStorageOptions()
-			);
+	private object getStorageOptions(IStorageProvider provider, StoredConfiguration configuration)
+	{
+		var options = _state
+			.StorageOptions
+			.FirstOrDefault(provider.OptionsIsSuitable);
+		return provider.CopyOptions(options) ?? provider.NewOptions();
+	}
 
-	private static void assignSchemaName(string schemaName, object options)
+	private static void assignSchemaName(IStorageProvider provider, string schemaName, object options)
 	{
 		if (string.IsNullOrEmpty(schemaName))
-			schemaName = DefaultSchemaName.ForStorageOptions(options);
-
-		switch (options)
-		{
-			case SqlServerStorageOptions sqlServerStorageOptions:
-				sqlServerStorageOptions.SchemaName = schemaName;
-				break;
-			case PostgreSqlStorageOptions postgreSqlStorageOptions:
-				postgreSqlStorageOptions.SchemaName = schemaName;
-				break;
-			case RedisStorageOptions redisStorageOptions:
-				redisStorageOptions.Prefix = schemaName;
-				break;
-		}
+			schemaName = provider.DefaultSchemaName();
+		provider.AssignSchemaName(options, schemaName);
 	}
 }

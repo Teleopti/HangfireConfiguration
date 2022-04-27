@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 
@@ -46,8 +47,8 @@ internal class WorkerServerUpgrader
 			})
 			.Select(x =>
 			{
-				var schemaName = x.SchemaName ?? x.ConnectionString.ToDbVendorSelector()
-					.SelectDialect(DefaultSchemaName.SqlServer(), DefaultSchemaName.Postgres());
+				var schemaName = x.SchemaName ?? x.ConnectionString
+					.GetProvider().DefaultSchemaName();
 
 				var connectionString = setCredentials(command, x.ConnectionString);
 

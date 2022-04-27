@@ -1,8 +1,5 @@
-using Hangfire.Configuration.Internals;
-using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
+using Hangfire.Configuration.Providers;
 using Hangfire.Server;
-using Hangfire.SqlServer;
 #if NET472
 using Owin;
 #else
@@ -34,12 +31,8 @@ namespace Hangfire.Configuration
 
 		public JobStorage MakeJobStorage(string connectionString, object options)
 		{
-			return connectionString.ToDbVendorSelector()
-				.SelectDialect<JobStorage>(
-					() => new SqlServerStorage(connectionString, (SqlServerStorageOptions) options),
-					() => new PostgreSqlStorage(connectionString, (PostgreSqlStorageOptions) options),
-					() => new RedisStorage(connectionString, (RedisStorageOptions) options)
-				);
+			return connectionString.GetProvider()
+				.NewStorage(connectionString, options);
 		}
 	}
 }

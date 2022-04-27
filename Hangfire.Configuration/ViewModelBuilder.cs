@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
+using Hangfire.Configuration.Providers;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -24,12 +24,7 @@ namespace Hangfire.Configuration
 					var schemaName = x.SchemaName;
 					var connstring = hidePassword(x);
 					if (x.ConnectionString != null)
-					{
-						schemaName ??= x.SelectDialect(
-							DefaultSchemaName.SqlServer,
-							DefaultSchemaName.Postgres,
-							DefaultSchemaName.Redis);
-					}
+						schemaName ??= x.ConnectionString.GetProvider().DefaultSchemaName();
 
 					return new ViewModel
 					{
@@ -47,7 +42,7 @@ namespace Hangfire.Configuration
 		private static string hidePassword(StoredConfiguration x)
 		{
 			const string hiddenPassword = "******";
-			return x.SelectDialect(
+			return x.ConnectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
 				() =>

@@ -1,3 +1,5 @@
+using Hangfire.Configuration.Providers;
+
 namespace Hangfire.Configuration.Internals;
 
 internal class RedisServerConfigurationCreator
@@ -13,7 +15,7 @@ internal class RedisServerConfigurationCreator
 
 	public void Create(CreateRedisWorkerServer command)
 	{
-		var prefix = command.Prefix ?? DefaultSchemaName.Redis();
+		var prefix = command.Prefix ?? new RedisStorageProvider().DefaultSchemaName();
 		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration, prefix);
 
 		_storage.WriteConfiguration(new StoredConfiguration

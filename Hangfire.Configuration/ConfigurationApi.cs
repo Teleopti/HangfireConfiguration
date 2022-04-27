@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
+using Hangfire.Configuration.Providers;
 using Npgsql;
 
 namespace Hangfire.Configuration
@@ -88,7 +89,7 @@ namespace Hangfire.Configuration
 			_sqlDialectCreator.Create(
 				storage,
 				creator,
-				command.SchemaName ?? DefaultSchemaName.SqlServer(),
+				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
 				command.Name
 			);
 		}
@@ -113,7 +114,7 @@ namespace Hangfire.Configuration
 			_sqlDialectCreator.Create(
 				storage,
 				creator,
-				command.SchemaName ?? DefaultSchemaName.Postgres(),
+				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
 				command.Name
 			);
 		}
