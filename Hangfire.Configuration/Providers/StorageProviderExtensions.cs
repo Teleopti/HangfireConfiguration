@@ -9,6 +9,10 @@ internal static class StorageProviderExtensions
 			.SelectDialect<IStorageProvider>(
 				() => new SqlServerStorageProvider(),
 				() => new PostgresStorageProvider(),
+#if Redis
 				() => new RedisStorageProvider()
+#else
+				() => new SqlServerStorageProvider()
+#endif
 			);
 }

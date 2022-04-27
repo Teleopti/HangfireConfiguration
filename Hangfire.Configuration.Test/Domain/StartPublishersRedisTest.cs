@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿#if Redis
+
+using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Pro.Redis;
 using NUnit.Framework;
 
@@ -20,13 +23,15 @@ public class StartPublishersRedisTest
 
 		var options = new RedisStorageOptions();
 		var storage = system.Hangfire.CreatedStorages.Single();
-		Assert.AreEqual(options.Prefix, storage.RedisOptions.Prefix);
-		Assert.AreEqual(options.MultiplexerPoolSize, storage.RedisOptions.MultiplexerPoolSize);
-		Assert.AreEqual(options.Database, storage.RedisOptions.Database);
-		Assert.AreEqual(options.InvisibilityTimeout, storage.RedisOptions.InvisibilityTimeout);
-		Assert.AreEqual(options.MaxSucceededListLength, storage.RedisOptions.MaxSucceededListLength);
-		Assert.AreEqual(options.MaxDeletedListLength, storage.RedisOptions.MaxDeletedListLength);
-		Assert.AreEqual(options.MaxStateHistoryLength, storage.RedisOptions.MaxStateHistoryLength);
-		Assert.AreEqual(options.CheckCertificateRevocation, storage.RedisOptions.CheckCertificateRevocation);
+		Assert.AreEqual(options.Prefix, storage.RedisOptions().Prefix);
+		Assert.AreEqual(options.MultiplexerPoolSize, storage.RedisOptions().MultiplexerPoolSize);
+		Assert.AreEqual(options.Database, storage.RedisOptions().Database);
+		Assert.AreEqual(options.InvisibilityTimeout, storage.RedisOptions().InvisibilityTimeout);
+		Assert.AreEqual(options.MaxSucceededListLength, storage.RedisOptions().MaxSucceededListLength);
+		Assert.AreEqual(options.MaxDeletedListLength, storage.RedisOptions().MaxDeletedListLength);
+		Assert.AreEqual(options.MaxStateHistoryLength, storage.RedisOptions().MaxStateHistoryLength);
+		Assert.AreEqual(options.CheckCertificateRevocation, storage.RedisOptions().CheckCertificateRevocation);
 	}
 }
+
+#endif

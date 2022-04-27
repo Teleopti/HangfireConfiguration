@@ -12,12 +12,16 @@ public class InstallRedisAttribute : Attribute, ITestAction
 	
 	public void BeforeTest(ITest test)
 	{
+#if Redis
 		redis = Process.Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "redis-server.exe"));
+#else
+		Assert.Ignore("Redis!");
+#endif
 	}
 
 	public void AfterTest(ITest test)
 	{
-		redis.Kill();
+		redis?.Kill();
 	}
 
 	public ActionTargets Targets => ActionTargets.Test;

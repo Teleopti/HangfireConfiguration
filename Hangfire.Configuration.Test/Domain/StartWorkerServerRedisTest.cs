@@ -1,5 +1,8 @@
-﻿using System;
+﻿#if Redis
+
+using System;
 using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Pro.Redis;
 using NUnit.Framework;
 using SharpTestsEx;
@@ -16,7 +19,8 @@ namespace Hangfire.Configuration.Test.Domain
 
 			system.WorkerServerStarter.Start();
 
-			Assert.NotNull(system.Hangfire.StartedServers.Single().storage.RedisOptions);
+			system.Hangfire.StartedServers.Single().storage.Options
+				.Should().Be.OfType<RedisStorageOptions>();
 		}
 
 		[Test]
@@ -38,7 +42,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 			system.WorkerServerStarter.Start();
 
-			var actual = system.Hangfire.StartedServers.Single().storage.RedisOptions;
+			var actual = system.Hangfire.StartedServers.Single().storage.RedisOptions();
 			actual.Should().Not.Be.SameInstanceAs(options);
 			actual.MultiplexerPoolSize.Should().Be.EqualTo(1);
 			actual.Database.Should().Be.EqualTo(42);
@@ -62,7 +66,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 			system.PublisherStarter.Start();
 
-			Assert.AreEqual("myprefix:", system.Hangfire.CreatedStorages.Single().RedisOptions.Prefix);
+			Assert.AreEqual("myprefix:", system.Hangfire.CreatedStorages.Single().RedisOptions().Prefix);
 		}
 		
 		[Test]
@@ -78,8 +82,10 @@ namespace Hangfire.Configuration.Test.Domain
 
 			system.WorkerServerStarter.Start();
 
-			Assert.AreEqual(DefaultSchemaName.Redis(),
-				system.Hangfire.StartedServers.Single().storage.RedisOptions.Prefix);
+			system.Hangfire.StartedServers.Single().storage.RedisOptions().Prefix
+				.Should().Be.EqualTo(new RedisStorageOptions().Prefix);
 		}
 	}
 }
+
+#endif

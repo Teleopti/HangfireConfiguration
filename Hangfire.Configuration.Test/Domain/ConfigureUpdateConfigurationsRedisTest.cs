@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿#if Redis
+
+using System.Linq;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
@@ -27,3 +29,5 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 	}
 }
+
+#endif

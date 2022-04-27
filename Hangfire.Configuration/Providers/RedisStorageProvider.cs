@@ -1,3 +1,4 @@
+#if Redis
 using Hangfire.Pro.Redis;
 
 namespace Hangfire.Configuration.Providers;
@@ -34,3 +35,5 @@ public class RedisStorageProvider : IStorageProvider
 		return new RedisStorage(connectionString, (RedisStorageOptions) options);
 	}
 }
+
+#endif

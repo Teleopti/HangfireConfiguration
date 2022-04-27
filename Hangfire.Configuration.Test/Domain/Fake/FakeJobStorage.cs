@@ -1,5 +1,4 @@
 using Hangfire.PostgreSql;
-using Hangfire.Pro.Redis;
 using Hangfire.SqlServer;
 using Hangfire.Storage;
 
@@ -10,7 +9,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 		public string ConnectionString { get; }
 		public SqlServerStorageOptions SqlServerOptions => Options as SqlServerStorageOptions;
 		public PostgreSqlStorageOptions PostgresOptions => Options as PostgreSqlStorageOptions;
-		public RedisStorageOptions RedisOptions => Options as RedisStorageOptions;
+
 		public object Options { get; }
 		private readonly IMonitoringApi _monitoringApi;
 
