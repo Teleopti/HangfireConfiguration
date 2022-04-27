@@ -7,7 +7,7 @@ internal class State
 {
 	public ConfigurationOptions Options { private get; set; }
 
-	public List<object> StorageOptions { get; } = new List<object>();
+	public List<object> StorageOptions { get; } = new();
 	public BackgroundJobServerOptions ServerOptions { get; set; }
 
 	public IEnumerable<ConfigurationState> Configurations = Enumerable.Empty<ConfigurationState>();

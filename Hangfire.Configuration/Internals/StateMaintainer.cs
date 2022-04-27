@@ -53,7 +53,7 @@ internal class StateMaintainer
 	private ConfigurationState buildConfigurationState(StoredConfiguration configuration)
 	{
 		var provider = configuration.ConnectionString.GetProvider();
-		var options = getStorageOptions(provider, configuration);
+		var options = getStorageOptions(provider);
 		assignSchemaName(provider, configuration.SchemaName, options);
 		return new ConfigurationState(
 			configuration,
@@ -61,11 +61,11 @@ internal class StateMaintainer
 		);
 	}
 
-	private object getStorageOptions(IStorageProvider provider, StoredConfiguration configuration)
+	private object getStorageOptions(IStorageProvider provider)
 	{
 		var options = _state
 			.StorageOptions
-			.FirstOrDefault(provider.OptionsIsSuitable);
+			.SingleOrDefault(provider.OptionsIsSuitable);
 		return provider.CopyOptions(options) ?? provider.NewOptions();
 	}
 
