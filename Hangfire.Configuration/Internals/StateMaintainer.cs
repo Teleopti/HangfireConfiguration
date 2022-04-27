@@ -65,7 +65,7 @@ internal class StateMaintainer
 	{
 		var options = _state
 			.StorageOptions
-			.SingleOrDefault(provider.OptionsIsSuitable);
+			.LastOrDefault(provider.OptionsIsSuitable);
 		return provider.CopyOptions(options) ?? provider.NewOptions();
 	}
 
