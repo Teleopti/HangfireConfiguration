@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Threading;
 using Dapper;
 using Npgsql;
+using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test;
 
@@ -10,6 +11,8 @@ public static class DatabaseTestSetup
 {
 	public static void SetupPostgres(string connectionString, int? schemaVersion = null)
 	{
+		Assert.Ignore("Ignore for now");
+		
 		var database = new NpgsqlConnectionStringBuilder(connectionString).Database;
 		var master = new NpgsqlConnectionStringBuilder(connectionString) { Database = "postgres" }.ToString();
 		using (var c = new NpgsqlConnection(master))
@@ -22,8 +25,14 @@ public static class DatabaseTestSetup
 			installSchema(conn, schemaVersion);
 	}
 	
+	public static bool RanSingleTest;
+	
 	public static void SetupSqlServer(string connectionString, int? schemaVersion = null)
 	{
+		if (RanSingleTest)
+			Assert.Ignore("Ignore the rest");
+		RanSingleTest = true;
+		
 		var database = new SqlConnectionStringBuilder(connectionString).InitialCatalog;
 		var master = new SqlConnectionStringBuilder(connectionString) { InitialCatalog = "master" }.ToString();
 		using (var c = new SqlConnection(master))
@@ -31,7 +40,6 @@ public static class DatabaseTestSetup
 			c.Execute($"if db_id('{database}') is not null alter database [{database}] set single_user with rollback immediate");
 			c.Execute($"DROP DATABASE IF EXISTS [{database}]");
 			c.Execute($"CREATE DATABASE [{database}]");
-			Thread.Sleep(5000);
 		}
 		
 		using(var conn = new SqlConnection(connectionString))
