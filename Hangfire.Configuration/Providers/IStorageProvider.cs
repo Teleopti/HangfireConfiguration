@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration.Providers;
 
-public interface IStorageProvider
+internal interface IStorageProvider
 {
 	object CopyOptions(object options);
 	object NewOptions();

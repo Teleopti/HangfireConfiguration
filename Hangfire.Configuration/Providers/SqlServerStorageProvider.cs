@@ -3,7 +3,7 @@ using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Providers;
 
-public class SqlServerStorageProvider : IStorageProvider
+internal class SqlServerStorageProvider : IStorageProvider
 {
 	public object CopyOptions(object options)
 	{

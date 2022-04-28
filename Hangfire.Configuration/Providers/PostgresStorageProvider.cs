@@ -2,7 +2,7 @@ using Hangfire.PostgreSql;
 
 namespace Hangfire.Configuration.Providers;
 
-public class PostgresStorageProvider : IStorageProvider
+internal class PostgresStorageProvider : IStorageProvider
 {
 	public object CopyOptions(object options)
 	{

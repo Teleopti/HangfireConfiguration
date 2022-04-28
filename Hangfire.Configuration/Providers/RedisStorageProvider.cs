@@ -3,7 +3,7 @@ using Hangfire.Pro.Redis;
 
 namespace Hangfire.Configuration.Providers;
 
-public class RedisStorageProvider : IStorageProvider
+internal class RedisStorageProvider : IStorageProvider
 {
 	public object CopyOptions(object options)
 	{
