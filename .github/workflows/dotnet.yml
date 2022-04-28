@@ -18,6 +18,10 @@ jobs:
       run: |
           docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd" -e "MSSQL_PID=Express" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
 
+    - name: Setup PostgreSQL
+      run: |
+          docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=envers -p 5432:5432 -d postgres:13
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
