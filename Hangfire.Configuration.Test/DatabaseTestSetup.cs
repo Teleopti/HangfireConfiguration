@@ -1,5 +1,6 @@
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Threading;
 using Dapper;
 using Npgsql;
 
@@ -30,6 +31,7 @@ public static class DatabaseTestSetup
 			c.Execute($"if db_id('{database}') is not null alter database [{database}] set single_user with rollback immediate");
 			c.Execute($"DROP DATABASE IF EXISTS [{database}]");
 			c.Execute($"CREATE DATABASE [{database}]");
+			Thread.Sleep(5000);
 		}
 		
 		using(var conn = new SqlConnection(connectionString))
