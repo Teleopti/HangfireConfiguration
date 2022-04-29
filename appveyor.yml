@@ -20,12 +20,15 @@ nuget:
 #  - ps: Write-Host 'This is PowerShell'
 #  - ps: .\postgres-configure-sspi.ps1 Password12!
 before_build:
-- cmd: nuget restore
-build:
-  verbosity: minimal
-test:
-  assemblies:
-    - Hangfire.Configuration.Test.dll
+- cmd: dotnet restore -p:Redis=false
+build_script:
+- dotnet build --no-restore -p:Redis=false
+test_script:
+- dotnet test --no-build --verbosity normal
+#build:
+#  verbosity: minimal
+#  assemblies:
+#    - Hangfire.Configuration.Test.dll
 #    - Hangfire.Configuration.PostgreSql.Test.dll
 artifacts:
 - path: '**\*.nupkg'
