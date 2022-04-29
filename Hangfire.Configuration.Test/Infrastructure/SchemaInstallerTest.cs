@@ -25,17 +25,12 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldThrowExceptionWhenNoDatabase()
 		{
 			var creator = new SchemaInstaller();
-
 			var connectionString = SelectDialect(
-				() =>
-				{
-					// tcp: is also more common in production cloud anyway, so may be a better example
-					var iDoubtThisWillFixTheRealRandomIssue = "tcp:localhost";
-					return new SqlConnectionStringBuilder(ConnectionString) {InitialCatalog = "Does_Not_Exist", DataSource = iDoubtThisWillFixTheRealRandomIssue}.ToString();
-				},
+				() => new SqlConnectionStringBuilder(ConnectionString) {InitialCatalog = "Does_Not_Exist"}.ToString(),
 				() => new NpgsqlConnectionStringBuilder(ConnectionString) {Database = "Does_Not_Exist"}.ToString());
-
+			
 			var exception = Assert.Catch(() => creator.TryConnect(connectionString));
+			
 			exception.Message.Should().Contain("Does_Not_Exist");
 		}
 

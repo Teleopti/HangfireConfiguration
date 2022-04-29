@@ -15,6 +15,7 @@ public class InstallRedisAttribute : Attribute, ITestAction
 #if Redis
 		redis = Process.Start(Path.Combine(TestContext.CurrentContext.TestDirectory, "redis-server.exe"));
 #else
+		redis = null;
 		Assert.Ignore("Redis!");
 #endif
 	}

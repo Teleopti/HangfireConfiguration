@@ -9,29 +9,54 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+#    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup SqlServer
-      run: |
-          docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd" -e "MSSQL_PID=Standard" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+#    - name: Setup SqlServer (docker)
+#      run: |
+#          docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd" -e "MSSQL_PID=Standard" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
 
-    - name: Setup PostgreSQL
-      run: |
-          docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=envers -p 5432:5432 -d postgres:13
+#    - name: Setup PostgreSQL (docker)
+#      run: |
+#          docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=envers -p 5432:5432 -d postgres:13
 
+    - name: Setup SQL Server (choco)
+      shell: pwsh
+      run: |
+          choco install sql-server-express --no-progress
+    
+    - name: Setup PostgreSQL (choco)
+      shell: pwsh
+      run: |
+          choco install postgresql13 --no-progress --params '/Password:root'
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
 
+    - name: Setup nuget Hangfire.Pro source
+      run: |
+          dotnet nuget remove source "HangfirePro"
+          dotnet nuget add source https://nuget.hangfire.io/nuget/hangfire-pro/v3/index.json -u ${{ secrets.HANGFIRE_PRO_USERNAME }} -p ${{ secrets.HANGFIRE_PRO_PASSWORD }}
+    
     - name: Restore dependencies
-      run: dotnet restore -p:Redis=false
+      run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore -p:Redis=false
+      run: dotnet build --no-restore --configuration Release "-p:Redis=false;Version=1.5000.${{ github.run_number }}"
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      
+    - name: Build with Redis
+      run: dotnet build --no-restore --configuration Release "-p:Redis=true;Version=1.5000.${{ github.run_number }}"
+
+    - name: Test with Redis
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      
+#    - name: Push to nuget.org
+#      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

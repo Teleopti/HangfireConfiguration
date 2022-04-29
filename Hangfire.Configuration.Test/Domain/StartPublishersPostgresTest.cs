@@ -19,10 +19,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new NpgsqlConnectionStringBuilder
-			            {
-				            Host = "Hangfire"
-			            }.ToString(),
+			            ConnectionString = "Host=Hangfire",
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }

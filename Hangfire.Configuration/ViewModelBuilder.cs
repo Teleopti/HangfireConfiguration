@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -44,7 +45,14 @@ namespace Hangfire.Configuration
 			const string hiddenPassword = "******";
 			return x.ConnectionString.ToDbVendorSelector().SelectDialect(
 				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
-				() => new NpgsqlConnectionStringBuilder(x.ConnectionString).Password == null ? x.ConnectionString : new NpgsqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
+				() =>
+				{
+					var parsed = NpgsqlConnectionStringBuilderWorkaround.Parse(x.ConnectionString);
+					if (parsed.Password == null)
+						return x.ConnectionString;
+					parsed.Password = hiddenPassword;
+					return parsed.ToString();
+				},
 				() =>
 				{
 					var parsed = StackExchange.Redis.ConfigurationOptions.Parse(x.ConnectionString);

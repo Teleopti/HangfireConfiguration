@@ -65,7 +65,7 @@ internal static class DbVendorExtensions
 			}
 		);
 	}
-	
+
 	public static string SetCredentials(this string connectionString, bool useIntegratedSecurity, string userName, string password)
 	{
 		return new connectionStringDialectSelector(connectionString).SelectDialect(
@@ -73,11 +73,12 @@ internal static class DbVendorExtensions
 			{
 				if (useIntegratedSecurity)
 				{
-					var ret = new SqlConnectionStringBuilder(connectionString) { IntegratedSecurity = true };
+					var ret = new SqlConnectionStringBuilder(connectionString) {IntegratedSecurity = true};
 					ret.Remove("User Id");
 					ret.Remove("Password");
 					return ret.ToString();
 				}
+
 				return SetUserNameAndPassword(connectionString, userName, password);
 			},
 			() =>
@@ -86,13 +87,13 @@ internal static class DbVendorExtensions
 				{
 					var ret = new NpgsqlConnectionStringBuilder(connectionString)
 					{
-						Username = null, 
+						IntegratedSecurity = false,
+						Username = null,
 						Password = null
 					};
-					// Setting IntegratedSecurity property may throw if the environment this runs on is linux
-					ret.Add("Integrated Security", "True");
-					return ret.ToString();
+					return NpgsqlConnectionStringBuilderWorkaround.SetIntegratedSecurity(ret.ToString());
 				}
+
 				return SetUserNameAndPassword(connectionString, userName, password);
 			});
 	}
@@ -140,7 +141,7 @@ internal static class DbVendorExtensions
 		{
 			try
 			{
-				new NpgsqlConnectionStringBuilder(_connectionString);
+				NpgsqlConnectionStringBuilderWorkaround.Parse(_connectionString);
 				return true;
 			}
 			catch (Exception)
