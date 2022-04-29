@@ -84,8 +84,14 @@ internal static class DbVendorExtensions
 			{
 				if (useIntegratedSecurity)
 				{
-					return new NpgsqlConnectionStringBuilder(connectionString) 
-						{ IntegratedSecurity = true, Username = null, Password = null}.ToString();
+					var ret = new NpgsqlConnectionStringBuilder(connectionString)
+					{
+						Username = null, 
+						Password = null
+					};
+					// Setting IntegratedSecurity property may throw if the environment this runs on is linux
+					ret.Add("Integrated Security", "True");
+					return ret.ToString();
 				}
 				return SetUserNameAndPassword(connectionString, userName, password);
 			});
