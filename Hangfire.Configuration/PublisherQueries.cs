@@ -17,12 +17,8 @@ public class PublisherQueries
 		_stateMaintainer = stateMaintainer;
 	}
 
-	public IEnumerable<ConfigurationInfo> QueryPublishers()
-	{
-		if (_options.ConfigurationOptions().CachePublisherQuery)
-			return _state.PublisherQueryCache.Get(queryPublishers);
-		return queryPublishers();
-	}
+	public IEnumerable<ConfigurationInfo> QueryPublishers() =>
+		_state.PublisherQueryCache.Get(queryPublishers);
 
 	private ConfigurationInfo[] queryPublishers()
 	{

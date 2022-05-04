@@ -14,7 +14,5 @@ namespace Hangfire.Configuration
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new();
 
         public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
-
-        public bool CachePublisherQuery { get; set; } = true;
     }
 }
