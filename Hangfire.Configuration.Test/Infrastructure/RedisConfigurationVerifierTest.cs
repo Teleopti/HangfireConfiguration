@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if Redis
+using System;
 using NUnit.Framework;
 using StackExchange.Redis;
 
@@ -67,3 +68,4 @@ public class RedisConfigurationVerifierTest
 		});
 	}
 }
+#endif

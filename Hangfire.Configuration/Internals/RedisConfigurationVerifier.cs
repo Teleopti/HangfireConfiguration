@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+#if Redis
 using StackExchange.Redis;
+#endif
 
 namespace Hangfire.Configuration.Internals;
 
@@ -9,6 +11,7 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
+#if Redis
 		if(!Regex.IsMatch(prefix, @"^\{([^\{\}]+)\}:$"))
 			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
 		
@@ -24,5 +27,6 @@ internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
 
 		if (!redis.GetDatabase().StringSet(prefix + "dbmarker", "keep", null, When.NotExists))
 			throw new ArgumentException($"Prefix '{prefix}' already in use!");
+#endif
 	}
 }

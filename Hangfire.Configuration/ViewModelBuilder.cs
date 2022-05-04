@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.Configuration.Providers;
-using Npgsql;
 
 namespace Hangfire.Configuration
 {
@@ -55,10 +53,14 @@ namespace Hangfire.Configuration
 				},
 				() =>
 				{
+#if Redis
 					var parsed = StackExchange.Redis.ConfigurationOptions.Parse(x.ConnectionString);
 					if (parsed.Password != null)
 						parsed.Password = hiddenPassword;
 					return parsed.ToString();
+#else
+					return x.ConnectionString;
+#endif
 				});
 		}
 	}
