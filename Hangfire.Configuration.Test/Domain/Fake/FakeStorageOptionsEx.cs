@@ -1,5 +1,3 @@
-#if Redis
-
 using Hangfire.Pro.Redis;
 
 namespace Hangfire.Configuration.Test.Domain.Fake;
@@ -11,5 +9,3 @@ public static class FakeJobStorageEx
 		return instance.Options as RedisStorageOptions;
 	}
 }
-
-#endif

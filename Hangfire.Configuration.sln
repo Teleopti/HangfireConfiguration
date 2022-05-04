@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipeline", "pipeline", "{07
 		NuGet.Config = NuGet.Config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Redis", "Hangfire.Configuration\Hangfire.Configuration.Redis.csproj", "{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{BAE6AED1-5414-4314-8556-E2439C531791}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,4 @@
-﻿#if Redis
-
-using System;
+﻿using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Pro.Redis;
@@ -87,5 +85,3 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 	}
 }
-
-#endif

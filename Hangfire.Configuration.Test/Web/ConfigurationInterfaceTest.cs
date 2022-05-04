@@ -226,7 +226,6 @@ namespace Hangfire.Configuration.Test.Web
 			storedConfiguration.SchemaName.Should().Be("TestSchema");
 		}
 		
-#if Redis
 		[Test]
 		public async Task ShouldCreateNewServerConfigurationForRedis()
 		{
@@ -248,7 +247,6 @@ namespace Hangfire.Configuration.Test.Web
 			storedConfiguration.ConnectionString.Should().Be("gurka");
 			storedConfiguration.SchemaName.Should().Be("gurka:");
 		}
-#endif
 		
 	}
 }

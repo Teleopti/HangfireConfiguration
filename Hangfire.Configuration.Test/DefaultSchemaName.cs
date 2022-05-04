@@ -1,8 +1,6 @@
 using System.Reflection;
 using Hangfire.PostgreSql;
-#if Redis
 using Hangfire.Pro.Redis;
-#endif
 using Hangfire.SqlServer;
 
 namespace Hangfire.Configuration.Test
@@ -16,9 +14,6 @@ namespace Hangfire.Configuration.Test
 
 		public static string Postgres() => new PostgreSqlStorageOptions().SchemaName;
 
-#if Redis
 		public static string Redis() => new RedisStorageOptions().Prefix;
-#endif
-		
 	}
 }

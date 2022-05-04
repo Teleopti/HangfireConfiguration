@@ -1,6 +1,4 @@
-﻿#if Redis
-
-using System.Linq;
+﻿using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using Hangfire.Pro.Redis;
 using NUnit.Framework;
@@ -33,5 +31,3 @@ public class StartPublishersRedisTest
 		Assert.AreEqual(options.CheckCertificateRevocation, storage.RedisOptions().CheckCertificateRevocation);
 	}
 }
-
-#endif

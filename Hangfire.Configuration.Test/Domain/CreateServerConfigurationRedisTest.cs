@@ -1,6 +1,4 @@
-﻿#if Redis
-
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -120,5 +118,3 @@ public class CreateServerConfigurationRedisTest
 		system.ConfigurationStorage.Data.Should().Be.Empty();
 	}
 }
-
-#endif

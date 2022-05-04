@@ -6,17 +6,13 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	</PropertyGroup>
-	<PropertyGroup>
-		<Redis Condition="'$(Redis)' != 'false'">true</Redis>
-		<DefineConstants Condition="'$(Redis)' == 'true'">Redis</DefineConstants>
-	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
 		<PackageReference Include="SharpTestsEx" Version="2.0.0" />
-		<PackageReference Include="redis-64" Version="3.0.503" Condition="'$(Redis)' == 'true'" />
-		<None Include="$(Pkgredis-64)\tools\redis-server.exe" Condition="'$(Redis)' == 'true'" >
+		<PackageReference Include="redis-64" Version="3.0.503" />
+		<None Include="$(Pkgredis-64)\tools\redis-server.exe" >
 			<Link>redis-server.exe</Link>
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -28,6 +24,6 @@
 		<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.10" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Hangfire.Configuration\Hangfire.Configuration.csproj" />
+		<ProjectReference Include="..\Hangfire.Configuration\Hangfire.Configuration.Redis.csproj" />
 	</ItemGroup>
 </Project>

@@ -135,8 +135,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        Assert.AreEqual(DefaultSchemaName.Postgres(), result.Single().SchemaName);
         }
-         
-#if Redis
+	    
         [Test]
         public void ShouldBuildWithDefaultSchemaNameForRedis()
         {
@@ -153,7 +152,6 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        Assert.AreEqual(DefaultSchemaName.Redis(), result.Single().SchemaName);
         }
-#endif
 	    
         [Test]
         public void ShouldBuildWithConfigurationName()

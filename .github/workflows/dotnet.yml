@@ -47,15 +47,9 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore --configuration Release "-p:Redis=false;Version=2.0.${{ github.run_number }}"
+      run: dotnet build --no-restore --configuration Release "-p:Version=2.0.${{ github.run_number }}"
       
     - name: Test
-      run: dotnet test --no-build --configuration Release --verbosity normal
-      
-    - name: Build with Redis
-      run: dotnet build --no-restore --configuration Release "-p:Redis=true;Version=2.0.${{ github.run_number }}"
-      
-    - name: Test with Redis
       run: dotnet test --no-build --configuration Release --verbosity normal
       
     - name: Push to nuget.org
