@@ -9,7 +9,7 @@
 	<PropertyGroup>
 		<Redis Condition="'$(Redis)' != 'false'">true</Redis>
 		<DefineConstants Condition="'$(Redis)' == 'true'">Redis</DefineConstants>
-		<PackageId Condition="'$(Redis)' == 'true'">Calabrio.Hangfire.Configuration</PackageId>
+		<PackageId Condition="'$(Redis)' == 'true'">Hangfir3.Configuration.Redis</PackageId>
 		<PackageId Condition="'$(Redis)' != 'true'">Hangfire.Configuration</PackageId>
 	</PropertyGroup>
 	<ItemGroup>
