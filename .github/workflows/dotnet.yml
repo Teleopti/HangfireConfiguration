@@ -37,5 +37,5 @@ jobs:
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
       
-#    - name: Push to nuget.org
-#      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Push to nuget.org
+      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
