@@ -160,7 +160,7 @@ public class ConfigurationPage : RazorPage
 			</div>
         </div>
 		<br><br>
-        <button class='button' type='button'>Create</button>
+        <button class='button' type='button'>Create</button> (<b>Note!</b> Restart is needed!)
     </form>
 </fieldset>
 </div>
