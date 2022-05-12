@@ -5,7 +5,7 @@
 		<TargetFrameworks>net472;net6.0</TargetFrameworks>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.csproj"/>
+		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.Redis.csproj"/>
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
 		<PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1"/>
