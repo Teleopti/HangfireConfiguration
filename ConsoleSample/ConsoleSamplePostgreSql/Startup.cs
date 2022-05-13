@@ -7,15 +7,9 @@ using Hangfire.Common;
 using Hangfire.Configuration;
 using Hangfire.PostgreSql;
 using Hangfire.Server;
-#if !NET472
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-
-#else
-using Owin;
-
-#endif
 
 namespace ConsoleSample
 {
@@ -32,16 +26,12 @@ namespace ConsoleSample
 	{
 		public static HangfireConfiguration HangfireConfiguration;
 
-#if !NET472
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddHangfire(x => { });
 		}
 
 		public void Configure(IApplicationBuilder app)
-#else
-		public void Configuration(IAppBuilder app)
-#endif
 
 		{
 			GlobalConfiguration.Configuration
@@ -50,11 +40,7 @@ namespace ConsoleSample
 				.UseSimpleAssemblyNameTypeSerializer()
 				.UseRecommendedSerializerSettings();
 
-#if !NET472
 			app.UseDeveloperExceptionPage();
-#else
-			app.UseErrorPage(new Microsoft.Owin.Diagnostics.ErrorPageOptions { ShowExceptionDetails = true });
-#endif
 
 			var configurationConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
 			var defaultHangfireConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
@@ -117,26 +103,11 @@ namespace ConsoleSample
 				.StartPublishers()
 				.StartWorkerServers(new[] {new CustomBackgroundProcess()});
 
-#if NET6_0
-
 			HangfireConfiguration
 				.QueryAllWorkerServers()
 				.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
 
 			app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
-
-#else
-			HangfireConfiguration
-				.QueryAllWorkerServers()
-				.Select((configurationInfo, i) => (configurationInfo, i))
-				.ForEach(s =>
-				{
-					Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard{s.i}");
-					app.UseHangfireDashboard($"/HangfireDashboard{s.i}", new DashboardOptions(),
-						s.configurationInfo.JobStorage);
-				});
-
-#endif
 		}
 	}
 }

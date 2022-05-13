@@ -13,6 +13,9 @@ namespace Hangfire.Configuration
         public bool UseWorkerDeterminer { get; set; } = true;
         public WorkerDeterminerOptions WorkerDeterminerOptions { get; } = new();
 
+#if NETSTANDARD2_0
         public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
+#endif
+	    
     }
 }

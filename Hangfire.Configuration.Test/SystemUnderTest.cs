@@ -1,8 +1,4 @@
-#if !NET472
 using Microsoft.AspNetCore.Builder;
-#else
-using Microsoft.Owin.Builder;
-#endif
 using System;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
@@ -15,11 +11,8 @@ namespace Hangfire.Configuration.Test
 
 		public SystemUnderTest()
 		{
-#if !NET472
 			ApplicationBuilder = new ApplicationBuilder(null);
-#else
-            ApplicationBuilder = new AppBuilder();
-#endif
+			
 			UseApplicationBuilder(ApplicationBuilder);
 
 			ConfigurationStorage = new FakeConfigurationStorage();
@@ -41,11 +34,7 @@ namespace Hangfire.Configuration.Test
 			ServerCountSampleRecorder = buildServerCountSampleRecorder();
 		}
 
-#if !NET472
 		public ApplicationBuilder ApplicationBuilder { get; }
-#else
-        public AppBuilder ApplicationBuilder { get; }
-#endif
 
 		public FakeMonitoringApi Monitor { get; }
 		public FakeConfigurationStorage ConfigurationStorage { get; }

@@ -1,3 +1,5 @@
+#if NETSTANDARD2_0
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,35 +7,20 @@ using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Internals;
 using Newtonsoft.Json.Linq;
-#if NETSTANDARD2_0
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-#else
-using Microsoft.Owin;
-#endif
 
 namespace Hangfire.Configuration.Web
 {
-#if NETSTANDARD2_0
 	public class ConfigurationMiddleware
-#else
-	public class ConfigurationMiddleware : OwinMiddleware
-#endif
 	{
 		private readonly HangfireConfiguration _configuration;
 		private readonly ConfigurationApi _configurationApi;
 		private readonly ConfigurationOptions _options;
 
 		public ConfigurationMiddleware(
-#if NETSTANDARD2_0
 			RequestDelegate next,
-#else
-			OwinMiddleware next,
-#endif
 			IDictionary<string, object> properties)
-#if !NETSTANDARD2_0
-			: base(next)
-#endif
 		{
 			var injected = properties?.ContainsKey("HangfireConfiguration") ?? false;
 			if (injected)
@@ -55,25 +42,16 @@ namespace Hangfire.Configuration.Web
 					HangfireConfigurationSchemaInstaller.Install(c);
 		}
 
-#if NETSTANDARD2_0
 		public async Task Invoke(HttpContext context)
-#else
-		public override async Task Invoke(IOwinContext context)
-#endif
 		{
 			await handleRequest(context);
 		}
 
-#if NETSTANDARD2_0
 		private async Task handleRequest(HttpContext context)
 		{
 			var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
 			if (syncIoFeature != null)
 				syncIoFeature.AllowSynchronousIO = true;
-#else
-		private async Task handleRequest(IOwinContext context)
-		{
-#endif
 
 			if (context.Request.Path.Value.Equals("/script"))
 			{
@@ -144,18 +122,10 @@ namespace Hangfire.Configuration.Web
 			});
 		}
 
-#if NETSTANDARD2_0
 		private async Task<int> parseConfigurationId(HttpContext context) =>
-#else
-		private async Task<int> parseConfigurationId(IOwinContext context) =>
-#endif
 			(await parseRequestBody(context.Request)).SelectToken("configurationId").Value<int>();
 
-#if NETSTANDARD2_0
 		private async Task saveWorkerGoalCount(HttpContext context)
-#else
-		private async Task saveWorkerGoalCount(IOwinContext context)
-#endif
 		{
 			var parsed = await parseRequestBody(context.Request);
 			_configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
@@ -166,11 +136,7 @@ namespace Hangfire.Configuration.Web
 			context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
 		}
 
-#if NETSTANDARD2_0
 		private async Task saveMaxWorkersPerServer(HttpContext context)
-#else
-		private async Task saveMaxWorkersPerServer(IOwinContext context)
-#endif
 		{
 			var parsed = await parseRequestBody(context.Request);
 			_configurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
@@ -181,11 +147,7 @@ namespace Hangfire.Configuration.Web
 			context.Response.WriteAsync("Max workers per server was saved successfully!").Wait();
 		}
 
-#if NETSTANDARD2_0
 		private async Task createNewServerConfiguration(HttpContext context)
-#else
-		private async Task createNewServerConfiguration(IOwinContext context)
-#endif
 		{
 			var parsed = await parseRequestBody(context.Request);
 			var provider = parsed.SelectToken("databaseProvider")?.Value<string>();
@@ -229,11 +191,7 @@ namespace Hangfire.Configuration.Web
 			});
 		}
 
-#if NETSTANDARD2_0
 		private async Task<JObject> parseRequestBody(HttpRequest request)
-#else
-		private async Task<JObject> parseRequestBody(IOwinRequest request)
-#endif
 		{
 			string text;
 			using (var reader = new StreamReader(request.Body))
@@ -247,11 +205,7 @@ namespace Hangfire.Configuration.Web
 		private static int? tryParseNullable(string value) =>
 			int.TryParse(value, out var outValue) ? outValue : null;
 
-#if NETSTANDARD2_0
 		private async Task processRequest(HttpContext context, Func<Task> action)
-#else
-		private async Task processRequest(IOwinContext context, Func<Task> action)
-#endif
 		{
 			try
 			{
@@ -267,3 +221,5 @@ namespace Hangfire.Configuration.Web
 		}
 	}
 }
+
+#endif

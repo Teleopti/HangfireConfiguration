@@ -2,16 +2,13 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ConsoleSample</RootNamespace>
-		<TargetFrameworks>net472;net6.0</TargetFrameworks>
+		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.Redis.csproj"/>
+		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.Redis.csproj" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
-		<PackageReference Include="Microsoft.Owin.SelfHost" Version="4.0.1"/>
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0"/>
-		<PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0"/>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
 	</ItemGroup>
 </Project>

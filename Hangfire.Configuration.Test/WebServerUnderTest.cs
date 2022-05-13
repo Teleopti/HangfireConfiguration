@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-#if !NET472
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
-#else
-using Microsoft.Owin.Testing;
-#endif
 
 namespace Hangfire.Configuration.Test
 {
@@ -26,7 +22,6 @@ namespace Hangfire.Configuration.Test
 			_client = client;
 		}
 
-#if !NET472
 		private (IDisposable server, HttpClient client) createServer(HangfireConfiguration hangfireConfiguration)
 		{
 			var server = new HostBuilder()
@@ -44,20 +39,6 @@ namespace Hangfire.Configuration.Test
 
 			return (server, server.GetTestClient());
 		}
-
-#else
-		private (IDisposable server, HttpClient client) createServer(HangfireConfiguration hangfireConfiguration)
-		{
-			var server = TestServer.Create(app =>
-			{
-				app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
-				app.UseHangfireConfigurationUI(_urlPathMatch, null);
-			});
-
-			return (server, server.HttpClient);
-		}
-
-#endif
 
 		public HttpClient TestClient => _client;
 

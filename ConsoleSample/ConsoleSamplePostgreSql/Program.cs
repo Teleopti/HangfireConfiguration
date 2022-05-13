@@ -3,11 +3,7 @@ using System.Linq;
 using System.Threading;
 using Hangfire;
 using Hangfire.Configuration;
-#if !NET472
 using Microsoft.AspNetCore.Hosting;
-#else
-using Microsoft.Owin.Hosting;
-#endif
 
 namespace ConsoleSample
 {
@@ -19,7 +15,6 @@ namespace ConsoleSample
 		{
 			Console.WriteLine("Starting site on " + NodeAddress);
 
-#if !NET472
 			using (var host = new WebHostBuilder()
 				       .UseUrls(NodeAddress)
 				       .UseStartup<Startup>()
@@ -29,10 +24,6 @@ namespace ConsoleSample
 				host.Start();
 				mainLoop(Startup.HangfireConfiguration);
 			}
-#else
-            using (WebApp.Start<Startup>(NodeAddress))
-                mainLoop(Startup.HangfireConfiguration);
-#endif
 
 			Console.WriteLine("Press Enter to exit...");
 			Console.ReadLine();
