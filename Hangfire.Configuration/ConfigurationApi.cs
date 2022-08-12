@@ -60,7 +60,7 @@ namespace Hangfire.Configuration
 				if (configurationId != null)
 					configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
 				else
-					configuration = configurations.FirstOrDefault(x => x.Active.GetValueOrDefault());
+					configuration = configurations.FirstOrDefault(x => x.IsActive());
 
 				if (configuration == null)
 					configuration = configurations.First();

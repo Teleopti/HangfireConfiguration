@@ -53,7 +53,8 @@ namespace Hangfire.Configuration
         {
             serverOptions = copyOptions(serverOptions);
 
-            if (options.UseWorkerDeterminer)
+            //var enabled = configurationState.Configuration.GoalWorkerCountEnabled ?? true;
+            if (options.UseWorkerDeterminer) // && enabled)
                 serverOptions.WorkerCount = _workerDeterminer.DetermineWorkerCount(
                     configurationState.MonitoringApi,
                     configurationState.Configuration,

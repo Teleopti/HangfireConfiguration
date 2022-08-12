@@ -34,5 +34,5 @@ internal class ConfigurationState
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
 	internal IMonitoringApi MonitoringApi => _monitoringApi.Value;
 
-	internal bool IsPublisher() => Configuration.Active.GetValueOrDefault();
+	internal bool IsPublisher() => Configuration.IsActive();
 }

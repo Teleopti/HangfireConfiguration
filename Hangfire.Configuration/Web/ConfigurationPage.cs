@@ -51,10 +51,9 @@ public class ConfigurationPage : RazorPage
 		if (configuration.Name != null)
 			title = title + " - " + configuration.Name;
 		var state = "";
-		if (configuration.Active.HasValue)
-			state = configuration.Active.GetValueOrDefault() ? 
-				" - <span class='active'>⬤</span> Active" : 
-				" - <span class='inactive'>⬤</span> Inactive";
+		state = configuration.Active ? 
+			" - <span class='active'>⬤</span> Active" : 
+			" - <span class='inactive'>⬤</span> Inactive";
 
 		WriteLiteral($@"
                 <div class='configuration'>

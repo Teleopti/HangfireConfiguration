@@ -24,7 +24,7 @@ public class PublisherQueries
 	{
 		_stateMaintainer.Refresh();
 		return _state.Configurations
-			.Where(x => x.Configuration.Active.GetValueOrDefault())
+			.Where(x => x.Configuration.IsActive())
 			.Select(x => new ConfigurationInfo(x))
 			.ToArray();
 	}

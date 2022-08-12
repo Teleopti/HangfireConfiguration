@@ -31,7 +31,7 @@ namespace Hangfire.Configuration
 						Name = x.Name,
 						ConnectionString = connstring,
 						SchemaName = schemaName,
-						Active = x.Active,
+						Active = x.IsActive(),
 						Workers = x.GoalWorkerCount,
 						MaxWorkersPerServer = x.MaxWorkersPerServer
 					};

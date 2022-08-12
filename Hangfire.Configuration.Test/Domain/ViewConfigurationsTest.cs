@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             Assert.AreEqual(1, result.Id);
             Assert.Null(result.SchemaName);
-            Assert.Null(result.Active);
+            Assert.IsFalse(result.Active);
             Assert.Null(result.Workers);
         }
         
