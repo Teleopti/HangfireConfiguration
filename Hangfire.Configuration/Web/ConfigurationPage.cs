@@ -50,10 +50,7 @@ public class ConfigurationPage : RazorPage
 		var title = "Configuration";
 		if (configuration.Name != null)
 			title = title + " - " + configuration.Name;
-		var state = "";
-		state = configuration.Active ? 
-			" - <span class='active'>⬤</span> Active" : 
-			" - <span class='inactive'>⬤</span> Inactive";
+		var state = configuration.Active ? " - <span class='active'>⬤</span> Active" : " - <span class='inactive'>⬤</span> Inactive";
 
 		WriteLiteral($@"
                 <div class='configuration'>
@@ -66,9 +63,36 @@ public class ConfigurationPage : RazorPage
 			WriteLiteral($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
 		}
 
+		writeActivateConfiguration(configuration);
+
+		writeWorkerBalancer(configuration);
+
+		WriteLiteral(@"</fieldset></div>");
+	}
+
+	private void writeWorkerBalancer(ViewModel configuration)
+	{
+		var enabled = true ? " - <span class='active'>⬤</span> Enabled" : " - <span class='inactive'>⬤</span> Disabled";
+		enabled = "";
+
+		WriteLiteral($@"
+                    <fieldset>
+                        <legend>Worker balancer{enabled}</legend>
+						");
+
+		// Math.Min(Environment.ProcessorCount * 5, 20)
+		// WriteLiteral($@"
+		//               <div>
+		//                   <form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='enableWorkerBalancer'>
+		//                       <label style='width: 126px'>Worker balancer: </label>
+		//                       <button class='button' type='button'>Disable</button>
+		// 					(When disabled, each process will get (cores * 5, max 20) workers) 
+		//                   </form>
+		//               </div>");
+
 		WriteLiteral($@"
                 <div>
-                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount' style='margin-bottom: 3px'>
+                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
                         <label for='workers' style='width: 126px'>Worker goal count: </label>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
@@ -87,30 +111,24 @@ public class ConfigurationPage : RazorPage
                     </form>
                 </div>");
 
+		WriteLiteral($@"
+                    </fieldset>
+                        ");
+	}
 
-		if (configuration.Active == false)
-		{
-			WriteLiteral($@"
-                    <div>
-                        <form class='form' id=""activateForm_{configuration.Id}"" action='activateServer' data-reload='true'>
-                            <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                            <button class='button' type='button'>Activate configuration</button>
-                        </form>
-                    </div>");
-		}
+	private void writeActivateConfiguration(ViewModel configuration)
+	{
+		var form = configuration.Active ? "inactivateForm" : "activateForm";
+		var action = configuration.Active ? "inactivateServer" : "activateServer";
+		var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
 
-		if (configuration.Active == true)
-		{
-			WriteLiteral($@"
-                    <div>
-                        <form class='form' id=""inactivateForm_{configuration.Id}"" action='inactivateServer' data-reload='true'>
-                            <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                            <button class='button' type='button'>Inactivate configuration</button>
-                        </form>
-                    </div>");
-		}
-
-		WriteLiteral(@"</fieldset></div>");
+		WriteLiteral($@"
+                <div>
+                    <form class='form' id=""{form}_{configuration.Id}"" action='{action}' data-reload='true' style='margin: 10px'>
+                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+                        <button class='button' type='button'>{button}</button>
+                    </form>
+                </div>");
 	}
 
 	private void writeCreateConfiguration()
