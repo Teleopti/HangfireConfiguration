@@ -8,7 +8,7 @@ public class StoredConfiguration
 	public string SchemaName { get; set; }
 	public bool? Active { get; set; }
 	
-	//public bool? GoalWorkerCountEnabled { get; set; }
+	public bool? WorkerBalancerEnabled { get; set; }
 	public int? GoalWorkerCount { get; set; }
 	public int? MaxWorkersPerServer { get; set; }
 

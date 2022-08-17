@@ -26,42 +26,46 @@ namespace Hangfire.Configuration
 			_currentTransaction.Value.Commit();
 			_currentTransaction.Value = null;
 		}
+		
+		private string tableName()
+		{
+			var c = currentConnector();
+			return c.SelectDialect(
+				$@"[{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration",
+				$@"{HangfireConfigurationSchemaInstaller.SchemaName}.Configuration");
+		}
+
+		const string Columns = @"
+    Name, 
+    ConnectionString, 
+    SchemaName, 
+    GoalWorkerCount, 
+    Active,
+	MaxWorkersPerServer,
+	WorkerBalancerEnabled";
+
+		const string ColumnMaps = @"
+	@Name,
+    @ConnectionString, 
+    @SchemaName, 
+    @GoalWorkerCount, 
+    @Active,
+    @MaxWorkersPerServer,
+	@WorkerBalancerEnabled";
 
 		public void LockConfiguration()
 		{
 			var c = currentConnector();
 			var sql = c.SelectDialect(
-				$@"SELECT * FROM [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration WITH (TABLOCKX)",
-				$@"LOCK TABLE {HangfireConfigurationSchemaInstaller.SchemaName}.configuration");
+				$@"SELECT * FROM {tableName()} WITH (TABLOCKX)",
+				$@"LOCK TABLE {tableName()}");
 			c.Execute(sql);
 		}
 
 		public IEnumerable<StoredConfiguration> ReadConfigurations()
 		{
-			const string sqlServer = $@"
-SELECT 
-    Id, 
-    Name, 
-    ConnectionString, 
-    SchemaName, 
-    GoalWorkerCount, 
-    Active,
-	MaxWorkersPerServer
-FROM 
-    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration";
-			const string postgreSql = $@"
-SELECT 
-    Id, 
-    Name, 
-    ConnectionString, 
-    SchemaName, 
-    GoalWorkerCount, 
-    Active,
-	MaxWorkersPerServer
-FROM 
-    {HangfireConfigurationSchemaInstaller.SchemaName}.configuration";
 			var c = currentConnector();
-			var sql = c.SelectDialect(sqlServer, postgreSql);
+			var sql = $@"SELECT Id, {Columns} FROM {tableName()}";
 			return c.Query<StoredConfiguration>(sql).ToArray();
 		}
 
@@ -75,72 +79,27 @@ FROM
 
 		private void insert(StoredConfiguration configuration)
 		{
+			var sql = $@"INSERT INTO {tableName()} ({Columns}) VALUES ({ColumnMaps});";
 			var c = currentConnector();
-			var sql = c.SelectDialect($@"
-INSERT INTO 
-    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration 
-(
-    Name,
-    ConnectionString, 
-	SchemaName, 
-	GoalWorkerCount, 
-	Active,
-	MaxWorkersPerServer
-) VALUES (
-    @Name,
-    @ConnectionString, 
-    @SchemaName, 
-    @GoalWorkerCount, 
-    @Active,
-    @MaxWorkersPerServer
-);", $@"
-INSERT INTO 
-    {HangfireConfigurationSchemaInstaller.SchemaName}.Configuration 
-(
-    Name,
-    ConnectionString, 
-    SchemaName, 
-    GoalWorkerCount, 
-    Active,
-	MaxWorkersPerServer
-) VALUES (
-    @Name,
-    @ConnectionString, 
-    @SchemaName, 
-    @GoalWorkerCount, 
-    @Active,
-    @MaxWorkersPerServer
-);");
 			c.Execute(sql, configuration);
 		}
 
 		private void update(StoredConfiguration configuration)
 		{
+			var sql = $@"
+UPDATE 
+    {tableName()}
+SET 
+    Name = @Name,
+    ConnectionString = @ConnectionString, 
+    SchemaName = @SchemaName, 
+    GoalWorkerCount = @GoalWorkerCount, 
+    Active = @Active,
+    MaxWorkersPerServer = @MaxWorkersPerServer,
+	WorkerBalancerEnabled = @WorkerBalancerEnabled
+WHERE 
+    Id = @Id;";
 			var c = currentConnector();
-			var sql = c.SelectDialect($@"
-UPDATE 
-    [{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration 
-SET 
-    Name = @Name,
-    ConnectionString = @ConnectionString, 
-    SchemaName = @SchemaName, 
-    GoalWorkerCount = @GoalWorkerCount, 
-    Active = @Active,
-    MaxWorkersPerServer = @MaxWorkersPerServer    
-WHERE 
-    Id = @Id;", $@"
-UPDATE 
-    {HangfireConfigurationSchemaInstaller.SchemaName}.Configuration 
-SET 
-    Name = @Name,
-    ConnectionString = @ConnectionString, 
-    SchemaName = @SchemaName, 
-    GoalWorkerCount = @GoalWorkerCount, 
-    Active = @Active,
-    MaxWorkersPerServer = @MaxWorkersPerServer    
-WHERE 
-    Id = @Id;");
-
 			c.Execute(sql, configuration);
 		}
 	}

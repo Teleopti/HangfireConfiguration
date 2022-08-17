@@ -136,6 +136,20 @@ BEGIN
 SET @CURRENT_SCHEMA_VERSION = 5;
 END
 
+IF @CURRENT_SCHEMA_VERSION < 6 AND @TARGET_SCHEMA_VERSION >= 6
+BEGIN
+    
+    PRINT 'Installing HangfireConfiguration schema version 6';
+	
+	ALTER TABLE [$(HangfireConfigurationSchema)].[Configuration]
+	ADD WorkerBalancerEnabled [INT] NULL
+	
+	PRINT 'Added WorkerBalancerEnabled column in [$(HangfireConfigurationSchema)].[Configuration]';
+	
+SET @CURRENT_SCHEMA_VERSION = 6;
+END
+
+
 
 
 UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA_VERSION

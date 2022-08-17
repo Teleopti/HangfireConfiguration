@@ -10,7 +10,7 @@ namespace Hangfire.Configuration
     public static class HangfireConfigurationSchemaInstaller
     {
         public const string SchemaName = "HangfireConfiguration";
-        public const int SchemaVersion = 5;
+        public const int SchemaVersion = 6;
 
         private static readonly string sqlServerScript = getStringResource(
             typeof(HangfireConfigurationSchemaInstaller).GetTypeInfo().Assembly,
