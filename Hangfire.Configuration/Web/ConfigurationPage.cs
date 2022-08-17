@@ -86,7 +86,7 @@ public class ConfigurationPage : RazorPage
 		//                   <form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='enableWorkerBalancer'>
 		//                       <label style='width: 126px'>Worker balancer: </label>
 		//                       <button class='button' type='button'>Disable</button>
-		// 					(When disabled, each process will get (cores * 5, max 20) workers) 
+		// 					(When disabled, each server will get (cores * 5, max 20) workers) 
 		//                   </form>
 		//               </div>");
 
@@ -97,7 +97,7 @@ public class ConfigurationPage : RazorPage
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
                         <button class='button' type='button'>Submit</button>
-                            (Default: {_options.WorkerDeterminerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerDeterminerOptions.MaximumGoalWorkerCount})
+                            (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
                     </form>
                 </div>");
 

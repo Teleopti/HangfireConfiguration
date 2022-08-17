@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.UseOptions(new ConfigurationOptions
             {
-	            WorkerDeterminerOptions =
+	            WorkerBalancerOptions =
 	            {
 		            MinimumWorkerCount = 2
 	            }

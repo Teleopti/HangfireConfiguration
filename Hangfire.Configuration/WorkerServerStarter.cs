@@ -8,20 +8,20 @@ namespace Hangfire.Configuration
     public class WorkerServerStarter
     {
         private readonly IHangfire _hangfire;
-        private readonly WorkerDeterminer _workerDeterminer;
+        private readonly WorkerBalancer _workerBalancer;
         private readonly StateMaintainer _stateMaintainer;
         private readonly State _state;
         private readonly ServerCountSampleRecorder _recorder;
 
         internal WorkerServerStarter(
             IHangfire hangfire,
-            WorkerDeterminer workerDeterminer,
+            WorkerBalancer workerBalancer,
             StateMaintainer stateMaintainer,
             State state,
             ServerCountSampleRecorder recorder)
         {
             _hangfire = hangfire;
-            _workerDeterminer = workerDeterminer;
+            _workerBalancer = workerBalancer;
             _stateMaintainer = stateMaintainer;
             _state = state;
             _recorder = recorder;
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration
             var backgroundProcesses = new List<IBackgroundProcess>();
             if (additionalProcesses != null)
                 backgroundProcesses.AddRange(additionalProcesses);
-            if (_state.ReadOptions().WorkerDeterminerOptions.UseServerCountSampling)
+            if (_state.ReadOptions().WorkerBalancerOptions.UseServerCountSampling)
 				backgroundProcesses.Add(_recorder);
             var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
 
@@ -54,11 +54,11 @@ namespace Hangfire.Configuration
             serverOptions = copyOptions(serverOptions);
 
             //var enabled = configurationState.Configuration.GoalWorkerCountEnabled ?? true;
-            if (options.UseWorkerDeterminer) // && enabled)
-                serverOptions.WorkerCount = _workerDeterminer.DetermineWorkerCount(
+            if (options.UseWorkerBalancer) // && enabled)
+                serverOptions.WorkerCount = _workerBalancer.DetermineWorkerCount(
                     configurationState.MonitoringApi,
                     configurationState.Configuration,
-                    options.WorkerDeterminerOptions
+                    options.WorkerBalancerOptions
                 );
 
             _hangfire.UseHangfireServer(

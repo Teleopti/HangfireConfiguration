@@ -93,7 +93,7 @@ namespace Hangfire.Configuration
 
 		private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
 
-		private WorkerDeterminer buildWorkerDeterminer() => new(BuildKeyValueStore());
+		private WorkerBalancer buildWorkerDeterminer() => new(BuildKeyValueStore());
 
 		protected ServerCountSampleRecorder buildServerCountSampleRecorder() =>
 			new(

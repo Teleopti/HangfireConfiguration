@@ -4,27 +4,27 @@
     {
         public int MinimumServerCount
         {
-            set => WorkerDeterminerOptions.MinimumServerCount = value;
+            set => WorkerBalancerOptions.MinimumServerCount = value;
         }
 
         public bool UseServerCountSampling
         {
-            set => WorkerDeterminerOptions.UseServerCountSampling = value;
+            set => WorkerBalancerOptions.UseServerCountSampling = value;
         }
 
         public int MaximumGoalWorkerCount
         {
-            set => WorkerDeterminerOptions.MaximumGoalWorkerCount = value;
+            set => WorkerBalancerOptions.MaximumGoalWorkerCount = value;
         }
 
         public int DefaultGoalWorkerCount
         {
-            set => WorkerDeterminerOptions.DefaultGoalWorkerCount = value;
+            set => WorkerBalancerOptions.DefaultGoalWorkerCount = value;
         }
 
         public int MinimumWorkerCount
         {
-            set => WorkerDeterminerOptions.MinimumWorkerCount = value;
+            set => WorkerBalancerOptions.MinimumWorkerCount = value;
         }
     }
 }
