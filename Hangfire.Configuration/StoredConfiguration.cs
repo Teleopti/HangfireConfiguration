@@ -13,4 +13,5 @@ public class StoredConfiguration
 	public int? MaxWorkersPerServer { get; set; }
 
 	internal bool IsActive() => Active.GetValueOrDefault();
+	internal bool WorkerBalancerIsEnabled() => WorkerBalancerEnabled ?? true;
 }

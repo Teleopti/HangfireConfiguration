@@ -81,7 +81,6 @@ namespace Hangfire.Configuration.Test.Domain
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            // ConnectionString = new SqlConnectionStringBuilder{ DataSource = "Hangfire" }.ToString(),
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            },

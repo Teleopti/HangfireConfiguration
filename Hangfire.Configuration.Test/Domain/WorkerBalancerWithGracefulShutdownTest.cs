@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain
 {
-    public class WorkerCountWithGracefulShutdownTest
+    public class WorkerBalancerWithGracefulShutdownTest
     {
         [Test]
         public void ShouldCalculateWorkersOnStartOfSecondServer()

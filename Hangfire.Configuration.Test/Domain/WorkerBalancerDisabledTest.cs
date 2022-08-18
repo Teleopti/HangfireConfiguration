@@ -1,20 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class WorkerCountDisabledTest
+public class WorkerBalancerDisabledTest
 {
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldGetHangfireDefault()
 	{
 		var system = new SystemUnderTest();
 		system.ConfigurationStorage.Has(new StoredConfiguration
 		{
-			//GoalWorkerCountEnabled = false,
+			WorkerBalancerEnabled = false,
 			Active = true
 		});
 		
