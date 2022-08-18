@@ -72,8 +72,9 @@ public class ConfigurationPage : RazorPage
 
 	private void writeWorkerBalancer(ViewModel configuration)
 	{
-		var enabled = true ? " - <span class='active'>⬤</span> Enabled" : " - <span class='inactive'>⬤</span> Disabled";
-		enabled = "";
+		var enabled = configuration.WorkerBalancerEnabled ? " - <span class='enabled'>⬤</span> Enabled" : " - <span class='disabled'>⬤</span> Disabled";
+		var enableAction = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
+		var enableButton = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
 
 		WriteLiteral($@"
                     <fieldset>
@@ -81,14 +82,15 @@ public class ConfigurationPage : RazorPage
 						");
 
 		// Math.Min(Environment.ProcessorCount * 5, 20)
-		// WriteLiteral($@"
-		//               <div>
-		//                   <form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='enableWorkerBalancer'>
-		//                       <label style='width: 126px'>Worker balancer: </label>
-		//                       <button class='button' type='button'>Disable</button>
-		// 					(When disabled, each server will get (cores * 5, max 20) workers) 
-		//                   </form>
-		//               </div>");
+		WriteLiteral($@"
+		        <div>
+					<form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='{enableAction}' data-reload='true'>
+						<label style='width: 126px'>Worker balancer: </label>
+						<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
+						<button class='button' type='button'>{enableButton}</button>
+						(When disabled, hangfire default will be used) 
+					</form>
+				</div>");
 
 		WriteLiteral($@"
                 <div>
@@ -118,13 +120,12 @@ public class ConfigurationPage : RazorPage
 
 	private void writeActivateConfiguration(ViewModel configuration)
 	{
-		var form = configuration.Active ? "inactivateForm" : "activateForm";
 		var action = configuration.Active ? "inactivateServer" : "activateServer";
 		var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
 
 		WriteLiteral($@"
                 <div>
-                    <form class='form' id=""{form}_{configuration.Id}"" action='{action}' data-reload='true' style='margin: 10px'>
+                    <form class='form' id=""activateForm_{configuration.Id}"" action='{action}' data-reload='true' style='margin: 10px'>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <button class='button' type='button'>{button}</button>
                     </form>

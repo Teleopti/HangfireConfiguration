@@ -31,11 +31,11 @@ legend {
 	font-weight: bold;
 }
 
-legend .active {
+legend .active, legend .enabled {
 	color: green;
 }
 
-legend .inactive {
+legend .inactive, legend .disabled {
 	color: red;
 }
 

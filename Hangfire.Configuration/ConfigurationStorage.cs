@@ -65,7 +65,7 @@ namespace Hangfire.Configuration
 		public IEnumerable<StoredConfiguration> ReadConfigurations()
 		{
 			var c = currentConnector();
-			var sql = $@"SELECT Id, {Columns} FROM {tableName()}";
+			var sql = $@"SELECT Id, {Columns} FROM {tableName()} ORDER BY Id";
 			return c.Query<StoredConfiguration>(sql).ToArray();
 		}
 

@@ -41,7 +41,7 @@ public class WorkerServerStarter
 
 		_stateMaintainer.Refresh();
 		_state.Configurations
-			.OrderBy(x => !(x.Configuration.Active ?? false))
+			.OrderBy(x => !x.Configuration.IsActive())
 			.ForEach(x => { startWorkerServer(x, options, serverOptions, backgroundProcesses); });
 	}
 
