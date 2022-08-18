@@ -98,7 +98,8 @@ namespace Hangfire.Configuration.Internals
 				                    new StoredConfiguration
 				                    {
 					                    Name = update.Name,
-					                    Active = true
+					                    Active = true,
+					                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
 				                    };
 
 				if (update.Name == DefaultConfigurationName.Name())
@@ -106,8 +107,7 @@ namespace Hangfire.Configuration.Internals
 				else
 					configuration.ConnectionString = update.ConnectionString;
 				configuration.SchemaName = update.SchemaName;
-				configuration.WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault();
-				
+
 				_storage.WriteConfiguration(configuration);
 			});
 

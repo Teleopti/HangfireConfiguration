@@ -70,4 +70,33 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
+	
+	[Test]
+	public void ShouldNotReenableIfConnectionStringIsChanged()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(new StoredConfiguration
+		{
+			Id = 1, 
+			Name = "hangfire", 
+			ConnectionString = new SqlConnectionStringBuilder {DataSource = "original"}.ToString(),
+			WorkerBalancerEnabled = false
+		});
+		
+		system.UseOptions(new ConfigurationOptions
+		{
+			UpdateConfigurations = new[]
+			{
+				new UpdateStorageConfiguration
+				{
+					Name = "hangfire",
+					ConnectionString = new SqlConnectionStringBuilder {DataSource = "changed"}.ToString()
+				}
+			}
+		});
+		system.WorkerServerStarter.Start();
+		
+		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+			.Should().Be(false);
+	}
 }
