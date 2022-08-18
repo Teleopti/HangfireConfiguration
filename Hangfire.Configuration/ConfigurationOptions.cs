@@ -10,7 +10,6 @@ namespace Hangfire.Configuration
         
         public IEnumerable<UpdateStorageConfiguration> UpdateConfigurations { get; set; }
 
-        public bool UseWorkerBalancer { get; set; } = true;
         public WorkerBalancerOptions WorkerBalancerOptions { get; } = new();
 
 #if NETSTANDARD2_0

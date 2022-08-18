@@ -161,19 +161,6 @@ namespace Hangfire.Configuration.Test.Domain
             
             Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
         }
-
-        [Test]
-        public void ShouldDisableWorkerDeterminer()
-        {
-            var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
-
-            system.UseOptions(new ConfigurationOptions {UseWorkerBalancer = false});
-            system.UseServerOptions(new BackgroundJobServerOptions {WorkerCount = 52});
-            system.WorkerServerStarter.Start();
-
-            Assert.AreEqual(52, system.Hangfire.StartedServers.Single().options.WorkerCount);
-        }
         
         [Test]
         public void ShouldGetHalfOfDefaultForFirstServer()

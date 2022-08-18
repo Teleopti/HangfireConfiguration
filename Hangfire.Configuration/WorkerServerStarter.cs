@@ -66,8 +66,7 @@ public class WorkerServerStarter
 
 	private void applyWorkerBalancer(ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)
 	{
-		var enabled = configurationState.Configuration.WorkerBalancerIsEnabled() &&
-		              options.UseWorkerBalancer;
+		var enabled = configurationState.Configuration.WorkerBalancerIsEnabled();
 		if (!enabled)
 			return;
 
