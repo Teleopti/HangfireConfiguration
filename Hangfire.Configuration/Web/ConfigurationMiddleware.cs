@@ -108,6 +108,18 @@ namespace Hangfire.Configuration.Web
 				return;
 			}
 
+			if (context.Request.Path.Value.Equals("/enableWorkerBalancer"))
+			{
+				await processRequest(context, async () => { _configurationApi.EnableWorkerBalancer(await parseConfigurationId(context)); });
+				return;
+			}
+
+			if (context.Request.Path.Value.Equals("/disableWorkerBalancer"))
+			{
+				await processRequest(context, async () => { _configurationApi.DisableWorkerBalancer(await parseConfigurationId(context)); });
+				return;
+			}
+			
 			if (!string.IsNullOrEmpty(context.Request.Path.Value))
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.NotFound;

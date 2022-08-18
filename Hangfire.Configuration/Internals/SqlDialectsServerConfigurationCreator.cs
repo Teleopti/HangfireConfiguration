@@ -19,7 +19,8 @@ internal class SqlDialectsServerConfigurationCreator
 		string storageConnectionString,
 		string creatorConnectionString,
 		string schemaName,
-		string name)
+		string name,
+		bool workerBalancer)
 	{
 		_installer.TryConnect(storageConnectionString);
 
@@ -35,7 +36,8 @@ internal class SqlDialectsServerConfigurationCreator
 			Name = name,
 			ConnectionString = storageConnectionString,
 			SchemaName = schemaName,
-			Active = false
+			Active = false,
+			WorkerBalancerEnabled = workerBalancer
 		});
 	}
 }

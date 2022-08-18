@@ -26,7 +26,8 @@ internal class RedisServerConfigurationCreator
 			SchemaName = prefix,
 			ConnectionString = command.Configuration,
 			Name = command.Name,
-			Active = false
+			Active = false,
+			WorkerBalancerEnabled = false
 		});
 	}
 	

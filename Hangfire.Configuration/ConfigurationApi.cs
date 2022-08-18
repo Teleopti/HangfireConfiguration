@@ -90,7 +90,8 @@ namespace Hangfire.Configuration
 				storage,
 				creator,
 				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
-				command.Name
+				command.Name,
+				true
 			);
 		}
 
@@ -115,7 +116,8 @@ namespace Hangfire.Configuration
 				storage,
 				creator,
 				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
-				command.Name
+				command.Name,
+				false
 			);
 		}
 
@@ -124,12 +126,7 @@ namespace Hangfire.Configuration
 
 		public void ActivateServer(int configurationId)
 		{
-			var configurations = _storage.ReadConfigurations();
-
-			var activate = configurations.Single(x => x.Id == configurationId);
-			activate.Active = true;
-			_storage.WriteConfiguration(activate);
-
+			mutateConfiguration(configurationId, c => { c.Active = true; });
 			_state.PublisherQueryCache.Invalidate();
 		}
 
@@ -138,7 +135,7 @@ namespace Hangfire.Configuration
 			var configurations = _storage.ReadConfigurations();
 			var inactivate = configurations.Single(x => x.Id == configurationId);
 			inactivate.Active = false;
-			if (!configurations.Any(x => x.Active==true))
+			if (!configurations.Any(x => x.Active == true))
 				throw new ArgumentException("You must have at least one active configuration!");
 			_storage.WriteConfiguration(inactivate);
 		}
@@ -151,5 +148,19 @@ namespace Hangfire.Configuration
 
 		public void WriteConfiguration(StoredConfiguration configuration) =>
 			_storage.WriteConfiguration(configuration);
+
+		public void EnableWorkerBalancer(int configurationId) =>
+			mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = true; });
+
+		public void DisableWorkerBalancer(int configurationId) =>
+			mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = false; });
+
+		private void mutateConfiguration(int configurationId, Action<StoredConfiguration> mutation)
+		{
+			var configurations = _storage.ReadConfigurations();
+			var configuration = configurations.Single(x => x.Id == configurationId);
+			mutation.Invoke(configuration);
+			_storage.WriteConfiguration(configuration);
+		}
 	}
 }
