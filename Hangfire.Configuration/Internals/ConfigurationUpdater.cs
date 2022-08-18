@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals
 {
@@ -104,8 +105,9 @@ namespace Hangfire.Configuration.Internals
 					configuration.ConnectionString = markConnectionString(update.ConnectionString);
 				else
 					configuration.ConnectionString = update.ConnectionString;
-
 				configuration.SchemaName = update.SchemaName;
+				configuration.WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault();
+				
 				_storage.WriteConfiguration(configuration);
 			});
 

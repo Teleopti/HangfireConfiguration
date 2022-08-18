@@ -8,6 +8,7 @@ internal interface IStorageProvider
 	
 	string DefaultSchemaName();
 	void AssignSchemaName(object options, string schemaName);
+	bool WorkerBalancerEnabledDefault();
 	
 	JobStorage NewStorage(string connectionString, object options);
 }

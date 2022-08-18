@@ -1,4 +1,5 @@
 ﻿using System;
+using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 
@@ -19,9 +20,12 @@ internal class SqlDialectsServerConfigurationCreator
 		string storageConnectionString,
 		string creatorConnectionString,
 		string schemaName,
-		string name,
-		bool workerBalancer)
+		string name)
 	{
+		var provider = storageConnectionString.GetProvider();
+		
+		schemaName ??= provider.DefaultSchemaName();
+		
 		_installer.TryConnect(storageConnectionString);
 
 		_installer.TryConnect(creatorConnectionString);
@@ -37,7 +41,7 @@ internal class SqlDialectsServerConfigurationCreator
 			ConnectionString = storageConnectionString,
 			SchemaName = schemaName,
 			Active = false,
-			WorkerBalancerEnabled = workerBalancer
+			WorkerBalancerEnabled = provider.WorkerBalancerEnabledDefault()
 		});
 	}
 }

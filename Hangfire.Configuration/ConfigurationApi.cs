@@ -89,9 +89,8 @@ namespace Hangfire.Configuration
 			_sqlDialectCreator.Create(
 				storage,
 				creator,
-				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
-				command.Name,
-				true
+				command.SchemaName,
+				command.Name
 			);
 		}
 
@@ -115,9 +114,8 @@ namespace Hangfire.Configuration
 			_sqlDialectCreator.Create(
 				storage,
 				creator,
-				command.SchemaName ?? storage.GetProvider().DefaultSchemaName(),
-				command.Name,
-				false
+				command.SchemaName,
+				command.Name
 			);
 		}
 

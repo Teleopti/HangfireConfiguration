@@ -41,7 +41,10 @@ public class DisableWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer { });
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		{
+			Server = "."
+		});
 
 		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
 			.Should().Be(true);
@@ -52,7 +55,10 @@ public class DisableWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer { });
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		{
+			Server = "localhost"
+		});
 
 		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
 			.Should().Be(false);
@@ -63,7 +69,10 @@ public class DisableWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer { });
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		{
+			Configuration = "my-redis"
+		});
 
 		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
 			.Should().Be(false);
