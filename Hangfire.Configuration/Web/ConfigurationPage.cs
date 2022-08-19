@@ -100,6 +100,7 @@ public class ConfigurationPage : RazorPage
                         <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
                         <button class='button' type='button'>Submit</button>
                             (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
+							(Temporary configuration, may reset to default at times)
                     </form>
                 </div>");
 
