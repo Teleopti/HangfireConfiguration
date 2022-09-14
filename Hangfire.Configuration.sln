@@ -11,11 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSamplePostgreSql", "ConsoleSample\ConsoleSamplePostgreSql\ConsoleSamplePostgreSql.csproj", "{BAE6AED1-5414-4314-8556-E2439C531791}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipeline", "pipeline", "{07E574AE-F67C-486C-AA54-342FD1BA092B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{07E574AE-F67C-486C-AA54-342FD1BA092B}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		NuGet.Config = NuGet.Config
+		LICENSE = LICENSE
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Redis", "Hangfire.Configuration\Hangfire.Configuration.Redis.csproj", "{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}"

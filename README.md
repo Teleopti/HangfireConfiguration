@@ -1,7 +1,8 @@
 Hangfire Configuration
 =======
 
-Configuration user interface for hangfire workers, servers and storages.
+Configuration user interface for Hangfire servers, storages and workers.
+Worker count balancer across multiple servers.
 
 Support for Sql Server, PostgreSql and Redis.
 
