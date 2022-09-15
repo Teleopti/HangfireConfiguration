@@ -23,7 +23,7 @@
 		<PackageReference Include="Hangfire.Core" Version="1.7.28" />
 		<PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
 		<PackageReference Include="Polly" Version="7.2.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Hangfire.Pro.Redis" Version="2.8.16" />
 		<PackageReference Include="StackExchange.Redis" Version="1.2.6" />
 	</ItemGroup>
