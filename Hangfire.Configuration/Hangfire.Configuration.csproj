@@ -14,7 +14,7 @@
 		<Description>Configuration user interface for Hangfire servers, storages and workers.</Description>
 		<PackageProjectUrl>https://github.com/Teleopti/HangfireConfiguration</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>hangfire, config</PackageTags>
+		<PackageTags>Hangfire</PackageTags>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
