@@ -13,7 +13,7 @@ jobs:
 
     - name: Setup SqlServer (docker)
       run: |
-          docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd2" -e "MSSQL_PID=Standard" -p 1433:1433 -d microsoft/mssql-server-windows-developer
+          docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd2" -e "MSSQL_PID=Standard" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
 
     - name: Setup PostgreSQL (choco)
       shell: pwsh
