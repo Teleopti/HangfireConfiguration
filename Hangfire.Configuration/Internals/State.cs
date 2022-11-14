@@ -5,6 +5,11 @@ namespace Hangfire.Configuration.Internals;
 
 internal class State
 {
+	public State(INow now)
+	{
+		QueryPublishersCache = new TimedCache<IEnumerable<ConfigurationInfo>>(now);
+	}
+	
 	public ConfigurationOptions Options { private get; set; }
 
 	public List<object> StorageOptions { get; } = new();
@@ -16,5 +21,5 @@ internal class State
 	public ConfigurationOptions ReadOptions() =>
 		Options ?? new ConfigurationOptions();
 
-	public PublisherQueryCache PublisherQueryCache { get; set; }
+	public TimedCache<IEnumerable<ConfigurationInfo>> QueryPublishersCache { get; }
 }

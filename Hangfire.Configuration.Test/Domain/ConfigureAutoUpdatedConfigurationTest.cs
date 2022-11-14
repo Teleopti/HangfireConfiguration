@@ -391,17 +391,18 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptions
             {
-	            UpdateConfigurations = new []
+	            UpdateConfigurations = new[]
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
+			            ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
             });
+            system.QueryPublishers();
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
             Assert.AreEqual("FirstUpdate", dataSource);
@@ -423,18 +424,19 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
             system.ConfigurationStorage.Clear();
-            
-            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+
+            system.UseOptions(new ConfigurationOptions
             {
-	            UpdateConfigurations = new []
+	            UpdateConfigurations = new[]
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "SecondUpdate" }.ToString(),
+			            ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
             });
+            system.QueryPublishers();
 
             var dataSource = new SqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).DataSource;
             Assert.AreEqual("SecondUpdate", dataSource);

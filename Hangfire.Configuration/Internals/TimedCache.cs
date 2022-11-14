@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class PublisherQueryCache
+internal class TimedCache<T>
 {
 	private readonly INow _now;
 	private DateTime? _timeout;
-	private ConfigurationInfo[] _data;
+	private T _data;
 	private readonly object _lock = new();
 
-	public PublisherQueryCache(INow now)
+	public TimedCache(INow now)
 	{
 		_now = now;
 	}
 
-	public IEnumerable<ConfigurationInfo> Get(Func<ConfigurationInfo[]> valueFactory)
+	public T Get(Func<T> valueFactory)
 	{
 		if (_now.UtcDateTime() >= _timeout)
 			Invalidate();
@@ -38,6 +38,6 @@ internal class PublisherQueryCache
 	public void Invalidate()
 	{
 		lock (_lock)
-			_data = null;
+			_data = default;
 	}
 }

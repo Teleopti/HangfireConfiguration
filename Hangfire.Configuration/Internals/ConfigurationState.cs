@@ -13,10 +13,14 @@ internal class ConfigurationState
 
 	public ConfigurationState(
 		StoredConfiguration configuration,
+		string connectionString,
+		string schemaName,
 		Func<JobStorage> jobStorageCreator
 	)
 	{
 		Configuration = configuration;
+		ConnectionString = connectionString;
+		SchemaName = schemaName;
 		_jobStorage = new Lazy<JobStorage>(jobStorageCreator, LazyThreadSafetyMode.ExecutionAndPublication);
 		_backgroundJobClient = new Lazy<IBackgroundJobClient>(() => new BackgroundJobClient(JobStorage), LazyThreadSafetyMode.ExecutionAndPublication);
 		_recurringJobManager = new Lazy<IRecurringJobManager>(() => new RecurringJobManager(JobStorage), LazyThreadSafetyMode.ExecutionAndPublication);
@@ -28,11 +32,20 @@ internal class ConfigurationState
 		var _ = _jobStorage.Value;
 	}
 
-	internal StoredConfiguration Configuration { get; set; }
+	internal StoredConfiguration Configuration;
+	internal string ConnectionString;
+	internal string SchemaName;
 	internal JobStorage JobStorage => _jobStorage.Value;
 	internal IBackgroundJobClient BackgroundJobClient => _backgroundJobClient.Value;
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
 	internal IMonitoringApi MonitoringApi => _monitoringApi.Value;
 
-	internal bool IsPublisher() => Configuration.IsActive();
+	internal bool IsPublisher()
+	{
+		if (Configuration == null)
+			return true;
+		return Configuration.IsActive();
+	}
+
+	internal bool WorkerBalancerIsEnabled() => Configuration.WorkerBalancerIsEnabled();
 }

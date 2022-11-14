@@ -12,9 +12,9 @@ internal class StateMaintainer
 	private readonly object _lock = new();
 
 	internal StateMaintainer(
-		IHangfire hangfire, 
-		IConfigurationStorage storage, 
-		ConfigurationUpdater configurationUpdater, 
+		IHangfire hangfire,
+		IConfigurationStorage storage,
+		ConfigurationUpdater configurationUpdater,
 		State state)
 	{
 		_hangfire = hangfire;
@@ -23,9 +23,27 @@ internal class StateMaintainer
 		_state = state;
 	}
 
-	public void Refresh()
+	public void Refresh() =>
+		refresh();
+
+	public void EnsureLoaded(string connectionString, string schemaName)
+	{
+		var exists = _state.Configurations
+			.Any(x => x.ConnectionString == connectionString && x.SchemaName == schemaName);
+		if (!exists)
+		{
+			_state.Configurations = _state.Configurations
+				.Append(buildConfigurationState(null, connectionString, schemaName));
+		}
+
+		refresh();
+	}
+
+	private void refresh()
 	{
 		var options = _state.ReadOptions();
+		// if (string.IsNullOrEmpty(options.ConnectionString))
+		// 	return;
 
 		var configurations = _storage.ReadConfigurations();
 		var configurationChanged = _configurationUpdater.Update(options, configurations);
@@ -34,30 +52,60 @@ internal class StateMaintainer
 
 		lock (_lock)
 		{
-			_state.Configurations = configurations
-				.OrderBy(x => x.Id)
-				.Select(c =>
+			configurations.ForEach(c =>
+			{
+				var existing = _state.Configurations
+					.SingleOrDefault(x => x.Configuration?.Id == c.Id);
+				if (existing == null)
+					existing = _state.Configurations
+						.Where(x => x.Configuration == null)
+						.Where(x => x.ConnectionString == c.ConnectionString)
+						.Where(x => x.SchemaName == c.SchemaName)
+						.SingleOrDefault();
+				if (existing != null)
 				{
-					var existing = _state.Configurations.SingleOrDefault(x => x.Configuration.Id == c.Id);
-					if (existing != null)
-					{
-						existing.Configuration = c;
-						return existing;
-					}
+					existing.Configuration = c;
+					return;
+				}
 
-					return buildConfigurationState(c);
-				}).ToArray();
+				_state.Configurations = _state.Configurations
+					.Append(buildConfigurationState(c))
+					.ToArray();
+			});
+
+			var toRemove = _state.Configurations
+				.Where(x => x.Configuration?.Id.HasValue ?? false)
+				.Where(x => !configurations.Select(x => x.Id).Contains(x.Configuration.Id))
+				.ToArray();
+			_state.Configurations = _state.Configurations.Except(toRemove).ToArray();
+			
+			_state.Configurations = _state.Configurations
+				.OrderBy(x => x.Configuration?.Id)
+				.ToArray();
+
 		}
 	}
 
-	private ConfigurationState buildConfigurationState(StoredConfiguration configuration)
+	private ConfigurationState buildConfigurationState(StoredConfiguration configuration) =>
+		buildConfigurationState(
+			configuration,
+			configuration.ConnectionString,
+			configuration.SchemaName
+		);
+
+	private ConfigurationState buildConfigurationState(
+		StoredConfiguration configuration,
+		string connectionString,
+		string schemaName)
 	{
-		var provider = configuration.ConnectionString.GetProvider();
+		var provider = connectionString.GetProvider();
 		var options = getStorageOptions(provider);
-		assignSchemaName(provider, configuration.SchemaName, options);
+		assignSchemaName(provider, schemaName, options);
 		return new ConfigurationState(
 			configuration,
-			() => _hangfire.MakeJobStorage(configuration.ConnectionString, options)
+			connectionString,
+			schemaName,
+			() => _hangfire.MakeJobStorage(connectionString, options)
 		);
 	}
 

@@ -16,8 +16,8 @@ public class ConfigurationInfo
 		_state.EnsureJobStorageInitialized();
 	}
 
-	public int ConfigurationId => _state.Configuration.Id.Value;
-	public string Name => _state.Configuration.Name;
+	public int? ConfigurationId => _state.Configuration?.Id;
+	public string Name => _state.Configuration?.Name;
 	public JobStorage JobStorage => _state.JobStorage;
 	public IBackgroundJobClient BackgroundJobClient => _state.BackgroundJobClient;
 	public IRecurringJobManager RecurringJobManager => _state.RecurringJobManager;

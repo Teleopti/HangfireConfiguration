@@ -391,17 +391,18 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptions
             {
-	            UpdateConfigurations = new []
+	            UpdateConfigurations = new[]
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "SecondUpdate" }.ToString(),
+			            ConnectionString = new NpgsqlConnectionStringBuilder {Host = "SecondUpdate"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
             });
+            system.QueryPublishers();
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
             Assert.AreEqual("FirstUpdate", host);
@@ -423,18 +424,19 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
             system.ConfigurationStorage.Clear();
-            
-            system.PublisherQueries.QueryPublishers(new ConfigurationOptions
+
+            system.UseOptions(new ConfigurationOptions
             {
-	            UpdateConfigurations = new []
+	            UpdateConfigurations = new[]
 	            {
 		            new UpdateStorageConfiguration
 		            {
-			            ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "SecondUpdate" }.ToString(),
+			            ConnectionString = new NpgsqlConnectionStringBuilder {Host = "SecondUpdate"}.ToString(),
 			            Name = DefaultConfigurationName.Name()
 		            }
 	            }
             });
+            system.QueryPublishers();
 
             var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
             Assert.AreEqual("SecondUpdate", host);

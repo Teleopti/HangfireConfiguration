@@ -16,7 +16,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start();
 
-            var storage = system.PublisherQueries.QueryPublishers();
+            var storage = system.QueryPublishers();
 
             Assert.NotNull(storage.Single());
         }
@@ -28,7 +28,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
             system.PublisherStarter.Start();
 
-            var storage = system.PublisherQueries.QueryPublishers()
+            var storage = system.QueryPublishers()
                 .Single().JobStorage as FakeJobStorage;
 
             Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start();
 
-            var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage;
+            var storage = system.QueryPublishers().Single().JobStorage;
 
             storage.Should().Be.SameInstanceAs(system.Hangfire.CreatedStorages.Single());
         }
@@ -55,7 +55,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
             system.PublisherStarter.Start();
 
-            var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
+            var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
             Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
         }
@@ -68,7 +68,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
             system.WorkerServerStarter.Start();
 
-            var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
+            var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
             Assert.AreEqual("Host=loscalhost;Database=fakedb;", storage.ConnectionString);
         }
@@ -85,7 +85,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi().ActivateServer(activatedId);
             system.ConfigurationApi().InactivateServer(inactivatedId);
 
-            var storage = system.PublisherQueries.QueryPublishers().Single().JobStorage as FakeJobStorage;
+            var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
 
             Assert.AreEqual("Host=loscalhost;Database=two;", storage.ConnectionString);
         }
@@ -96,19 +96,18 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration());
 
-            system.PublisherQueries
-                .QueryPublishers(
-                    new ConfigurationOptions
-                    {
-	                    UpdateConfigurations = new []
-	                    {
-		                    new UpdateStorageConfiguration
-		                    {
-			                    ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "Hangfire" }.ToString(),
-			                    Name = DefaultConfigurationName.Name()
-		                    }
-	                    }
-                    });
+            system.UseOptions(new ConfigurationOptions
+            {
+	            UpdateConfigurations = new[]
+	            {
+		            new UpdateStorageConfiguration
+		            {
+			            ConnectionString = new NpgsqlConnectionStringBuilder {Host = "Hangfire"}.ToString(),
+			            Name = DefaultConfigurationName.Name()
+		            }
+	            }
+            });
+            system.QueryPublishers();
 
             system.ConfigurationStorage.Data.Single().ConnectionString
 	            .Should().Contain("Hangfire");
@@ -125,7 +124,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             system.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
-            system.PublisherQueries.QueryPublishers();
+            system.QueryPublishers();
 
 			Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
         }
@@ -136,11 +135,11 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Host=loscalhost;Database=1;" });
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Host=loscalhost;Database=2;" });
-            system.PublisherQueries.QueryPublishers();
+            system.QueryPublishers();
             system.ConfigurationStorage.Remove(1);
             system.ConfigurationApi().ActivateServer(2);
             
-            var storage = system.PublisherQueries.QueryPublishers();
+            var storage = system.QueryPublishers();
             
             Assert.AreEqual("Host=loscalhost;Database=2;", (storage.Single().JobStorage as FakeJobStorage).ConnectionString);
         }
@@ -151,8 +150,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Id = 4, Active = true});
 
-            var configurationInfo = system.PublisherQueries.QueryPublishers()
-                .Single();
+            var configurationInfo = system.QueryPublishers().Single();
 
             Assert.AreEqual(4, configurationInfo.ConfigurationId);
         }
@@ -163,8 +161,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", Active = true});
 
-            var configurationInfo = system.PublisherQueries.QueryPublishers()
-                .Single();
+            var configurationInfo = system.QueryPublishers().Single();
 
             Assert.AreEqual("name", configurationInfo.Name);
         }

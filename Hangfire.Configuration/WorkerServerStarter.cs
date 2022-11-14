@@ -41,7 +41,7 @@ public class WorkerServerStarter
 
 		_stateMaintainer.Refresh();
 		_state.Configurations
-			.OrderBy(x => !x.Configuration.IsActive())
+			.OrderBy(x => !x.IsPublisher())
 			.ForEach(x => { startWorkerServer(x, options, serverOptions, backgroundProcesses); });
 	}
 
@@ -66,7 +66,7 @@ public class WorkerServerStarter
 
 	private void applyWorkerBalancer(ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)
 	{
-		var enabled = configurationState.Configuration.WorkerBalancerIsEnabled();
+		var enabled = configurationState.WorkerBalancerIsEnabled();
 		if (!enabled)
 			return;
 

@@ -28,7 +28,6 @@ namespace Hangfire.Configuration.Test
 			});
 			WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
 			PublisherStarter = BuildPublisherStarter();
-			PublisherQueries = new PublisherQueriesUnderTest(BuildPublisherQueries(), BuildOptions());
 			WorkerServerQueries = BuildWorkerServerQueries();
 			ViewModelBuilder = BuildViewModelBuilder();
 			ServerCountSampleRecorder = buildServerCountSampleRecorder();
@@ -45,7 +44,6 @@ namespace Hangfire.Configuration.Test
 
 		public WorkerServerStarterUnderTest WorkerServerStarter { get; }
 		public PublisherStarter PublisherStarter { get; }
-		public PublisherQueriesUnderTest PublisherQueries { get; }
 		public WorkerServerQueries WorkerServerQueries { get; }
 		public ViewModelBuilder ViewModelBuilder { get; }
 		public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
@@ -113,5 +111,6 @@ namespace Hangfire.Configuration.Test
 				return ConfigurationStorage.Data.First();
 			}
 		}
+
 	}
 }

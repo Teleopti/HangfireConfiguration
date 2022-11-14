@@ -125,7 +125,7 @@ namespace Hangfire.Configuration
 		public void ActivateServer(int configurationId)
 		{
 			mutateConfiguration(configurationId, c => { c.Active = true; });
-			_state.PublisherQueryCache.Invalidate();
+			_state.QueryPublishersCache.Invalidate();
 		}
 
 		public void InactivateServer(int configurationId)

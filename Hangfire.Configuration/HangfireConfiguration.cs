@@ -17,10 +17,7 @@ namespace Hangfire.Configuration
 
 		public HangfireConfiguration()
 		{
-			_state = new State
-			{
-				PublisherQueryCache = new PublisherQueryCache(BuildNow())
-			};
+			_state = new State(BuildNow());
 		}
 		
 #if NETSTANDARD2_0
@@ -75,6 +72,9 @@ namespace Hangfire.Configuration
 		public IEnumerable<ConfigurationInfo> QueryPublishers() =>
 			BuildPublisherQueries().QueryPublishers();
 
+		public ConfigurationInfo GetPublisher(string connectionString, string schemaName) =>
+			BuildPublisherQueries().GetPublisher(connectionString, schemaName);
+		
 		public ConfigurationApi ConfigurationApi() =>
 			BuildConfigurationApi();
 
@@ -120,7 +120,7 @@ namespace Hangfire.Configuration
 				new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 			);
 
-		protected PublisherQueries BuildPublisherQueries() => new(BuildOptions(), _state, builderStateMaintainer(null));
+		protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer(null));
 
 		protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(null), _state);
 
