@@ -326,7 +326,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            ConnectionString = @"Host=localhost;Database=fakedb;"
             });
 
-            system.UseOptions(new ConfigurationOptions());
+            system.UseOptions(new ConfigurationOptionsForTest());
             system.WorkerServerStarter.Start();
 
             var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();

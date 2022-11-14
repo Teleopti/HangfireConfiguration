@@ -15,17 +15,14 @@ namespace Hangfire.Configuration.Test
 			
 			UseApplicationBuilder(ApplicationBuilder);
 
-			ConfigurationStorage = new FakeConfigurationStorage();
+			ConfigurationStorage = new FakeConfigurationStorage(() => BuildOptions().ConfigurationOptions());
 			KeyValueStore = new FakeKeyValueStore();
 			SchemaInstaller = new FakeSchemaInstaller();
 			Monitor = new FakeMonitoringApi();
 			Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
 			RedisConfigurationVerifier = new FakeRedisConfigurationVerifier();
 
-			UseOptions(new ConfigurationOptions
-			{
-				ConnectionString = "unknown-storage"
-			});
+			UseOptions(new ConfigurationOptionsForTest());
 			WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
 			PublisherStarter = BuildPublisherStarter();
 			WorkerServerQueries = BuildWorkerServerQueries();

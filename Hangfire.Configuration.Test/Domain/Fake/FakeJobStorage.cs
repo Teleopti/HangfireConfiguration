@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake
 
 		public override IStorageConnection GetConnection()
 		{
-			throw new System.NotImplementedException();
+			throw new System.NotImplementedException("Hangfire is faked!");
 		}
 	}
 }

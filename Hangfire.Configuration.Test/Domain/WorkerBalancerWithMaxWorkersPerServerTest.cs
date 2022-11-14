@@ -22,7 +22,7 @@ public class WorkerBalancerWithMaxWorkersPerServerTest
 	public void ShouldUseMinimumWhenMaxIsLess()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptionsForTest
 		{
 			WorkerBalancerOptions =
 			{

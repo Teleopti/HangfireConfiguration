@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain
         [Test]
         public void ShouldNotStartRecorder()
         {
-	        var options = new ConfigurationOptions();
+	        var options = new ConfigurationOptionsForTest();
 	        options.WorkerBalancerOptions.UseServerCountSampling = false;
 	        var system = new SystemUnderTest();
 	        system.UseOptions(options);

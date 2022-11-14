@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {
@@ -57,7 +57,7 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", ConnectionString = "previous"});
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {
@@ -79,7 +79,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {

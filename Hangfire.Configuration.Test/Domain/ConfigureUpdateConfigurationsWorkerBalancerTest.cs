@@ -13,7 +13,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.UseOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptionsForTest
 		{
 			UpdateConfigurations = new[]
 			{
@@ -34,7 +34,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.UseOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptionsForTest
 		{
 			UpdateConfigurations = new[]
 			{
@@ -55,7 +55,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.UseOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptionsForTest
 		{
 			UpdateConfigurations = new[]
 			{
@@ -83,7 +83,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 			WorkerBalancerEnabled = false
 		});
 		
-		system.UseOptions(new ConfigurationOptions
+		system.UseOptions(new ConfigurationOptionsForTest
 		{
 			UpdateConfigurations = new[]
 			{

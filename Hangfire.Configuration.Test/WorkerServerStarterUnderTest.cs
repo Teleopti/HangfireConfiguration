@@ -24,6 +24,8 @@ namespace Hangfire.Configuration.Test
 
         public void Start(ConfigurationOptions options)
         {
+	        if (string.IsNullOrEmpty(options.ConnectionString))
+		        options.ConnectionString = new ConfigurationOptionsForTest().ConnectionString;
 	        _options.UseOptions(options);
 	        _instance.Start();
         }

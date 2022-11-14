@@ -412,7 +412,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
         {
             var system = new SystemUnderTest();
-            system.WorkerServerStarter.Start(new ConfigurationOptions
+            system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new []
 	            {
@@ -425,7 +425,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.ConfigurationStorage.Clear();
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {

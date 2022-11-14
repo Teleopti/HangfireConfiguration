@@ -1,4 +1,5 @@
 using System.Linq;
+using Hangfire.Configuration.Test.Domain.Fake;
 using Npgsql;
 using NUnit.Framework;
 
@@ -425,7 +426,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.ConfigurationStorage.Clear();
 
-            system.UseOptions(new ConfigurationOptions
+            system.UseOptions(new ConfigurationOptionsForTest
             {
 	            UpdateConfigurations = new[]
 	            {

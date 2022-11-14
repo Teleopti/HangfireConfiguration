@@ -1,7 +1,12 @@
-﻿namespace Hangfire.Configuration.Test.Domain.Fake
+﻿namespace Hangfire.Configuration.Test
 {
     public class ConfigurationOptionsForTest : ConfigurationOptions
     {
+	    public ConfigurationOptionsForTest()
+	    {
+		    ConnectionString = "unknown-storage";
+	    }
+
         public int MinimumServerCount
         {
             set => WorkerBalancerOptions.MinimumServerCount = value;

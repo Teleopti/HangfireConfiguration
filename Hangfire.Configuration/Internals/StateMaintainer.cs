@@ -42,8 +42,8 @@ internal class StateMaintainer
 	private void refresh()
 	{
 		var options = _state.ReadOptions();
-		// if (string.IsNullOrEmpty(options.ConnectionString))
-		// 	return;
+		if (string.IsNullOrEmpty(options.ConnectionString))
+			return;
 
 		var configurations = _storage.ReadConfigurations();
 		var configurationChanged = _configurationUpdater.Update(options, configurations);

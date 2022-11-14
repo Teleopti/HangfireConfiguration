@@ -7,6 +7,7 @@ namespace Hangfire.Configuration.Test.Domain.Fake;
 
 public class FakeConfigurationStorage : IConfigurationStorage
 {
+	private readonly Func<ConfigurationOptions> _options;
 	public IEnumerable<StoredConfiguration> Data => _data.Values;
 	public int? Workers => Data.FirstOrDefault()?.GoalWorkerCount;
 	public int? MaxWorkersPerServer => Data.FirstOrDefault()?.MaxWorkersPerServer;
@@ -16,8 +17,15 @@ public class FakeConfigurationStorage : IConfigurationStorage
 	private int _nextId = 1;
 	private int nextId() => _nextId++;
 
+	public FakeConfigurationStorage(Func<ConfigurationOptions> options)
+	{
+		_options = options;
+	}
+	
 	public IEnumerable<StoredConfiguration> ReadConfigurations()
 	{
+		// if (string.IsNullOrEmpty(_options.Invoke().ConnectionString))
+		// 	throw new Exception("BOOM");
 		ReadConfigurationsQueryCount++;
 		return Data.Select(x => x.Copy()).ToArray();
 	}
