@@ -8,8 +8,11 @@ internal class State
 	public State(INow now)
 	{
 		QueryPublishersCache = new TimedCache<IEnumerable<ConfigurationInfo>>(now);
+		Lock = new object();
 	}
-	
+
+	public object Lock { get; set; }
+
 	public ConfigurationOptions Options { private get; set; }
 
 	public List<object> StorageOptions { get; } = new();

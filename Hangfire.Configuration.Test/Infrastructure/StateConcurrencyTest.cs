@@ -24,6 +24,30 @@ namespace Hangfire.Configuration.Test.Infrastructure
                 .Times(100)
                 .Wait();
         }
+        
+        [Test]
+        public void ShouldReturnCorrectNumberOfPublishersConcurrently()
+        {
+	        const int publisherCount = 500;
+	        var system = new SystemUnderInfraTest();
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = null});
+	        var connectionStrings = Enumerable.Range(1, publisherCount)
+		        .Select(i => "connection" + i)
+		        .ToArray();
+
+	        var run = new ConcurrencyRunner();
+	        run.InParallel(() =>
+		        {
+			        connectionStrings.ForEach(x =>
+			        {
+				        system.GetPublisher(x, "schema");
+			        });
+			        var actual = system.QueryPublishers().Count();
+			        Assert.AreEqual(publisherCount, actual);
+		        })
+		        .Times(100)
+		        .Wait();
+        }
 
         public StateConcurrencyTest(string connectionString) : base(connectionString)
         {

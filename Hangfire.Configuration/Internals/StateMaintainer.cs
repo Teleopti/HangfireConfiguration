@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Hangfire.Configuration.Providers;
 
@@ -9,7 +10,6 @@ internal class StateMaintainer
 	private readonly IConfigurationStorage _storage;
 	private readonly ConfigurationUpdater _configurationUpdater;
 	private readonly State _state;
-	private readonly object _lock = new();
 
 	internal StateMaintainer(
 		IHangfire hangfire,
@@ -32,8 +32,18 @@ internal class StateMaintainer
 			.Any(x => x.ConnectionString == connectionString && x.SchemaName == schemaName);
 		if (!exists)
 		{
-			_state.Configurations = _state.Configurations
-				.Append(buildConfigurationState(null, connectionString, schemaName));
+			lock (_state.Lock)
+			{
+				exists = _state.Configurations
+					.Any(x => x.ConnectionString == connectionString && x.SchemaName == schemaName);
+				if (!exists)
+				{
+					_state.Configurations = _state.Configurations
+						.Append(buildConfigurationState(null, connectionString, schemaName))
+						.ToArray();
+				}
+				
+			}
 		}
 
 		refresh();
@@ -50,7 +60,7 @@ internal class StateMaintainer
 		if (configurationChanged)
 			configurations = _storage.ReadConfigurations();
 
-		lock (_lock)
+		lock (_state.Lock)
 		{
 			configurations.ForEach(c =>
 			{
