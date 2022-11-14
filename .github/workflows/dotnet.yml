@@ -11,9 +11,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup SqlServer (docker)
+    - name: Setup SQL Server (choco)
+      shell: pwsh
       run: |
-          docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=P@ssw0rd2" -e "MSSQL_PID=Standard" -p 1433:1433 -d tobiasfenster/mssql-server-dev-unsupported:2019-latest
+          choco install sql-server-express --no-progress
 
     - name: Setup PostgreSQL (choco)
       shell: pwsh
