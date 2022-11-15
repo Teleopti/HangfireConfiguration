@@ -47,9 +47,7 @@ internal class WorkerServerUpgrader
 			})
 			.Select(x =>
 			{
-				var schemaName = x.SchemaName ?? x.ConnectionString
-					.GetProvider().DefaultSchemaName();
-
+				var schemaName = x.AppliedSchemaName();
 				var connectionString = setCredentials(command, x.ConnectionString);
 
 				try

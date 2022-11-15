@@ -20,16 +20,14 @@ namespace Hangfire.Configuration
 			return _storage.ReadConfigurations()
 				.Select(x =>
 				{
-					var schemaName = x.SchemaName;
-					var connstring = hidePassword(x);
-					if (x.ConnectionString != null)
-						schemaName ??= x.ConnectionString.GetProvider().DefaultSchemaName();
+					var schemaName = x.AppliedSchemaName();
+					var connectionString = hidePassword(x);
 
 					return new ViewModel
 					{
 						Id = x.Id,
 						Name = x.Name,
-						ConnectionString = connstring,
+						ConnectionString = connectionString,
 						SchemaName = schemaName,
 						Active = x.IsActive(),
 						WorkerBalancerEnabled = x.WorkerBalancerIsEnabled(),

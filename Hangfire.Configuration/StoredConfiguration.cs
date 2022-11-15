@@ -1,3 +1,5 @@
+using Hangfire.Configuration.Providers;
+
 namespace Hangfire.Configuration;
 
 public class StoredConfiguration
@@ -14,4 +16,12 @@ public class StoredConfiguration
 
 	internal bool IsActive() => Active.GetValueOrDefault();
 	internal bool WorkerBalancerIsEnabled() => WorkerBalancerEnabled ?? true;
+	internal string AppliedSchemaName()
+	{
+		if (SchemaName != null)
+			return SchemaName;
+		if (ConnectionString != null)
+			return ConnectionString.GetProvider().DefaultSchemaName();
+		return SchemaName;
+	}
 }

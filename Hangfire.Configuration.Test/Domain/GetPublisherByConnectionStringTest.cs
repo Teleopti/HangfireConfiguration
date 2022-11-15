@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ public class GetPublisherByConnectionStringTest
 		result1.BackgroundJobClient.Should().Be.OfType<BackgroundJobClient>();
 		result1.RecurringJobManager.Should().Be.InstanceOf<RecurringJobManager>();
 	}
-	
+
 	[Test]
 	public void ShouldGetSameStorageEveryTime()
 	{
@@ -38,7 +39,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage
 			.Should().Be.SameInstanceAs(result2.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetExistingConfigurationWhenAble()
 	{
@@ -46,7 +47,7 @@ public class GetPublisherByConnectionStringTest
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
 		system.ConfigurationStorage.Has(new StoredConfiguration
 		{
-			Active = true, 
+			Active = true,
 			ConnectionString = "connection",
 			SchemaName = "schema"
 		});
@@ -57,7 +58,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage
 			.Should().Be.SameInstanceAs(result2.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetExistingConfigurationWhenAble2()
 	{
@@ -65,7 +66,7 @@ public class GetPublisherByConnectionStringTest
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
 		system.ConfigurationStorage.Has(new StoredConfiguration
 		{
-			Active = true, 
+			Active = true,
 			ConnectionString = "connection",
 			SchemaName = "schema"
 		});
@@ -76,7 +77,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage
 			.Should().Be.SameInstanceAs(result2.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetExistingConfigurationWhenAble3()
 	{
@@ -88,7 +89,7 @@ public class GetPublisherByConnectionStringTest
 		system.ConfigurationStorage.Has(new StoredConfiguration
 		{
 			Id = 3,
-			Active = true, 
+			Active = true,
 			ConnectionString = "connection",
 			SchemaName = "schema"
 		});
@@ -97,7 +98,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage.Should().Be.SameInstanceAs(result2.JobStorage);
 		result2.ConfigurationId.Should().Be(3);
 	}
-	
+
 	[Test]
 	public void ShouldGetSameStorageTogetherWithQuery()
 	{
@@ -106,7 +107,7 @@ public class GetPublisherByConnectionStringTest
 		system.ConfigurationStorage.Has(new StoredConfiguration
 		{
 			Id = 1,
-			Active = true, 
+			Active = true,
 			ConnectionString = "connection1",
 			SchemaName = "schema1"
 		});
@@ -118,7 +119,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage.Should().Be.SameInstanceAs(result3.JobStorage);
 		result2.ConfigurationId.Should().Be(1);
 	}
-	
+
 	[Test]
 	public void ShouldGetStorageForEachConnection()
 	{
@@ -131,7 +132,7 @@ public class GetPublisherByConnectionStringTest
 		result1.JobStorage
 			.Should().Not.Be.SameInstanceAs(result2.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetSameStorageWithSameConnection()
 	{
@@ -148,7 +149,7 @@ public class GetPublisherByConnectionStringTest
 		result2A.JobStorage
 			.Should().Be.SameInstanceAs(result2B.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetSameStorageWithSameConnection2()
 	{
@@ -165,7 +166,7 @@ public class GetPublisherByConnectionStringTest
 		result2A.JobStorage
 			.Should().Be.SameInstanceAs(result2B.JobStorage);
 	}
-	
+
 	[Test]
 	public void ShouldGetStorageForEachSchema()
 	{
@@ -194,5 +195,21 @@ public class GetPublisherByConnectionStringTest
 
 		result.Single().ConnectionString.Should().Be("connection");
 		result.Single().SchemaName.Should().Be("schema");
+	}
+
+
+	[Test]
+	public void ShouldReturnDefaultSchemaNameFromQueryPublishers()
+	{
+		var system = new SystemUnderTest();
+		system.ConfigurationStorage.Has(new StoredConfiguration
+		{
+			ConnectionString = new SqlConnectionStringBuilder {InitialCatalog = "db"}.ToString(),
+			Active = true
+		});
+
+		var result = system.QueryPublishers();
+
+		result.Single().SchemaName.Should().Be(DefaultSchemaName.SqlServer());
 	}
 }

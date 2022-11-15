@@ -1,4 +1,5 @@
 using Hangfire.Configuration.Internals;
+using Hangfire.Configuration.Providers;
 using Hangfire.Storage;
 
 namespace Hangfire.Configuration;
@@ -19,8 +20,8 @@ public class ConfigurationInfo
 	public int? ConfigurationId => _state.Configuration?.Id;
 	public string Name => _state.Configuration?.Name;
 	public string ConnectionString => _state.Configuration?.ConnectionString;
-	public string SchemaName => _state.Configuration?.SchemaName;
-	
+	public string SchemaName => _state.Configuration?.AppliedSchemaName();
+
 	public JobStorage JobStorage => _state.JobStorage;
 	public IBackgroundJobClient BackgroundJobClient => _state.BackgroundJobClient;
 	public IRecurringJobManager RecurringJobManager => _state.RecurringJobManager;
