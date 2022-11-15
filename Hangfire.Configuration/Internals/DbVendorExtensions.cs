@@ -85,13 +85,12 @@ internal static class DbVendorExtensions
 			{
 				if (useIntegratedSecurity)
 				{
-					var ret = new NpgsqlConnectionStringBuilder(connectionString)
+					return new NpgsqlConnectionStringBuilder(connectionString)
 					{
-						IntegratedSecurity = false,
+						IntegratedSecurity = true,
 						Username = null,
 						Password = null
-					};
-					return NpgsqlConnectionStringBuilderWorkaround.SetIntegratedSecurity(ret.ToString());
+					}.ToString();
 				}
 
 				return SetUserNameAndPassword(connectionString, userName, password);
@@ -141,7 +140,7 @@ internal static class DbVendorExtensions
 		{
 			try
 			{
-				NpgsqlConnectionStringBuilderWorkaround.Parse(_connectionString);
+				new NpgsqlConnectionStringBuilder(_connectionString);
 				return true;
 			}
 			catch (Exception)

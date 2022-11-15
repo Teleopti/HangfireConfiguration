@@ -11,15 +11,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup SQL Server (choco)
-      shell: pwsh
-      run: |
-          choco install sql-server-express --no-progress
-
-    - name: Setup PostgreSQL (choco)
-      shell: pwsh
-      run: |
-          choco install postgresql13 --no-progress --params '/Password:root'
+#    - name: Setup SQL Server (choco)
+#      shell: pwsh
+#      run: |
+#          choco install sql-server-express --no-progress
+#
+#    - name: Setup PostgreSQL (choco)
+#      shell: pwsh
+#      run: |
+#          choco install postgresql13 --no-progress --params '/Password:root'
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
@@ -40,5 +40,5 @@ jobs:
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
       
-    - name: Push to nuget.org
-      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+#    - name: Push to nuget.org
+#      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
