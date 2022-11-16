@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Hangfire.Configuration.Providers;
 
@@ -28,14 +27,12 @@ internal class StateMaintainer
 
 	public void EnsureLoaded(string connectionString, string schemaName)
 	{
-		var exists = _state.Configurations
-			.Any(x => x.ConnectionString == connectionString && x.SchemaName == schemaName);
+		var exists = _state.Configurations.Any(x => x.Matches(connectionString, schemaName));
 		if (!exists)
 		{
 			lock (_state.Lock)
 			{
-				exists = _state.Configurations
-					.Any(x => x.ConnectionString == connectionString && x.SchemaName == schemaName);
+				exists = _state.Configurations.Any(x => x.Matches(connectionString, schemaName));
 				if (!exists)
 				{
 					_state.Configurations = _state.Configurations
@@ -64,14 +61,7 @@ internal class StateMaintainer
 		{
 			configurations.ForEach(c =>
 			{
-				var existing = _state.Configurations
-					.SingleOrDefault(x => x.Configuration?.Id == c.Id);
-				if (existing == null)
-					existing = _state.Configurations
-						.Where(x => x.Configuration == null)
-						.Where(x => x.ConnectionString == c.ConnectionString)
-						.Where(x => x.SchemaName == c.SchemaName)
-						.SingleOrDefault();
+				var existing = _state.Configurations.SingleOrDefault(x => x.Matches(c));
 				if (existing != null)
 				{
 					existing.Configuration = c;

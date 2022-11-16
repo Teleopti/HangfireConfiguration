@@ -33,19 +33,16 @@ internal class ConfigurationState
 	}
 
 	internal StoredConfiguration Configuration;
-	internal string ConnectionString;
-	internal string SchemaName;
+	internal readonly string ConnectionString;
+	internal readonly string SchemaName;
 	internal JobStorage JobStorage => _jobStorage.Value;
 	internal IBackgroundJobClient BackgroundJobClient => _backgroundJobClient.Value;
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
 	internal IMonitoringApi MonitoringApi => _monitoringApi.Value;
 
-	internal bool IsPublisher()
-	{
-		if (Configuration == null)
-			return true;
-		return Configuration.IsActive();
-	}
+	internal bool IsPublisher() =>
+		Configuration == null || Configuration.IsActive();
 
-	internal bool WorkerBalancerIsEnabled() => Configuration.WorkerBalancerIsEnabled();
+	internal bool WorkerBalancerIsEnabled() => 
+		Configuration.WorkerBalancerIsEnabled();
 }

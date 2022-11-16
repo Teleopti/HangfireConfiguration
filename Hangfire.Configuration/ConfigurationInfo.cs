@@ -1,5 +1,4 @@
 using Hangfire.Configuration.Internals;
-using Hangfire.Configuration.Providers;
 using Hangfire.Storage;
 
 namespace Hangfire.Configuration;

@@ -34,8 +34,7 @@ public class PublisherQueries
 	{
 		_stateMaintainer.EnsureLoaded(connectionString, schemaName);
 		return _state.Configurations
-			.Where(x => x.ConnectionString == connectionString)
-			.Where(x => x.SchemaName == schemaName)
+			.Where(x => x.Matches(connectionString, schemaName))
 			.Select(x => new ConfigurationInfo(x))
 			.First();
 	}
