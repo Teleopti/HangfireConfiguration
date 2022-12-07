@@ -89,6 +89,8 @@ public class WorkerServerStarter
 			CancellationCheckInterval = serverOptions.CancellationCheckInterval,
 			SchedulePollingInterval = serverOptions.SchedulePollingInterval,
 			ServerCheckInterval = serverOptions.ServerCheckInterval,
-			WorkerCount = serverOptions.WorkerCount
+			WorkerCount = serverOptions.WorkerCount,
+			
+			Activator = serverOptions.Activator
 		};
 }
