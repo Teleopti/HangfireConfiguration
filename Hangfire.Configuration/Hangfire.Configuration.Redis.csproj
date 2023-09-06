@@ -26,8 +26,6 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Hangfire.Pro.Redis" Version="2.8.16" />
 		<PackageReference Include="StackExchange.Redis" Version="1.2.6" />
-<!--		Remove this when we upgrade Hangfire.Pro.Redis and StackExchange.Redis. This is a forced hoist due to security issue of 4.3.0-->
-		<PackageReference Include="System.Net.Security" Version="4.3.2" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
 		<PackageReference Include="Microsoft.Owin" Version="4.2.2" />
