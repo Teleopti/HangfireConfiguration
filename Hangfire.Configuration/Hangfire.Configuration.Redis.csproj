@@ -37,14 +37,9 @@
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Remove="InstallPostgreSql.sql" />
-		<None Remove="InstallSqlServer.sql" />
-		<EmbeddedResource Include="InstallPostgreSql.sql" />
-		<EmbeddedResource Include="InstallSqlServer.sql" />
-		<None Remove="Pages\script.js" />
-		<EmbeddedResource Include="Web\script.js" />
-		<None Remove="Pages\styles.css" />
-		<EmbeddedResource Include="Web\styles.css" />
+		<EmbeddedResource Include="*.sql" />
+		<EmbeddedResource Include="Web\*.js" />
+		<EmbeddedResource Include="Web\*.css" />
 	</ItemGroup>
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 	<ItemGroup>
