@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Internals;
@@ -80,43 +81,43 @@ namespace Hangfire.Configuration.Web
 
 			if (context.Request.Path.Value.Equals("/saveWorkerGoalCount"))
 			{
-				await processRequest(context, async () => await saveWorkerGoalCount(context));
+				processRequest(context, () => saveWorkerGoalCount(context));
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/saveMaxWorkersPerServer"))
 			{
-				await processRequest(context, async () => await saveMaxWorkersPerServer(context));
+				processRequest(context, () => saveMaxWorkersPerServer(context));
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/createNewServerConfiguration"))
 			{
-				await processRequest(context, async () => await createNewServerConfiguration(context));
+				processRequest(context, () => createNewServerConfiguration(context));
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/activateServer"))
 			{
-				await processRequest(context, async () => { _configurationApi.ActivateServer(await parseConfigurationId(context)); });
+				processRequest(context, () => { _configurationApi.ActivateServer(parseConfigurationId(context)); });
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/inactivateServer"))
 			{
-				await processRequest(context, async () => { _configurationApi.InactivateServer(await parseConfigurationId(context)); });
+				processRequest(context, () => { _configurationApi.InactivateServer(parseConfigurationId(context)); });
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/enableWorkerBalancer"))
 			{
-				await processRequest(context, async () => { _configurationApi.EnableWorkerBalancer(await parseConfigurationId(context)); });
+				processRequest(context, () => { _configurationApi.EnableWorkerBalancer(parseConfigurationId(context)); });
 				return;
 			}
 
 			if (context.Request.Path.Value.Equals("/disableWorkerBalancer"))
 			{
-				await processRequest(context, async () => { _configurationApi.DisableWorkerBalancer(await parseConfigurationId(context)); });
+				processRequest(context, () => { _configurationApi.DisableWorkerBalancer(parseConfigurationId(context)); });
 				return;
 			}
 			
@@ -126,20 +127,20 @@ namespace Hangfire.Configuration.Web
 				return;
 			}
 
-			await processRequest(context, async () =>
+			processRequest(context, async () =>
 			{
 				var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
 				var html = page.ToString();
-				await context.Response.WriteAsync(html);
+				context.Response.WriteAsync(html).Wait();
 			});
 		}
 
-		private async Task<int> parseConfigurationId(HttpContext context) =>
-			(await parseRequestBody(context.Request)).SelectToken("configurationId").Value<int>();
-
-		private async Task saveWorkerGoalCount(HttpContext context)
+		private int parseConfigurationId(HttpContext context) =>
+			parseRequestJsonBody(context.Request).SelectToken("configurationId").Value<int>();
+		
+		private void saveWorkerGoalCount(HttpContext context)
 		{
-			var parsed = await parseRequestBody(context.Request);
+			var parsed = parseRequestJsonBody(context.Request);
 			_configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
 			{
 				ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
@@ -148,9 +149,9 @@ namespace Hangfire.Configuration.Web
 			context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
 		}
 
-		private async Task saveMaxWorkersPerServer(HttpContext context)
+		private void saveMaxWorkersPerServer(HttpContext context)
 		{
-			var parsed = await parseRequestBody(context.Request);
+			var parsed = parseRequestJsonBody(context.Request);
 			_configurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
 			{
 				ConfigurationId = parsed.SelectToken("configurationId").Value<int>(),
@@ -159,9 +160,9 @@ namespace Hangfire.Configuration.Web
 			context.Response.WriteAsync("Max workers per server was saved successfully!").Wait();
 		}
 
-		private async Task createNewServerConfiguration(HttpContext context)
+		private void createNewServerConfiguration(HttpContext context)
 		{
-			var parsed = await parseRequestBody(context.Request);
+			var parsed = parseRequestJsonBody(context.Request);
 			var provider = parsed.SelectToken("databaseProvider")?.Value<string>();
 			if (provider == "PostgreSql")
 			{
@@ -203,32 +204,31 @@ namespace Hangfire.Configuration.Web
 			});
 		}
 
-		private async Task<JObject> parseRequestBody(HttpRequest request)
+		private JObject parseRequestJsonBody(HttpRequest request)
 		{
 			string text;
 			using (var reader = new StreamReader(request.Body))
-				text = await reader.ReadToEndAsync();
+				text = reader.ReadToEnd();
 			if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Request empty", nameof(request));
 
-			var parsed = JObject.Parse(text);
-			return parsed;
+			return JObject.Parse(text);
 		}
 
 		private static int? tryParseNullable(string value) =>
 			int.TryParse(value, out var outValue) ? outValue : null;
 
-		private async Task processRequest(HttpContext context, Func<Task> action)
+		private void processRequest(HttpContext context, Action action)
 		{
 			try
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.OK;
 				context.Response.ContentType = "text/html; charset=utf-8";
-				await action.Invoke();
+				action.Invoke();
 			}
 			catch (Exception ex)
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-				await context.Response.WriteAsync(ex.Message);
+				context.Response.WriteAsync(ex.Message).Wait();
 			}
 		}
 	}
