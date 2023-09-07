@@ -3,11 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Internals;
-using Hangfire.Dashboard;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -44,23 +42,25 @@ namespace Hangfire.Configuration.Web
 					HangfireConfigurationSchemaInstaller.Install(c);
 		}
 
-		public async Task Invoke(HttpContext context)
-		{
-			await handleRequest(context);
-		}
-
-		private async Task handleRequest(HttpContext context)
+		public Task Invoke(HttpContext context)
 		{
 			var syncIoFeature = context.Features.Get<IHttpBodyControlFeature>();
 			if (syncIoFeature != null)
 				syncIoFeature.AllowSynchronousIO = true;
+			
+			handleRequest(context);
+			
+			return Task.CompletedTask;
+		}
 
+		private void handleRequest(HttpContext context)
+		{
 			if (context.Request.Path.Value.Equals("/script"))
 			{
 				context.Response.StatusCode = (int) HttpStatusCode.OK;
 				context.Response.ContentType = "application/javascript";
 				using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.script.js");
-				await stream.CopyToAsync(context.Response.Body);
+				stream.CopyTo(context.Response.Body);
 				return;
 			}
 
@@ -69,7 +69,7 @@ namespace Hangfire.Configuration.Web
 				context.Response.StatusCode = (int) HttpStatusCode.OK;
 				context.Response.ContentType = "text/css";
 				using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.styles.css");
-				await stream.CopyToAsync(context.Response.Body);
+				stream.CopyTo(context.Response.Body);
 				return;
 			}
 
