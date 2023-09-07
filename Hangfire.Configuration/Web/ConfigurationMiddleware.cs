@@ -107,6 +107,13 @@ namespace Hangfire.Configuration.Web
             c.Response.ContentType = contentType;
 
             using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.{resourceName}");
+            
+            if (stream == null)
+            {
+                c.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                return;
+            }
+            
             stream.CopyTo(c.Response.Body);
         }
         

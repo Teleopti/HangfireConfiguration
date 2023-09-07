@@ -166,13 +166,21 @@ public class ConfigurationInterfaceTest
 	}
 
 	[Test]
-	public async Task ShouldNotFindUnknownAction()
+	public async Task ShouldNotFindUnknownResource()
 	{
 		using var s = new WebServerUnderTest(new SystemUnderTest(), "/config");
-		var response = await s.TestClient.GetAsync("/config/unknownAction");
+		var response = await s.TestClient.GetAsync("/config/unknown_js");
 		Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 	}
 
+	[Test]
+	public async Task ShouldNotFindUnknownAction()
+	{
+		using var s = new WebServerUnderTest(new SystemUnderTest(), "/config");
+		var response = await s.TestClient.PostAsync("/config/unknownAction", null);
+		Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+	}
+	
 	[Test]
 	public async Task ShouldInactivateServer()
 	{
