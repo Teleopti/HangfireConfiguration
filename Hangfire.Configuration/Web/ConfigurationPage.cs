@@ -36,7 +36,7 @@ public class ConfigurationPage
         write("<html>");
         write($@"<base href=""{_basePath}/"">");
         write("<head>");
-        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles""/>");
+        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles_css""/>");
         write("</head>");
         write("<body>");
         write("<h2>Hangfire configuration</h2>");
@@ -49,7 +49,7 @@ public class ConfigurationPage
         writeCreateConfiguration();
         write("</div>");
 
-        write($@"<script src='{_basePath}/script'></script>");
+        write($@"<script src=""{_basePath}/script_js""></script>");
         write("</body>");
         write("</html>");
     }
