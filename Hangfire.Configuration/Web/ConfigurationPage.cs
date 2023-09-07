@@ -1,88 +1,97 @@
+using System.Collections.Generic;
 using System.Linq;
-using Hangfire.Dashboard;
+using System.Text;
 
 namespace Hangfire.Configuration.Web;
 
-public class ConfigurationPage : RazorPage
+public class ConfigurationPage
 {
-	private readonly ViewModelBuilder _viewModelBuilder;
-	private readonly string _basePath;
-	private readonly ConfigurationOptions _options;
+    private readonly ViewModelBuilder _viewModelBuilder;
+    private readonly string _basePath;
+    private readonly ConfigurationOptions _options;
+    private readonly StringBuilder _content = new();
 
-	public ConfigurationPage(HangfireConfiguration configuration, string basePath, ConfigurationOptions options)
-	{
-		_viewModelBuilder = configuration.ViewModelBuilder();
-		_basePath = basePath;
-		_options = options;
-	}
+    public ConfigurationPage(
+        HangfireConfiguration configuration,
+        string basePath,
+        ConfigurationOptions options)
+    {
+        _viewModelBuilder = configuration.ViewModelBuilder();
+        _basePath = basePath;
+        _options = options;
+    }
 
-	public override void Execute()
-	{
-		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
-		buildHtml(configurations);
-	}
+    public string FullPage()
+    {
+        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+        writePage(configurations);
+        return _content.ToString();
+    }
 
-	private void buildHtml(ViewModel[] configurations)
-	{
-		WriteLiteral("<html>");
-		WriteLiteral($@"<base href=""{_basePath}/"">");
-		WriteLiteral("<head>");
-		WriteLiteral(@"<link rel=""stylesheet"" type=""text/css"" href=""styles""/>");
-		WriteLiteral("</head>");
-		WriteLiteral("<body>");
-		WriteLiteral("<h2>Hangfire configuration</h2>");
+    private void write(string textToAppend) =>
+        _content.Append(textToAppend);
 
-		configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
+    private void writePage(IEnumerable<ViewModel> configurations)
+    {
+        write("<html>");
+        write($@"<base href=""{_basePath}/"">");
+        write("<head>");
+        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles""/>");
+        write("</head>");
+        write("<body>");
+        write("<h2>Hangfire configuration</h2>");
 
-		WriteLiteral("<div class='configurations'>");
-		foreach (var configuration in configurations)
-			writeConfiguration(configuration);
-		writeCreateConfiguration();
-		WriteLiteral("</div>");
+        configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
 
-		WriteLiteral($@"<script src='{_basePath}/script'></script>");
-		WriteLiteral("</body>");
-		WriteLiteral("</html>");
-	}
+        write("<div class='configurations'>");
+        foreach (var configuration in configurations)
+            writeConfiguration(configuration);
+        writeCreateConfiguration();
+        write("</div>");
 
-	private void writeConfiguration(ViewModel configuration)
-	{
-		var title = "Configuration";
-		if (configuration.Name != null)
-			title = title + " - " + configuration.Name;
-		var state = configuration.Active ? " - <span class='active'>⬤</span> Active" : " - <span class='inactive'>⬤</span> Inactive";
+        write($@"<script src='{_basePath}/script'></script>");
+        write("</body>");
+        write("</html>");
+    }
 
-		WriteLiteral($@"
+    private void writeConfiguration(ViewModel configuration)
+    {
+        var title = "Configuration";
+        if (configuration.Name != null)
+            title = title + " - " + configuration.Name;
+        var state = configuration.Active ? " - <span class='active'>⬤</span> Active" : " - <span class='inactive'>⬤</span> Inactive";
+
+        write($@"
                 <div class='configuration'>
                     <fieldset>
                         <legend>{title}{state}</legend>");
 
-		WriteLiteral($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
-		if (!string.IsNullOrEmpty(configuration.SchemaName))
-		{
-			WriteLiteral($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
-		}
+        write($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
+        if (!string.IsNullOrEmpty(configuration.SchemaName))
+        {
+            write($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
+        }
 
-		writeActivateConfiguration(configuration);
+        writeActivateConfiguration(configuration);
 
-		writeWorkerBalancer(configuration);
+        writeWorkerBalancer(configuration);
 
-		WriteLiteral(@"</fieldset></div>");
-	}
+        write(@"</fieldset></div>");
+    }
 
-	private void writeWorkerBalancer(ViewModel configuration)
-	{
-		var enabled = configuration.WorkerBalancerEnabled ? " - <span class='enabled'>⬤</span> Enabled" : " - <span class='disabled'>⬤</span> Disabled";
-		var enableAction = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
-		var enableButton = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
+    private void writeWorkerBalancer(ViewModel configuration)
+    {
+        var enabled = configuration.WorkerBalancerEnabled ? " - <span class='enabled'>⬤</span> Enabled" : " - <span class='disabled'>⬤</span> Disabled";
+        var enableAction = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
+        var enableButton = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
 
-		WriteLiteral($@"
+        write($@"
                     <fieldset>
                         <legend>Worker balancer{enabled}</legend>
 						");
 
-		// Math.Min(Environment.ProcessorCount * 5, 20)
-		WriteLiteral($@"
+        // Math.Min(Environment.ProcessorCount * 5, 20)
+        write($@"
 		        <div>
 					<form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='{enableAction}' data-reload='true'>
 						<label style='width: 126px'>Worker balancer: </label>
@@ -92,7 +101,7 @@ public class ConfigurationPage : RazorPage
 					</form>
 				</div>");
 
-		WriteLiteral($@"
+        write($@"
                 <div>
                     <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
                         <label for='workers' style='width: 126px'>Worker goal count: </label>
@@ -104,7 +113,7 @@ public class ConfigurationPage : RazorPage
                     </form>
                 </div>");
 
-		WriteLiteral($@"
+        write($@"
                 <div>
                     <form class='form' id=""maxWorkersPerServerForm_{configuration.Id}"" action='saveMaxWorkersPerServer'>
                         <label for='maxWorkers' style='width: 126px'>Max workers per server: </label>
@@ -114,29 +123,29 @@ public class ConfigurationPage : RazorPage
                     </form>
                 </div>");
 
-		WriteLiteral($@"
+        write($@"
                     </fieldset>
                         ");
-	}
+    }
 
-	private void writeActivateConfiguration(ViewModel configuration)
-	{
-		var action = configuration.Active ? "inactivateServer" : "activateServer";
-		var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
+    private void writeActivateConfiguration(ViewModel configuration)
+    {
+        var action = configuration.Active ? "inactivateServer" : "activateServer";
+        var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
 
-		WriteLiteral($@"
+        write($@"
                 <div>
                     <form class='form' id=""activateForm_{configuration.Id}"" action='{action}' data-reload='true' style='margin: 10px'>
                         <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
                         <button class='button' type='button'>{button}</button>
                     </form>
                 </div>");
-	}
+    }
 
-	private void writeCreateConfiguration()
-	{
-		WriteLiteral(
-			@"
+    private void writeCreateConfiguration()
+    {
+        write(
+            @"
 <div class='configuration'>
 <fieldset>
     <legend>Create new</legend>
@@ -184,5 +193,5 @@ public class ConfigurationPage : RazorPage
 </fieldset>
 </div>
 ");
-	}
+    }
 }

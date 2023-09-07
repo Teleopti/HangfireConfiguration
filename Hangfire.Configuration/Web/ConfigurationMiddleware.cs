@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Internals;
+using Hangfire.Dashboard;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -127,10 +128,10 @@ namespace Hangfire.Configuration.Web
 				return;
 			}
 
-			processRequest(context, async () =>
+			processRequest(context, () =>
 			{
 				var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
-				var html = page.ToString();
+				var html = page.FullPage();
 				context.Response.WriteAsync(html).Wait();
 			});
 		}
