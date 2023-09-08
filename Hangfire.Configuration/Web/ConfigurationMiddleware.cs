@@ -49,14 +49,15 @@ namespace Hangfire.Configuration.Web
         private IEnumerable<(Func<HttpContext, bool> matcher, Action<HttpContext> action)> routes()
         {
             yield return (c => c.Request.Method == "GET" && string.IsNullOrEmpty(c.Request.Path.Value), displayPage);
+            yield return (c => c.Request.Path.Value.Equals("/nothing"), _ => {});
             yield return (c => c.Request.Method == "GET", returnResource);
             yield return (c => c.Request.Path.Value.Equals("/saveWorkerGoalCount"), saveWorkerGoalCount);
             yield return (c => c.Request.Path.Value.Equals("/saveMaxWorkersPerServer"), saveMaxWorkersPerServer);
             yield return (c => c.Request.Path.Value.Equals("/createNewServerConfiguration"), createNewServerConfiguration);
-            yield return (c => c.Request.Path.Value.Equals("/activateServer"), c => { _configurationApi.ActivateServer(parseConfigurationId(c)); });
-            yield return (c => c.Request.Path.Value.Equals("/inactivateServer"), c => { _configurationApi.InactivateServer(parseConfigurationId(c)); });
-            yield return (c => c.Request.Path.Value.Equals("/enableWorkerBalancer"), c => { _configurationApi.EnableWorkerBalancer(parseConfigurationId(c)); });
-            yield return (c => c.Request.Path.Value.Equals("/disableWorkerBalancer"), c => { _configurationApi.DisableWorkerBalancer(parseConfigurationId(c)); });
+            yield return (c => c.Request.Path.Value.Equals("/activateServer"), activateServer);
+            yield return (c => c.Request.Path.Value.Equals("/inactivateServer"), inactivateServer);
+            yield return (c => c.Request.Path.Value.Equals("/enableWorkerBalancer"), enableWorkerBalancer);
+            yield return (c => c.Request.Path.Value.Equals("/disableWorkerBalancer"), disableWorkerBalancer);
         }
 
         public Task Invoke(HttpContext context)
@@ -89,13 +90,6 @@ namespace Hangfire.Configuration.Web
             context.Response.StatusCode = (int) HttpStatusCode.NotFound;
         }
         
-        private void displayPage(HttpContext c)
-        {
-            var page = new ConfigurationPage(_configuration, c.Request.PathBase.Value, _options);
-            var html = page.FullPage();
-            c.Response.WriteAsync(html).Wait();
-        }
-        
         private void returnResource(HttpContext c)
         {
             var resourceName = c.Request.Path.Value
@@ -117,29 +111,31 @@ namespace Hangfire.Configuration.Web
             stream.CopyTo(c.Response.Body);
         }
         
-        private int parseConfigurationId(HttpContext context) =>
-            parseRequestJsonBody(context.Request).SelectToken("configurationId").Value<int>();
+        private void displayPage(HttpContext context) =>
+            display(context, p => p.BuildPage());
 
         private void saveWorkerGoalCount(HttpContext context)
         {
-            var parsed = parseRequestJsonBody(context.Request);
+            var configurationId = parseConfigurationId(context);
             _configurationApi.WriteGoalWorkerCount(new WriteGoalWorkerCount
             {
-                ConfigurationId = tryParseNullable(parsed.SelectToken("configurationId")?.Value<string>()),
-                Workers = tryParseNullable(parsed.SelectToken("workers").Value<string>())
+                ConfigurationId = configurationId,
+                Workers = tryParseNullable(context.Request.Form["workers"])
             });
-            context.Response.WriteAsync("Worker goal count was saved successfully!").Wait();
+            display(context, p => p.Configuration(configurationId));
+            display(context, p => p.Message("Worker goal count was saved successfully!"));
         }
 
         private void saveMaxWorkersPerServer(HttpContext context)
         {
-            var parsed = parseRequestJsonBody(context.Request);
+            var configurationId = parseConfigurationId(context);
             _configurationApi.WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
             {
-                ConfigurationId = parsed.SelectToken("configurationId").Value<int>(),
-                MaxWorkers = tryParseNullable(parsed.SelectToken("maxWorkers").Value<string>())
+                ConfigurationId = configurationId,
+                MaxWorkers = tryParseNullable(context.Request.Form["maxWorkers"])
             });
-            context.Response.WriteAsync("Max workers per server was saved successfully!").Wait();
+            display(context, p => p.Configuration(configurationId));
+            display(context, p => p.Message("Max workers per server was saved successfully!"));
         }
 
         private void createNewServerConfiguration(HttpContext context)
@@ -186,6 +182,44 @@ namespace Hangfire.Configuration.Web
             });
         }
 
+        private void inactivateServer(HttpContext context)
+        {
+            var configurationId = parseConfigurationId(context);
+            _configurationApi.InactivateServer(configurationId);
+            display(context, p => p.Configuration(configurationId));
+        }
+
+        private void activateServer(HttpContext context)
+        {
+            var configurationId = parseConfigurationId(context);
+            _configurationApi.ActivateServer(configurationId);
+            display(context, p => p.Configuration(configurationId));
+        }
+
+        private void enableWorkerBalancer(HttpContext c)
+        {
+            var configurationId = parseConfigurationId(c);
+            _configurationApi.EnableWorkerBalancer(configurationId);
+            display(c, p => p.Configuration(configurationId));
+        }
+
+        private void disableWorkerBalancer(HttpContext c)
+        {
+            var configurationId = parseConfigurationId(c);
+            _configurationApi.DisableWorkerBalancer(configurationId);
+            display(c, p => p.Configuration(configurationId));
+        }
+
+        private void display(HttpContext context, Func<ConfigurationPage, string> html)
+        {
+            var page = new ConfigurationPage(_configuration, context.Request.PathBase.Value, _options);
+            var response = html.Invoke(page);
+            context.Response.WriteAsync(response).Wait();
+        }
+
+        private int parseConfigurationId(HttpContext context) =>
+            int.Parse(context.Request.Form["configurationId"]);
+        
         private JObject parseRequestJsonBody(HttpRequest request)
         {
             string text;

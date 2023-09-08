@@ -21,15 +21,12 @@ public class ConfigurationPage
         _options = options;
     }
 
-    public string FullPage()
+    public string BuildPage()
     {
         var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
         writePage(configurations);
         return _content.ToString();
     }
-
-    private void write(string textToAppend) =>
-        _content.Append(textToAppend);
 
     private void writePage(IEnumerable<ViewModel> configurations)
     {
@@ -50,10 +47,19 @@ public class ConfigurationPage
         write("</div>");
 
         write($@"<script src=""{_basePath}/script_js""></script>");
+        write($@"<script src=""{_basePath}/htmx_min_js""></script>");
         write("</body>");
         write("</html>");
     }
 
+    public string Configuration(int configurationId)
+    {
+        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+        var configuration = configurations.Single(x => x.Id == configurationId);
+        writeConfiguration(configuration);
+        return _content.ToString();
+    }
+    
     private void writeConfiguration(ViewModel configuration)
     {
         var title = "Configuration";
@@ -82,8 +88,8 @@ public class ConfigurationPage
     private void writeWorkerBalancer(ViewModel configuration)
     {
         var enabled = configuration.WorkerBalancerEnabled ? " - <span class='enabled'>⬤</span> Enabled" : " - <span class='disabled'>⬤</span> Disabled";
-        var enableAction = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
-        var enableButton = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
+        var action = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
+        var button = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
 
         write($@"
                     <fieldset>
@@ -93,21 +99,21 @@ public class ConfigurationPage
         // Math.Min(Environment.ProcessorCount * 5, 20)
         write($@"
 		        <div>
-					<form class='form' id=""workerBalancerEnableForm_{configuration.Id}"" action='{enableAction}' data-reload='true'>
+					<form class='form' hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML'>
 						<label style='width: 126px'>Worker balancer: </label>
-						<input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-						<button class='button' type='button'>{enableButton}</button>
+						<input type='hidden' value='{configuration.Id}' name='configurationId'>
+						<button class='button' type='submit'>{button}</button>
 						(When disabled, hangfire default will be used) 
 					</form>
 				</div>");
 
         write($@"
                 <div>
-                    <form class='form' id=""workerCountForm_{configuration.Id}"" action='saveWorkerGoalCount'>
+                    <form class='form' hx-post='saveWorkerGoalCount' hx-target='closest .configuration' hx-swap='outerHTML'>
                         <label for='workers' style='width: 126px'>Worker goal count: </label>
-                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                        <input type='number' value='{configuration.Workers}' id='workers' name='workers' style='margin-right: 6px; width:60px'>
-                        <button class='button' type='button'>Submit</button>
+                        <input type='hidden' value='{configuration.Id}' name='configurationId'>
+                        <input type='number' value='{configuration.Workers}' name='workers' style='margin-right: 6px; width:60px'>
+                        <button class='button' type='submit'>Save</button>
                             (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
 							(Temporary configuration, may reset to default at times)
                     </form>
@@ -115,11 +121,11 @@ public class ConfigurationPage
 
         write($@"
                 <div>
-                    <form class='form' id=""maxWorkersPerServerForm_{configuration.Id}"" action='saveMaxWorkersPerServer'>
+                    <form class='form' hx-post='saveMaxWorkersPerServer' hx-target='closest .configuration' hx-swap='outerHTML'>
                         <label for='maxWorkers' style='width: 126px'>Max workers per server: </label>
-                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                        <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' id='maxWorkers' name='maxWorkers' style='margin-right: 6px; width:60px'>
-                        <button class='button' type='button'>Submit</button>
+                        <input type='hidden' value='{configuration.Id}' name='configurationId'>
+                        <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' name='maxWorkers' style='margin-right: 6px; width:60px'>
+                        <button class='button' type='submit'>Save</button>
                     </form>
                 </div>");
 
@@ -135,9 +141,9 @@ public class ConfigurationPage
 
         write($@"
                 <div>
-                    <form class='form' id=""activateForm_{configuration.Id}"" action='{action}' data-reload='true' style='margin: 10px'>
-                        <input type='hidden' value='{configuration.Id}' id='configurationId' name='configurationId'>
-                        <button class='button' type='button'>{button}</button>
+                    <form class='form' hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML' style='margin: 10px'>
+                        <input type='hidden' value='{configuration.Id}' name='configurationId'>
+                        <button class='button' type='submit'>{button}</button>
                     </form>
                 </div>");
     }
@@ -194,4 +200,14 @@ public class ConfigurationPage
 </div>
 ");
     }
+    
+    public string Message(string message) =>
+        $@"
+<div class='message' hx-get='nothing' hx-trigger='load delay:2s' hx-swap='delete' hx-target='this'>
+    <p>{message}</p>
+</div>
+";
+
+    private void write(string textToAppend) =>
+        _content.Append(textToAppend);
 }

@@ -17,6 +17,9 @@ var forms = document.querySelectorAll('form');
 
 forms.forEach(function(form) {
 
+    if (!form.id)
+        return;
+    
     var button = form.querySelector('button');
     
     button.addEventListener('click', function(){
