@@ -19,7 +19,7 @@ namespace Hangfire.Configuration.Web
         private readonly ConfigurationApi _configurationApi;
         private readonly ConfigurationOptions _options;
         private readonly Lazy<IEnumerable<(Func<HttpContext, bool> matcher, Action<HttpContext> action)>> _routes;
-        
+
         public ConfigurationMiddleware(
             RequestDelegate next,
             IDictionary<string, object> properties)
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Web
         private IEnumerable<(Func<HttpContext, bool> matcher, Action<HttpContext> action)> routes()
         {
             yield return (c => c.Request.Method == "GET" && string.IsNullOrEmpty(c.Request.Path.Value), displayPage);
-            yield return (c => c.Request.Path.Value.Equals("/nothing"), _ => {});
+            yield return (c => c.Request.Path.Value.Equals("/nothing"), _ => { });
             yield return (c => c.Request.Method == "GET", returnResource);
             yield return (c => c.Request.Path.Value.Equals("/saveWorkerGoalCount"), saveWorkerGoalCount);
             yield return (c => c.Request.Path.Value.Equals("/saveMaxWorkersPerServer"), saveMaxWorkersPerServer);
@@ -86,10 +86,10 @@ namespace Hangfire.Configuration.Web
                 processRequest(context, () => { route.action.Invoke(context); });
                 return;
             }
-            
+
             context.Response.StatusCode = (int) HttpStatusCode.NotFound;
         }
-        
+
         private void returnResource(HttpContext c)
         {
             var resourceName = c.Request.Path.Value
@@ -101,16 +101,16 @@ namespace Hangfire.Configuration.Web
             c.Response.ContentType = contentType;
 
             using var stream = GetType().Assembly.GetManifestResourceStream($"{typeof(ConfigurationPage).Namespace}.{resourceName}");
-            
+
             if (stream == null)
             {
                 c.Response.StatusCode = (int) HttpStatusCode.NotFound;
                 return;
             }
-            
+
             stream.CopyTo(c.Response.Body);
         }
-        
+
         private void displayPage(HttpContext context) =>
             display(context, p => p.BuildPage());
 
@@ -219,7 +219,7 @@ namespace Hangfire.Configuration.Web
 
         private int parseConfigurationId(HttpContext context) =>
             int.Parse(context.Request.Form["configurationId"]);
-        
+
         private JObject parseRequestJsonBody(HttpRequest request)
         {
             string text;

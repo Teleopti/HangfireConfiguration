@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,44 +11,47 @@ namespace Hangfire.Configuration.Test.Web;
 [Parallelizable(ParallelScope.None)]
 public class WorkerBalancerDisableTest
 {
-	[Test]
-	public async Task ShouldDisable()
-	{
-		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
-		{
-			Id = 2
-		});
+    [Test]
+    public void ShouldDisable()
+    {
+        var system = new SystemUnderTest();
+        system.ConfigurationStorage.Has(new StoredConfiguration
+        {
+            Id = 2
+        });
 
-		using var s = new WebServerUnderTest(system);
-		await s.TestClient.PostAsync(
-			"/config/disableWorkerBalancer",
-			new StringContent(JsonConvert.SerializeObject(new
-			{
-				configurationId = 2
-			})));
+        using var s = new WebServerUnderTest(system);
+        s.TestClient.PostAsync(
+            "/config/disableWorkerBalancer",
+            new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("configurationId", "2"),
+            })
+        ).Wait();
 
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
-			.Should().Be(false);
-	}
-	[Test]
-	public async Task ShouldEnable()
-	{
-		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
-		{
-			Id = 2
-		});
+        system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+            .Should().Be(false);
+    }
 
-		using var s = new WebServerUnderTest(system);
-		await s.TestClient.PostAsync(
-			"/config/enableWorkerBalancer",
-			new StringContent(JsonConvert.SerializeObject(new
-			{
-				configurationId = 2
-			})));
+    [Test]
+    public void ShouldEnable()
+    {
+        var system = new SystemUnderTest();
+        system.ConfigurationStorage.Has(new StoredConfiguration
+        {
+            Id = 2
+        });
 
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
-			.Should().Be(true);
-	}
+        using var s = new WebServerUnderTest(system);
+        s.TestClient.PostAsync(
+            "/config/enableWorkerBalancer",
+            new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("configurationId", "2"),
+            })
+        ).Wait();
+
+        system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+            .Should().Be(true);
+    }
 }
