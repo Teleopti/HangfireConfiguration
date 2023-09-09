@@ -28,30 +28,6 @@ public class ConfigurationPage
         return _content.ToString();
     }
 
-    private void writePage(IEnumerable<ViewModel> configurations)
-    {
-        write("<html>");
-        write($@"<base href=""{_basePath}/"">");
-        write("<head>");
-        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles_css""/>");
-        write("</head>");
-        write("<body>");
-        write("<h2>Hangfire configuration</h2>");
-
-        configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
-
-        write("<div class='configurations'>");
-        foreach (var configuration in configurations)
-            writeConfiguration(configuration);
-        writeCreateConfiguration();
-        write("</div>");
-
-        write($@"<script src=""{_basePath}/script_js""></script>");
-        write($@"<script src=""{_basePath}/htmx_min_js""></script>");
-        write("</body>");
-        write("</html>");
-    }
-
     public string Configuration(int configurationId)
     {
         var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
@@ -59,6 +35,43 @@ public class ConfigurationPage
         writeConfiguration(configuration);
         return _content.ToString();
     }
+
+    public string CreateConfigurationSelection()
+    {
+        writeCreateNewServerSelection();
+        return _content.ToString();
+    }
+    
+    public string CreateConfiguration(string databaseProvider)
+    {
+        writeCreateNewServerConfiguration(databaseProvider);
+        return _content.ToString();
+    }
+    
+    private void writePage(IEnumerable<ViewModel> configurations)
+    {
+        write("<html>");
+        write($@"<base href=""{_basePath}/"">");
+        write("<head>");
+        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles_css""/>");
+        write("</head>");
+        write("<body hx-ext='response-targets' hx-target-500='next .error'>");
+        write("<h2>Hangfire configuration</h2>");
+
+        configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
+
+        write("<div class='configurations'>");
+        foreach (var configuration in configurations)
+            writeConfiguration(configuration);
+        writeCreateNewServerSelection();
+        write("</div>");
+
+        write($@"<script src=""{_basePath}/htmx_min_js""></script>");
+        write($@"<script src=""{_basePath}/response-targets_js""></script>");
+        write("</body>");
+        write("</html>");
+    }
+
     
     private void writeConfiguration(ViewModel configuration)
     {
@@ -70,7 +83,7 @@ public class ConfigurationPage
         write($@"
                 <div class='configuration'>
                     <fieldset>
-                        <legend>{title}{state}</legend>");
+                    <legend>{title}{state}</legend>");
 
         write($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
         if (!string.IsNullOrEmpty(configuration.SchemaName))
@@ -83,6 +96,8 @@ public class ConfigurationPage
         writeWorkerBalancer(configuration);
 
         write(@"</fieldset></div>");
+
+        write("<div class='error'></div>");
     }
 
     private void writeWorkerBalancer(ViewModel configuration)
@@ -148,62 +163,95 @@ public class ConfigurationPage
                 </div>");
     }
 
-    private void writeCreateConfiguration()
+    private void writeCreateNewServerSelection()
     {
-        write(
+                write(
             @"
+<div class='configuration'>
+    <fieldset>
+        <legend>Create new</legend>
+        <div style='display: flex'>
+            <div>
+                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=SqlServer' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                    Sql Server
+                </button>
+            </div>
+            <div>
+                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=PostgreSql' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                    PostgreSql
+                </button>
+            </div>
+            <div>
+                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=Redis' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                    Redis
+                </button>
+            </div>
+        </div>
+    </fieldset>
+</div>
+");
+    }
+    
+    private void writeCreateNewServerConfiguration(string databaseProvider)
+    {
+        var database = $@"
+            <label for='database'>Database (existing): </label><br>
+        	<input type='text' id='database' name='database'><br>";
+        var applicationUser = $@"
+			<fieldset>
+				<h3>Application user</h3>
+				<label for='user'>SQL User Name:</label><br>
+				<input type='text' id='user' name='user' class='small'><br>
+				<label for='password'>SQL Password: </label><br>
+				<input type='password' id='password' name='password' class='small'>
+			</fieldset>";
+        var creatorUser = $@"
+            <fieldset>
+	            <h3>User with create permissions</h3>
+	            <label for='schemaCreatorUser'>SQL User Name: </label><br>
+	            <input type='text' id='schemaCreatorUser' name='schemaCreatorUser' class='small'><br>
+	            <label for='schemaCreatorPassword'>SQL Password: </label><br>
+	            <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword' class='small'>
+            </fieldset>";
+        
+        if (databaseProvider == "Redis")
+        {
+            database = null;
+            applicationUser = null;
+            creatorUser = null;
+        }
+        
+        write(
+            @$"
 <div class='configuration'>
 <fieldset>
     <legend>Create new</legend>
-    <form class='form' id=""createForm"" action='createNewServerConfiguration' data-reload='true'>
+    <form class='form' hx-post='createNewServerConfiguration' hx-target='closest .configuration' hx-swap='outerHTML'>
         <div style='display: flex'>
             <fieldset>
                 <h3>Storage</h3>
-                <label for='databaseProvider'>Database provider: </label><br>
-                <select id='databaseProvider' name='databaseProvider'>
-					<option value='SqlServer' selected='true'>SQL Server</option>
-					<option value='PostgreSql'>PostgreSql</option>
-					<option value='redis'>Redis</option>
-				</select><br>
+                <input type='hidden' value='{databaseProvider}' name='databaseProvider' />
 				<label for='server'>Server: </label><br>
                 <input type='text' id='server' name='server'><br>
-				<div id='database'>
-					<label for='database'>Database (existing): </label><br>
-					<input type='text' id='database' name='database'><br>
-				</div>
+                {database}
 				<label for='schemaName'>Schema (optional): </label><br>
 				<input type='text' id='schemaName' name='schemaName'>
-             </fieldset>
-			<div id='applicationUser'>
-				<fieldset>
-					<h3>Application user</h3>
-					<label for='user'>SQL User Name:</label><br>
-					<input type='text' id='user' name='user' class='small'><br>
-					<label for='password'>SQL Password: </label><br>
-					<input type='password' id='password' name='password' class='small'>
-				</fieldset>
-			</div>
-			<div id='creatorUser'>
-	            <fieldset>
-					<h3>User with create permissions</h3>
-					<label for='schemaCreatorUser'>SQL User Name: </label><br>
-					<input type='text' id='schemaCreatorUser' name='schemaCreatorUser' class='small'><br>
-					<label for='schemaCreatorPassword'>SQL Password: </label><br>
-					<input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword' class='small'>
-	            </fieldset>
-			</div>
+            </fieldset>
+            {applicationUser}
+            {creatorUser}
         </div>
 		<br><br>
-        <button class='button' type='button'>Create</button>
+        <button class='button' type='submit'>Create</button>
     </form>
 </fieldset>
 </div>
+<div class='error'></div>
 ");
     }
     
     public string Message(string message) =>
         $@"
-<div class='message' hx-get='nothing' hx-trigger='load delay:2s' hx-swap='delete' hx-target='this'>
+<div class='message' hx-get='nothing' hx-trigger='load delay:3s' hx-swap='delete' hx-target='this'>
     <p>{message}</p>
 </div>
 ";

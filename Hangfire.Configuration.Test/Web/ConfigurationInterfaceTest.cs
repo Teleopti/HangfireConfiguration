@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -67,17 +65,17 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         var response = s.TestClient.PostAsync(
             "/config/saveWorkerGoalCount",
-            new StringContent(JsonConvert.SerializeObject(new
-            {
-                configurationId = 1,
-                workers = 11
-            }))
+            formContent(
+                new
+                {
+                    configurationId = 1,
+                    workers = 11
+                })
         ).Result;
 
         Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         var message = response.Content.ReadAsStringAsync().Result;
-        message.Should().Not.Be.Empty();
-        message.Should().Not.Contain("<");
+        message.Should().Contain("Invalid goal worker count");
     }
 
     [Test]
@@ -109,7 +107,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            new StringContent(JsonConvert.SerializeObject(
+            formContent(
                 new
                 {
                     server = ".",
@@ -119,7 +117,7 @@ public class ConfigurationInterfaceTest
                     schemaName = "TestSchema",
                     schemaCreatorUser = "schemaCreatorUser",
                     schemaCreatorPassword = "schemaCreatorPassword"
-                }))
+                })
         ).Wait();
 
         var storedConfiguration = system.ConfigurationStorage.Data.Single();
@@ -136,7 +134,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            new StringContent(JsonConvert.SerializeObject(
+            formContent(
                 new
                 {
                     server = ".",
@@ -147,7 +145,7 @@ public class ConfigurationInterfaceTest
                     schemaName = "TestSchema",
                     schemaCreatorUser = "schemaCreatorUser",
                     schemaCreatorPassword = "schemaCreatorPassword"
-                }))
+                })
         ).Wait();
 
         Assert.AreEqual("name", system.ConfigurationStorage.Data.Single().Name);
@@ -204,7 +202,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            new StringContent(JsonConvert.SerializeObject(
+            formContent(
                 new
                 {
                     server = "localhost",
@@ -215,7 +213,7 @@ public class ConfigurationInterfaceTest
                     schemaCreatorUser = "schemaCreatorUser",
                     schemaCreatorPassword = "schemaCreatorPassword",
                     databaseProvider = "PostgreSql"
-                }))
+                })
         ).Wait();
 
         var storedConfiguration = system.ConfigurationStorage.Data.Single();
@@ -232,18 +230,27 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            new StringContent(JsonConvert.SerializeObject(
+            formContent(
                 new
                 {
                     server = "gurka",
                     schemaName = "gurka:",
-                    databaseProvider = "redis"
-                }))
+                    databaseProvider = "Redis"
+                })
         ).Wait();
 
         var storedConfiguration = system.ConfigurationStorage.Data.Single();
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Be("gurka");
         storedConfiguration.SchemaName.Should().Be("gurka:");
+    }
+
+    private FormUrlEncodedContent formContent(object data)
+    {
+        var properties = data.GetType().GetProperties();
+        var keyValues = properties
+            .Select(x => new KeyValuePair<string, string>(x.Name, x.GetValue(data).ToString()))
+            .ToArray();
+        return new FormUrlEncodedContent(keyValues);
     }
 }

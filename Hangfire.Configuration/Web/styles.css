@@ -5,6 +5,7 @@ body {
 }
 
 .configuration {
+	padding-top: 5px;
 	width: 1000px
 }
 
@@ -18,12 +19,8 @@ h3 {
 	margin: 0;
 }
 
-div {
-	padding-top: 3px
-}
-
 p {
-	margin-top: 0;
+	margin: 0;
 }
 
 legend {
@@ -40,6 +37,7 @@ legend .inactive, legend .disabled {
 }
 
 fieldset {
+	margin: 0;
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 	border-radius: 8px;
@@ -77,7 +75,7 @@ form input, form select {
 }
 
 form input.small {
-	width: 250px;
+	width: 245px;
 }
 
 button {
@@ -93,16 +91,18 @@ button {
 
 .message {
 	width: 1000px;
-	height: 26px;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+.message p {
 	-webkit-border-radius: 8px;
 	-moz-border-radius: 8px;
 	border-radius: 8px;
 	border: 1px solid green;
 	background-color: lightgreen;
+	padding: 7px;
 }
-.message p {
-	margin-left: 10px;
-	margin-top: 1px;
+.error .message p {
+	border: 1px solid red;
+	background-color: lightcoral;
 }

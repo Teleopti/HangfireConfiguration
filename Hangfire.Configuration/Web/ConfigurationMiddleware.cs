@@ -2,12 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire.Configuration.Internals;
-using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
@@ -51,9 +49,10 @@ namespace Hangfire.Configuration.Web
             yield return (c => c.Request.Method == "GET" && string.IsNullOrEmpty(c.Request.Path.Value), displayPage);
             yield return (c => c.Request.Path.Value.Equals("/nothing"), _ => { });
             yield return (c => c.Request.Method == "GET", returnResource);
+            yield return (c => c.Request.Path.Value.Equals("/createNewServerSelection"), createNewServerSelection);
+            yield return (c => c.Request.Path.Value.Equals("/createNewServerConfiguration"), createNewServerConfiguration);
             yield return (c => c.Request.Path.Value.Equals("/saveWorkerGoalCount"), saveWorkerGoalCount);
             yield return (c => c.Request.Path.Value.Equals("/saveMaxWorkersPerServer"), saveMaxWorkersPerServer);
-            yield return (c => c.Request.Path.Value.Equals("/createNewServerConfiguration"), createNewServerConfiguration);
             yield return (c => c.Request.Path.Value.Equals("/activateServer"), activateServer);
             yield return (c => c.Request.Path.Value.Equals("/inactivateServer"), inactivateServer);
             yield return (c => c.Request.Path.Value.Equals("/enableWorkerBalancer"), enableWorkerBalancer);
@@ -138,48 +137,60 @@ namespace Hangfire.Configuration.Web
             display(context, p => p.Message("Max workers per server was saved successfully!"));
         }
 
+        private void createNewServerSelection(HttpContext context)
+        {
+            var provider = context.Request.Query["databaseProvider"];
+            display(context, p => p.CreateConfiguration(provider));
+        }
+
         private void createNewServerConfiguration(HttpContext context)
         {
-            var parsed = parseRequestJsonBody(context.Request);
-            var provider = parsed.SelectToken("databaseProvider")?.Value<string>();
-            if (provider == "PostgreSql")
+            var databaseProvider = context.Request.Form["databaseProvider"];
+
+            if (databaseProvider == "SqlServer" || string.IsNullOrEmpty(databaseProvider))
+            {
+                _configurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
+                {
+                    Name = context.Request.Form["name"],
+                    Server = context.Request.Form["server"],
+                    Database = context.Request.Form["database"],
+                    User = context.Request.Form["user"],
+                    Password = context.Request.Form["password"],
+                    SchemaName = context.Request.Form["schemaName"],
+                    SchemaCreatorUser = context.Request.Form["schemaCreatorUser"],
+                    SchemaCreatorPassword = context.Request.Form["schemaCreatorPassword"]
+                });
+            }
+
+            if (databaseProvider == "PostgreSql")
             {
                 _configurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
                 {
-                    Name = parsed.SelectToken("name")?.Value<string>(),
-                    Server = parsed.SelectToken("server").Value<string>(),
-                    Database = parsed.SelectToken("database").Value<string>(),
-                    User = parsed.SelectToken("user").Value<string>(),
-                    Password = parsed.SelectToken("password").Value<string>(),
-                    SchemaName = parsed.SelectToken("schemaName").Value<string>(),
-                    SchemaCreatorUser = parsed.SelectToken("schemaCreatorUser").Value<string>(),
-                    SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>(),
+                    Name = context.Request.Form["name"],
+                    Server = context.Request.Form["server"],
+                    Database = context.Request.Form["database"],
+                    User = context.Request.Form["user"],
+                    Password = context.Request.Form["password"],
+                    SchemaName = context.Request.Form["schemaName"],
+                    SchemaCreatorUser = context.Request.Form["schemaCreatorUser"],
+                    SchemaCreatorPassword = context.Request.Form["schemaCreatorPassword"],
                 });
-                return;
             }
 
-            if (provider == "redis")
+            if (databaseProvider == "Redis")
             {
                 _configurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
                 {
-                    Name = parsed.SelectToken("name")?.Value<string>(),
-                    Configuration = parsed.SelectToken("server").Value<string>(),
-                    Prefix = parsed.SelectToken("schemaName").Value<string>(),
+                    Name = context.Request.Form["name"],
+                    Configuration = context.Request.Form["server"],
+                    Prefix = context.Request.Form["schemaName"],
                 });
-                return;
             }
 
-            _configurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
-            {
-                Name = parsed.SelectToken("name")?.Value<string>(),
-                Server = parsed.SelectToken("server").Value<string>(),
-                Database = parsed.SelectToken("database").Value<string>(),
-                User = parsed.SelectToken("user").Value<string>(),
-                Password = parsed.SelectToken("password").Value<string>(),
-                SchemaName = parsed.SelectToken("schemaName").Value<string>(),
-                SchemaCreatorUser = parsed.SelectToken("schemaCreatorUser").Value<string>(),
-                SchemaCreatorPassword = parsed.SelectToken("schemaCreatorPassword").Value<string>()
-            });
+            var configurationId = _configurationApi.ReadConfigurations().Max(x => x.Id.Value);
+
+            display(context, p => p.Configuration(configurationId));
+            display(context, p => p.CreateConfigurationSelection());
         }
 
         private void inactivateServer(HttpContext context)
@@ -220,16 +231,6 @@ namespace Hangfire.Configuration.Web
         private int parseConfigurationId(HttpContext context) =>
             int.Parse(context.Request.Form["configurationId"]);
 
-        private JObject parseRequestJsonBody(HttpRequest request)
-        {
-            string text;
-            using (var reader = new StreamReader(request.Body))
-                text = reader.ReadToEnd();
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Request empty", nameof(request));
-
-            return JObject.Parse(text);
-        }
-
         private static int? tryParseNullable(string value) =>
             int.TryParse(value, out var outValue) ? outValue : null;
 
@@ -244,7 +245,13 @@ namespace Hangfire.Configuration.Web
             catch (Exception ex)
             {
                 context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                context.Response.WriteAsync(ex.Message).Wait();
+                // Uses a htmx extension to redirect error message into a div placeholder
+                // defined by this in the html:
+                // hx-ext='response-targets' hx-target-500='next .error'
+                // reswap is needed to put the message inside the placeholder
+                // couldnt find a neat way to keep these 2 things together.
+                context.Response.Headers.Append("HX-Reswap", "innerHTML");
+                display(context, p => p.Message(ex.Message));
             }
         }
     }
