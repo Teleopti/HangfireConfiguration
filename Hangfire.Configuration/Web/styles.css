@@ -1,109 +1,127 @@
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	font-size: 14px;
-	padding-left: calc(50% - 500px);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    padding-left: calc(50% - 500px);
 }
 
 .configuration {
-	padding-top: 5px;
-	width: 1000px
+    padding-top: 5px;
+    width: 1000px
 }
 
 h2 {
-	font-size: 30px;
-	font-weight: 500
+    font-size: 30px;
+    font-weight: 500
 }
 
 h3 {
-	font-weight: 700;
-	margin: 0;
+    font-weight: 700;
+    margin: 0;
 }
 
 p {
-	margin: 0;
+    margin: 0;
 }
 
 legend {
-	font-size: 16px;
-	font-weight: bold;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 legend .active, legend .enabled {
-	color: green;
+    color: green;
 }
 
 legend .inactive, legend .disabled {
-	color: red;
+    color: red;
 }
 
 fieldset {
-	margin: 0;
-	-webkit-border-radius: 8px;
-	-moz-border-radius: 8px;
-	border-radius: 8px;
-	border: 1px solid rgba(66, 139, 202, 1);
+    margin: 0;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(66, 139, 202, 1);
 }
 
 fieldset fieldset {
-	margin-right: 5px;
-	border: 1px solid #ccc;
+    margin-right: 5px;
+    border: 1px solid #ccc;
 }
 
 fieldset fieldset legend {
-	font-size: 12px;
-	font-weight: normal;
+    font-size: 12px;
+    font-weight: normal;
 }
 
 label {
-	margin-right: 10px;
-	color: #888;
-	font-size: 12px;
-	display: inline-block;
-	margin-top: 8px;
+    margin-right: 10px;
+    color: #888;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 8px;
 }
 
 form {
-	margin: 0;
+    margin: 0;
 }
 
 form input, form select {
-	width: 400px;
-	height: 26px;
-	border: 1px solid #ccc;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
+    width: 400px;
+    height: 26px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
 }
 
 form input.small {
-	width: 245px;
+    width: 245px;
 }
 
 button {
-	height: 26px;
-	padding: 1px 5px;
-	font-size: 12px;
-	line-height: 1.5;
-	border-radius: 3px;
-	color: #fff;
-	background-color: #337ab7;
-	border: 1px solid transparent;
+    height: 26px;
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    color: #fff;
+    background-color: #337ab7;
+    border: 1px solid transparent;
 }
 
 .message {
-	width: 1000px;
-	margin-top: 10px;
-	margin-bottom: 10px;
+    width: 1000px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
+
 .message p {
-	-webkit-border-radius: 8px;
-	-moz-border-radius: 8px;
-	border-radius: 8px;
-	border: 1px solid green;
-	background-color: lightgreen;
-	padding: 7px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    border: 1px solid green;
+    background-color: lightgreen;
+    padding: 7px;
 }
+
 .error .message p {
-	border: 1px solid red;
-	background-color: lightcoral;
+    border: 1px solid red;
+    background-color: lightcoral;
+}
+
+.htmx-request button {
+    animation: glowing-button 1s linear infinite;
+}
+
+@keyframes glowing-button {
+    0% {
+        box-shadow: 0 0 10px lightgreen;
+    }
+    50% {
+        box-shadow: 0 0 10px darkgreen;
+    }
+    100% {
+        box-shadow: 0 0 10px lightgreen;
+    }
 }

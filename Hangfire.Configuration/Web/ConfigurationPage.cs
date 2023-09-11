@@ -41,13 +41,14 @@ public class ConfigurationPage
         writeCreateNewServerSelection();
         return _content.ToString();
     }
-    
+
     public string CreateConfiguration(string databaseProvider)
     {
         writeCreateNewServerConfiguration(databaseProvider);
+        write("<div class='error'></div>");
         return _content.ToString();
     }
-    
+
     private void writePage(IEnumerable<ViewModel> configurations)
     {
         write("<html>");
@@ -62,7 +63,11 @@ public class ConfigurationPage
 
         write("<div class='configurations'>");
         foreach (var configuration in configurations)
+        {
             writeConfiguration(configuration);
+            write("<div class='error'></div>");
+        }
+
         writeCreateNewServerSelection();
         write("</div>");
 
@@ -72,7 +77,6 @@ public class ConfigurationPage
         write("</html>");
     }
 
-    
     private void writeConfiguration(ViewModel configuration)
     {
         var title = "Configuration";
@@ -96,8 +100,6 @@ public class ConfigurationPage
         writeWorkerBalancer(configuration);
 
         write(@"</fieldset></div>");
-
-        write("<div class='error'></div>");
     }
 
     private void writeWorkerBalancer(ViewModel configuration)
@@ -165,7 +167,7 @@ public class ConfigurationPage
 
     private void writeCreateNewServerSelection()
     {
-                write(
+        write(
             @"
 <div class='configuration'>
     <fieldset>
@@ -191,7 +193,7 @@ public class ConfigurationPage
 </div>
 ");
     }
-    
+
     private void writeCreateNewServerConfiguration(string databaseProvider)
     {
         var database = $@"
@@ -213,14 +215,14 @@ public class ConfigurationPage
 	            <label for='schemaCreatorPassword'>SQL Password: </label><br>
 	            <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword' class='small'>
             </fieldset>";
-        
+
         if (databaseProvider == "Redis")
         {
             database = null;
             applicationUser = null;
             creatorUser = null;
         }
-        
+
         write(
             @$"
 <div class='configuration'>
@@ -245,10 +247,9 @@ public class ConfigurationPage
     </form>
 </fieldset>
 </div>
-<div class='error'></div>
 ");
     }
-    
+
     public string Message(string message) =>
         $@"
 <div class='message' hx-get='nothing' hx-trigger='load delay:3s' hx-swap='delete' hx-target='this'>
