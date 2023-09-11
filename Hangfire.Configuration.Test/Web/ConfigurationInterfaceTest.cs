@@ -234,7 +234,7 @@ public class ConfigurationInterfaceTest
                 new
                 {
                     server = "gurka",
-                    schemaName = "gurka:",
+                    schemaName = "{gurka}:",
                     databaseProvider = "Redis"
                 })
         ).Wait();
@@ -242,7 +242,7 @@ public class ConfigurationInterfaceTest
         var storedConfiguration = system.ConfigurationStorage.Data.Single();
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Be("gurka");
-        storedConfiguration.SchemaName.Should().Be("gurka:");
+        storedConfiguration.SchemaName.Should().Be("{gurka}:");
     }
 
     private FormUrlEncodedContent formContent(object data)
