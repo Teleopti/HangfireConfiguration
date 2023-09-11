@@ -7,14 +7,11 @@ using StackExchange.Redis;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class RedisConfigurationVerifier : IRedisConfigurationVerifier
+internal class RedisConnectionVerifier : IRedisConnectionVerifier
 {
 	public void VerifyConfiguration(string configuration, string prefix)
 	{
 #if Redis
-		if(!Regex.IsMatch(prefix, @"^\{([^\{\}]+)\}:$"))
-			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
-		
 		using var redis = ConnectionMultiplexer.Connect(configuration + ",allowAdmin=true");
 		foreach (var endPoint in redis.GetEndPoints())
 		{

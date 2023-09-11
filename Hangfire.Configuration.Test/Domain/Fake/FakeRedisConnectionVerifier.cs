@@ -2,7 +2,7 @@
 
 namespace Hangfire.Configuration.Test.Domain.Fake;
 
-public class FakeRedisConfigurationVerifier : IRedisConfigurationVerifier
+public class FakeRedisConnectionVerifier : IRedisConnectionVerifier
 {
 	private bool _throws;
 	

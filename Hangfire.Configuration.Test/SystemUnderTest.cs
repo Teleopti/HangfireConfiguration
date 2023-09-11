@@ -15,12 +15,12 @@ namespace Hangfire.Configuration.Test
 			
 			UseApplicationBuilder(ApplicationBuilder);
 
-			ConfigurationStorage = new FakeConfigurationStorage(() => BuildOptions().ConfigurationOptions());
+			ConfigurationStorage = new FakeConfigurationStorage();
 			KeyValueStore = new FakeKeyValueStore();
 			SchemaInstaller = new FakeSchemaInstaller();
 			Monitor = new FakeMonitoringApi();
 			Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
-			RedisConfigurationVerifier = new FakeRedisConfigurationVerifier();
+			RedisConnectionVerifier = new FakeRedisConnectionVerifier();
 
 			UseOptions(new ConfigurationOptionsForTest());
 			WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
@@ -37,7 +37,7 @@ namespace Hangfire.Configuration.Test
 		public FakeKeyValueStore KeyValueStore { get; }
 		public FakeSchemaInstaller SchemaInstaller { get; }
 		public FakeHangfire Hangfire { get; }
-		public FakeRedisConfigurationVerifier RedisConfigurationVerifier { get; }
+		public FakeRedisConnectionVerifier RedisConnectionVerifier { get; }
 
 		public WorkerServerStarterUnderTest WorkerServerStarter { get; }
 		public PublisherStarter PublisherStarter { get; }
@@ -53,7 +53,7 @@ namespace Hangfire.Configuration.Test
 		protected override INow BuildNow() =>
 			_now ??= new FakeNow {Time = "2020-12-01 09:00".Utc()};
 
-		protected override IRedisConfigurationVerifier BuildRedisConfigurationVerifier() => RedisConfigurationVerifier;
+		protected override IRedisConnectionVerifier BuildRedisConnectionVerifier() => RedisConnectionVerifier;
 
 		public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
 		{

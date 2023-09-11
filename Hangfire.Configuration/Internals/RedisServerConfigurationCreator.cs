@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
@@ -6,20 +7,25 @@ namespace Hangfire.Configuration.Internals;
 internal class RedisServerConfigurationCreator
 {
 	private readonly IConfigurationStorage _storage;
-	private readonly IRedisConfigurationVerifier _redisConfigurationVerifier;
+	private readonly IRedisConnectionVerifier _redisConnectionVerifier;
 
-	public RedisServerConfigurationCreator(IConfigurationStorage storage, IRedisConfigurationVerifier redisConfigurationVerifier)
+	public RedisServerConfigurationCreator(IConfigurationStorage storage, IRedisConnectionVerifier redisConnectionVerifier)
 	{
 		_storage = storage;
-		_redisConfigurationVerifier = redisConfigurationVerifier;
+		_redisConnectionVerifier = redisConnectionVerifier;
 	}
 
 #if Redis
 
 	public void Create(CreateRedisWorkerServer command)
 	{
-		var prefix = command.Prefix ?? new RedisStorageProvider().DefaultSchemaName();
-		_redisConfigurationVerifier.VerifyConfiguration(command.Configuration, prefix);
+		var defaultSchemaName = $"{{{new RedisStorageProvider().DefaultSchemaName().TrimEnd(':')}}}:";
+		var prefix = command.Prefix ?? defaultSchemaName;
+		
+		if(!Regex.IsMatch(prefix, @"^\{([^\{\}]+)\}:$"))
+			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
+
+		_redisConnectionVerifier.VerifyConfiguration(command.Configuration, prefix);
 
 		_storage.WriteConfiguration(new StoredConfiguration
 		{

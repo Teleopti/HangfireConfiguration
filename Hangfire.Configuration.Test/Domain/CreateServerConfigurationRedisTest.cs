@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
@@ -17,7 +18,7 @@ public class CreateServerConfigurationRedisTest
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
-		Assert.AreEqual("AwesomeServer:425", storedConfiguration.ConnectionString);
+		storedConfiguration.ConnectionString.Should().Be("AwesomeServer:425");
 	}
 
 	[Test]
@@ -31,7 +32,7 @@ public class CreateServerConfigurationRedisTest
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
-		Assert.AreEqual("matte", storedConfiguration.Name);
+		storedConfiguration.Name.Should().Be("matte");
 	}
 
 	[Test]
@@ -45,7 +46,7 @@ public class CreateServerConfigurationRedisTest
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Single();
-		Assert.False(storedConfiguration.Active);
+		storedConfiguration.Active.Should().Be(false);
 	}
 
 	[Test]
@@ -55,11 +56,11 @@ public class CreateServerConfigurationRedisTest
 
 		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			Prefix = "my-prefix:"
+			Prefix = "{my-prefix}:"
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();
-		Assert.AreEqual("my-prefix:", storedConfiguration.SchemaName);
+		storedConfiguration.SchemaName.Should().Be("{my-prefix}:");
 	}
 
 	[Test]
@@ -73,7 +74,7 @@ public class CreateServerConfigurationRedisTest
 		});
 
 		var storedConfiguration = system.ConfigurationStorage.Data.Last();
-		Assert.AreEqual(DefaultSchemaName.Redis(), storedConfiguration.SchemaName);
+		storedConfiguration.SchemaName.Should().Be("{hangfire}:");
 	}
 	
 	[Test]
@@ -83,11 +84,12 @@ public class CreateServerConfigurationRedisTest
 	
 		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
 		{
-			Configuration = "AwesomeServer", Prefix = "prefix"
+			Configuration = "AwesomeServer", 
+			Prefix = "{prefix}:"
 		});
 
-		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
-			.Should().Be.EqualTo(("AwesomeServer", "prefix"));
+		system.RedisConnectionVerifier.WasSucessfullyVerifiedWith
+			.Should().Be.EqualTo(("AwesomeServer", "{prefix}:"));
 	}
 
 	[Test]
@@ -100,15 +102,15 @@ public class CreateServerConfigurationRedisTest
 			Configuration = "AwesomeServer"
 		});
 
-		system.RedisConfigurationVerifier.WasSucessfullyVerifiedWith
-			.Should().Be.EqualTo(("AwesomeServer", DefaultSchemaName.Redis()));
+		system.RedisConnectionVerifier.WasSucessfullyVerifiedWith
+			.Should().Be.EqualTo(("AwesomeServer", "{hangfire}:"));
 	}
 	
 	[Test]
 	public void ShouldNotCreateServerConfigurationIfVerifierThrows()
 	{
 		var system = new SystemUnderTest();
-		system.RedisConfigurationVerifier.Throws();
+		system.RedisConnectionVerifier.Throws();
 
 		Assert.Catch(() =>
 			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
@@ -116,5 +118,26 @@ public class CreateServerConfigurationRedisTest
 				Configuration = "someconfig"
 			}));
 		system.ConfigurationStorage.Data.Should().Be.Empty();
+	}
+	
+	[TestCase("a{prefix}:")]
+	[TestCase("{prefix}:a")]
+	[TestCase("{prefix}")]
+	[TestCase("prefix}:")]
+	[TestCase("{}:")]
+	[TestCase("{pre{fix}:")]
+	[TestCase("{pre}fix}:")]
+	public void ShouldThrowIfPrefixIsNotCorrect(string prefix)
+	{
+		var system = new SystemUnderInfraTest();
+
+		Assert.Throws<ArgumentException>(() =>
+		{
+			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+			{
+				Configuration = "localhost",
+				Prefix = prefix
+			});
+		});
 	}
 }

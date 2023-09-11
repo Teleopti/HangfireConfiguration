@@ -6,7 +6,7 @@ namespace Hangfire.Configuration.Test
 	{
 		public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
 		public IConfigurationStorage ConfigurationStorage => base.BuildConfigurationStorage();
-		public IRedisConfigurationVerifier RedisConfigurationVerifier => base.BuildRedisConfigurationVerifier();
+		public IRedisConnectionVerifier RedisConnectionVerifier => base.BuildRedisConnectionVerifier();
 
 		public void UseRealHangfire() => _realHangfire = true;
 		private bool _realHangfire;
