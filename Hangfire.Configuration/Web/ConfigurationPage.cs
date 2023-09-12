@@ -39,7 +39,6 @@ public class ConfigurationPage
     public string CreateConfiguration(string databaseProvider)
     {
         writeCreateNewServerConfiguration(databaseProvider);
-        write("<div class='error'></div>");
         return _content.ToString();
     }
 
@@ -63,6 +62,8 @@ public class ConfigurationPage
         }
 
         writeCreateNewServerConfiguration(null);
+        write("<div class='error'></div>");
+        
         write("</div>");
         write("<br/><br/><br/><br/><br/>");
 
