@@ -36,12 +36,6 @@ public class ConfigurationPage
         return _content.ToString();
     }
 
-    public string CreateConfigurationSelection()
-    {
-        writeCreateNewServerSelection();
-        return _content.ToString();
-    }
-
     public string CreateConfiguration(string databaseProvider)
     {
         writeCreateNewServerConfiguration(databaseProvider);
@@ -68,8 +62,9 @@ public class ConfigurationPage
             write("<div class='error'></div>");
         }
 
-        writeCreateNewServerSelection();
+        writeCreateNewServerConfiguration(null);
         write("</div>");
+        write("<br/><br/><br/><br/><br/>");
 
         write($@"<script src=""{_basePath}/htmx_min_js""></script>");
         write($@"<script src=""{_basePath}/response-targets_js""></script>");
@@ -91,9 +86,7 @@ public class ConfigurationPage
 
         write($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
         if (!string.IsNullOrEmpty(configuration.SchemaName))
-        {
             write($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
-        }
 
         writeActivateConfiguration(configuration);
 
@@ -116,7 +109,7 @@ public class ConfigurationPage
         // Math.Min(Environment.ProcessorCount * 5, 20)
         write($@"
 		        <div>
-					<form class='form' hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML'>
+					<form hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML'>
 						<label style='width: 126px'>Worker balancer: </label>
 						<input type='hidden' value='{configuration.Id}' name='configurationId'>
 						<button class='button' type='submit'>{button}</button>
@@ -126,7 +119,7 @@ public class ConfigurationPage
 
         write($@"
                 <div>
-                    <form class='form' hx-post='saveWorkerGoalCount' hx-target='closest .configuration' hx-swap='outerHTML'>
+                    <form hx-post='saveWorkerGoalCount' hx-target='closest .configuration' hx-swap='outerHTML'>
                         <label for='workers' style='width: 126px'>Worker goal count: </label>
                         <input type='hidden' value='{configuration.Id}' name='configurationId'>
                         <input type='number' value='{configuration.Workers}' name='workers' style='margin-right: 6px; width:60px'>
@@ -138,7 +131,7 @@ public class ConfigurationPage
 
         write($@"
                 <div>
-                    <form class='form' hx-post='saveMaxWorkersPerServer' hx-target='closest .configuration' hx-swap='outerHTML'>
+                    <form hx-post='saveMaxWorkersPerServer' hx-target='closest .configuration' hx-swap='outerHTML'>
                         <label for='maxWorkers' style='width: 126px'>Max workers per server: </label>
                         <input type='hidden' value='{configuration.Id}' name='configurationId'>
                         <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' name='maxWorkers' style='margin-right: 6px; width:60px'>
@@ -158,50 +151,50 @@ public class ConfigurationPage
 
         write($@"
                 <div>
-                    <form class='form' hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML' style='margin: 10px'>
+                    <form hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML' style='margin: 10px'>
                         <input type='hidden' value='{configuration.Id}' name='configurationId'>
                         <button class='button' type='submit'>{button}</button>
                     </form>
                 </div>");
     }
 
-    private void writeCreateNewServerSelection()
+    private void writeCreateNewServerConfiguration(string databaseProvider)
     {
-        write(
-            @"
+        write(@$"
 <div class='configuration'>
     <fieldset>
         <legend>Create new</legend>
-        <div style='display: flex'>
-            <div>
-                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=SqlServer' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
-                    Sql Server
-                </button>
-            </div>
-            <div>
-                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=PostgreSql' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
-                    PostgreSql
-                </button>
-            </div>
-            <div>
-                <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=Redis' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
-                    Redis
-                </button>
-            </div>
+        <div style='display: flex; margin:10px'>
+            <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=SqlServer' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                Sql Server
+            </button>
+            <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=PostgreSql' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                PostgreSql
+            </button>
+            <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=Redis' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
+                Redis
+            </button>
         </div>
-    </fieldset>
-</div>
 ");
+
+        if (databaseProvider != null)
+            writeCreateNewServerConfigurationForm(databaseProvider);
+
+        write(@$"</fieldset></div>");
     }
 
-    private void writeCreateNewServerConfiguration(string databaseProvider)
+    private void writeCreateNewServerConfigurationForm(string databaseProvider)
     {
+        var storageName = "Sql Server";
+        if (databaseProvider != "SqlServer")
+            storageName = databaseProvider;
+
         var database = $@"
             <label for='database'>Database (existing): </label><br>
         	<input type='text' id='database' name='database'><br>";
         var applicationUser = $@"
 			<fieldset>
-				<h3>Application user</h3>
+				<legend>Application user</legend>
 				<label for='user'>SQL User Name:</label><br>
 				<input type='text' id='user' name='user' class='small'><br>
 				<label for='password'>SQL Password: </label><br>
@@ -209,7 +202,7 @@ public class ConfigurationPage
 			</fieldset>";
         var creatorUser = $@"
             <fieldset>
-	            <h3>User with create permissions</h3>
+	            <legend>User with create permissions</legend>
 	            <label for='schemaCreatorUser'>SQL User Name: </label><br>
 	            <input type='text' id='schemaCreatorUser' name='schemaCreatorUser' class='small'><br>
 	            <label for='schemaCreatorPassword'>SQL Password: </label><br>
@@ -223,30 +216,24 @@ public class ConfigurationPage
             creatorUser = null;
         }
 
-        write(
-            @$"
-<div class='configuration'>
-<fieldset>
-    <legend>Create new</legend>
-    <form class='form' hx-post='createNewServerConfiguration' hx-target='closest .configuration' hx-swap='outerHTML'>
-        <div style='display: flex'>
-            <fieldset>
-                <h3>Storage</h3>
-                <input type='hidden' value='{databaseProvider}' name='databaseProvider' />
-				<label for='server'>Server: </label><br>
-                <input type='text' id='server' name='server'><br>
-                {database}
-				<label for='schemaName'>Schema (optional): </label><br>
-				<input type='text' id='schemaName' name='schemaName'>
-            </fieldset>
-            {applicationUser}
-            {creatorUser}
-        </div>
-		<br><br>
-        <button class='button' type='submit'>Create</button>
-    </form>
-</fieldset>
-</div>
+        write($@"
+<form hx-post='createNewServerConfiguration' hx-target='closest .configuration' hx-swap='outerHTML'>
+    <div style='display: flex'>
+        <fieldset>
+            <legend>{storageName}</legend>
+            <input type='hidden' value='{databaseProvider}' name='databaseProvider' />
+			<label for='server'>Server: </label><br>
+            <input type='text' id='server' name='server'><br>
+            {database}
+			<label for='schemaName'>Schema (optional): </label><br>
+			<input type='text' id='schemaName' name='schemaName'>
+        </fieldset>
+        {applicationUser}
+        {creatorUser}
+    </div>
+	<br>
+    <button class='button' type='submit'>Create</button>
+</form>
 ");
     }
 

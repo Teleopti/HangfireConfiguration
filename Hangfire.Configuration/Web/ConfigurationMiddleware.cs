@@ -190,7 +190,7 @@ namespace Hangfire.Configuration.Web
             var configurationId = _configurationApi.ReadConfigurations().Max(x => x.Id.Value);
 
             display(context, p => p.Configuration(configurationId));
-            display(context, p => p.CreateConfigurationSelection());
+            display(context, p => p.CreateConfiguration(null));
         }
 
         private void inactivateServer(HttpContext context)
