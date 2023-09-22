@@ -7,7 +7,7 @@
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
+		<PackageReference Include="HangFire.Autofac" Version="2.4.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
