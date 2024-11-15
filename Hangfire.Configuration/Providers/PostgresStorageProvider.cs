@@ -1,4 +1,5 @@
 using Hangfire.PostgreSql;
+using Hangfire.PostgreSql.Factories;
 
 namespace Hangfire.Configuration.Providers;
 
@@ -12,5 +13,5 @@ internal class PostgresStorageProvider : IStorageProvider
 	public bool WorkerBalancerEnabledDefault() => false;
 
 	public JobStorage NewStorage(string connectionString, object options) =>
-		new PostgreSqlStorage(connectionString, (PostgreSqlStorageOptions) options);
+		new PostgreSqlStorage(new NpgsqlConnectionFactory(connectionString, (PostgreSqlStorageOptions) options));
 }
