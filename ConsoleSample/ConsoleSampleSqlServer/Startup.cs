@@ -68,7 +68,6 @@ namespace ConsoleSample
 				QueuePollInterval = TimeSpan.Zero,
 				SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
 				UseRecommendedIsolationLevel = true,
-				UsePageLocksOnDequeue = true,
 				DisableGlobalLocks = true,
 				EnableHeavyMigrations = true,
 				PrepareSchemaIfNecessary = true,

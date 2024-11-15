@@ -256,7 +256,6 @@ namespace Hangfire.Configuration.Test.Domain
 	            DashboardJobListLimit = 6,
 	            TransactionTimeout = TimeSpan.FromMinutes(7.0),
 	            DisableGlobalLocks = !new SqlServerStorageOptions().DisableGlobalLocks,
-	            UsePageLocksOnDequeue = !new SqlServerStorageOptions().UsePageLocksOnDequeue
             };
             system.UseStorageOptions(options);
             
@@ -271,7 +270,6 @@ namespace Hangfire.Configuration.Test.Domain
 			Assert.AreEqual(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
 			Assert.AreEqual(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
 			Assert.AreEqual(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
-			Assert.AreEqual(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
         [Test]
@@ -296,7 +294,6 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.AreEqual(options.DashboardJobListLimit, storage.SqlServerOptions.DashboardJobListLimit);
             Assert.AreEqual(options.TransactionTimeout, storage.SqlServerOptions.TransactionTimeout);
             Assert.AreEqual(options.DisableGlobalLocks, storage.SqlServerOptions.DisableGlobalLocks);
-            Assert.AreEqual(options.UsePageLocksOnDequeue, storage.SqlServerOptions.UsePageLocksOnDequeue);
 		}
 
         [Test]
