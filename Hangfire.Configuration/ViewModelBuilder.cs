@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
-using Hangfire.Configuration.Providers;
+using Npgsql;
 
 namespace Hangfire.Configuration
 {
@@ -41,11 +41,18 @@ namespace Hangfire.Configuration
 		{
 			const string hiddenPassword = "******";
 			return x.ConnectionString.ToDbVendorSelector().SelectDialect(
-				() => new SqlConnectionStringBuilder(x.ConnectionString).Password == string.Empty ? x.ConnectionString : new SqlConnectionStringBuilder(x.ConnectionString) {Password = hiddenPassword}.ToString(),
 				() =>
 				{
-					var parsed = NpgsqlConnectionStringBuilderWorkaround.Parse(x.ConnectionString);
-					if (parsed.Password == null)
+					var parsed = new SqlConnectionStringBuilder(x.ConnectionString);
+					if (string.IsNullOrEmpty(parsed.Password))
+						return x.ConnectionString;
+					parsed.Password = hiddenPassword;
+					return parsed.ToString();
+				},
+				() =>
+				{
+					var parsed = new NpgsqlConnectionStringBuilder(x.ConnectionString);
+					if (string.IsNullOrEmpty(parsed.Password))
 						return x.ConnectionString;
 					parsed.Password = hiddenPassword;
 					return parsed.ToString();

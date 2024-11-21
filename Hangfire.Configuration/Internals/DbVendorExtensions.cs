@@ -53,17 +53,19 @@ internal static class DbVendorExtensions
 		return new connectionStringDialectSelector(connectionString).SelectDialect(
 			() =>
 			{
-				var ret = new SqlConnectionStringBuilder(connectionString) {UserID = userName, Password = password};
+				var ret = new SqlConnectionStringBuilder(connectionString)
+				{
+					UserID = userName, 
+					Password = password
+				};
 				ret.Remove("Integrated security");
 				return ret.ToString();
 			},
-			() =>
+			() => new NpgsqlConnectionStringBuilder(connectionString)
 			{
-				var ret = new NpgsqlConnectionStringBuilder(connectionString) {Username = userName, Password = password};
-				ret.Remove("Integrated security");
-				return ret.ToString();
-			}
-		);
+				Username = userName,
+				Password = password
+			}.ToString());
 	}
 
 	public static string SetCredentials(this string connectionString, bool useIntegratedSecurity, string userName, string password)
@@ -81,20 +83,7 @@ internal static class DbVendorExtensions
 
 				return SetUserNameAndPassword(connectionString, userName, password);
 			},
-			() =>
-			{
-				if (useIntegratedSecurity)
-				{
-					var ret = new NpgsqlConnectionStringBuilder(connectionString)
-					{
-						Username = null,
-						Password = null
-					};
-					return NpgsqlConnectionStringBuilderWorkaround.SetIntegratedSecurity(ret.ToString());
-				}
-
-				return SetUserNameAndPassword(connectionString, userName, password);
-			});
+			() => SetUserNameAndPassword(connectionString, userName, password));
 	}
 
 	public static DbConnection CreateConnection(this string connectionString)
@@ -140,7 +129,7 @@ internal static class DbVendorExtensions
 		{
 			try
 			{
-				NpgsqlConnectionStringBuilderWorkaround.Parse(_connectionString);
+				new NpgsqlConnectionStringBuilder(_connectionString);
 				return true;
 			}
 			catch (Exception)

@@ -238,21 +238,6 @@ public class UpgradeWorkerServersTest
 	}
 	
 	[Test]
-	public void ShouldUpgradeUsingIntegratedSecurityWithoutCredentialsPostgres()
-	{
-		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
-		{
-			ConnectionString = "Host=localhost;Database=db"
-		});
-
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
-
-		var upgraded = system.SchemaInstaller.InstalledSchemas.Single();
-		upgraded.ConnectionString.Should().Contain("Integrated Security=True");
-	}
-
-	[Test]
 	public void ShouldUpgradeConfigurationSchemaWithCredentials()
 	{
 		var system = new SystemUnderTest();

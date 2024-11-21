@@ -194,18 +194,18 @@ namespace Hangfire.Configuration.Test.Domain
 		}
 
 		[Test]
-		public void ShouldKeepConnstringAsIsIfSqlServerIntegratedSecurity()
+		public void ShouldKeepConnectionStringAsIsIfSqlServerIntegratedSecurity()
 		{
 			var system = new SystemUnderTest();
-			var connstring = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
+			var connectionString = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
 			system.ConfigurationStorage.Has(new StoredConfiguration
 			{
-				ConnectionString = connstring
+				ConnectionString = connectionString
 			});
 
 			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Be.EqualTo(connstring);
+			result.ConnectionString.Should().Be.EqualTo(connectionString);
 		}
 
 		[Test]
@@ -221,21 +221,6 @@ namespace Hangfire.Configuration.Test.Domain
 
 			result.ConnectionString.Should().Not.Contain("thePassword");
 			result.ConnectionString.Should().Contain("******");
-		}
-
-		[Test]
-		public void ShouldKeepConnstringAsIsIfPostgresIntegratedSecurity()
-		{
-			var system = new SystemUnderTest();
-			var connstring = "Host=.;Database=a;Integrated Security=true;";
-			system.ConfigurationStorage.Has(new StoredConfiguration
-			{
-				ConnectionString = connstring
-			});
-
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
-
-			result.ConnectionString.Should().Be.EqualTo(connstring);
 		}
 
 		[Test]
