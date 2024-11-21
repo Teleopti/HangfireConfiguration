@@ -26,6 +26,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Hangfire.Pro.Redis" Version="3.0.10" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.16" />
+		<PackageReference Include="Npgsql" Version="8.0.6" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
 		<PackageReference Include="Microsoft.Owin" Version="4.2.2" />

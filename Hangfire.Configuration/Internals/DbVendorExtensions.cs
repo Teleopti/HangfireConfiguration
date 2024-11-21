@@ -87,7 +87,6 @@ internal static class DbVendorExtensions
 				{
 					var ret = new NpgsqlConnectionStringBuilder(connectionString)
 					{
-						IntegratedSecurity = false,
 						Username = null,
 						Password = null
 					};
