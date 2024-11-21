@@ -26,7 +26,7 @@ public class RedisConfigurationVerifierTest
 
 		Assert.DoesNotThrow(() =>
 		{
-			system.RedisConnectionVerifier.VerifyConfiguration("localhost,ConnectTimeout=100", "{hangfire}:");
+			system.RedisConnectionVerifier.VerifyConfiguration("localhost,ConnectTimeout=100,abortConnect=false", "{hangfire}:");
 		});
 	}
 	
