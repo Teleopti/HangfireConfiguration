@@ -40,7 +40,7 @@ namespace Hangfire.Configuration
 		private static string hidePassword(StoredConfiguration x)
 		{
 			const string hiddenPassword = "******";
-			return x.ConnectionString.ToDbVendorSelector().SelectDialect(
+			return x.ConnectionString.ToDbSelector().PickFunc(
 				() =>
 				{
 					var parsed = new SqlConnectionStringBuilder(x.ConnectionString);

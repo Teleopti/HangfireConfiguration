@@ -7,7 +7,7 @@ internal class Connector : ConnectorBase
 {
 	protected override void operation(Action<IDbConnection, IDbTransaction> action)
 	{
-		this.ExecuteDialect(() =>
+		this.PickAction(() =>
 			{
 				using var connection = ConnectionString.CreateConnection();
 				OpenWithRetry(connection);

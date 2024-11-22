@@ -7,7 +7,7 @@ using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
-internal abstract class ConnectorBase : IDbVendorSelector
+internal abstract class ConnectorBase : IDbSelector
 {
 	protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
@@ -51,8 +51,8 @@ internal abstract class ConnectorBase : IDbVendorSelector
 		_connectionRetry.Execute(connection.Open);
 	}
 
-	public T SelectDialect<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
+	public T PickFunc<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
 	{
-		return ConnectionString.ToDbVendorSelector().SelectDialect(sqlServer, postgres);
+		return ConnectionString.ToDbSelector().PickFunc(sqlServer, postgres);
 	}
 }

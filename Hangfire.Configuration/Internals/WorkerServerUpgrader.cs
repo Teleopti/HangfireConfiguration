@@ -42,7 +42,7 @@ internal class WorkerServerUpgrader
 			.Where(x => !string.IsNullOrEmpty(x.ConnectionString))
 			.Where(x =>
 			{
-				var hasSchema = x.ConnectionString.ToDbVendorSelector().SelectDialect(true, true, false);
+				var hasSchema = x.ConnectionString.ToDbSelector().PickDialect(true, true, false);
 				return hasSchema;
 			})
 			.Select(x =>

@@ -20,7 +20,7 @@ namespace Hangfire.Configuration
 
 		public void InstallHangfireStorageSchema(string schemaName, string connectionString)
 		{
-			connectionString.ToDbVendorSelector().ExecuteDialect(
+			connectionString.ToDbSelector().PickAction(
 				() =>
 				{
 					using var conn = connectionString.CreateConnection();

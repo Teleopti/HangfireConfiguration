@@ -16,10 +16,10 @@ namespace Hangfire.Configuration
 
         public void Write(string key, string value)
         {
-	        var updateSqlQuery = _connector.SelectDialect(
+	        var updateSqlQuery = _connector.PickDialect(
 		        $"UPDATE [{schema}].KeyValueStore SET [Value] = @Value WHERE [Key] = @Key", 
 		        $"UPDATE {schema}.KeyValueStore SET Value = @Value WHERE Key = @Key");
-	        var insertSqlQuery = _connector.SelectDialect(
+	        var insertSqlQuery = _connector.PickDialect(
 		        $"INSERT INTO [{schema}].KeyValueStore ([Key], [Value]) VALUES (@Key, @Value)", 
 		        $"INSERT INTO {schema}.KeyValueStore (Key, Value) VALUES (@Key, @Value)");
 	        
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration
 
         public string Read(string key)
         {
-	        var sqlQuery = _connector.SelectDialect(
+	        var sqlQuery = _connector.PickDialect(
 		        $"SELECT [Value] FROM [{schema}].KeyValueStore WHERE [Key] = @Key", 
 		        $"SELECT Value FROM {schema}.KeyValueStore WHERE Key = @Key");
 			return _connector

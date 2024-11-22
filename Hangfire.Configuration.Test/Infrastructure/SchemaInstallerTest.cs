@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Data.SqlClient;
 using Dapper;
+using DbAgnostic;
 using Npgsql;
 using NUnit.Framework;
 using SharpTestsEx;
@@ -25,9 +26,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 		public void ShouldThrowExceptionWhenNoDatabase()
 		{
 			var creator = new SchemaInstaller();
-			var connectionString = SelectDialect(
-				() => new SqlConnectionStringBuilder(ConnectionString) {InitialCatalog = "Does_Not_Exist"}.ToString(),
-				() => new NpgsqlConnectionStringBuilder(ConnectionString) {Database = "Does_Not_Exist"}.ToString());
+			var connectionString = ConnectionString.ChangeDatabase("Does_Not_Exist");
 			
 			var exception = Assert.Catch(() => creator.TryConnect(connectionString));
 			
@@ -41,7 +40,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
 			creator.InstallHangfireStorageSchema("hangfiretestschema", ConnectionString);
 
-			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
+			using var conn = ConnectionString.CreateConnection();
 			Assert.AreEqual("hangfiretestschema", conn.ExecuteScalar<string>("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'hangfiretestschema'"));
 		}
 
@@ -52,8 +51,8 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
 			creator.InstallHangfireStorageSchema("", ConnectionString);
 
-			var expected = SelectDialect(() => "HangFire", () => "hangfire");
-			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
+			var expected = ConnectionString.PickDialect("HangFire", "hangfire");
+			using var conn = ConnectionString.CreateConnection();
 			Assert.AreEqual(expected, conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'"));
 		}
 
@@ -86,7 +85,7 @@ namespace Hangfire.Configuration.Test.Infrastructure
 			creator.InstallHangfireConfigurationSchema(ConnectionString);
 
 			var expected = "hangfireconfiguration";
-			using var conn = SelectDialect<DbConnection>(() => new SqlConnection(ConnectionString), () => new NpgsqlConnection(ConnectionString));
+			using var conn = ConnectionString.CreateConnection();
 			var actual = conn.ExecuteScalar<string>($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{expected}'");
 			Assert.AreEqual(expected.ToLower(), actual.ToLower());
 		}

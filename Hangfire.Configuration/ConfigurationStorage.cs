@@ -30,7 +30,7 @@ namespace Hangfire.Configuration
 		private string tableName()
 		{
 			var c = currentConnector();
-			return c.SelectDialect(
+			return c.PickDialect(
 				$@"[{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration",
 				$@"{HangfireConfigurationSchemaInstaller.SchemaName}.Configuration");
 		}
@@ -56,7 +56,7 @@ namespace Hangfire.Configuration
 		public void LockConfiguration()
 		{
 			var c = currentConnector();
-			var sql = c.SelectDialect(
+			var sql = c.PickDialect(
 				$@"SELECT * FROM {tableName()} WITH (TABLOCKX)",
 				$@"LOCK TABLE {tableName()}");
 			c.Execute(sql);
