@@ -29,9 +29,19 @@
 		<PackageReference Include="Microsoft.Owin" Version="4.2.2" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.15" />
-		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+		<!-- this is Hangfire.AspNetCore and upgrades of its dependencies -->
+		<!-- which has dependency on dependency with vulnerabilities -->
+		<!-- System.Security.Cryptography.Xml -->
+		<!-- System.Text.Encodings.Web -->
+		<!-- etc etc -->
+		<!-- https://github.com/HangfireIO/Hangfire/issues/2005 -->
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.15"/>
+		<PackageReference Include="Microsoft.AspNetCore.Antiforgery" Version="2.3.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.0"/>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6"/>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="*.sql" />
