@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration", "Hangfire.Configuration\Hangfire.Configuration.csproj", "{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire.Configuration.Test", "Hangfire.Configuration.Test\Hangfire.Configuration.Test.csproj", "{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSampleSqlServer", "ConsoleSample\ConsoleSampleSqlServer\ConsoleSampleSqlServer.csproj", "{CFCA91E2-6EBC-4171-9182-A133D88F9818}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSamplePostgreSql", "ConsoleSample\ConsoleSamplePostgreSql\ConsoleSamplePostgreSql.csproj", "{BAE6AED1-5414-4314-8556-E2439C531791}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{07E574AE-F67C-486C-AA54-342FD1BA092B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		NuGet.Config = NuGet.Config
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.Configuration.Redis", "Hangfire.Configuration\Hangfire.Configuration.Redis.csproj", "{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FEA1092-A5AC-47F6-80E6-1A6BA759F74C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A8FAB94-47C7-4EFD-87B5-5F462C6D8D9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFCA91E2-6EBC-4171-9182-A133D88F9818}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE6AED1-5414-4314-8556-E2439C531791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFE53FF9-BB40-4945-BD1D-1989F500FDFF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A9DD76E-4670-4A12-9EBC-1DAB93E82EFC}
+	EndGlobalSection
+EndGlobal
