@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ConsoleSample</RootNamespace>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Hangfire.Configuration\Hangfire.Configuration.Redis.csproj" />
