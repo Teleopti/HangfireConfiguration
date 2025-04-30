@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
@@ -211,5 +212,16 @@ public class GetPublisherByConnectionStringTest
 		var result = system.QueryPublishers();
 
 		result.Single().SchemaName.Should().Be(DefaultSchemaName.SqlServer());
+	}
+
+	[Test]
+	public void ShouldThrowWhenNoConnectionString()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ""});
+
+		var ex = Assert.Catch(() => system.GetPublisher("", ""));
+
+		ex.Message.Should().Contain("Missing connection string");
 	}
 }

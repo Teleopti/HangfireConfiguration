@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
@@ -32,6 +33,8 @@ public class PublisherQueries
 	
 	private ConfigurationInfo getPublisher(string connectionString, string schemaName)
 	{
+		if (string.IsNullOrEmpty(connectionString))
+			throw new ArgumentException("Missing connection string getting publisher by connection string");
 		_stateMaintainer.EnsureLoaded(connectionString, schemaName);
 		return _state.Configurations
 			.Where(x => x.Matches(connectionString, schemaName))
