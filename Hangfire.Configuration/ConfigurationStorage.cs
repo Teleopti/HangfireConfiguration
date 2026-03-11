@@ -26,7 +26,7 @@ namespace Hangfire.Configuration
 			_currentTransaction.Value.Commit();
 			_currentTransaction.Value = null;
 		}
-		
+
 		private string tableName()
 		{
 			var c = currentConnector();
@@ -75,6 +75,13 @@ namespace Hangfire.Configuration
 				update(configuration);
 			else
 				insert(configuration);
+		}
+
+		public void DeleteConfiguration(StoredConfiguration configuration)
+		{
+			var sql = $@"DELETE FROM {tableName()} WHERE Id = @Id;";
+			var c = currentConnector();
+			c.Execute(sql, configuration);
 		}
 
 		private void insert(StoredConfiguration configuration)

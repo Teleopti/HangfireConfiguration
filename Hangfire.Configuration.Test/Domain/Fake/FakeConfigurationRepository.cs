@@ -32,6 +32,11 @@ public class FakeConfigurationStorage : IConfigurationStorage
 			_data.TryAdd(configuration.Id.Value, configuration);
 	}
 
+	public void DeleteConfiguration(StoredConfiguration configuration)
+	{
+		_data.Remove(configuration.Id.Value, out _);
+	}
+
 	public void Transaction(Action action) =>
 		action.Invoke();
 

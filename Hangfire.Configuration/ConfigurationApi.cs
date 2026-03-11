@@ -160,5 +160,12 @@ namespace Hangfire.Configuration
 			mutation.Invoke(configuration);
 			_storage.WriteConfiguration(configuration);
 		}
+
+		public void DeleteConfiguration(int? configurationId)
+		{
+			var configurations = _storage.ReadConfigurations();
+			var configuration = configurations.Single(x => x.Id == configurationId);
+			_storage.DeleteConfiguration(configuration);
+		}
 	}
 }

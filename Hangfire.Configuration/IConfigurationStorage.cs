@@ -7,6 +7,7 @@ public interface IConfigurationStorage
 {
 	IEnumerable<StoredConfiguration> ReadConfigurations();
 	void WriteConfiguration(StoredConfiguration configuration);
+	void DeleteConfiguration(StoredConfiguration configuration);
 
 	void Transaction(Action action);
 	void LockConfiguration();

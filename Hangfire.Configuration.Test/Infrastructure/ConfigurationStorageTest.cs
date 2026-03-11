@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure
 {
@@ -114,6 +115,25 @@ namespace Hangfire.Configuration.Test.Infrastructure
 
             var configuration = storage.ReadConfigurations().Single();
             Assert.AreEqual("name", configuration.Name);
+        }
+        
+        [Test]
+        public void ShouldDelete()
+        {
+	        var system = new SystemUnderInfraTest();
+	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+	        var storage = system.ConfigurationStorage;
+	        storage.WriteConfiguration(new StoredConfiguration
+	        {
+		        ConnectionString = "c",
+		        SchemaName = "s"
+	        });
+	        var configuration = storage.ReadConfigurations().Single();
+
+	        storage.DeleteConfiguration(configuration);
+
+	        var result = storage.ReadConfigurations();
+	        result.Should().Be.Empty();
         }
     }
 }

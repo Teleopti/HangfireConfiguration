@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain
 {
@@ -47,6 +48,27 @@ namespace Hangfire.Configuration.Test.Domain
             Assert.AreEqual("SchemaName", result.SchemaName);
             Assert.True(result.Active);
             Assert.AreEqual(44, result.GoalWorkerCount);
+        }
+        
+        [Test]
+        public void ShouldDelete()
+        {
+            var system = new SystemUnderTest();
+
+            system.ConfigurationApi().WriteConfiguration(new StoredConfiguration
+            {
+                Id = 3,
+                ConnectionString = "c",
+                SchemaName = "s",
+                Active = true,
+                GoalWorkerCount = 4
+            });
+            var configuration = system.ConfigurationApi().ReadConfigurations().Single();
+            
+            system.ConfigurationApi().DeleteConfiguration(configuration.Id);
+
+            var result = system.ConfigurationApi().ReadConfigurations();
+            result.Should().Be.Empty();
         }
     }
 }
