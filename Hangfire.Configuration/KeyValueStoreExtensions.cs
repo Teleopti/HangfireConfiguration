@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Hangfire.Configuration
@@ -11,7 +13,7 @@ namespace Hangfire.Configuration
 		public static void ServerCountSamples(this IKeyValueStore instance, ServerCountSamples samples) =>
 			instance.write("ServerCountSamples", samples);
 
-
+		
 		private static T read<T>(this IKeyValueStore instance, string key, Func<T> @default)
 		{
 			var value = instance.Read(key);

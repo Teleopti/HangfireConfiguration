@@ -9,12 +9,12 @@ namespace Hangfire.Configuration.Internals;
 internal class WorkerServerUpgrader
 {
 	private readonly ISchemaInstaller _installer;
-	private readonly IConfigurationStorage _storage;
+	private readonly ConfigurationStorage _storage;
 	private readonly Options _options;
 
 	public WorkerServerUpgrader(
 		ISchemaInstaller installer,
-		IConfigurationStorage storage,
+		ConfigurationStorage storage,
 		Options options)
 	{
 		_installer = installer;

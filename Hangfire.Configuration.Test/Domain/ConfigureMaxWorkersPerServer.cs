@@ -14,20 +14,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi().WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer {MaxWorkers = expected});
 
-	        Assert.AreEqual(expected, system.ConfigurationStorage.MaxWorkersPerServer);
+	        Assert.AreEqual(expected, system.Configurations().Single().MaxWorkersPerServer);
         }
         
         [Test]
         public void ShouldWriteMaxWorkersPerServerForSpecificConfiguration()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
-	        {
-		        Id = 1
-	        }, new StoredConfiguration
-	        {
-		        Id = 2
-	        });
+	        system.WithConfiguration(new StoredConfiguration {Id = 1});
+	        system.WithConfiguration(new StoredConfiguration {Id = 2});
 
 	        system.ConfigurationApi().WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer
 	        {
@@ -35,7 +30,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        MaxWorkers = 7
 	        });
 
-	        Assert.AreEqual(7, system.ConfigurationStorage.Data.Single(x => x.Id == 2).MaxWorkersPerServer);
+	        Assert.AreEqual(7, system.Configurations().Single(x => x.Id == 2).MaxWorkersPerServer);
         }
     }
 }

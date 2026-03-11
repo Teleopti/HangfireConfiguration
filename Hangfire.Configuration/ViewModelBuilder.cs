@@ -8,9 +8,9 @@ namespace Hangfire.Configuration
 {
 	public class ViewModelBuilder
 	{
-		private readonly IConfigurationStorage _storage;
+		private readonly ConfigurationStorage _storage;
 
-		public ViewModelBuilder(IConfigurationStorage storage)
+		public ViewModelBuilder(ConfigurationStorage storage)
 		{
 			_storage = storage;
 		}

@@ -126,6 +126,7 @@ namespace Hangfire.Configuration
 
 		protected ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
 
+		protected ConfigurationStorage BuildConfigurationStorage() => new(BuildKeyValueStore());
 
 		// boundary
 		protected virtual IHangfire BuildHangfire(object appBuilder) =>
@@ -133,9 +134,6 @@ namespace Hangfire.Configuration
 
 		protected virtual ISchemaInstaller BuildSchemaInstaller() =>
 			new SchemaInstaller();
-
-		protected virtual IConfigurationStorage BuildConfigurationStorage() =>
-			new ConfigurationStorage(buildConnector());
 
 		protected virtual IKeyValueStore BuildKeyValueStore() =>
 			new KeyValueStore(buildConnector());

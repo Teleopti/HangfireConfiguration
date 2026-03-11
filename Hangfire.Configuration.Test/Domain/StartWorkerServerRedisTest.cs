@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseRedisOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "something"});
+			system.WithConfiguration(new StoredConfiguration {ConnectionString = "something"});
 
 			system.WorkerServerStarter.Start();
 
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseProvidedRedisOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = "redis"});
+			system.WithConfiguration(new StoredConfiguration {ConnectionString = "redis"});
 			var options = new RedisStorageOptions
 			{
 				MultiplexerPoolSize = 1,
@@ -55,7 +55,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseSchemaNameFromConfigurationAsPrefix()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Active = true, 
 				SchemaName = "myprefix:",
@@ -71,7 +71,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseDefaultPrefix()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Active = true,
 				SchemaName = null, 

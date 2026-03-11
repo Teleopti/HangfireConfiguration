@@ -10,14 +10,14 @@ namespace Hangfire.Configuration
 {
 	public class ConfigurationApi
 	{
-		private readonly IConfigurationStorage _storage;
+		private readonly ConfigurationStorage _storage;
 		private readonly State _state;
 		private readonly SqlDialectsServerConfigurationCreator _sqlDialectCreator;
 		private readonly RedisServerConfigurationCreator _redisCreator;
 		private readonly WorkerServerUpgrader _upgrader;
 
 		internal ConfigurationApi(
-			IConfigurationStorage storage,
+			ConfigurationStorage storage,
 			State state,
 			SqlDialectsServerConfigurationCreator sqlDialectCreator,
 			RedisServerConfigurationCreator redisCreator,

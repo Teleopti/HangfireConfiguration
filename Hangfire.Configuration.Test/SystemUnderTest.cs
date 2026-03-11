@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Test.Domain.Fake;
 
@@ -15,7 +16,6 @@ namespace Hangfire.Configuration.Test
 			
 			UseApplicationBuilder(ApplicationBuilder);
 
-			ConfigurationStorage = new FakeConfigurationStorage();
 			KeyValueStore = new FakeKeyValueStore();
 			SchemaInstaller = new FakeSchemaInstaller();
 			Monitor = new FakeMonitoringApi();
@@ -23,6 +23,7 @@ namespace Hangfire.Configuration.Test
 			RedisConnectionVerifier = new FakeRedisConnectionVerifier();
 
 			UseOptions(new ConfigurationOptionsForTest());
+			ConfigurationStorage = BuildConfigurationStorage();
 			WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
 			PublisherStarter = BuildPublisherStarter();
 			WorkerServerQueries = BuildWorkerServerQueries();
@@ -33,19 +34,18 @@ namespace Hangfire.Configuration.Test
 		public ApplicationBuilder ApplicationBuilder { get; }
 
 		public FakeMonitoringApi Monitor { get; }
-		public FakeConfigurationStorage ConfigurationStorage { get; }
 		public FakeKeyValueStore KeyValueStore { get; }
 		public FakeSchemaInstaller SchemaInstaller { get; }
 		public FakeHangfire Hangfire { get; }
 		public FakeRedisConnectionVerifier RedisConnectionVerifier { get; }
 
+		public ConfigurationStorage ConfigurationStorage { get; }
 		public WorkerServerStarterUnderTest WorkerServerStarter { get; }
 		public PublisherStarter PublisherStarter { get; }
 		public WorkerServerQueries WorkerServerQueries { get; }
 		public ViewModelBuilder ViewModelBuilder { get; }
 		public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
-		protected override IConfigurationStorage BuildConfigurationStorage() => ConfigurationStorage;
 		protected override IKeyValueStore BuildKeyValueStore() => KeyValueStore;
 		protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
 		protected override ISchemaInstaller BuildSchemaInstaller() => SchemaInstaller;
@@ -57,9 +57,25 @@ namespace Hangfire.Configuration.Test
 
 		public SystemUnderTest WithConfiguration(StoredConfiguration configurations)
 		{
-			ConfigurationStorage.Has(configurations);
+			ConfigurationStorage.WriteConfiguration(configurations);
 			return this;
 		}
+		
+		public IEnumerable<StoredConfiguration> Configurations() => 
+			ConfigurationStorage.ReadConfigurations();
+
+		public SystemUnderTest HasGoalWorkerCount(int goalWorkerCount)
+		{
+			ConfigurationStorage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = goalWorkerCount});
+			return this;
+		}
+
+		public void ClearConfigurations()
+		{
+			ConfigurationStorage.ReadConfigurations()
+				.ForEach(x => ConfigurationStorage.DeleteConfiguration(x));
+		}
+		
 
 		public SystemUnderTest WithAnnouncedServer(string serverId)
 		{
@@ -75,39 +91,39 @@ namespace Hangfire.Configuration.Test
 			return this;
 		}
 
-		public void StartWorkerServer()
-		{
-			WorkerServerStarter.Start();
-		}
-
 		public SystemUnderTest WithServerCountSample(ServerCountSample sample)
 		{
 			KeyValueStore.Has(sample);
 			return this;
 		}
 
-		public SystemUnderTest WithGoalWorkerCount(int goal)
+		public SystemUnderTest WithGoalWorkerCount(int goalWorkerCount)
 		{
-			configuration.GoalWorkerCount = goal;
+			var configuration = getConfiguration();
+			configuration.GoalWorkerCount = goalWorkerCount;
+			ConfigurationStorage.WriteConfiguration(configuration);
 			return this;
 		}
 
-		public SystemUnderTest WithMaxWorkersPerServer(int maxWorkers)
+		public SystemUnderTest WithMaxWorkersPerServer(int maxWorkersPerServer)
 		{
-			configuration.MaxWorkersPerServer = maxWorkers;
+			var configuration = getConfiguration();
+			configuration.MaxWorkersPerServer = maxWorkersPerServer;
+			ConfigurationStorage.WriteConfiguration(configuration);
 			return this;
 		}
 
-		private StoredConfiguration configuration
+		public void StartWorkerServer()
 		{
-			get
-			{
-				if (!ConfigurationStorage.Data.Any())
-					ConfigurationStorage.Has(new StoredConfiguration());
-
-				return ConfigurationStorage.Data.First();
-			}
+			WorkerServerStarter.Start();
 		}
 
+		private StoredConfiguration getConfiguration()
+		{
+			var existing = ConfigurationStorage.ReadConfigurations();
+			if (!existing.Any())
+				ConfigurationStorage.WriteConfiguration(new StoredConfiguration());
+			return ConfigurationStorage.ReadConfigurations().First();
+		}
 	}
 }

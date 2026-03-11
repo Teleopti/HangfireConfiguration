@@ -89,6 +89,30 @@ BEGIN
 		var_CURRENT_SCHEMA_VERSION := 6;
 	END IF;
 
+	IF var_CURRENT_SCHEMA_VERSION < 7 AND var_TARGET_SCHEMA_VERSION >= 7 THEN
+
+		RAISE NOTICE 'Installing HangfireConfiguration schema version 7';
+
+		INSERT INTO $(HangfireConfigurationSchema).keyvaluestore (key, value)
+		SELECT
+			'Configuration:' || id::text,
+			json_build_object(
+				'Id', id,
+				'ConnectionString', connectionstring,
+				'SchemaName', schemaname,
+				'GoalWorkerCount', goalworkercount,
+				'Active', active,
+				'Name', name,
+				'MaxWorkersPerServer', maxworkersperserver,
+				'WorkerBalancerEnabled', workerbalancerenabled
+			)::text
+		FROM $(HangfireConfigurationSchema).configuration;
+
+		RAISE NOTICE 'Migrated Configuration rows to KeyValueStore';
+
+		var_CURRENT_SCHEMA_VERSION := 7;
+	END IF;
+
 
 
 

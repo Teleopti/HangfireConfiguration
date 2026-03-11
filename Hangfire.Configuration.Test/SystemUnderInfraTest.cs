@@ -4,9 +4,9 @@ namespace Hangfire.Configuration.Test
 {
 	public class SystemUnderInfraTest : HangfireConfiguration
 	{
-		public IKeyValueStore KeyValueStore => base.BuildKeyValueStore();
-		public IConfigurationStorage ConfigurationStorage => base.BuildConfigurationStorage();
-		public IRedisConnectionVerifier RedisConnectionVerifier => base.BuildRedisConnectionVerifier();
+		public IKeyValueStore KeyValueStore => BuildKeyValueStore();
+		public ConfigurationStorage ConfigurationStorage => BuildConfigurationStorage();
+		public IRedisConnectionVerifier RedisConnectionVerifier => BuildRedisConnectionVerifier();
 
 		public void UseRealHangfire() => _realHangfire = true;
 		private bool _realHangfire;

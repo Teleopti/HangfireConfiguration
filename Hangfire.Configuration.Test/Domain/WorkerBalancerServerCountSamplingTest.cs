@@ -11,7 +11,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldDetermineWorkersFromSample()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
 		system.WorkerServerStarter.Start();
@@ -23,7 +23,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldDetermineWorkersFromSample2()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 5});
 
 		system.WorkerServerStarter.Start();
@@ -35,7 +35,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldDetermineWorkersWithoutSample()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 
 		system.WorkerServerStarter.Start();
 
@@ -46,7 +46,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldApplyMinimumServerCount()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 1});
 
 		system.UseOptions(new ConfigurationOptionsForTest
@@ -62,7 +62,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldDisableServerCountSampling()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 10});
 		system.Monitor.AnnounceServer("server");
 
@@ -78,7 +78,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldCalculateWithoutServerCountFromServerRecycling()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 3});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
@@ -92,7 +92,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldCalculateWithoutServerCountFromServerRecycling_2()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(10);
+		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 3});
@@ -106,7 +106,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldCalculateWithEarliestSample()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(8);
+		system.HasGoalWorkerCount(8);
 		system.KeyValueStore.Has(new ServerCountSample
 		{
 			Count = 2,
@@ -127,7 +127,7 @@ public class WorkerBalancerServerCountSamplingTest
 	public void ShouldIgnoreSampleWhenServerCountIsZero()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.HasGoalWorkerCount(8);
+		system.HasGoalWorkerCount(8);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 0});
 
 		system.WorkerServerStarter.Start();

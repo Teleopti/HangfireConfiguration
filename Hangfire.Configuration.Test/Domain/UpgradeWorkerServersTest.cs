@@ -23,7 +23,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeStorageSchema()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});
@@ -38,7 +38,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeStorageSchemaWithSchemaName()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Data Source=.;Initial Catalog=db",
 			SchemaName = "myschema"
@@ -54,17 +54,16 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeTwoConfigurations()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(
-			new StoredConfiguration
-			{
-				ConnectionString = "Data Source=.;Initial Catalog=db",
-				SchemaName = "schema1"
-			},
-			new StoredConfiguration
-			{
-				ConnectionString = "Data Source=.;Initial Catalog=db",
-				SchemaName = "schema2"
-			});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "Data Source=.;Initial Catalog=db",
+			SchemaName = "schema1"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "Data Source=.;Initial Catalog=db",
+			SchemaName = "schema2"
+		});
 
 		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
 
@@ -76,11 +75,10 @@ public class UpgradeWorkerServersTest
 	public void ShouldSkipNullOrEmptyConnectionString([Values("", null)] string c)
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(
-			new StoredConfiguration
-			{
-				ConnectionString = c
-			});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = c
+		});
 
 		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
 
@@ -91,7 +89,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeStorageSchemaWithDefaultSchemaName()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Data Source=.;Initial Catalog=db",
 		});
@@ -106,7 +104,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeStorageSchemaWithDefaultSchemaNamePostgres()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Host=local;Database=db",
 		});
@@ -121,7 +119,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeUsingCredentials()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});
@@ -141,7 +139,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeUsingCredentialsPostgres()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Host=localhost;Database=datta"
 		});
@@ -161,7 +159,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldNotUpgradeRedis()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "redisserver"
 		});
@@ -186,7 +184,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldInstallStorageSchemaEvenIfConfigurationSchemaFails()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Host=host;Database=datta"
 		});
@@ -202,17 +200,16 @@ public class UpgradeWorkerServersTest
 	public void ShouldInstallSecondStorageSchemaEvenIfFirstStorageSchemaFails()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(
-			new StoredConfiguration
-			{
-				ConnectionString = "Host=host;Database=data1",
-				SchemaName = "schema1"
-			},
-			new StoredConfiguration
-			{
-				ConnectionString = "Host=host;Database=data2",
-				SchemaName = "schema2"
-			});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "Host=host;Database=data1",
+			SchemaName = "schema1"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "Host=host;Database=data2",
+			SchemaName = "schema2"
+		});
 		system.SchemaInstaller.InstallHangfireStorageSchemaFailsWith = (new Exception("boom!"), "schema1");
 
 		var exception = Assert.Catch(() => system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers()));
@@ -226,7 +223,7 @@ public class UpgradeWorkerServersTest
 	public void ShouldUpgradeUsingIntegratedSecurityWithoutCredentials()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});

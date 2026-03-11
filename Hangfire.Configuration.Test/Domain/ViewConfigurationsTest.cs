@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildConfiguration()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Id = 1,
 				ConnectionString = "theConnstring",
@@ -31,7 +31,7 @@ namespace Hangfire.Configuration.Test.Domain
 		{
 			var system = new SystemUnderTest();
 
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Id = 2,
 				ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithNullValues()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Id = 1,
 				ConnectionString = null,
@@ -71,14 +71,14 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildForMultipleConfigurations()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 				{
 					Id = 1,
 					ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
 					SchemaName = "schemaName1",
 					Active = true
-				},
-				new StoredConfiguration
+				});
+			system.WithConfiguration(new StoredConfiguration
 				{
 					Id = 2,
 					ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
@@ -95,7 +95,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithWorkers()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 10});
+			system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 10});
 
 			var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -106,13 +106,11 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithDefaultSchemaName()
 		{
 			var system = new SystemUnderTest();
-			var storedConfiguration = new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "Data Source=.",
 				SchemaName = null
-			};
-
-			system.ConfigurationStorage.Has(storedConfiguration);
+			});
 
 			var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -123,13 +121,11 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithDefaultSchemaNameForPostgres()
 		{
 			var system = new SystemUnderTest();
-			var storedConfiguration = new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "Host=localhost",
 				SchemaName = null
-			};
-
-			system.ConfigurationStorage.Has(storedConfiguration);
+			});
 
 			var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -140,13 +136,11 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithDefaultSchemaNameForRedis()
 		{
 			var system = new SystemUnderTest();
-			var storedConfiguration = new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "redis-roger",
 				SchemaName = null
-			};
-
-			system.ConfigurationStorage.Has(storedConfiguration);
+			});
 
 			var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -157,7 +151,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithConfigurationName()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Name = "name"
 			});
@@ -182,7 +176,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldHideSqlServerPassword()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "Data Source=.;Initial Catalog=foo;User Id=me;Password=thePassword;"
 			});
@@ -198,7 +192,7 @@ namespace Hangfire.Configuration.Test.Domain
 		{
 			var system = new SystemUnderTest();
 			var connectionString = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = connectionString
 			});
@@ -212,7 +206,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldHidePostgresPassword()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "Host=.;Database=foo;User Id=me;Password=thePassword;"
 			});
@@ -227,7 +221,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldLeaveRedisConnectionStringAsIsIfNoPassword()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "localhost"
 			});
@@ -241,7 +235,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldHideRedisPassword()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "localhost,password=thePassword"
 			});
@@ -256,7 +250,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldHideRedisPasswordCasingAndSpaces()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "localhost, paSsword=thePassword"
 			});
@@ -270,7 +264,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldNotReplacePasswordIfStringExistsOnOtherPlacesInConnectionString()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "localhost,password=o"
 			});
@@ -284,7 +278,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldHandleRedisConnstringContainsEqualSign()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				ConnectionString = "myserver,password=thåström=great"
 			});
@@ -298,7 +292,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithWorkerBalancerEnabled()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				WorkerBalancerEnabled = true
 			});
@@ -312,7 +306,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithWorkerBalancerEnabledNull()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				WorkerBalancerEnabled = null
 			});
@@ -326,7 +320,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldBuildWithWorkerBalancerDisabled()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				WorkerBalancerEnabled = false
 			});

@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
                 }
             });
 
-            var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
+            var host = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).Host;
             Assert.AreEqual("host", host);
         }
 
@@ -36,7 +36,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.UseOptions(new ConfigurationOptions());
             system.WorkerServerStarter.Start();
 
-            Assert.IsEmpty(system.ConfigurationStorage.Data);
+            Assert.IsEmpty(system.Configurations());
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
+            var applicationName = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
             Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
         }
 
@@ -77,7 +77,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var applicationName = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).ApplicationName;
+            var applicationName = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
             Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
         }
 
@@ -86,7 +86,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var existing = new NpgsqlConnectionStringBuilder { Host = "existing" }.ToString();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -100,7 +100,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
+            var actual = system.Configurations().OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
         }
 
@@ -109,7 +109,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var existing = new NpgsqlConnectionStringBuilder { Host = "AnotherDataSourceWith.AutoUpdate.InIt"}.ToString();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -123,7 +123,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
+            var actual = system.Configurations().OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
         }
 
@@ -132,7 +132,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var existing = new NpgsqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -146,7 +146,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).First();
+            var actual = system.Configurations().OrderBy(x => x.Id).First();
             Assert.AreEqual(existing, actual.ConnectionString);
         }
 
@@ -154,7 +154,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "existing"}.ToString()});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "existing"}.ToString()});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -168,7 +168,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var actual = system.ConfigurationStorage.Data.OrderBy(x => x.Id).Last();
+            var actual = system.Configurations().OrderBy(x => x.Id).Last();
             Assert.AreEqual("autoupdated", new NpgsqlConnectionStringBuilder(actual.ConnectionString).Host);
         }
 
@@ -177,7 +177,7 @@ namespace Hangfire.Configuration.Test.Domain
         {
             var system = new SystemUnderTest();
             var existing = new NpgsqlConnectionStringBuilder { Host = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = existing});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -191,7 +191,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            var updatedConnectionString = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString);
+            var updatedConnectionString = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString);
             Assert.AreEqual("newDataSource", updatedConnectionString.Host);
             Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
         }
@@ -200,7 +200,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUpdateLegacyConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 55});
+            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 55});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -215,8 +215,8 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
-            Assert.AreEqual(55, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
-            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Single().ConnectionString);
+            Assert.AreEqual(55, system.Configurations().Single().GoalWorkerCount);
+            Assert.AreEqual(expected, system.Configurations().Single().ConnectionString);
         }
 
         [Test]
@@ -225,8 +225,8 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
             var one = new NpgsqlConnectionStringBuilder { Host = "One"}.ToString();
             var two = new NpgsqlConnectionStringBuilder { Host = "Two", ApplicationName = "Two.AutoUpdate"}.ToString();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = one});
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = two});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = one});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = two});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -241,7 +241,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
 
             var expected = new NpgsqlConnectionStringBuilder { Host = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
-            Assert.AreEqual(expected, system.ConfigurationStorage.Data.Last().ConnectionString);
+            Assert.AreEqual(expected, system.Configurations().Last().ConnectionString);
         }
 
         [Test]
@@ -261,14 +261,14 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.True(system.ConfigurationStorage.Data.Single().Active);
+            Assert.True(system.Configurations().Single().Active);
         }
 
         [Test]
         public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 4});
+            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -282,14 +282,14 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.True(system.ConfigurationStorage.Data.Single().Active);
+            Assert.True(system.Configurations().Single().Active);
         }
 
         [Test]
         public void ShouldBeActiveOnUpdateIfActiveBefore()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(),
                 Active = true
@@ -307,15 +307,15 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.True(system.ConfigurationStorage.Data.Single().Active);
+            Assert.True(system.Configurations().Single().Active);
         }
 
         [Test]
         public void ShouldNotActivateWhenUpdating()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "DataSource"}.ToString(), Active = true});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "DataSource"}.ToString(), Active = true});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -329,8 +329,8 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.False(system.ConfigurationStorage.Data.First().Active);
-            Assert.True(system.ConfigurationStorage.Data.Last().Active);
+            Assert.False(system.Configurations().First().Active);
+            Assert.True(system.Configurations().Last().Active);
         }
 
         [Test]
@@ -351,14 +351,14 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
         }
 
         [Test]
         public void ShouldSaveSchemaNameOnLegacyConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 4});
+            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -373,7 +373,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.AreEqual("schemaName", system.ConfigurationStorage.Data.Single().SchemaName);
+            Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
         }
 
         [Test]
@@ -405,7 +405,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.QueryPublishers();
 
-            var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
+            var host = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).Host;
             Assert.AreEqual("FirstUpdate", host);
         }
 
@@ -424,7 +424,7 @@ namespace Hangfire.Configuration.Test.Domain
 		            }
 	            }
             });
-            system.ConfigurationStorage.Clear();
+            system.ClearConfigurations();
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
@@ -439,7 +439,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.QueryPublishers();
 
-            var host = new NpgsqlConnectionStringBuilder(system.ConfigurationStorage.Data.Single().ConnectionString).Host;
+            var host = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).Host;
             Assert.AreEqual("SecondUpdate", host);
         }
 
@@ -460,14 +460,14 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
         }
 
         [Test]
         public void ShouldAutoUpdateWithDefaultConfigurationName2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions
             {
@@ -481,7 +481,7 @@ namespace Hangfire.Configuration.Test.Domain
 	            }
             });
 
-            Assert.AreEqual("Hangfire", system.ConfigurationStorage.Data.Single().Name);
+            Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
         }
     }
 }

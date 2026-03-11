@@ -12,7 +12,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryWorkerServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             var workerServers = system.WorkerServerQueries.QueryAllWorkerServers();
 
@@ -23,7 +23,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnWorkerServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
 
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldAutoUpdate()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
@@ -50,7 +50,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.WorkerServerQueries.QueryAllWorkerServers();
 
-            system.ConfigurationStorage.Data.Single().ConnectionString
+            system.Configurations().Single().ConnectionString
 	            .Should().Contain("Hangfire");
         }
 
@@ -58,7 +58,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryWorkerServersWithDefaultSqlStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
             system.UseStorageOptions(new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
             system.WorkerServerQueries.QueryAllWorkerServers();
@@ -70,7 +70,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryWorkerServersWithDefaultPostgresStorageOptions()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString =  @"Host=localhost;Database=fakedb;" });
+	        system.WithConfiguration(new StoredConfiguration {ConnectionString =  @"Host=localhost;Database=fakedb;" });
 
 	        system.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
 	        system.WorkerServerQueries.QueryAllWorkerServers();
@@ -82,7 +82,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnStorageConfigurationId()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 3});
+            system.WithConfiguration(new StoredConfiguration {Id = 3});
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
 
@@ -93,7 +93,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnConfigurationName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name"});
+            system.WithConfiguration(new StoredConfiguration {Name = "name"});
 
             var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
 

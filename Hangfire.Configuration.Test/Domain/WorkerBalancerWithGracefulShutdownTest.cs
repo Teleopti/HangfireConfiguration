@@ -10,7 +10,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateWorkersOnStartOfSecondServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.HasGoalWorkerCount(8);
             system.Monitor.AnnounceServer("runningServer");
 
             system.WorkerServerStarter.Start();
@@ -22,7 +22,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateWorkersOnStartOfThirdServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(9);
+            system.HasGoalWorkerCount(9);
             system.Monitor.AnnounceServer("server1");
             system.Monitor.AnnounceServer("server2");
 
@@ -35,7 +35,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldRoundWorkerCountUp()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(10);
+            system.HasGoalWorkerCount(10);
             system.Monitor.AnnounceServer("server1");
             system.Monitor.AnnounceServer("server2");
             system.Monitor.AnnounceServer("server3");
@@ -49,7 +49,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateBasedOnMaxOneHundredWhenStartingFourthServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(200);
+            system.HasGoalWorkerCount(200);
             system.Monitor.AnnounceServer("server1");
             system.Monitor.AnnounceServer("server2");
             system.Monitor.AnnounceServer("server3");
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldCalculateGoalBasedOnMinimumKnownOnStartOfThirdServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(100);
+            system.HasGoalWorkerCount(100);
             system.Monitor.AnnounceServer("server1");
             system.Monitor.AnnounceServer("server2");
 

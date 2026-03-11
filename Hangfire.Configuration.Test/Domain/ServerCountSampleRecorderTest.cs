@@ -11,7 +11,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartRecorder()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start();
 
@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldRecord()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
             system.Monitor.AnnounceServer("runningServer");
 
             system.ServerCountSampleRecorder.Record();
@@ -51,7 +51,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldRecordBoth()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
             system.Monitor.AnnounceServer("runningServer1");
             system.Monitor.AnnounceServer("runningServer2");
 

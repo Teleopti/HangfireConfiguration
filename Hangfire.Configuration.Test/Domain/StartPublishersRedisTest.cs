@@ -11,7 +11,7 @@ public class StartPublishersRedisTest
 	public void ShouldPassDefaultStorageOptionsToHangfire()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Active = true, 
 			ConnectionString = "redis"

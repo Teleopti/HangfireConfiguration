@@ -25,7 +25,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		});
 		system.WorkerServerStarter.Start();
 
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(true);
 	}
 
@@ -46,7 +46,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		});
 		system.WorkerServerStarter.Start();
 
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 
@@ -67,7 +67,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		});
 		system.WorkerServerStarter.Start();
 
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 	
@@ -75,7 +75,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 	public void ShouldNotReenableIfConnectionStringIsChanged()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1, 
 			Name = "hangfire", 
@@ -96,7 +96,7 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		});
 		system.WorkerServerStarter.Start();
 		
-		system.ConfigurationStorage.Data.Single().WorkerBalancerEnabled
+		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 }

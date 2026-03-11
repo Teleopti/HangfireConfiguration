@@ -30,7 +30,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetGoalForFirstServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.HasGoalWorkerCount(8);
 
             system.WorkerServerStarter.Start();
 
@@ -41,7 +41,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetOneIfGoalIsZero()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(0);
+            system.HasGoalWorkerCount(0);
 
             system.WorkerServerStarter.Start();
 
@@ -52,7 +52,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetOneIfGoalIsNegative()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(-1);
+            system.HasGoalWorkerCount(-1);
 
             system.WorkerServerStarter.Start();
 
@@ -63,7 +63,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetMaxOneHundred()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(101);
+            system.HasGoalWorkerCount(101);
 
             system.WorkerServerStarter.Start();
 
@@ -94,7 +94,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseMinimumWorkerCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(0);
+            system.HasGoalWorkerCount(0);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
@@ -108,7 +108,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseMaximumGoalWorkerCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(202);
+            system.HasGoalWorkerCount(202);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
@@ -122,7 +122,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseMinimumServerCount()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(15);
+            system.HasGoalWorkerCount(15);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
@@ -136,7 +136,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseMinimumWorkerCountWithMinimumKnownServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(7);
+            system.HasGoalWorkerCount(7);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
@@ -151,7 +151,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetGoalForFirstServerWhenMinimumKnownServersIsZero()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.HasGoalWorkerCount(8);
 
             system.WorkerServerStarter.Start(
                 new ConfigurationOptionsForTest
@@ -187,7 +187,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetHalfOfGoalForFirstServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.HasGoalWorkerCount(8);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {
@@ -201,7 +201,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetHalfOfGoalOnRestartOfSingleServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(8);
+            system.HasGoalWorkerCount(8);
             system.Monitor.AnnounceServer("restartedServer");
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
@@ -216,7 +216,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetHalfOfMaxOneHundred()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.HasGoalWorkerCount(101);
+            system.HasGoalWorkerCount(101);
 
             system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
             {

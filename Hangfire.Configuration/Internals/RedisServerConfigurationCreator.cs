@@ -6,10 +6,10 @@ namespace Hangfire.Configuration.Internals;
 
 internal class RedisServerConfigurationCreator
 {
-	private readonly IConfigurationStorage _storage;
+	private readonly ConfigurationStorage _storage;
 	private readonly IRedisConnectionVerifier _redisConnectionVerifier;
 
-	public RedisServerConfigurationCreator(IConfigurationStorage storage, IRedisConnectionVerifier redisConnectionVerifier)
+	public RedisServerConfigurationCreator(ConfigurationStorage storage, IRedisConnectionVerifier redisConnectionVerifier)
 	{
 		_storage = storage;
 		_redisConnectionVerifier = redisConnectionVerifier;

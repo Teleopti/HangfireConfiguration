@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "awesomeSchema"
 			});
 
-            var storedConfiguration = system.ConfigurationStorage.Data.Last();
+            var storedConfiguration = system.Configurations().Last();
             Assert.AreEqual(@"Host=AwesomeServer;Database=TestDatabase;Username=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
             Assert.AreEqual("awesomeSchema", storedConfiguration.SchemaName);
         }
@@ -232,7 +232,7 @@ namespace Hangfire.Configuration.Test.Domain
                 SchemaName = "schema"
             });
 
-            var storedConfiguration = system.ConfigurationStorage.Data.Last();
+            var storedConfiguration = system.Configurations().Last();
             Assert.AreEqual("namedConfiguration", storedConfiguration.Name);
         }
         
@@ -248,7 +248,7 @@ namespace Hangfire.Configuration.Test.Domain
 		        SchemaName = null
 	        });
 
-	        var storedConfiguration = system.ConfigurationStorage.Data.Last();
+	        var storedConfiguration = system.Configurations().Last();
 	        Assert.AreEqual(DefaultSchemaName.Postgres(), storedConfiguration.SchemaName);
         }
     }

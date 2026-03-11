@@ -44,7 +44,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithExistingActiveConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
+            system.WithConfiguration(new StoredConfiguration {Active = true});
 
             system.PublisherStarter.Start();
 
@@ -55,8 +55,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "Data Source=."});
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = "Data Source=."});
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "ActiveSchema",
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldPassDefaultStorageOptionsToHangfire()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true, ConnectionString = "Data Source=."});
+			system.WithConfiguration(new StoredConfiguration { Active = true, ConnectionString = "Data Source=."});
 
 			system.PublisherStarter.Start();
 
@@ -92,7 +92,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseStorageOptions()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Active = true,
 				ConnectionString = "Data Source=."
@@ -127,7 +127,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName",
@@ -143,13 +143,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName1",
 	            ConnectionString = "Data Source=."
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName2",
@@ -169,9 +169,9 @@ namespace Hangfire.Configuration.Test.Domain
             var system = new SystemUnderTest();
 
             const string connectionString = "Data Source=fake;Integrated Security=SSPI;Initial Catalog=db;";
-			system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = connectionString });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
+			system.WithConfiguration(new StoredConfiguration {Active = false});
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = connectionString });
+            system.WithConfiguration(new StoredConfiguration {Active = false});
 
             system.PublisherStarter.Start();
 

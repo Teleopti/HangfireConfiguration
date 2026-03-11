@@ -17,7 +17,7 @@ public class CreateServerConfigurationRedisTest
 			Configuration = "AwesomeServer:425"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Single();
+		var storedConfiguration = system.Configurations().Single();
 		storedConfiguration.ConnectionString.Should().Be("AwesomeServer:425");
 	}
 
@@ -31,7 +31,7 @@ public class CreateServerConfigurationRedisTest
 			Name = "matte"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Single();
+		var storedConfiguration = system.Configurations().Single();
 		storedConfiguration.Name.Should().Be("matte");
 	}
 
@@ -45,7 +45,7 @@ public class CreateServerConfigurationRedisTest
 			Configuration = "redis"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Single();
+		var storedConfiguration = system.Configurations().Single();
 		storedConfiguration.Active.Should().Be(false);
 	}
 
@@ -59,7 +59,7 @@ public class CreateServerConfigurationRedisTest
 			Prefix = "{my-prefix}:"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		var storedConfiguration = system.Configurations().Last();
 		storedConfiguration.SchemaName.Should().Be("{my-prefix}:");
 	}
 
@@ -73,7 +73,7 @@ public class CreateServerConfigurationRedisTest
 			Prefix = null
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		var storedConfiguration = system.Configurations().Last();
 		storedConfiguration.SchemaName.Should().Be("{hangfire}:");
 	}
 	
@@ -117,7 +117,7 @@ public class CreateServerConfigurationRedisTest
 			{
 				Configuration = "someconfig"
 			}));
-		system.ConfigurationStorage.Data.Should().Be.Empty();
+		system.Configurations().Should().Be.Empty();
 	}
 	
 	[TestCase("a{prefix}:")]

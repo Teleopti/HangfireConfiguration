@@ -5,11 +5,11 @@ namespace Hangfire.Configuration.Internals;
 
 internal class SqlDialectsServerConfigurationCreator
 {
-	private readonly IConfigurationStorage _storage;
+	private readonly ConfigurationStorage _storage;
 	private readonly ISchemaInstaller _installer;
 
 	public SqlDialectsServerConfigurationCreator(
-		IConfigurationStorage storage,
+		ConfigurationStorage storage,
 		ISchemaInstaller installer)
 	{
 		_storage = storage;

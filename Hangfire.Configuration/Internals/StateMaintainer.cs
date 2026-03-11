@@ -6,13 +6,13 @@ namespace Hangfire.Configuration.Internals;
 internal class StateMaintainer
 {
 	private readonly IHangfire _hangfire;
-	private readonly IConfigurationStorage _storage;
+	private readonly ConfigurationStorage _storage;
 	private readonly ConfigurationUpdater _configurationUpdater;
 	private readonly State _state;
 
 	internal StateMaintainer(
 		IHangfire hangfire,
-		IConfigurationStorage storage,
+		ConfigurationStorage storage,
 		ConfigurationUpdater configurationUpdater,
 		State state)
 	{

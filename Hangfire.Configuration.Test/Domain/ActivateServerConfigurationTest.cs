@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain
 				SchemaName = "awesomeSchema"
 			});
 
-			var storedConfiguration = system.ConfigurationStorage.Data.Last();
+			var storedConfiguration = system.Configurations().Last();
 			Assert.AreEqual(false, storedConfiguration.Active);
 		}
 
@@ -29,7 +29,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldActivate()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration
+			system.WithConfiguration(new StoredConfiguration
 			{
 				Id = 1,
 				ConnectionString = "connectionString",
@@ -39,7 +39,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 			system.ConfigurationApi().ActivateServer(1);
 
-			var storedConfiguration = system.ConfigurationStorage.Data.Single();
+			var storedConfiguration = system.Configurations().Single();
 			Assert.AreEqual(true, storedConfiguration.Active);
 		}
 	}

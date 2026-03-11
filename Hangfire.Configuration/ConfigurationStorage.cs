@@ -1,113 +1,54 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Hangfire.Configuration.Internals;
+using Newtonsoft.Json;
 
 namespace Hangfire.Configuration
 {
-	public class ConfigurationStorage : IConfigurationStorage
+	public class ConfigurationStorage
 	{
-		private readonly Connector _connector;
+		private readonly IKeyValueStore _store;
 
-		internal ConfigurationStorage(Connector connector)
+		internal ConfigurationStorage(IKeyValueStore store)
 		{
-			_connector = connector;
+			_store = store;
 		}
-
-		private readonly ThreadLocal<ConnectorTransaction> _currentTransaction = new();
-
-		private ConnectorBase currentConnector() => (ConnectorBase) _currentTransaction.Value ?? _connector;
-
+		
 		public void Transaction(Action action)
 		{
-			_currentTransaction.Value = new ConnectorTransaction(_connector.ConnectionString);
-			action.Invoke();
-			_currentTransaction.Value.Commit();
-			_currentTransaction.Value = null;
+			_store.Transaction(action);
 		}
-
-		private string tableName()
-		{
-			var c = currentConnector();
-			return c.PickDialect(
-				$@"[{HangfireConfigurationSchemaInstaller.SchemaName}].Configuration",
-				$@"{HangfireConfigurationSchemaInstaller.SchemaName}.Configuration");
-		}
-
-		const string Columns = @"
-    Name, 
-    ConnectionString, 
-    SchemaName, 
-    GoalWorkerCount, 
-    Active,
-	MaxWorkersPerServer,
-	WorkerBalancerEnabled";
-
-		const string ColumnMaps = @"
-	@Name,
-    @ConnectionString, 
-    @SchemaName, 
-    @GoalWorkerCount, 
-    @Active,
-    @MaxWorkersPerServer,
-	@WorkerBalancerEnabled";
 
 		public void LockConfiguration()
 		{
-			var c = currentConnector();
-			var sql = c.PickDialect(
-				$@"SELECT * FROM {tableName()} WITH (TABLOCKX)",
-				$@"LOCK TABLE {tableName()}");
-			c.Execute(sql);
+			_store.LockConfiguration();
 		}
 
 		public IEnumerable<StoredConfiguration> ReadConfigurations()
 		{
-			var c = currentConnector();
-			var sql = $@"SELECT Id, {Columns} FROM {tableName()} ORDER BY Id";
-			return c.Query<StoredConfiguration>(sql).ToArray();
+			return _store.ReadPrefix("Configuration:")
+				.Select(JsonConvert.DeserializeObject<StoredConfiguration>)
+				.OrderBy(x => x.Id)
+				.ToArray();
 		}
 
 		public void WriteConfiguration(StoredConfiguration configuration)
 		{
 			if (configuration.Id != null)
-				update(configuration);
+				_store.Write($"Configuration:{configuration.Id}", JsonConvert.SerializeObject(configuration));
 			else
-				insert(configuration);
+			{
+				var id = ReadConfigurations()
+					.Select(x => x.Id)
+					.Max() ?? 0;
+				configuration.Id = id + 1;
+				_store.Write($"Configuration:{configuration.Id}", JsonConvert.SerializeObject(configuration));
+			}
 		}
-
+		
 		public void DeleteConfiguration(StoredConfiguration configuration)
 		{
-			var sql = $@"DELETE FROM {tableName()} WHERE Id = @Id;";
-			var c = currentConnector();
-			c.Execute(sql, configuration);
-		}
-
-		private void insert(StoredConfiguration configuration)
-		{
-			var sql = $@"INSERT INTO {tableName()} ({Columns}) VALUES ({ColumnMaps});";
-			var c = currentConnector();
-			c.Execute(sql, configuration);
-		}
-
-		private void update(StoredConfiguration configuration)
-		{
-			var sql = $@"
-UPDATE 
-    {tableName()}
-SET 
-    Name = @Name,
-    ConnectionString = @ConnectionString, 
-    SchemaName = @SchemaName, 
-    GoalWorkerCount = @GoalWorkerCount, 
-    Active = @Active,
-    MaxWorkersPerServer = @MaxWorkersPerServer,
-	WorkerBalancerEnabled = @WorkerBalancerEnabled
-WHERE 
-    Id = @Id;";
-			var c = currentConnector();
-			c.Execute(sql, configuration);
+			_store.Delete($"Configuration:{configuration.Id}");
 		}
 	}
 }

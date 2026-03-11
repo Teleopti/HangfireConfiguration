@@ -149,7 +149,32 @@ BEGIN
 SET @CURRENT_SCHEMA_VERSION = 6;
 END
 
+IF @CURRENT_SCHEMA_VERSION < 7 AND @TARGET_SCHEMA_VERSION >= 7
+BEGIN
+    
+    PRINT 'Installing HangfireConfiguration schema version 7';
 
+    EXEC sp_executesql N'
+        INSERT INTO [$(HangfireConfigurationSchema)].[KeyValueStore] ([Key], [Value])
+        SELECT
+            ''Configuration:'' + CONVERT(nvarchar, [Id]),
+            (SELECT
+                [Id],
+                [ConnectionString],
+                [SchemaName],
+                [GoalWorkerCount],
+                [Active],
+                [Name],
+                [MaxWorkersPerServer],
+                [WorkerBalancerEnabled]
+            FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)
+        FROM [$(HangfireConfigurationSchema)].[Configuration]
+    ';
+
+    PRINT 'Migrated Configuration rows to KeyValueStore';
+
+SET @CURRENT_SCHEMA_VERSION = 7;
+END
 
 
 UPDATE [$(HangfireConfigurationSchema)].[Schema] SET [Version] = @CURRENT_SCHEMA_VERSION

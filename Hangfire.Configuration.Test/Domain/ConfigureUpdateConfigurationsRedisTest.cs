@@ -21,7 +21,7 @@ namespace Hangfire.Configuration.Test.Domain
 				}
 			});
 
-			var configuration = system.ConfigurationStorage.Data.Single();
+			var configuration = system.Configurations().Single();
 			Assert.AreEqual("redis", configuration.Name);
 			Assert.AreEqual("redis$$connstring", configuration.ConnectionString);
 		}

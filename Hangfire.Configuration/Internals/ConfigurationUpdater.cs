@@ -6,10 +6,12 @@ namespace Hangfire.Configuration.Internals
 {
 	internal class ConfigurationUpdater
 	{
-		private readonly IConfigurationStorage _storage;
+		private readonly ConfigurationStorage _storage;
 		private readonly State _state;
 
-		internal ConfigurationUpdater(IConfigurationStorage storage, State state)
+		internal ConfigurationUpdater(
+			ConfigurationStorage storage, 
+			State state)
 		{
 			_storage = storage;
 			_state = state;

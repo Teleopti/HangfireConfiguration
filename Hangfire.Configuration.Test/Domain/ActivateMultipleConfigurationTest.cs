@@ -10,12 +10,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateMultipleConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 1,
                 Active = false
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 2,
                 Active = false
@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
             system.ConfigurationApi().ActivateServer(1);
             system.ConfigurationApi().ActivateServer(2);
 
-            var configurations = system.ConfigurationStorage.Data;
+            var configurations = system.Configurations();
             Assert.AreEqual(true, configurations.ElementAt(0).Active);
             Assert.AreEqual(true, configurations.ElementAt(1).Active);
         }
@@ -33,12 +33,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldActivateConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 1,
                 Active = false
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 2,
                 Active = false
@@ -46,7 +46,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi().ActivateServer(2);
 
-            var configurations = system.ConfigurationStorage.Data;
+            var configurations = system.Configurations();
             Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
             Assert.AreEqual(true, configurations.Single(x => x.Id == 2).Active);
         }
@@ -55,12 +55,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldInactivateConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Id = 1,
 	            Active = true
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Id = 2,
 	            Active = true
@@ -68,7 +68,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi().InactivateServer(1);
 
-            var configurations = system.ConfigurationStorage.Data;
+            var configurations = system.Configurations();
             Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
         }
         
@@ -76,7 +76,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotInactivateLastConfiguration()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        Id = 1,
 		        Active = true
@@ -89,12 +89,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotInactivateLastConfigurationWhenOnlyUnActiveExists()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        Id = 1,
 		        Active = true
 	        });
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        Id = 2,
 		        Active = false
@@ -107,12 +107,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotThrowDueToLastConfigurationWhenUnActivatingNonActive()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        Id = 1,
 		        Active = true
 	        });
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        Id = 2,
 		        Active = false
@@ -120,7 +120,7 @@ namespace Hangfire.Configuration.Test.Domain
 
 	        system.ConfigurationApi().InactivateServer(2);
 	        
-	        var configurations = system.ConfigurationStorage.Data;
+	        var configurations = system.Configurations();
 	        Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
         }
 
@@ -128,12 +128,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldInactivateGivenConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 1,
                 Active = true
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
                 Id = 2,
                 Active = true
@@ -141,7 +141,7 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.ConfigurationApi().InactivateServer(2);
 
-            var configurations = system.ConfigurationStorage.Data;
+            var configurations = system.Configurations();
             Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
             Assert.AreEqual(false, configurations.Single(x => x.Id == 2).Active);
         }

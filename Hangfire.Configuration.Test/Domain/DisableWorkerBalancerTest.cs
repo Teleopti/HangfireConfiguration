@@ -10,14 +10,14 @@ public class DisableWorkerBalancerTest
 	public void ShouldDisable()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, WorkerBalancerEnabled = true});
-		system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, WorkerBalancerEnabled = true});
+		system.WithConfiguration(new StoredConfiguration {Id = 1, WorkerBalancerEnabled = true});
+		system.WithConfiguration(new StoredConfiguration {Id = 2, WorkerBalancerEnabled = true});
 
 		system.ConfigurationApi().DisableWorkerBalancer(2);
 
-		system.ConfigurationStorage.Data.Single(x => x.Id == 1).WorkerBalancerEnabled
+		system.Configurations().Single(x => x.Id == 1).WorkerBalancerEnabled
 			.Should().Be(true);
-		system.ConfigurationStorage.Data.Single(x => x.Id == 2).WorkerBalancerEnabled
+		system.Configurations().Single(x => x.Id == 2).WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 
@@ -25,14 +25,14 @@ public class DisableWorkerBalancerTest
 	public void ShouldEnable()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, WorkerBalancerEnabled = false});
-		system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, WorkerBalancerEnabled = false});
+		system.WithConfiguration(new StoredConfiguration {Id = 1, WorkerBalancerEnabled = false});
+		system.WithConfiguration(new StoredConfiguration {Id = 2, WorkerBalancerEnabled = false});
 
 		system.ConfigurationApi().EnableWorkerBalancer(2);
 
-		system.ConfigurationStorage.Data.Single(x => x.Id == 1).WorkerBalancerEnabled
+		system.Configurations().Single(x => x.Id == 1).WorkerBalancerEnabled
 			.Should().Be(false);
-		system.ConfigurationStorage.Data.Single(x => x.Id == 2).WorkerBalancerEnabled
+		system.Configurations().Single(x => x.Id == 2).WorkerBalancerEnabled
 			.Should().Be(true);
 	}
 
@@ -46,7 +46,7 @@ public class DisableWorkerBalancerTest
 			Server = "."
 		});
 
-		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
+		system.Configurations().Last().WorkerBalancerEnabled
 			.Should().Be(true);
 	}
 
@@ -60,7 +60,7 @@ public class DisableWorkerBalancerTest
 			Server = "localhost"
 		});
 
-		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
+		system.Configurations().Last().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 
@@ -74,7 +74,7 @@ public class DisableWorkerBalancerTest
 			Configuration = "my-redis"
 		});
 
-		system.ConfigurationStorage.Data.Last().WorkerBalancerEnabled
+		system.Configurations().Last().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 }

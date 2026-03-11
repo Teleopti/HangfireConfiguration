@@ -44,7 +44,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithExistingActiveConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
+            system.WithConfiguration(new StoredConfiguration {Active = true});
 
             system.PublisherStarter.Start();
 
@@ -55,8 +55,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartWithActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration { Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration { Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "ActiveSchema", 
@@ -72,7 +72,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldPassDefaultStorageOptionsToHangfire()
 		{
 			var system = new SystemUnderTest();
-			system.ConfigurationStorage.Has(new StoredConfiguration { Active = true, ConnectionString = @"Host=localhost;Database=active;" });
+			system.WithConfiguration(new StoredConfiguration { Active = true, ConnectionString = @"Host=localhost;Database=active;" });
 
 			system.PublisherStarter.Start();
 
@@ -94,7 +94,7 @@ namespace Hangfire.Configuration.Test.Domain
 		public void ShouldUseStorageOptions()
 		{
 		    var system = new SystemUnderTest();
-		    system.ConfigurationStorage.Has(new StoredConfiguration
+		    system.WithConfiguration(new StoredConfiguration
 		    {
 			    Active = true, 
 			    ConnectionString = @"Host=localhost;Database=fakedb;"
@@ -119,7 +119,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName",
@@ -135,13 +135,13 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromTwoConfigurations()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName1",
 	            ConnectionString = @"Host=localhost;Database=fakedb;"
 			});
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            SchemaName = "SchemaName2",
@@ -159,9 +159,9 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldNotCreateInactiveStorages()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
+            system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=fakedb;" });
 
             system.PublisherStarter.Start();
 

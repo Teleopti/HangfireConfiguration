@@ -13,7 +13,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryPublishers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
+            system.WithConfiguration(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start();
 
             var storage = system.QueryPublishers();
@@ -25,7 +25,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnStorageWithCorrectConnectionString()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
             system.PublisherStarter.Start();
 
             var storage = system.QueryPublishers()
@@ -38,7 +38,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnCreatedStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true});
+            system.WithConfiguration(new StoredConfiguration {Active = true});
             system.PublisherStarter.Start();
 
             var storage = system.QueryPublishers().Single().JobStorage;
@@ -50,9 +50,9 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
+            system.WithConfiguration(new StoredConfiguration {Active = false});
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {Active = false});
             system.PublisherStarter.Start();
 
             var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
@@ -64,8 +64,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheActiveStorageAfterServerStart()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false});
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {Active = false});
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
             system.WorkerServerStarter.Start();
 
             var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
@@ -77,8 +77,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheChangedActiveStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=one;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = false, ConnectionString = "Host=loscalhost;Database=two;" });
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=one;" });
+            system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = "Host=loscalhost;Database=two;" });
             system.PublisherStarter.Start();
             var activatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
             var inactivatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => x.Active.Value).Id.Value;
@@ -94,7 +94,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldAutoUpdate()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
@@ -109,7 +109,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.QueryPublishers();
 
-            system.ConfigurationStorage.Data.Single().ConnectionString
+            system.Configurations().Single().ConnectionString
 	            .Should().Contain("Hangfire");
         }
 
@@ -117,7 +117,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldQueryPublishersWithDefaultStorageOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true,
 				ConnectionString = "Host=loscalhost;Database=fakedb;"
@@ -133,10 +133,10 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnTheChangedActiveStorageWhenInactiveWasDeleted()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Host=loscalhost;Database=1;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Host=loscalhost;Database=2;" });
+            system.WithConfiguration(new StoredConfiguration {Id = 1, Active = true, ConnectionString = "Host=loscalhost;Database=1;" });
+            system.WithConfiguration(new StoredConfiguration {Id = 2, Active = false, ConnectionString = "Host=loscalhost;Database=2;" });
             system.QueryPublishers();
-            system.ConfigurationStorage.Remove(1);
+            system.ConfigurationStorage.DeleteConfiguration(new StoredConfiguration {Id = 1});
             system.ConfigurationApi().ActivateServer(2);
             
             var storage = system.QueryPublishers();
@@ -148,7 +148,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnStorageConfigurationId()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Id = 4, Active = true});
+            system.WithConfiguration(new StoredConfiguration {Id = 4, Active = true});
 
             var configurationInfo = system.QueryPublishers().Single();
 
@@ -159,7 +159,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldReturnConfigurationName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", Active = true});
+            system.WithConfiguration(new StoredConfiguration {Name = "name", Active = true});
 
             var configurationInfo = system.QueryPublishers().Single();
 

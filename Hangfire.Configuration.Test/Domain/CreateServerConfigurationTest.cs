@@ -24,7 +24,7 @@ public class CreateServerConfigurationTest
 			SchemaName = "awesomeSchema"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		var storedConfiguration = system.Configurations().Last();
 		Assert.AreEqual("Data Source=AwesomeServer;Initial Catalog=TestDatabase;User ID=testUser;Password=awesomePassword", storedConfiguration.ConnectionString);
 		Assert.AreEqual("awesomeSchema", storedConfiguration.SchemaName);
 	}
@@ -232,7 +232,7 @@ public class CreateServerConfigurationTest
 			SchemaName = "schema"
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		var storedConfiguration = system.Configurations().Last();
 		Assert.AreEqual("namedConfiguration", storedConfiguration.Name);
 	}
         
@@ -246,7 +246,7 @@ public class CreateServerConfigurationTest
 			SchemaName = null
 		});
 
-		var storedConfiguration = system.ConfigurationStorage.Data.Last();
+		var storedConfiguration = system.Configurations().Last();
 		Assert.AreEqual(DefaultSchemaName.SqlServer(), storedConfiguration.SchemaName);
 	}
 }

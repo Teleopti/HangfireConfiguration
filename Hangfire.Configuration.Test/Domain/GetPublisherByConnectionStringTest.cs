@@ -46,7 +46,7 @@ public class GetPublisherByConnectionStringTest
 	{
 		var system = new SystemUnderTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Active = true,
 			ConnectionString = "connection",
@@ -65,7 +65,7 @@ public class GetPublisherByConnectionStringTest
 	{
 		var system = new SystemUnderTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Active = true,
 			ConnectionString = "connection",
@@ -87,7 +87,7 @@ public class GetPublisherByConnectionStringTest
 
 		var result1 = system.GetPublisher("connection", "schema");
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 3,
 			Active = true,
@@ -105,7 +105,7 @@ public class GetPublisherByConnectionStringTest
 	{
 		var system = new SystemUnderTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "connection"});
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
 			Active = true,
@@ -185,7 +185,7 @@ public class GetPublisherByConnectionStringTest
 	public void ShouldReturnConnectionStringNSchemaFromQueryPublishers()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = "connection",
 			SchemaName = "schema",
@@ -203,7 +203,7 @@ public class GetPublisherByConnectionStringTest
 	public void ShouldReturnDefaultSchemaNameFromQueryPublishers()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			ConnectionString = new SqlConnectionStringBuilder {InitialCatalog = "db"}.ToString(),
 			Active = true

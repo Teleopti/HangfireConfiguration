@@ -10,7 +10,7 @@ public class WorkerBalancerDisabledTest
 	public void ShouldGetHangfireDefault()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationStorage.Has(new StoredConfiguration
+		system.WithConfiguration(new StoredConfiguration
 		{
 			WorkerBalancerEnabled = false,
 			Active = true

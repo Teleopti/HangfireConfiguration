@@ -15,7 +15,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start();
 
@@ -27,7 +27,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassServerOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
             var serverOptions = new BackgroundJobServerOptions
             {
                 Queues = new[] {"queue1", "queue2"},
@@ -66,7 +66,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassNullServerNameToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
             system.WorkerServerStarter.Start();
@@ -78,7 +78,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassAppBuilderToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start();
 
@@ -90,7 +90,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
             var backgroundProcess = new Worker();
 
             system.WorkerServerStarter.Start(new []{backgroundProcess});
@@ -102,8 +102,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldStartTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start();
 
@@ -114,8 +114,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToFirstServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start(new Worker());
 
@@ -128,7 +128,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructHangfireStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration());
+            system.WithConfiguration(new StoredConfiguration());
 
             system.WorkerServerStarter.Start();
 
@@ -139,7 +139,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorage()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
             system.WorkerServerStarter.Start();
 
@@ -150,7 +150,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldConstructSqlHangfireStorageWithOptions()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration { ConnectionString = "Data Source=."});
+            system.WithConfiguration(new StoredConfiguration { ConnectionString = "Data Source=."});
 
             system.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
             system.WorkerServerStarter.Start();
@@ -162,7 +162,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            SchemaName = "SchemaName", 
 	            ConnectionString = "Data Source=."
@@ -178,7 +178,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfiguration2()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            SchemaName = "SchemaName", 
 	            ConnectionString = "Data Source=."
@@ -193,12 +193,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            SchemaName = "SchemaName1",
 	            ConnectionString = "Data Source=."
             });
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            SchemaName = "SchemaName2",
 	            ConnectionString = "Data Source=."
@@ -214,7 +214,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseDefaultSchemaName()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            SchemaName = null, 
 	            ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;"
@@ -230,7 +230,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseDefaultSchemaNameWhenEmpty()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {SchemaName = "", ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
+            system.WithConfiguration(new StoredConfiguration {SchemaName = "", ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
             system.WorkerServerStarter.Start();
 
@@ -242,7 +242,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            ConnectionString = @"Data Source=."
             });
@@ -276,7 +276,7 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassDefaultStorageOptionsToHangfire()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration
+            system.WithConfiguration(new StoredConfiguration
             {
 	            Active = true, 
 	            ConnectionString = @"Data Source=."
@@ -300,8 +300,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldPassBackgroundProcessesToActiveServer()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
-            system.ConfigurationStorage.Has(new StoredConfiguration {Active = true, ConnectionString = @"Data Source=.;Initial Catalog=active;" });
+            system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
+            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Data Source=.;Initial Catalog=active;" });
 
             system.WorkerServerStarter.Start(new Worker());
 
@@ -316,8 +316,8 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldGetGoalWorkerCountForTwoServers()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 20});
-            system.ConfigurationStorage.Has(new StoredConfiguration {GoalWorkerCount = 100});
+            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 20});
+            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 100});
 
             system.WorkerServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
@@ -329,12 +329,12 @@ namespace Hangfire.Configuration.Test.Domain
         public void ShouldUseSchemaNameFromConfigurationOfTwoServersWithOptions()
         {
 	        var system = new SystemUnderTest();
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        SchemaName = "schema1",
 		        ConnectionString = "Data Source=."
 	        });
-	        system.ConfigurationStorage.Has(new StoredConfiguration
+	        system.WithConfiguration(new StoredConfiguration
 	        {
 		        SchemaName = "schema2",
 		        ConnectionString = "Data Source=."

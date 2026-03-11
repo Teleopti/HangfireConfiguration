@@ -13,7 +13,7 @@ public class MaxWorkersPerServerTest
     public void ShouldSave()
     {
         var system = new SystemUnderTest();
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
         });
@@ -28,14 +28,14 @@ public class MaxWorkersPerServerTest
             })
         ).Wait();
 
-        Assert.AreEqual(5, system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+        Assert.AreEqual(5, system.Configurations().Single().MaxWorkersPerServer);
     }
 
     [Test]
     public void ShouldSaveEmpty()
     {
         var system = new SystemUnderTest();
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
             MaxWorkersPerServer = 4
@@ -51,6 +51,6 @@ public class MaxWorkersPerServerTest
             })
         ).Wait();
 
-        Assert.Null(system.ConfigurationStorage.Data.Single().MaxWorkersPerServer);
+        Assert.Null(system.Configurations().Single().MaxWorkersPerServer);
     }
 }

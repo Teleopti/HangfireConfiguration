@@ -30,7 +30,7 @@ public class ConfigurationInterfaceTest
     public void ShouldSaveWorkerGoalCount()
     {
         var system = new SystemUnderTest();
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
             GoalWorkerCount = 3
@@ -47,8 +47,8 @@ public class ConfigurationInterfaceTest
         ).Result;
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        Assert.AreEqual(1, system.ConfigurationStorage.Data.Single().Id);
-        Assert.AreEqual(10, system.ConfigurationStorage.Data.Single().GoalWorkerCount);
+        Assert.AreEqual(1, system.Configurations().Single().Id);
+        Assert.AreEqual(10, system.Configurations().Single().GoalWorkerCount);
     }
 
     [Test]
@@ -56,7 +56,7 @@ public class ConfigurationInterfaceTest
     {
         var system = new SystemUnderTest();
         system.UseOptions(new ConfigurationOptionsForTest {MaximumGoalWorkerCount = 10});
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
             GoalWorkerCount = 3
@@ -82,7 +82,7 @@ public class ConfigurationInterfaceTest
     public void ShouldActivateServer()
     {
         var system = new SystemUnderTest();
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 2
         });
@@ -96,7 +96,7 @@ public class ConfigurationInterfaceTest
             })
         ).Wait();
 
-        Assert.True(system.ConfigurationStorage.Data.Single().Active);
+        Assert.True(system.Configurations().Single().Active);
     }
 
     [Test]
@@ -120,7 +120,7 @@ public class ConfigurationInterfaceTest
                 })
         ).Wait();
 
-        var storedConfiguration = system.ConfigurationStorage.Data.Single();
+        var storedConfiguration = system.Configurations().Single();
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Contain("Data Source=.;Initial Catalog=database");
         storedConfiguration.SchemaName.Should().Be("TestSchema");
@@ -148,7 +148,7 @@ public class ConfigurationInterfaceTest
                 })
         ).Wait();
 
-        Assert.AreEqual("name", system.ConfigurationStorage.Data.Single().Name);
+        Assert.AreEqual("name", system.Configurations().Single().Name);
     }
 
     [Test]
@@ -171,12 +171,12 @@ public class ConfigurationInterfaceTest
     public void ShouldInactivateServer()
     {
         var system = new SystemUnderTest();
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 17,
             Active = true
         });
-        system.ConfigurationStorage.Has(new StoredConfiguration
+        system.WithConfiguration(new StoredConfiguration
         {
             Id = 3,
             Active = true
@@ -191,7 +191,7 @@ public class ConfigurationInterfaceTest
             })
         ).Wait();
 
-        Assert.False(system.ConfigurationStorage.Data.Single(x => x.Id == 3).Active);
+        Assert.False(system.Configurations().Single(x => x.Id == 3).Active);
     }
 
     [Test]
@@ -216,7 +216,7 @@ public class ConfigurationInterfaceTest
                 })
         ).Wait();
 
-        var storedConfiguration = system.ConfigurationStorage.Data.Single();
+        var storedConfiguration = system.Configurations().Single();
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Contain("Host=localhost;Database=database");
         storedConfiguration.SchemaName.Should().Be("TestSchema");
@@ -239,7 +239,7 @@ public class ConfigurationInterfaceTest
                 })
         ).Wait();
 
-        var storedConfiguration = system.ConfigurationStorage.Data.Single();
+        var storedConfiguration = system.Configurations().Single();
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Be("gurka");
         storedConfiguration.SchemaName.Should().Be("{gurka}:");

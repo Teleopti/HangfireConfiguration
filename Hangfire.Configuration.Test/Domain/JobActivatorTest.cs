@@ -19,7 +19,7 @@ public class JobActivatorTest
 			Activator = activator
 		});
 
-		system.ConfigurationStorage.Has(new StoredConfiguration {Name = "Hangfire"});
+		system.WithConfiguration(new StoredConfiguration {Name = "Hangfire"});
 		system.WorkerServerStarter.Start();
 
 		system.Hangfire.StartedServers.Single().options.Activator

@@ -24,7 +24,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.WorkerServerStarter.Start();
 
-            var configuration = system.ConfigurationStorage.Data.Single();
+            var configuration = system.Configurations().Single();
             Assert.AreEqual("name", configuration.Name);
             Assert.AreEqual("connectionString", configuration.ConnectionString);
             Assert.AreEqual("schema", configuration.SchemaName);
@@ -48,14 +48,14 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.WorkerServerStarter.Start();
 
-            Assert.True(system.ConfigurationStorage.Data.Single().Active);
+            Assert.True(system.Configurations().Single().Active);
         }
 
         [Test]
         public void ShouldUpdateConfiguration()
         {
             var system = new SystemUnderTest();
-            system.ConfigurationStorage.Has(new StoredConfiguration {Name = "name", ConnectionString = "previous"});
+            system.WithConfiguration(new StoredConfiguration {Name = "name", ConnectionString = "previous"});
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
@@ -70,7 +70,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.WorkerServerStarter.Start();
 
-            var configuration = system.ConfigurationStorage.Data.Single();
+            var configuration = system.Configurations().Single();
             Assert.AreEqual("newConnectionString", configuration.ConnectionString);
         }
 
@@ -99,7 +99,7 @@ namespace Hangfire.Configuration.Test.Domain
             });
             system.WorkerServerStarter.Start();
 
-            var configuration = system.ConfigurationStorage.Data.OrderBy(x => x.Id);
+            var configuration = system.Configurations().OrderBy(x => x.Id);
             Assert.AreEqual("name1", configuration.ElementAt(0).Name);
             Assert.AreEqual("connectionString1", configuration.ElementAt(0).ConnectionString);
             Assert.AreEqual("schema1", configuration.ElementAt(0).SchemaName);
