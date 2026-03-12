@@ -110,6 +110,10 @@ BEGIN
 
 		RAISE NOTICE 'Migrated Configuration rows to KeyValueStore';
 
+		DROP TABLE $(HangfireConfigurationSchema).configuration;
+
+		RAISE NOTICE 'Dropped configuration table';
+
 		var_CURRENT_SCHEMA_VERSION := 7;
 	END IF;
 

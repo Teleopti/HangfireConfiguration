@@ -173,6 +173,10 @@ BEGIN
 
     PRINT 'Migrated Configuration rows to KeyValueStore';
 
+    DROP TABLE [$(HangfireConfigurationSchema)].[Configuration];
+
+    PRINT 'Dropped Configuration table';
+
 SET @CURRENT_SCHEMA_VERSION = 7;
 END
 
