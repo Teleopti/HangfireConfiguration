@@ -3,12 +3,9 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class ConfigurationStorageMaxWorkersPerServerTest : DatabaseTest
+public class ConfigurationStorageMaxWorkersPerServerTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public ConfigurationStorageMaxWorkersPerServerTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldWriteMaxWorkersPerServer()
 	{

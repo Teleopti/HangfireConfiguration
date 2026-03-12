@@ -7,12 +7,9 @@ using SharpTestsEx;
 namespace Hangfire.Configuration.Test.Integration;
 
 [Parallelizable(ParallelScope.None)]
-public class AutoUpdateConcurrencyTest : DatabaseTest
+public class AutoUpdateConcurrencyTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public AutoUpdateConcurrencyTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldNotInsertMultiple()
 	{

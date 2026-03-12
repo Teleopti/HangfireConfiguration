@@ -5,12 +5,9 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class ConfigurationStorageWorkerBalancerTest : DatabaseTest
+public class ConfigurationStorageWorkerBalancerTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public ConfigurationStorageWorkerBalancerTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldWriteEnabled()
 	{

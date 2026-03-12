@@ -5,12 +5,9 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
-public class QueueWorkTest : DatabaseTest
+public class QueueWorkTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public QueueWorkTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldRunEnqueuedJobOnWorker_SqlServerStorage()
 	{

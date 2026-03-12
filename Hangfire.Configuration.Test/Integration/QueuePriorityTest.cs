@@ -6,14 +6,11 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
-public class QueuePriorityTest : DatabaseTest
+public class QueuePriorityTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
 	private readonly string[] _queues = {"default", "a-queue-starting-with-a"};
 	private IEnumerable<string> queuesAlphabetical => _queues.OrderBy(x => x).ToArray();
-
-	public QueuePriorityTest(string connectionString) : base(connectionString)
-	{
-	}
 
 	[Test]
 	public void ShouldRunJobsInQueueAlphabeticalOrder_SqlServer()
