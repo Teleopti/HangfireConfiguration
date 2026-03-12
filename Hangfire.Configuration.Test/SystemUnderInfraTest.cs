@@ -1,4 +1,4 @@
-﻿using Hangfire.Configuration.Test.Domain.Fake;
+using Hangfire.Configuration.Test.Domain.Fake;
 
 namespace Hangfire.Configuration.Test;
 
@@ -11,10 +11,10 @@ public class SystemUnderInfraTest : HangfireConfiguration
 	public void UseRealHangfire() => _realHangfire = true;
 	private bool _realHangfire;
 
-	protected override IHangfire BuildHangfire(object appBuilder)
+	protected override IHangfire BuildHangfire()
 	{
 		if (_realHangfire)
-			return base.BuildHangfire(appBuilder);
-		return new FakeHangfire(null, new FakeMonitoringApi());
+			return base.BuildHangfire();
+		return new FakeHangfire(new FakeMonitoringApi());
 	}
 }

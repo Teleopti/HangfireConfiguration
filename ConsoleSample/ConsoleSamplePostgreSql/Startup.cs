@@ -95,13 +95,13 @@ namespace ConsoleSample
 				;
 
 			HangfireConfiguration
-				.UseStorageOptions(storageOptions) //Needed???? already set above
+				.UseApplicationBuilder(app)
 				.UseServerOptions(new BackgroundJobServerOptions
 				{
 					Queues = new[] {"critical", "default"},
 				})
 				.StartPublishers()
-				.StartWorkerServers(new[] {new CustomBackgroundProcess()});
+				.StartWorkerServers([new CustomBackgroundProcess()]);
 
 			HangfireConfiguration
 				.QueryAllWorkerServers()

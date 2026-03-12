@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.Server;
 #if NETSTANDARD2_0
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 #else
 using Owin;
 #endif
@@ -19,11 +22,11 @@ public class HangfireConfiguration
 	{
 		_state = new State(BuildNow());
 	}
-		
+
 #if NETSTANDARD2_0
 	public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
 #else
-    public HangfireConfiguration UseApplicationBuilder(IAppBuilder builder)
+	public HangfireConfiguration UseApplicationBuilder(IAppBuilder builder)
 #endif
 	{
 		_builder = builder;
@@ -54,17 +57,11 @@ public class HangfireConfiguration
 		return this;
 	}
 
-	public HangfireConfiguration StartWorkerServers()
-	{
+	public IDisposable StartWorkerServers() =>
 		BuildWorkerServerStarter().Start();
-		return this;
-	}
 
-	public HangfireConfiguration StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses)
-	{
+	public IDisposable StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses) =>
 		BuildWorkerServerStarter().Start(additionalProcesses.ToArray());
-		return this;
-	}
 
 	public IEnumerable<ConfigurationInfo> QueryAllWorkerServers() =>
 		BuildWorkerServerQueries().QueryAllWorkerServers();
@@ -74,26 +71,25 @@ public class HangfireConfiguration
 
 	public ConfigurationInfo GetPublisher(string connectionString, string schemaName) =>
 		BuildPublisherQueries().GetPublisher(connectionString, schemaName);
-		
+
 	public ConfigurationApi ConfigurationApi() =>
 		BuildConfigurationApi();
 
 	internal ViewModelBuilder ViewModelBuilder() =>
 		BuildViewModelBuilder();
 
-	internal Options Options() => 
+	internal Options Options() =>
 		BuildOptions();
-		
-		
-	private StateMaintainer builderStateMaintainer(object appBuilder) => new(
-		BuildHangfire(appBuilder), 
+
+	private StateMaintainer builderStateMaintainer() => new(
+		BuildHangfire(),
 		BuildConfigurationStorage(),
-		buildConfigurationUpdater(), 
+		buildConfigurationUpdater(),
 		_state,
 		BuildNow());
 
 	private ConfigurationUpdater buildConfigurationUpdater() => new(
-		BuildConfigurationStorage(), 
+		BuildConfigurationStorage(),
 		_state,
 		BuildNow());
 
@@ -108,7 +104,7 @@ public class HangfireConfiguration
 		new(
 			BuildKeyValueStore(),
 			_state,
-			builderStateMaintainer(null),
+			builderStateMaintainer(),
 			BuildNow());
 
 
@@ -116,13 +112,14 @@ public class HangfireConfiguration
 	protected Options BuildOptions() => new(_state);
 
 	protected WorkerServerStarter BuildWorkerServerStarter() =>
-		new(BuildHangfire(_builder), 
+		new(BuildHangfire(),
 			buildWorkerBalancer(),
-			builderStateMaintainer(_builder), 
-			_state, 
-			buildServerCountSampleRecorder());
+			builderStateMaintainer(),
+			_state,
+			buildServerCountSampleRecorder(),
+			_builder);
 
-	protected PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
+	protected PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(), _state);
 
 	protected ConfigurationApi BuildConfigurationApi() =>
 		new(BuildConfigurationStorage(),
@@ -132,17 +129,17 @@ public class HangfireConfiguration
 			new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 		);
 
-	protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer(null));
+	protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer());
 
-	protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(null), _state);
+	protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(), _state);
 
 	protected ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
 
 	protected ConfigurationStorage BuildConfigurationStorage() => new(BuildKeyValueStore());
 
 	// boundary
-	protected virtual IHangfire BuildHangfire(object appBuilder) =>
-		new RealHangfire(appBuilder);
+	protected virtual IHangfire BuildHangfire() =>
+		new RealHangfire();
 
 	protected virtual ISchemaInstaller BuildSchemaInstaller() =>
 		new SchemaInstaller();
@@ -153,5 +150,4 @@ public class HangfireConfiguration
 	protected virtual INow BuildNow() => new Now();
 
 	protected virtual IRedisConnectionVerifier BuildRedisConnectionVerifier() => new RedisConnectionVerifier();
-
 }

@@ -4,8 +4,7 @@ namespace Hangfire.Configuration;
 
 public interface IHangfire
 {
-	void UseHangfireServer(
-		JobStorage storage,
+	BackgroundJobServer UseHangfireServer(JobStorage storage,
 		BackgroundJobServerOptions options,
 		params IBackgroundProcess[] additionalProcesses);
 

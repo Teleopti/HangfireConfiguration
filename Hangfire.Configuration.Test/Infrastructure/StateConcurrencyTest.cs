@@ -17,11 +17,11 @@ public class StateConcurrencyTest(string connectionString) :
 		Enumerable.Range(1, storageCount)
 			.ForEach(_ => { system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {ConnectionString = ConnectionString}); });
 
-		var hangfireConfiguration = system.StartWorkerServers();
+		using var _ = system.StartWorkerServers();
 		var run = new ConcurrencyRunner();
 		run.InParallel(() =>
 			{
-				var actual = hangfireConfiguration.QueryAllWorkerServers().Count();
+				var actual = system.QueryAllWorkerServers().Count();
 				Assert.AreEqual(storageCount, actual);
 			})
 			.Times(100)

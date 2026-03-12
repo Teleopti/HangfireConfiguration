@@ -1,7 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.Server;
+#if NET472
+using System.Threading;
+using Owin;
+using Microsoft.Owin;
+
+#else
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+#endif
 
 namespace Hangfire.Configuration;
 
@@ -12,24 +23,27 @@ public class WorkerServerStarter
 	private readonly StateMaintainer _stateMaintainer;
 	private readonly State _state;
 	private readonly ServerCountSampleRecorder _recorder;
+	private readonly object _appBuilder;
 
 	internal WorkerServerStarter(
 		IHangfire hangfire,
 		WorkerBalancer workerBalancer,
 		StateMaintainer stateMaintainer,
 		State state,
-		ServerCountSampleRecorder recorder)
+		ServerCountSampleRecorder recorder,
+		object appBuilder)
 	{
 		_hangfire = hangfire;
 		_workerBalancer = workerBalancer;
 		_stateMaintainer = stateMaintainer;
 		_state = state;
 		_recorder = recorder;
+		_appBuilder = appBuilder;
 	}
 
-	public void Start() => Start(null);
+	public IDisposable Start() => Start(null);
 
-	public void Start(IBackgroundProcess[] additionalProcesses)
+	public IDisposable Start(IBackgroundProcess[] additionalProcesses)
 	{
 		var options = _state.ReadOptions();
 		var backgroundProcesses = new List<IBackgroundProcess>();
@@ -40,17 +54,39 @@ public class WorkerServerStarter
 		var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
 
 		_stateMaintainer.Refresh();
-		_state.Configurations
+
+		var servers = _state.Configurations
 			.Where(x => !x.IsShutdown())
 			.OrderBy(x => !x.IsPublisher())
-			.ForEach(x =>
-			{
-				//
-				startWorkerServer(x, options, serverOptions, backgroundProcesses);
-			});
+			.Select(x => startWorkerServer(x, options, serverOptions, backgroundProcesses))
+			.Where(x => x != null)
+			.ToArray();
+
+		var lifetime = new ServerLifetime(servers);
+		hookApplicationLifetime(lifetime);
+		return lifetime;
 	}
 
-	private void startWorkerServer(
+	private void hookApplicationLifetime(ServerLifetime servers)
+	{
+		if (_appBuilder == null)
+			return;
+#if NET472
+		var context = new OwinContext(((IAppBuilder) _appBuilder).Properties);
+		var token = context.Get<CancellationToken>("host.OnAppDisposing");
+		if (token == default)
+			token = context.Get<CancellationToken>("server.OnDispose");
+		token.Register(servers.Dispose);
+#else
+		var lifetime = ((IApplicationBuilder) _appBuilder).ApplicationServices?.GetRequiredService<IApplicationLifetime>();
+		if (lifetime == null)
+			return;
+		lifetime.ApplicationStopping.Register(servers.SendStop);
+		lifetime.ApplicationStopped.Register(servers.Dispose);
+#endif
+	}
+
+	private BackgroundJobServer startWorkerServer(
 		ConfigurationState configurationState,
 		ConfigurationOptions options,
 		BackgroundJobServerOptions serverOptions,
@@ -60,13 +96,14 @@ public class WorkerServerStarter
 
 		applyWorkerBalancer(configurationState, options, serverOptions);
 
-		_hangfire.UseHangfireServer(
+		var server = _hangfire.UseHangfireServer(
 			configurationState.JobStorage,
 			serverOptions,
 			backgroundProcesses.ToArray()
 		);
 
 		backgroundProcesses.Clear();
+		return server;
 	}
 
 	private void applyWorkerBalancer(ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)

@@ -73,6 +73,7 @@ namespace ConsoleSample
 		[Queue("critical")]
 		public void Random(int number)
 		{
+			Console.WriteLine("Starting	task: " + number);
 			int time;
 			lock (Rand)
 			{
@@ -81,6 +82,7 @@ namespace ConsoleSample
 
 			if (time < 5)
 			{
+				Console.WriteLine("Failed task: " + number);
 				throw new Exception();
 			}
 

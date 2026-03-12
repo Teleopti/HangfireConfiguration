@@ -24,7 +24,7 @@ public class IntegrationTest(string connectionString) :
 				}
 			}
 		});
-		system.StartWorkerServers();
+		using var _ = system.StartWorkerServers();
 	}
 	
 	[Test]

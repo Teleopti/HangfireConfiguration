@@ -5,20 +5,20 @@ using Hangfire.Server;
 
 namespace Hangfire.Configuration.Test.Domain.Fake;
 
-public class FakeHangfire(object appBuilder, FakeMonitoringApi monitoringApi) : IHangfire
+public class FakeHangfire(FakeMonitoringApi monitoringApi) : IHangfire
 {
     public FakeJobStorage LastCreatedStorage => CreatedStorages.LastOrDefault();
     public IEnumerable<FakeJobStorage> CreatedStorages = Enumerable.Empty<FakeJobStorage>();
 
-    public IEnumerable<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; private set; } =
-        Array.Empty<(object builder, FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)>();
+    public IEnumerable<(FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; private set; } =
+        Array.Empty<(FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)>();
 
-    public void UseHangfireServer(
-        JobStorage storage,
+    public BackgroundJobServer UseHangfireServer(JobStorage storage,
         BackgroundJobServerOptions options,
         params IBackgroundProcess[] additionalProcesses)
     {
-        StartedServers = StartedServers.Append((_appBuilder: appBuilder, storage as FakeJobStorage, options, additionalProcesses)).ToArray();
+        StartedServers = StartedServers.Append((storage as FakeJobStorage, options, additionalProcesses)).ToArray();
+        return null;
     }
 
     public JobStorage MakeJobStorage(string connectionString, object options)

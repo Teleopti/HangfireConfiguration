@@ -19,7 +19,7 @@ public class SystemUnderTest : HangfireConfiguration
 		KeyValueStore = new FakeKeyValueStore();
 		SchemaInstaller = new FakeSchemaInstaller();
 		Monitor = new FakeMonitoringApi();
-		Hangfire = new FakeHangfire(ApplicationBuilder, Monitor);
+		Hangfire = new FakeHangfire(Monitor);
 		RedisConnectionVerifier = new FakeRedisConnectionVerifier();
 
 		UseOptions(new ConfigurationOptionsForTest());
@@ -47,7 +47,7 @@ public class SystemUnderTest : HangfireConfiguration
 	public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
 	protected override IKeyValueStore BuildKeyValueStore() => KeyValueStore;
-	protected override IHangfire BuildHangfire(object appBuilder) => Hangfire;
+	protected override IHangfire BuildHangfire() => Hangfire;
 	protected override ISchemaInstaller BuildSchemaInstaller() => SchemaInstaller;
 
 	protected override INow BuildNow() =>

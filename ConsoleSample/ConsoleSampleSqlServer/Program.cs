@@ -68,11 +68,12 @@ namespace ConsoleSample
 
 	public class Services
 	{
-		private static readonly Random Rand = new Random();
+		private static readonly Random Rand = new();
 
 		[Queue("critical")]
 		public void Random(int number)
 		{
+			Console.WriteLine("Starting	task: " + number);
 			int time;
 			lock (Rand)
 			{
@@ -81,6 +82,7 @@ namespace ConsoleSample
 
 			if (time < 5)
 			{
+				Console.WriteLine("Failed task: " + number);
 				throw new Exception();
 			}
 

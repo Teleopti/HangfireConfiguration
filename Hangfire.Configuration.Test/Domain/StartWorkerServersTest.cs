@@ -75,18 +75,6 @@ public class StartWorkerServersTest
 	}
 
 	[Test]
-	public void ShouldPassAppBuilderToHangfire()
-	{
-		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration());
-
-		system.WorkerServerStarter.Start();
-
-		system.Hangfire.StartedServers.Single().builder
-			.Should().Be.SameInstanceAs(system.ApplicationBuilder);
-	}
-
-	[Test]
 	public void ShouldPassBackgroundProcessesToHangfire()
 	{
 		var system = new SystemUnderTest();
