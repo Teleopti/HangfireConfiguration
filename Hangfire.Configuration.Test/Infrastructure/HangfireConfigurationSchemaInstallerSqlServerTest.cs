@@ -26,6 +26,23 @@ public class HangfireConfigurationSchemaInstallerSqlServerTest
 	}
 
 	[Test]
+	[TestCase(1)]
+	[TestCase(2)]
+	[TestCase(3)]
+	[TestCase(4)]
+	[TestCase(5)]
+	[TestCase(6)]
+	[TestCase(7)]
+	public void ShouldUpgradeFromSchemaVersion(int schemaVersion)
+	{
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion);
+		
+		install();
+
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+	}
+
+	[Test]
 	public void ShouldUpgradeFrom2ToLatest()
 	{
 		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 2);

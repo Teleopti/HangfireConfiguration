@@ -21,6 +21,19 @@ public class HangfireConfigurationSchemaInstallerPostgresTest
 	}
 
 	[Test]
+	[TestCase(5)]
+	[TestCase(6)]
+	[TestCase(7)]
+	public void ShouldUpgradeFromSchemaVersion(int schemaVersion)
+	{
+		DatabaseTestSetup.SetupPostgres(ConnectionStrings.Postgres, schemaVersion);
+
+		install();
+
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+	}
+
+	[Test]
 	public void ShouldUpgradeFrom5To6()
 	{
 		DatabaseTestSetup.SetupPostgres(ConnectionStrings.Postgres, schemaVersion: 5);
