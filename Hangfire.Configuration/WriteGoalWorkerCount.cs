@@ -1,8 +1,7 @@
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public class WriteGoalWorkerCount
 {
-    public class WriteGoalWorkerCount
-    {
-        public int? ConfigurationId;
-        public int? Workers;
-    }
+    public int? ConfigurationId;
+    public int? Workers;
 }

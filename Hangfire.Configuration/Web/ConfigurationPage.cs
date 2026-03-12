@@ -11,7 +11,7 @@ public class ConfigurationPage
     private readonly ConfigurationOptions _options;
     private readonly StringBuilder _content = new();
 
-    public ConfigurationPage(
+    internal ConfigurationPage(
         HangfireConfiguration configuration,
         string basePath,
         ConfigurationOptions options)

@@ -20,7 +20,7 @@ public static class DatabaseTestSetup
 		using (var conn = new NpgsqlConnection(connectionString))
 			installSchema(conn, schemaVersion);
 	}
-	
+
 	public static void SetupSqlServer(string connectionString, int? schemaVersion = null)
 	{
 		var database = new SqlConnectionStringBuilder(connectionString).InitialCatalog;
@@ -31,6 +31,7 @@ public static class DatabaseTestSetup
 			c.Execute($"DROP DATABASE IF EXISTS [{database}]");
 			c.Execute($"CREATE DATABASE [{database}]");
 		}
+
 		using (var conn = new SqlConnection(connectionString))
 			installSchema(conn, schemaVersion);
 	}

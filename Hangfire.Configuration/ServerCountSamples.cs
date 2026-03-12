@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public class ServerCountSamples
 {
-	public class ServerCountSamples
-	{
-		public IEnumerable<ServerCountSample> Samples { get; set; } =
-			Enumerable.Empty<ServerCountSample>();
-	}
+	public IEnumerable<ServerCountSample> Samples { get; set; } =
+		Enumerable.Empty<ServerCountSample>();
 }

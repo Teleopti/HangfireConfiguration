@@ -10,7 +10,7 @@ public class ViewModelBuilder
 {
 	private readonly ConfigurationStorage _storage;
 
-	public ViewModelBuilder(ConfigurationStorage storage)
+	internal ViewModelBuilder(ConfigurationStorage storage)
 	{
 		_storage = storage;
 	}

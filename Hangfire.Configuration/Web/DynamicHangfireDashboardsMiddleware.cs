@@ -14,7 +14,7 @@ public class DynamicHangfireDashboardsMiddleware
 	private readonly HangfireConfiguration _configuration;
 	private readonly DashboardOptions _dashboardOptions;
 
-	public DynamicHangfireDashboardsMiddleware(
+	internal DynamicHangfireDashboardsMiddleware(
 		RequestDelegate next,
 		ConfigurationOptions options,
 		DashboardOptions dashboardOptions)

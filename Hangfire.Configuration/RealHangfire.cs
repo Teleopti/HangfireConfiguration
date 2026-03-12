@@ -6,33 +6,32 @@ using Owin;
 using Microsoft.AspNetCore.Builder;
 #endif
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public class RealHangfire : IHangfire
 {
-	public class RealHangfire : IHangfire
+	private readonly object _applicationBuilder;
+
+	internal RealHangfire(object applicationBuilder)
 	{
-		private readonly object _applicationBuilder;
+		_applicationBuilder = applicationBuilder;
+	}
 
-		public RealHangfire(object applicationBuilder)
-		{
-			_applicationBuilder = applicationBuilder;
-		}
-
-		public void UseHangfireServer(
-			JobStorage storage,
-			BackgroundJobServerOptions options,
-			params IBackgroundProcess[] additionalProcesses)
-		{
+	public void UseHangfireServer(
+		JobStorage storage,
+		BackgroundJobServerOptions options,
+		params IBackgroundProcess[] additionalProcesses)
+	{
 #if !NET472
-            ((IApplicationBuilder) _applicationBuilder).UseHangfireServer(options, additionalProcesses, storage);
+        ((IApplicationBuilder) _applicationBuilder).UseHangfireServer(options, additionalProcesses, storage);
 #else
-			((IAppBuilder) _applicationBuilder).UseHangfireServer(storage, options, additionalProcesses);
+		((IAppBuilder) _applicationBuilder).UseHangfireServer(storage, options, additionalProcesses);
 #endif
-		}
+	}
 
-		public JobStorage MakeJobStorage(string connectionString, object options)
-		{
-			return connectionString.GetProvider()
-				.NewStorage(connectionString, options);
-		}
+	public JobStorage MakeJobStorage(string connectionString, object options)
+	{
+		return connectionString.GetProvider()
+			.NewStorage(connectionString, options);
 	}
 }
