@@ -11,6 +11,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+    env:
+      VERSION: 4.0.${{ github.run_number }}
     
     steps:
     - uses: actions/checkout@v3
@@ -39,7 +41,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore --configuration Release "-p:Version=4.0.${{ github.run_number }}"
+      run: dotnet build --no-restore --configuration Release "-p:Version=${{ env.VERSION }}"
       
     - name: Test
       run: dotnet test --no-build --configuration Release --verbosity normal
@@ -49,6 +51,6 @@ jobs:
 
     - name: Tag commit with version
       run: |
-        git tag "4.0.${{ github.run_number }}"
-        git push origin "4.0.${{ github.run_number }}"
+        git tag "${{ env.VERSION }}"
+        git push origin "${{ env.VERSION }}"
 
