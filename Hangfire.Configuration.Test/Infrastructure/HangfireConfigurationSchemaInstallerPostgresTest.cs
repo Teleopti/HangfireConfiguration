@@ -3,6 +3,7 @@ using System.Linq;
 using Dapper;
 using DbAgnostic;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
@@ -42,7 +43,7 @@ VALUES
 				new
 				{
 					ConnectionString = ConnectionStrings.Postgres,
-					SchemaName = "s",
+					SchemaName = "hangfire",
 					Active = true,
 					WorkerBalancerEnabled = true,
 					GoalWorkerCount = 10,
@@ -51,8 +52,14 @@ VALUES
 
 		install();
 
-		Assert.AreEqual(10, read().Single().GoalWorkerCount);
-		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
+		var result = read().Single();
+		result.ConnectionString.Should().Be(ConnectionStrings.Postgres);
+		result.SchemaName.Should().Be("hangfire");
+		result.Active.Should().Be(true);
+		result.WorkerBalancerEnabled.Should().Be(true);
+		result.GoalWorkerCount.Should().Be(10);
+		result.MaxWorkersPerServer.Should().Be(2);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
 	}
 
 	private void install(int? schemaVersion = null)
