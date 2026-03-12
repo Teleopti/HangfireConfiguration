@@ -3,169 +3,167 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Configuration.Internals;
-using Hangfire.Configuration.Providers;
 using Npgsql;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public class ConfigurationApi
 {
-	public class ConfigurationApi
+	private readonly ConfigurationStorage _storage;
+	private readonly State _state;
+	private readonly SqlDialectsServerConfigurationCreator _sqlDialectCreator;
+	private readonly RedisServerConfigurationCreator _redisCreator;
+	private readonly WorkerServerUpgrader _upgrader;
+
+	internal ConfigurationApi(
+		ConfigurationStorage storage,
+		State state,
+		SqlDialectsServerConfigurationCreator sqlDialectCreator,
+		RedisServerConfigurationCreator redisCreator,
+		WorkerServerUpgrader upgrader)
 	{
-		private readonly ConfigurationStorage _storage;
-		private readonly State _state;
-		private readonly SqlDialectsServerConfigurationCreator _sqlDialectCreator;
-		private readonly RedisServerConfigurationCreator _redisCreator;
-		private readonly WorkerServerUpgrader _upgrader;
+		_storage = storage;
+		_state = state;
+		_sqlDialectCreator = sqlDialectCreator;
+		_redisCreator = redisCreator;
+		_upgrader = upgrader;
+	}
 
-		internal ConfigurationApi(
-			ConfigurationStorage storage,
-			State state,
-			SqlDialectsServerConfigurationCreator sqlDialectCreator,
-			RedisServerConfigurationCreator redisCreator,
-			WorkerServerUpgrader upgrader)
+	public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
+	{
+		if (command.Workers > _state.ReadOptions().WorkerBalancerOptions.MaximumGoalWorkerCount)
+			throw new Exception("Invalid goal worker count.");
+
+		var configuration = matchingConfiguration(command.ConfigurationId);
+
+		configuration.GoalWorkerCount = command.Workers;
+
+		_storage.WriteConfiguration(configuration);
+	}
+
+	public void WriteMaxWorkersPerServer(WriteMaxWorkersPerServer command)
+	{
+		var configuration = matchingConfiguration(command.ConfigurationId);
+
+		configuration.MaxWorkersPerServer = command.MaxWorkers;
+
+		_storage.WriteConfiguration(configuration);
+	}
+
+	private StoredConfiguration matchingConfiguration(int? configurationId)
+	{
+		var configurations = _storage.ReadConfigurations();
+		var configuration = new StoredConfiguration();
+		if (configurations.Any())
 		{
-			_storage = storage;
-			_state = state;
-			_sqlDialectCreator = sqlDialectCreator;
-			_redisCreator = redisCreator;
-			_upgrader = upgrader;
+			if (configurationId != null)
+				configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
+			else
+				configuration = configurations.FirstOrDefault(x => x.IsActive());
+
+			if (configuration == null)
+				configuration = configurations.First();
 		}
 
-		public void WriteGoalWorkerCount(WriteGoalWorkerCount command)
+		return configuration;
+	}
+
+	public void CreateServerConfiguration(CreateSqlServerWorkerServer command)
+	{
+		var storage = new SqlConnectionStringBuilder
 		{
-			if (command.Workers > _state.ReadOptions().WorkerBalancerOptions.MaximumGoalWorkerCount)
-				throw new Exception("Invalid goal worker count.");
-
-			var configuration = matchingConfiguration(command.ConfigurationId);
-
-			configuration.GoalWorkerCount = command.Workers;
-
-			_storage.WriteConfiguration(configuration);
-		}
-
-		public void WriteMaxWorkersPerServer(WriteMaxWorkersPerServer command)
+			DataSource = command.Server ?? "",
+			InitialCatalog = command.Database ?? "",
+			UserID = command.User ?? "",
+			Password = command.Password ?? "",
+		}.ToString();
+		var creator = new SqlConnectionStringBuilder
 		{
-			var configuration = matchingConfiguration(command.ConfigurationId);
+			DataSource = command.Server ?? "",
+			InitialCatalog = command.Database ?? "",
+			UserID = command.SchemaCreatorUser ?? "",
+			Password = command.SchemaCreatorPassword ?? "",
+		}.ToString();
 
-			configuration.MaxWorkersPerServer = command.MaxWorkers;
+		_sqlDialectCreator.Create(
+			storage,
+			creator,
+			command.SchemaName,
+			command.Name
+		);
+	}
 
-			_storage.WriteConfiguration(configuration);
-		}
-
-		private StoredConfiguration matchingConfiguration(int? configurationId)
+	public void CreateServerConfiguration(CreatePostgresWorkerServer command)
+	{
+		var storage = new NpgsqlConnectionStringBuilder
 		{
-			var configurations = _storage.ReadConfigurations();
-			var configuration = new StoredConfiguration();
-			if (configurations.Any())
-			{
-				if (configurationId != null)
-					configuration = configurations.FirstOrDefault(x => x.Id == configurationId);
-				else
-					configuration = configurations.FirstOrDefault(x => x.IsActive());
-
-				if (configuration == null)
-					configuration = configurations.First();
-			}
-
-			return configuration;
-		}
-
-		public void CreateServerConfiguration(CreateSqlServerWorkerServer command)
+			Host = command.Server,
+			Database = command.Database,
+			Username = command.User,
+			Password = command.Password,
+		}.ToString();
+		var creator = new NpgsqlConnectionStringBuilder
 		{
-			var storage = new SqlConnectionStringBuilder
-			{
-				DataSource = command.Server ?? "",
-				InitialCatalog = command.Database ?? "",
-				UserID = command.User ?? "",
-				Password = command.Password ?? "",
-			}.ToString();
-			var creator = new SqlConnectionStringBuilder
-			{
-				DataSource = command.Server ?? "",
-				InitialCatalog = command.Database ?? "",
-				UserID = command.SchemaCreatorUser ?? "",
-				Password = command.SchemaCreatorPassword ?? "",
-			}.ToString();
+			Host = command.Server,
+			Database = command.Database,
+			Username = command.SchemaCreatorUser,
+			Password = command.SchemaCreatorPassword,
+		}.ToString();
 
-			_sqlDialectCreator.Create(
-				storage,
-				creator,
-				command.SchemaName,
-				command.Name
-			);
-		}
+		_sqlDialectCreator.Create(
+			storage,
+			creator,
+			command.SchemaName,
+			command.Name
+		);
+	}
 
-		public void CreateServerConfiguration(CreatePostgresWorkerServer command)
-		{
-			var storage = new NpgsqlConnectionStringBuilder
-			{
-				Host = command.Server,
-				Database = command.Database,
-				Username = command.User,
-				Password = command.Password,
-			}.ToString();
-			var creator = new NpgsqlConnectionStringBuilder
-			{
-				Host = command.Server,
-				Database = command.Database,
-				Username = command.SchemaCreatorUser,
-				Password = command.SchemaCreatorPassword,
-			}.ToString();
+	public void CreateServerConfiguration(CreateRedisWorkerServer command) =>
+		_redisCreator.Create(command);
 
-			_sqlDialectCreator.Create(
-				storage,
-				creator,
-				command.SchemaName,
-				command.Name
-			);
-		}
+	public void ActivateServer(int configurationId)
+	{
+		mutateConfiguration(configurationId, c => { c.Active = true; });
+		_state.QueryPublishersCache.Invalidate();
+	}
 
-		public void CreateServerConfiguration(CreateRedisWorkerServer command) =>
-			_redisCreator.Create(command);
+	public void InactivateServer(int configurationId)
+	{
+		var configurations = _storage.ReadConfigurations();
+		var inactivate = configurations.Single(x => x.Id == configurationId);
+		inactivate.Active = false;
+		if (!configurations.Any(x => x.Active == true))
+			throw new ArgumentException("You must have at least one active configuration!");
+		_storage.WriteConfiguration(inactivate);
+	}
 
-		public void ActivateServer(int configurationId)
-		{
-			mutateConfiguration(configurationId, c => { c.Active = true; });
-			_state.QueryPublishersCache.Invalidate();
-		}
+	public void UpgradeWorkerServers(UpgradeWorkerServers command) =>
+		_upgrader.Upgrade(command);
 
-		public void InactivateServer(int configurationId)
-		{
-			var configurations = _storage.ReadConfigurations();
-			var inactivate = configurations.Single(x => x.Id == configurationId);
-			inactivate.Active = false;
-			if (!configurations.Any(x => x.Active == true))
-				throw new ArgumentException("You must have at least one active configuration!");
-			_storage.WriteConfiguration(inactivate);
-		}
+	public IEnumerable<StoredConfiguration> ReadConfigurations() =>
+		_storage.ReadConfigurations();
 
-		public void UpgradeWorkerServers(UpgradeWorkerServers command) =>
-			_upgrader.Upgrade(command);
+	public void WriteConfiguration(StoredConfiguration configuration) =>
+		_storage.WriteConfiguration(configuration);
 
-		public IEnumerable<StoredConfiguration> ReadConfigurations() =>
-			_storage.ReadConfigurations();
+	public void EnableWorkerBalancer(int configurationId) =>
+		mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = true; });
 
-		public void WriteConfiguration(StoredConfiguration configuration) =>
-			_storage.WriteConfiguration(configuration);
+	public void DisableWorkerBalancer(int configurationId) =>
+		mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = false; });
 
-		public void EnableWorkerBalancer(int configurationId) =>
-			mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = true; });
+	private void mutateConfiguration(int configurationId, Action<StoredConfiguration> mutation)
+	{
+		var configurations = _storage.ReadConfigurations();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		mutation.Invoke(configuration);
+		_storage.WriteConfiguration(configuration);
+	}
 
-		public void DisableWorkerBalancer(int configurationId) =>
-			mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = false; });
-
-		private void mutateConfiguration(int configurationId, Action<StoredConfiguration> mutation)
-		{
-			var configurations = _storage.ReadConfigurations();
-			var configuration = configurations.Single(x => x.Id == configurationId);
-			mutation.Invoke(configuration);
-			_storage.WriteConfiguration(configuration);
-		}
-
-		public void DeleteConfiguration(int? configurationId)
-		{
-			var configurations = _storage.ReadConfigurations();
-			var configuration = configurations.Single(x => x.Id == configurationId);
-			_storage.DeleteConfiguration(configuration);
-		}
+	public void DeleteConfiguration(int? configurationId)
+	{
+		var configurations = _storage.ReadConfigurations();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		_storage.DeleteConfiguration(configuration);
 	}
 }

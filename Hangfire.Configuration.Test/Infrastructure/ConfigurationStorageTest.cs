@@ -2,138 +2,134 @@ using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test.Infrastructure;
+
+public class ConfigurationStorageTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-    public class ConfigurationStorageTest : DatabaseTest
-    {
-	    public ConfigurationStorageTest(string connectionString) : base(connectionString)
-	    {
-	    }
+	[Test]
+	public void ShouldReadEmptyConfiguration()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
 
-        [Test]
-        public void ShouldReadEmptyConfiguration()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
+		Assert.IsEmpty(storage.ReadConfigurations());
+	}
 
-            Assert.IsEmpty(storage.ReadConfigurations());
-        }
+	[Test]
+	public void ShouldWrite()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
 
-        [Test]
-        public void ShouldWrite()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "connection string",
+			SchemaName = "schema name",
+			Active = false
+		});
 
-            storage.WriteConfiguration(new StoredConfiguration
-            {
-	            ConnectionString = "connection string",
-	            SchemaName = "schema name",
-	            Active = false
-            });
+		var configuration = storage.ReadConfigurations().Single();
+		Assert.AreEqual("connection string", configuration.ConnectionString);
+		Assert.AreEqual("schema name", configuration.SchemaName);
+		Assert.AreEqual(false, configuration.Active);
+	}
 
-            var configuration = storage.ReadConfigurations().Single();
-            Assert.AreEqual("connection string", configuration.ConnectionString);
-            Assert.AreEqual("schema name", configuration.SchemaName);
-            Assert.AreEqual(false, configuration.Active);
-        }
+	[Test]
+	public void ShouldRead()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "connectionString",
+			SchemaName = "schemaName",
+			GoalWorkerCount = 3,
+			Active = true
+		});
 
-        [Test]
-        public void ShouldRead()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
-            storage.WriteConfiguration(new StoredConfiguration
-            {
-	            ConnectionString = "connectionString",
-	            SchemaName = "schemaName",
-	            GoalWorkerCount = 3,
-	            Active = true
-            });
+		var result = storage.ReadConfigurations().Single();
 
-            var result = storage.ReadConfigurations().Single();
+		Assert.AreEqual(1, result.Id);
+		Assert.AreEqual("connectionString", result.ConnectionString);
+		Assert.AreEqual("schemaName", result.SchemaName);
+		Assert.AreEqual(3, result.GoalWorkerCount);
+		Assert.AreEqual(true, result.Active);
+	}
 
-            Assert.AreEqual(1, result.Id);
-            Assert.AreEqual("connectionString", result.ConnectionString);
-            Assert.AreEqual("schemaName", result.SchemaName);
-            Assert.AreEqual(3, result.GoalWorkerCount);
-            Assert.AreEqual(true, result.Active);
-        }
+	[Test]
+	public void ShouldUpdate()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration());
 
-        [Test]
-        public void ShouldUpdate()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
-            storage.WriteConfiguration(new StoredConfiguration());
+		var existing = storage.ReadConfigurations().Single();
+		existing.ConnectionString = "connection";
+		existing.SchemaName = "schema";
+		existing.GoalWorkerCount = 23;
+		existing.Active = true;
+		storage.WriteConfiguration(existing);
 
-            var existing = storage.ReadConfigurations().Single();
-            existing.ConnectionString = "connection";
-            existing.SchemaName = "schema";
-            existing.GoalWorkerCount = 23;
-            existing.Active = true;
-            storage.WriteConfiguration(existing);
+		var configuration = storage.ReadConfigurations().Single();
+		Assert.AreEqual("connection", configuration.ConnectionString);
+		Assert.AreEqual("schema", configuration.SchemaName);
+		Assert.AreEqual(23, configuration.GoalWorkerCount);
+		Assert.AreEqual(true, configuration.Active);
+	}
 
-            var configuration = storage.ReadConfigurations().Single();
-            Assert.AreEqual("connection", configuration.ConnectionString);
-            Assert.AreEqual("schema", configuration.SchemaName);
-            Assert.AreEqual(23, configuration.GoalWorkerCount);
-            Assert.AreEqual(true, configuration.Active);
-        }
+	[Test]
+	public void ShouldWriteName()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
 
-        [Test]
-        public void ShouldWriteName()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration
+		{
+			Name = "name",
+		});
 
-            storage.WriteConfiguration(new StoredConfiguration
-            {
-	            Name = "name",
-            });
+		var configuration = storage.ReadConfigurations().Single();
+		Assert.AreEqual("name", configuration.Name);
+	}
 
-            var configuration = storage.ReadConfigurations().Single();
-            Assert.AreEqual("name", configuration.Name);
-        }
+	[Test]
+	public void ShouldUpdateName()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration());
 
-        [Test]
-        public void ShouldUpdateName()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
-            storage.WriteConfiguration(new StoredConfiguration());
+		var existing = storage.ReadConfigurations().Single();
+		existing.Name = "name";
+		storage.WriteConfiguration(existing);
 
-            var existing = storage.ReadConfigurations().Single();
-            existing.Name = "name";
-            storage.WriteConfiguration(existing);
-
-            var configuration = storage.ReadConfigurations().Single();
-            Assert.AreEqual("name", configuration.Name);
-        }
+		var configuration = storage.ReadConfigurations().Single();
+		Assert.AreEqual("name", configuration.Name);
+	}
         
-        [Test]
-        public void ShouldDelete()
-        {
-	        var system = new SystemUnderInfraTest();
-	        system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-	        var storage = system.ConfigurationStorage;
-	        storage.WriteConfiguration(new StoredConfiguration
-	        {
-		        ConnectionString = "c",
-		        SchemaName = "s"
-	        });
-	        var configuration = storage.ReadConfigurations().Single();
+	[Test]
+	public void ShouldDelete()
+	{
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		var storage = system.ConfigurationStorage;
+		storage.WriteConfiguration(new StoredConfiguration
+		{
+			ConnectionString = "c",
+			SchemaName = "s"
+		});
+		var configuration = storage.ReadConfigurations().Single();
 
-	        storage.DeleteConfiguration(configuration);
+		storage.DeleteConfiguration(configuration);
 
-	        var result = storage.ReadConfigurations();
-	        result.Should().Be.Empty();
-        }
-    }
+		var result = storage.ReadConfigurations();
+		result.Should().Be.Empty();
+	}
 }

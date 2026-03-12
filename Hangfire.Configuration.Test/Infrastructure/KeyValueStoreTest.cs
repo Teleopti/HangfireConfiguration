@@ -1,26 +1,22 @@
 ﻿using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test.Infrastructure;
+
+public class KeyValueStoreTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public class KeyValueStoreTest : DatabaseTest
+	[Test]
+	public void ShouldReadValueMatchingKey()
 	{
-		public KeyValueStoreTest(string connectionString) : base(connectionString)
-		{
-		}
+		var system = new SystemUnderInfraTest();
+		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
+		system.KeyValueStore.Write("firstKey", "1");
+		system.KeyValueStore.Write("secondKey", "2");
 
-		[Test]
-		public void ShouldReadValueMatchingKey()
-		{
-			var system = new SystemUnderInfraTest();
-			system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-			system.KeyValueStore.Write("firstKey", "1");
-			system.KeyValueStore.Write("secondKey", "2");
+		var value1 = system.KeyValueStore.Read("firstKey");
+		var value2 = system.KeyValueStore.Read("secondKey");
 
-			var value1 = system.KeyValueStore.Read("firstKey");
-			var value2 = system.KeyValueStore.Read("secondKey");
-
-			Assert.AreEqual("1", value1);
-			Assert.AreEqual("2", value2);
-		}
+		Assert.AreEqual("1", value1);
+		Assert.AreEqual("2", value2);
 	}
 }

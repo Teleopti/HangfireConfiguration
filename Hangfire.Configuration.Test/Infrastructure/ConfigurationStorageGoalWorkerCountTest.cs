@@ -3,12 +3,9 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class ConfigurationStorageGoalWorkerCountTest : DatabaseTest
+public class ConfigurationStorageGoalWorkerCountTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public ConfigurationStorageGoalWorkerCountTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldReadEmptyGoalWorkerCount()
 	{

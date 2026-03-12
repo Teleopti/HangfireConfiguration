@@ -4,17 +4,10 @@ using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class RedisServerConfigurationCreator
+internal class RedisServerConfigurationCreator(
+	ConfigurationStorage storage, 
+	IRedisConnectionVerifier redisConnectionVerifier)
 {
-	private readonly ConfigurationStorage _storage;
-	private readonly IRedisConnectionVerifier _redisConnectionVerifier;
-
-	public RedisServerConfigurationCreator(ConfigurationStorage storage, IRedisConnectionVerifier redisConnectionVerifier)
-	{
-		_storage = storage;
-		_redisConnectionVerifier = redisConnectionVerifier;
-	}
-
 #if Redis
 
 	public void Create(CreateRedisWorkerServer command)
@@ -25,9 +18,9 @@ internal class RedisServerConfigurationCreator
 		if(!Regex.IsMatch(prefix, @"^\{([^\{\}]+)\}:$"))
 			throw new ArgumentException("Prefix must be in the format '{yourPrefix}:'!");
 
-		_redisConnectionVerifier.VerifyConfiguration(command.Configuration, prefix);
+		redisConnectionVerifier.VerifyConfiguration(command.Configuration, prefix);
 
-		_storage.WriteConfiguration(new StoredConfiguration
+		storage.WriteConfiguration(new StoredConfiguration
 		{
 			SchemaName = prefix,
 			ConnectionString = command.Configuration,

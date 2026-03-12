@@ -2,332 +2,331 @@ using System.Linq;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class ViewConfigurationsTest
 {
-	public class ViewConfigurationsTest
+	[Test]
+	public void ShouldBuildConfiguration()
 	{
-		[Test]
-		public void ShouldBuildConfiguration()
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Id = 1,
-				ConnectionString = "theConnstring",
-				SchemaName = "schemaName",
-				Active = true
-			});
+			Id = 1,
+			ConnectionString = "theConnstring",
+			SchemaName = "schemaName",
+			Active = true
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			Assert.AreEqual(1, result.Id);
-			Assert.AreEqual("theConnstring", result.ConnectionString);
-			Assert.AreEqual("schemaName", result.SchemaName);
-			Assert.AreEqual(true, result.Active);
-		}
+		Assert.AreEqual(1, result.Id);
+		Assert.AreEqual("theConnstring", result.ConnectionString);
+		Assert.AreEqual("schemaName", result.SchemaName);
+		Assert.AreEqual(true, result.Active);
+	}
 
-		[Test]
-		public void ShouldBuildConfiguration2()
+	[Test]
+	public void ShouldBuildConfiguration2()
+	{
+		var system = new SystemUnderTest();
+
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
+			Id = 2,
+			ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
+			SchemaName = "schemaName2",
+			Active = false
+		});
 
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Id = 2,
-				ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
-				SchemaName = "schemaName2",
-				Active = false
-			});
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		Assert.AreEqual(2, result.Id);
+		Assert.AreEqual("schemaName2", result.SchemaName);
+		Assert.AreEqual(false, result.Active);
+	}
 
-			Assert.AreEqual(2, result.Id);
-			Assert.AreEqual("schemaName2", result.SchemaName);
-			Assert.AreEqual(false, result.Active);
-		}
-
-		[Test]
-		public void ShouldBuildWithNullValues()
+	[Test]
+	public void ShouldBuildWithNullValues()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Id = 1,
-				ConnectionString = null,
-				SchemaName = null,
-				Active = null,
-				GoalWorkerCount = null
-			});
+			Id = 1,
+			ConnectionString = null,
+			SchemaName = null,
+			Active = null,
+			GoalWorkerCount = null
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			Assert.AreEqual(1, result.Id);
-			Assert.Null(result.SchemaName);
-			Assert.IsFalse(result.Active);
-			Assert.Null(result.Workers);
-		}
+		Assert.AreEqual(1, result.Id);
+		Assert.Null(result.SchemaName);
+		Assert.IsFalse(result.Active);
+		Assert.Null(result.Workers);
+	}
 
-		[Test]
-		public void ShouldBuildForMultipleConfigurations()
+	[Test]
+	public void ShouldBuildForMultipleConfigurations()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-				{
-					Id = 1,
-					ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
-					SchemaName = "schemaName1",
-					Active = true
-				});
-			system.WithConfiguration(new StoredConfiguration
-				{
-					Id = 2,
-					ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
-					SchemaName = "schemaName2",
-					Active = false
-				});
-
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
-
-			Assert.AreEqual(2, result.Count());
-		}
-
-		[Test]
-		public void ShouldBuildWithWorkers()
+			Id = 1,
+			ConnectionString = "Data Source=Server1;Integrated Security=SSPI;Initial Catalog=Test_Database_1;Application Name=Test",
+			SchemaName = "schemaName1",
+			Active = true
+		});
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 10});
+			Id = 2,
+			ConnectionString = "Data Source=Server2;Integrated Security=SSPI;Initial Catalog=Test_Database_2;Application Name=Test",
+			SchemaName = "schemaName2",
+			Active = false
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-			Assert.AreEqual(10, result.Single().Workers);
-		}
+		Assert.AreEqual(2, result.Count());
+	}
 
-		[Test]
-		public void ShouldBuildWithDefaultSchemaName()
+	[Test]
+	public void ShouldBuildWithWorkers()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 10});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+		Assert.AreEqual(10, result.Single().Workers);
+	}
+
+	[Test]
+	public void ShouldBuildWithDefaultSchemaName()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "Data Source=.",
-				SchemaName = null
-			});
+			ConnectionString = "Data Source=.",
+			SchemaName = null
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-			Assert.AreEqual(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
-		}
+		Assert.AreEqual(DefaultSchemaName.SqlServer(), result.Single().SchemaName);
+	}
 
-		[Test]
-		public void ShouldBuildWithDefaultSchemaNameForPostgres()
+	[Test]
+	public void ShouldBuildWithDefaultSchemaNameForPostgres()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "Host=localhost",
-				SchemaName = null
-			});
+			ConnectionString = "Host=localhost",
+			SchemaName = null
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-			Assert.AreEqual(DefaultSchemaName.Postgres(), result.Single().SchemaName);
-		}
+		Assert.AreEqual(DefaultSchemaName.Postgres(), result.Single().SchemaName);
+	}
 
-		[Test]
-		public void ShouldBuildWithDefaultSchemaNameForRedis()
+	[Test]
+	public void ShouldBuildWithDefaultSchemaNameForRedis()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "redis-roger",
-				SchemaName = null
-			});
+			ConnectionString = "redis-roger",
+			SchemaName = null
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-			Assert.AreEqual(DefaultSchemaName.Redis(), result.Single().SchemaName);
-		}
+		Assert.AreEqual(DefaultSchemaName.Redis(), result.Single().SchemaName);
+	}
 
-		[Test]
-		public void ShouldBuildWithConfigurationName()
+	[Test]
+	public void ShouldBuildWithConfigurationName()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Name = "name"
-			});
+			Name = "name"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-			Assert.AreEqual("name", result.Single().Name);
-		}
+		Assert.AreEqual("name", result.Single().Name);
+	}
 
-		[Test]
-		public void ShouldBuildWithMaxWorkersPerServer()
+	[Test]
+	public void ShouldBuildWithMaxWorkersPerServer()
+	{
+		var system = new SystemUnderTest();
+		system.WithMaxWorkersPerServer(5);
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations();
+
+		Assert.AreEqual(5, result.Single().MaxWorkersPerServer);
+	}
+
+	[Test]
+	public void ShouldHideSqlServerPassword()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithMaxWorkersPerServer(5);
+			ConnectionString = "Data Source=.;Initial Catalog=foo;User Id=me;Password=thePassword;"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			Assert.AreEqual(5, result.Single().MaxWorkersPerServer);
-		}
+		result.ConnectionString.Should().Not.Contain("thePassword");
+		result.ConnectionString.Should().Contain("******");
+	}
 
-		[Test]
-		public void ShouldHideSqlServerPassword()
+	[Test]
+	public void ShouldKeepConnectionStringAsIsIfSqlServerIntegratedSecurity()
+	{
+		var system = new SystemUnderTest();
+		var connectionString = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "Data Source=.;Initial Catalog=foo;User Id=me;Password=thePassword;"
-			});
+			ConnectionString = connectionString
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Not.Contain("thePassword");
-			result.ConnectionString.Should().Contain("******");
-		}
+		result.ConnectionString.Should().Be.EqualTo(connectionString);
+	}
 
-		[Test]
-		public void ShouldKeepConnectionStringAsIsIfSqlServerIntegratedSecurity()
+	[Test]
+	public void ShouldHidePostgresPassword()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			var connectionString = "Data Source=.;Initial Catalog=a;Integrated Security=SSPI;";
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = connectionString
-			});
+			ConnectionString = "Host=.;Database=foo;User Id=me;Password=thePassword;"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Be.EqualTo(connectionString);
-		}
+		result.ConnectionString.Should().Not.Contain("thePassword");
+		result.ConnectionString.Should().Contain("******");
+	}
 
-		[Test]
-		public void ShouldHidePostgresPassword()
+	[Test]
+	public void ShouldLeaveRedisConnectionStringAsIsIfNoPassword()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "Host=.;Database=foo;User Id=me;Password=thePassword;"
-			});
+			ConnectionString = "localhost"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Not.Contain("thePassword");
-			result.ConnectionString.Should().Contain("******");
-		}
+		result.ConnectionString.Should().Be.EqualTo("localhost");
+	}
 
-		[Test]
-		public void ShouldLeaveRedisConnectionStringAsIsIfNoPassword()
+	[Test]
+	public void ShouldHideRedisPassword()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "localhost"
-			});
+			ConnectionString = "localhost,password=thePassword"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Be.EqualTo("localhost");
-		}
+		result.ConnectionString.Should().Not.Contain("thePassword");
+		result.ConnectionString.Should().Contain("******");
+	}
 
-		[Test]
-		public void ShouldHideRedisPassword()
+	[Test]
+	public void ShouldHideRedisPasswordCasingAndSpaces()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "localhost,password=thePassword"
-			});
+			ConnectionString = "localhost, paSsword=thePassword"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Not.Contain("thePassword");
-			result.ConnectionString.Should().Contain("******");
-		}
+		result.ConnectionString.Should().Not.Contain("thePassword");
+	}
 
-		[Test]
-		public void ShouldHideRedisPasswordCasingAndSpaces()
+	[Test]
+	public void ShouldNotReplacePasswordIfStringExistsOnOtherPlacesInConnectionString()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "localhost, paSsword=thePassword"
-			});
+			ConnectionString = "localhost,password=o"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Not.Contain("thePassword");
-		}
+		result.ConnectionString.Should().StartWith("localhost");
+	}
 
-		[Test]
-		public void ShouldNotReplacePasswordIfStringExistsOnOtherPlacesInConnectionString()
+	[Test]
+	public void ShouldHandleRedisConnstringContainsEqualSign()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "localhost,password=o"
-			});
+			ConnectionString = "myserver,password=thåström=great"
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().StartWith("localhost");
-		}
+		result.ConnectionString.Should().Not.Contain("great");
+	}
 
-		[Test]
-		public void ShouldHandleRedisConnstringContainsEqualSign()
+	[Test]
+	public void ShouldBuildWithWorkerBalancerEnabled()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				ConnectionString = "myserver,password=thåström=great"
-			});
+			WorkerBalancerEnabled = true
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.ConnectionString.Should().Not.Contain("great");
-		}
+		result.WorkerBalancerEnabled.Should().Be.True();
+	}
 
-		[Test]
-		public void ShouldBuildWithWorkerBalancerEnabled()
+	[Test]
+	public void ShouldBuildWithWorkerBalancerEnabledNull()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				WorkerBalancerEnabled = true
-			});
+			WorkerBalancerEnabled = null
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.WorkerBalancerEnabled.Should().Be.True();
-		}
+		result.WorkerBalancerEnabled.Should().Be.True();
+	}
 
-		[Test]
-		public void ShouldBuildWithWorkerBalancerEnabledNull()
+	[Test]
+	public void ShouldBuildWithWorkerBalancerDisabled()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				WorkerBalancerEnabled = null
-			});
+			WorkerBalancerEnabled = false
+		});
 
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-			result.WorkerBalancerEnabled.Should().Be.True();
-		}
-
-		[Test]
-		public void ShouldBuildWithWorkerBalancerDisabled()
-		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				WorkerBalancerEnabled = false
-			});
-
-			var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
-
-			result.WorkerBalancerEnabled.Should().Be.False();
-		}
+		result.WorkerBalancerEnabled.Should().Be.False();
 	}
 }

@@ -2,148 +2,147 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class ActivateMultipleConfigurationTest
 {
-    public class ActivateMultipleConfigurationTest
-    {
-        [Test]
-        public void ShouldActivateMultipleConfigurations()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 1,
-                Active = false
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 2,
-                Active = false
-            });
+	[Test]
+	public void ShouldActivateMultipleConfigurations()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = false
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = false
+		});
 
-            system.ConfigurationApi().ActivateServer(1);
-            system.ConfigurationApi().ActivateServer(2);
+		system.ConfigurationApi().ActivateServer(1);
+		system.ConfigurationApi().ActivateServer(2);
 
-            var configurations = system.Configurations();
-            Assert.AreEqual(true, configurations.ElementAt(0).Active);
-            Assert.AreEqual(true, configurations.ElementAt(1).Active);
-        }
+		var configurations = system.Configurations();
+		Assert.AreEqual(true, configurations.ElementAt(0).Active);
+		Assert.AreEqual(true, configurations.ElementAt(1).Active);
+	}
 
-        [Test]
-        public void ShouldActivateConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 1,
-                Active = false
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 2,
-                Active = false
-            });
+	[Test]
+	public void ShouldActivateConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = false
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = false
+		});
 
-            system.ConfigurationApi().ActivateServer(2);
+		system.ConfigurationApi().ActivateServer(2);
 
-            var configurations = system.Configurations();
-            Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
-            Assert.AreEqual(true, configurations.Single(x => x.Id == 2).Active);
-        }
+		var configurations = system.Configurations();
+		Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
+		Assert.AreEqual(true, configurations.Single(x => x.Id == 2).Active);
+	}
 
-        [Test]
-        public void ShouldInactivateConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            Id = 1,
-	            Active = true
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            Id = 2,
-	            Active = true
-            });
+	[Test]
+	public void ShouldInactivateConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = true
+		});
 
-            system.ConfigurationApi().InactivateServer(1);
+		system.ConfigurationApi().InactivateServer(1);
 
-            var configurations = system.Configurations();
-            Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
-        }
+		var configurations = system.Configurations();
+		Assert.AreEqual(false, configurations.Single(x => x.Id == 1).Active);
+	}
         
-        [Test]
-        public void ShouldNotInactivateLastConfiguration()
-        {
-	        var system = new SystemUnderTest();
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        Id = 1,
-		        Active = true
-	        });
+	[Test]
+	public void ShouldNotInactivateLastConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = true
+		});
 
-	        Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
-        }
+		Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
+	}
         
-        [Test]
-        public void ShouldNotInactivateLastConfigurationWhenOnlyUnActiveExists()
-        {
-	        var system = new SystemUnderTest();
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        Id = 1,
-		        Active = true
-	        });
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        Id = 2,
-		        Active = false
-	        });
+	[Test]
+	public void ShouldNotInactivateLastConfigurationWhenOnlyUnActiveExists()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = false
+		});
 
-	        Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
-        }
+		Assert.Throws<ArgumentException>(() => system.ConfigurationApi().InactivateServer(1));
+	}
         
-        [Test]
-        public void ShouldNotThrowDueToLastConfigurationWhenUnActivatingNonActive()
-        {
-	        var system = new SystemUnderTest();
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        Id = 1,
-		        Active = true
-	        });
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        Id = 2,
-		        Active = false
-	        });
+	[Test]
+	public void ShouldNotThrowDueToLastConfigurationWhenUnActivatingNonActive()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = false
+		});
 
-	        system.ConfigurationApi().InactivateServer(2);
+		system.ConfigurationApi().InactivateServer(2);
 	        
-	        var configurations = system.Configurations();
-	        Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
-        }
+		var configurations = system.Configurations();
+		Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
+	}
 
-        [Test]
-        public void ShouldInactivateGivenConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 1,
-                Active = true
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-                Id = 2,
-                Active = true
-            });
+	[Test]
+	public void ShouldInactivateGivenConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Active = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			Active = true
+		});
 
-            system.ConfigurationApi().InactivateServer(2);
+		system.ConfigurationApi().InactivateServer(2);
 
-            var configurations = system.Configurations();
-            Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
-            Assert.AreEqual(false, configurations.Single(x => x.Id == 2).Active);
-        }
-    }
+		var configurations = system.Configurations();
+		Assert.AreEqual(true, configurations.Single(x => x.Id == 1).Active);
+		Assert.AreEqual(false, configurations.Single(x => x.Id == 2).Active);
+	}
 }

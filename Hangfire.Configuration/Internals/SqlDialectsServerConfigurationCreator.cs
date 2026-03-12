@@ -3,19 +3,10 @@ using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class SqlDialectsServerConfigurationCreator
+internal class SqlDialectsServerConfigurationCreator(
+	ConfigurationStorage storage,
+	ISchemaInstaller installer)
 {
-	private readonly ConfigurationStorage _storage;
-	private readonly ISchemaInstaller _installer;
-
-	public SqlDialectsServerConfigurationCreator(
-		ConfigurationStorage storage,
-		ISchemaInstaller installer)
-	{
-		_storage = storage;
-		_installer = installer;
-	}
-
 	public void Create(
 		string storageConnectionString,
 		string creatorConnectionString,
@@ -26,16 +17,16 @@ internal class SqlDialectsServerConfigurationCreator
 		
 		schemaName ??= provider.DefaultSchemaName();
 		
-		_installer.TryConnect(storageConnectionString);
+		installer.TryConnect(storageConnectionString);
 
-		_installer.TryConnect(creatorConnectionString);
+		installer.TryConnect(creatorConnectionString);
 
-		if (_installer.HangfireStorageSchemaExists(schemaName, creatorConnectionString))
+		if (installer.HangfireStorageSchemaExists(schemaName, creatorConnectionString))
 			throw new Exception("Schema already exists.");
 
-		_installer.InstallHangfireStorageSchema(schemaName, creatorConnectionString);
+		installer.InstallHangfireStorageSchema(schemaName, creatorConnectionString);
 
-		_storage.WriteConfiguration(new StoredConfiguration
+		storage.WriteConfiguration(new StoredConfiguration
 		{
 			Name = name,
 			ConnectionString = storageConnectionString,

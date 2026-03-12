@@ -2,7 +2,6 @@
 using System.Linq;
 using Dapper;
 using DbAgnostic;
-using Npgsql;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;

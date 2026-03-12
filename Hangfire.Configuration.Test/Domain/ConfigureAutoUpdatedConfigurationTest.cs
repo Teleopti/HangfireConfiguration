@@ -2,485 +2,484 @@ using System.Data.SqlClient;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class ConfigureAutoUpdatedConfigurationTest
 {
-    public class ConfigureAutoUpdatedConfigurationTest
-    {
-        [Test]
-        public void ShouldConfigureAutoUpdatedServer()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldConfigureAutoUpdatedServer()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
-            Assert.AreEqual("DataSource", dataSource);
-        }
+		var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
+		Assert.AreEqual("DataSource", dataSource);
+	}
 
-        [Test]
-        public void ShouldNotConfigureAutoUpdatedServerIfNoneGiven()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldNotConfigureAutoUpdatedServerIfNoneGiven()
+	{
+		var system = new SystemUnderTest();
 
-            system.UseOptions(new ConfigurationOptions());
-            system.WorkerServerStarter.Start();
+		system.UseOptions(new ConfigurationOptions());
+		system.WorkerServerStarter.Start();
 
-            Assert.IsEmpty(system.Configurations());
-        }
+		Assert.IsEmpty(system.Configurations());
+	}
 
-        [Test]
-        public void ShouldMarkAutoUpdatedConnectionString()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldMarkAutoUpdatedConnectionString()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var applicationName = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
-            Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
-        }
+		var applicationName = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
+		Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
+	}
 
-        [Test]
-        public void ShouldMarkAutoUpdatedConnectionStringWhenNoApplicationName()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldMarkAutoUpdatedConnectionStringWhenNoApplicationName()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var applicationName = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
-            Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
-        }
+		var applicationName = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
+		Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
+	}
 
-        [Test]
-        public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
-        {
-            var system = new SystemUnderTest();
-            var existing = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
+	[Test]
+	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
+	{
+		var system = new SystemUnderTest();
+		var existing = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var actual = system.Configurations().OrderBy(x => x.Id).First();
-            Assert.AreEqual(existing, actual.ConnectionString);
-        }
+		var actual = system.Configurations().OrderBy(x => x.Id).First();
+		Assert.AreEqual(existing, actual.ConnectionString);
+	}
 
-        [Test]
-        public void ShouldNotUpdateExistingConfigurationThatIsNotMarked2()
-        {
-            var system = new SystemUnderTest();
-            var existing = new SqlConnectionStringBuilder {DataSource = "AnotherDataSourceWith.AutoUpdate.InIt"}.ToString();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
+	[Test]
+	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked2()
+	{
+		var system = new SystemUnderTest();
+		var existing = new SqlConnectionStringBuilder {DataSource = "AnotherDataSourceWith.AutoUpdate.InIt"}.ToString();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var actual = system.Configurations().OrderBy(x => x.Id).First();
-            Assert.AreEqual(existing, actual.ConnectionString);
-        }
+		var actual = system.Configurations().OrderBy(x => x.Id).First();
+		Assert.AreEqual(existing, actual.ConnectionString);
+	}
 
-        [Test]
-        public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
-        {
-            var system = new SystemUnderTest();
-            var existing = new SqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
+	[Test]
+	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
+	{
+		var system = new SystemUnderTest();
+		var existing = new SqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var actual = system.Configurations().OrderBy(x => x.Id).First();
-            Assert.AreEqual(existing, actual.ConnectionString);
-        }
+		var actual = system.Configurations().OrderBy(x => x.Id).First();
+		Assert.AreEqual(existing, actual.ConnectionString);
+	}
 
-        [Test]
-        public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString()});
+	[Test]
+	public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString()});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "autoupdated" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var actual = system.Configurations().OrderBy(x => x.Id).Last();
-            Assert.AreEqual("autoupdated", new SqlConnectionStringBuilder(actual.ConnectionString).DataSource);
-        }
+		var actual = system.Configurations().OrderBy(x => x.Id).Last();
+		Assert.AreEqual("autoupdated", new SqlConnectionStringBuilder(actual.ConnectionString).DataSource);
+	}
 
-        [Test]
-        public void ShouldUpdate()
-        {
-            var system = new SystemUnderTest();
-            var existing = new SqlConnectionStringBuilder {DataSource = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
+	[Test]
+	public void ShouldUpdate()
+	{
+		var system = new SystemUnderTest();
+		var existing = new SqlConnectionStringBuilder {DataSource = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-           });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var updatedConnectionString = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString);
-            Assert.AreEqual("newDataSource", updatedConnectionString.DataSource);
-            Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
-        }
+		var updatedConnectionString = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString);
+		Assert.AreEqual("newDataSource", updatedConnectionString.DataSource);
+		Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
+	}
 
-        [Test]
-        public void ShouldUpdateLegacyConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 55});
+	[Test]
+	public void ShouldUpdateLegacyConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 55});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "dataSource", ApplicationName = "applicationName"}.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "dataSource", ApplicationName = "applicationName"}.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
-            Assert.AreEqual(55, system.Configurations().Single().GoalWorkerCount);
-            Assert.AreEqual(expected, system.Configurations().Single().ConnectionString);
-        }
+		var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
+		Assert.AreEqual(55, system.Configurations().Single().GoalWorkerCount);
+		Assert.AreEqual(expected, system.Configurations().Single().ConnectionString);
+	}
 
-        [Test]
-        public void ShouldUpdateOneOfTwo()
-        {
-            var system = new SystemUnderTest();
-            var one = new SqlConnectionStringBuilder {DataSource = "One"}.ToString();
-            var two = new SqlConnectionStringBuilder {DataSource = "Two", ApplicationName = "Two.AutoUpdate"}.ToString();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = one});
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = two});
+	[Test]
+	public void ShouldUpdateOneOfTwo()
+	{
+		var system = new SystemUnderTest();
+		var one = new SqlConnectionStringBuilder {DataSource = "One"}.ToString();
+		var two = new SqlConnectionStringBuilder {DataSource = "Two", ApplicationName = "Two.AutoUpdate"}.ToString();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = one});
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = two});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            var expected = new SqlConnectionStringBuilder {DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
-            Assert.AreEqual(expected, system.Configurations().Last().ConnectionString);
-        }
+		var expected = new SqlConnectionStringBuilder {DataSource = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
+		Assert.AreEqual(expected, system.Configurations().Last().ConnectionString);
+	}
 
-        [Test]
-        public void ShouldActivateOnFirstUpdate()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldActivateOnFirstUpdate()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.True(system.Configurations().Single().Active);
-        }
+		Assert.True(system.Configurations().Single().Active);
+	}
 
-        [Test]
-        public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
+	[Test]
+	public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.True(system.Configurations().Single().Active);
-        }
+		Assert.True(system.Configurations().Single().Active);
+	}
 
-        [Test]
-        public void ShouldBeActiveOnUpdateIfActiveBefore()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-                ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(),
-                Active = true
-            });
+	[Test]
+	public void ShouldBeActiveOnUpdateIfActiveBefore()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(),
+			Active = true
+		});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.True(system.Configurations().Single().Active);
-        }
+		Assert.True(system.Configurations().Single().Active);
+	}
 
-        [Test]
-        public void ShouldNotActivateWhenUpdating()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(), Active = true});
+	[Test]
+	public void ShouldNotActivateWhenUpdating()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(), Active = true});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.False(system.Configurations().First().Active);
-            Assert.True(system.Configurations().Last().Active);
-        }
+		Assert.False(system.Configurations().First().Active);
+		Assert.True(system.Configurations().Last().Active);
+	}
 
-        [Test]
-        public void ShouldSaveSchemaName()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldSaveSchemaName()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
-			            Name = DefaultConfigurationName.Name(),
-			            SchemaName = "schemaName"
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+					Name = DefaultConfigurationName.Name(),
+					SchemaName = "schemaName"
+				}
+			}
+		});
 
-            Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
-        }
+		Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
+	}
 
-        [Test]
-        public void ShouldSaveSchemaNameOnLegacyConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
+	[Test]
+	public void ShouldSaveSchemaNameOnLegacyConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
-			            Name = DefaultConfigurationName.Name(),
-			            SchemaName = "schemaName"
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "AutoUpdate" }.ToString(),
+					Name = DefaultConfigurationName.Name(),
+					SchemaName = "schemaName"
+				}
+			}
+		});
 
-            Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
-        }
+		Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
+	}
 
-        [Test]
-        public void ShouldOnlyAutoUpdateOnce()
-        {
-            var system = new SystemUnderTest();
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+	[Test]
+	public void ShouldOnlyAutoUpdateOnce()
+	{
+		var system = new SystemUnderTest();
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            system.UseOptions(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new[]
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
-            system.QueryPublishers();
+		system.UseOptions(new ConfigurationOptions
+		{
+			UpdateConfigurations = new[]
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
+		system.QueryPublishers();
 
-            var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
-            Assert.AreEqual("FirstUpdate", dataSource);
-        }
+		var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
+		Assert.AreEqual("FirstUpdate", dataSource);
+	}
 
-        [Test]
-        public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
-        {
-            var system = new SystemUnderTest();
-            system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
-            system.ClearConfigurations();
+	[Test]
+	public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
+	{
+		var system = new SystemUnderTest();
+		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "FirstUpdate" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
+		system.ClearConfigurations();
 
-            system.UseOptions(new ConfigurationOptionsForTest
-            {
-	            UpdateConfigurations = new[]
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
-            system.QueryPublishers();
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			UpdateConfigurations = new[]
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
+		system.QueryPublishers();
 
-            var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
-            Assert.AreEqual("SecondUpdate", dataSource);
-        }
+		var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
+		Assert.AreEqual("SecondUpdate", dataSource);
+	}
 
-        [Test]
-        public void ShouldAutoUpdateWithDefaultConfigurationName()
-        {
-            var system = new SystemUnderTest();
+	[Test]
+	public void ShouldAutoUpdateWithDefaultConfigurationName()
+	{
+		var system = new SystemUnderTest();
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
-        }
+		Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
+	}
 
-        [Test]
-        public void ShouldAutoUpdateWithDefaultConfigurationName2()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+	[Test]
+	public void ShouldAutoUpdateWithDefaultConfigurationName2()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
 
-            system.WorkerServerStarter.Start(new ConfigurationOptions
-            {
-	            UpdateConfigurations = new []
-	            {
-		            new UpdateStorageConfiguration
-		            {
-			            ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
-			            Name = DefaultConfigurationName.Name()
-		            }
-	            }
-            });
+		system.WorkerServerStarter.Start(new ConfigurationOptions
+		{
+			UpdateConfigurations = new []
+			{
+				new UpdateStorageConfiguration
+				{
+					ConnectionString = new SqlConnectionStringBuilder{ DataSource = "DataSource" }.ToString(),
+					Name = DefaultConfigurationName.Name()
+				}
+			}
+		});
 
-            Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
-        }
-    }
+		Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
+	}
 }

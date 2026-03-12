@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ExceptionServices;
-using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration.Internals;
 

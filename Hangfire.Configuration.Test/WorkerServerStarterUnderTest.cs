@@ -1,33 +1,23 @@
 using Hangfire.Server;
 
-namespace Hangfire.Configuration.Test
+namespace Hangfire.Configuration.Test;
+
+public class WorkerServerStarterUnderTest(WorkerServerStarter instance, Options options)
 {
-    public class WorkerServerStarterUnderTest
-    {
-        private readonly WorkerServerStarter _instance;
-        private readonly Options _options;
+	public void Start() => 
+		instance.Start();
 
-        public WorkerServerStarterUnderTest(WorkerServerStarter instance, Options options)
-        {
-            _instance = instance;
-            _options = options;
-        }
+	public void Start(IBackgroundProcess additionalProcess) => 
+		instance.Start(additionalProcess.AsArray());
 
-        public void Start() => 
-	        _instance.Start();
+	public void Start(IBackgroundProcess[] additionalProcesses) => 
+		instance.Start(additionalProcesses);
 
-        public void Start(IBackgroundProcess additionalProcess) => 
-	        _instance.Start(additionalProcess.AsArray());
-
-        public void Start(IBackgroundProcess[] additionalProcesses) => 
-	        _instance.Start(additionalProcesses);
-
-        public void Start(ConfigurationOptions options)
-        {
-	        if (string.IsNullOrEmpty(options.ConnectionString))
-		        options.ConnectionString = new ConfigurationOptionsForTest().ConnectionString;
-	        _options.UseOptions(options);
-	        _instance.Start();
-        }
-    }
+	public void Start(ConfigurationOptions options1)
+	{
+		if (string.IsNullOrEmpty(options1.ConnectionString))
+			options1.ConnectionString = new ConfigurationOptionsForTest().ConnectionString;
+		options.UseOptions(options1);
+		instance.Start();
+	}
 }

@@ -3,28 +3,24 @@ using Dapper;
 using DbAgnostic;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Infrastructure
+namespace Hangfire.Configuration.Test.Infrastructure;
+
+public class HangfireConfigurationSchemaInstallerTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public class HangfireConfigurationSchemaInstallerTest : DatabaseTest
+	[Test]
+	public void ShouldUpgradeFrom0ToLatest()
 	{
-		public HangfireConfigurationSchemaInstallerTest(string connectionString) : base(connectionString)
-		{
-		}
+		using var c = ConnectionString.CreateConnection();
+		HangfireConfigurationSchemaInstaller.Install(c);
 
-		[Test]
-		public void ShouldUpgradeFrom0ToLatest()
-		{
-			using var c = ConnectionString.CreateConnection();
-			HangfireConfigurationSchemaInstaller.Install(c);
+		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
+	}
 
-			Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
-		}
-
-		private int version()
-		{
-			var schemaName = ConnectionString.PickDialect("[Schema]", "schema");
-			using var c = ConnectionString.CreateConnection();
-			return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
-		}
+	private int version()
+	{
+		var schemaName = ConnectionString.PickDialect("[Schema]", "schema");
+		using var c = ConnectionString.CreateConnection();
+		return c.Query<int>($"SELECT Version FROM HangfireConfiguration.{schemaName}").Single();
 	}
 }

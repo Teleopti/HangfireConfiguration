@@ -4,70 +4,69 @@ using System.Linq;
 using Hangfire.Configuration.Internals;
 using Npgsql;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public class ViewModelBuilder
 {
-	public class ViewModelBuilder
+	private readonly ConfigurationStorage _storage;
+
+	public ViewModelBuilder(ConfigurationStorage storage)
 	{
-		private readonly ConfigurationStorage _storage;
+		_storage = storage;
+	}
 
-		public ViewModelBuilder(ConfigurationStorage storage)
-		{
-			_storage = storage;
-		}
+	public IEnumerable<ViewModel> BuildServerConfigurations()
+	{
+		return _storage.ReadConfigurations()
+			.Select(x =>
+			{
+				var schemaName = x.AppliedSchemaName();
+				var connectionString = hidePassword(x);
 
-		public IEnumerable<ViewModel> BuildServerConfigurations()
-		{
-			return _storage.ReadConfigurations()
-				.Select(x =>
+				return new ViewModel
 				{
-					var schemaName = x.AppliedSchemaName();
-					var connectionString = hidePassword(x);
+					Id = x.Id,
+					Name = x.Name,
+					ConnectionString = connectionString,
+					SchemaName = schemaName,
+					Active = x.IsActive(),
+					WorkerBalancerEnabled = x.WorkerBalancerIsEnabled(),
+					Workers = x.GoalWorkerCount,
+					MaxWorkersPerServer = x.MaxWorkersPerServer
+				};
+			}).ToArray();
+	}
 
-					return new ViewModel
-					{
-						Id = x.Id,
-						Name = x.Name,
-						ConnectionString = connectionString,
-						SchemaName = schemaName,
-						Active = x.IsActive(),
-						WorkerBalancerEnabled = x.WorkerBalancerIsEnabled(),
-						Workers = x.GoalWorkerCount,
-						MaxWorkersPerServer = x.MaxWorkersPerServer
-					};
-				}).ToArray();
-		}
-
-		private static string hidePassword(StoredConfiguration x)
-		{
-			const string hiddenPassword = "******";
-			return x.ConnectionString.ToDbSelector().PickFunc(
-				() =>
-				{
-					var parsed = new SqlConnectionStringBuilder(x.ConnectionString);
-					if (string.IsNullOrEmpty(parsed.Password))
-						return x.ConnectionString;
-					parsed.Password = hiddenPassword;
-					return parsed.ToString();
-				},
-				() =>
-				{
-					var parsed = new NpgsqlConnectionStringBuilder(x.ConnectionString);
-					if (string.IsNullOrEmpty(parsed.Password))
-						return x.ConnectionString;
-					parsed.Password = hiddenPassword;
-					return parsed.ToString();
-				},
-				() =>
-				{
-#if Redis
-					var parsed = StackExchange.Redis.ConfigurationOptions.Parse(x.ConnectionString);
-					if (parsed.Password != null)
-						parsed.Password = hiddenPassword;
-					return parsed.ToString();
-#else
+	private static string hidePassword(StoredConfiguration x)
+	{
+		const string hiddenPassword = "******";
+		return x.ConnectionString.ToDbSelector().PickFunc(
+			() =>
+			{
+				var parsed = new SqlConnectionStringBuilder(x.ConnectionString);
+				if (string.IsNullOrEmpty(parsed.Password))
 					return x.ConnectionString;
+				parsed.Password = hiddenPassword;
+				return parsed.ToString();
+			},
+			() =>
+			{
+				var parsed = new NpgsqlConnectionStringBuilder(x.ConnectionString);
+				if (string.IsNullOrEmpty(parsed.Password))
+					return x.ConnectionString;
+				parsed.Password = hiddenPassword;
+				return parsed.ToString();
+			},
+			() =>
+			{
+#if Redis
+				var parsed = StackExchange.Redis.ConfigurationOptions.Parse(x.ConnectionString);
+				if (parsed.Password != null)
+					parsed.Password = hiddenPassword;
+				return parsed.ToString();
+#else
+				return x.ConnectionString;
 #endif
-				});
-		}
+			});
 	}
 }

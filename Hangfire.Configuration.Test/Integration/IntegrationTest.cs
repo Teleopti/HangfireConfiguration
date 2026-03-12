@@ -1,17 +1,13 @@
 using System;
 using Hangfire.Configuration.Test.Infrastructure;
 using NUnit.Framework;
-using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Integration;
 
 [Parallelizable(ParallelScope.None)]
-public class IntegrationTest : DatabaseTest
+public class IntegrationTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
-	public IntegrationTest(string connectionString) : base(connectionString)
-	{
-	}
-
 	[Test]
 	public void ShouldStartServerWithWorkers()
 	{

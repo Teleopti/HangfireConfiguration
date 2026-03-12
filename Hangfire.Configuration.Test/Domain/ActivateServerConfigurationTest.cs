@@ -1,46 +1,45 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class ActivateServerConfigurationTest
 {
-	public class ActivateServerConfigurationTest
+	[Test]
+	public void ShouldBeInactiveWhenCreated()
 	{
-		[Test]
-		public void ShouldBeInactiveWhenCreated()
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
 		{
-			var system = new SystemUnderTest();
+			Server = "AwesomeServer",
+			Database = "TestDatabase",
+			User = "testUser",
+			Password = "awesomePassword",
+			SchemaCreatorUser = "createUser",
+			SchemaCreatorPassword = "createPassword",
+			SchemaName = "awesomeSchema"
+		});
 
-			system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
-			{
-				Server = "AwesomeServer",
-				Database = "TestDatabase",
-				User = "testUser",
-				Password = "awesomePassword",
-				SchemaCreatorUser = "createUser",
-				SchemaCreatorPassword = "createPassword",
-				SchemaName = "awesomeSchema"
-			});
+		var storedConfiguration = system.Configurations().Last();
+		Assert.AreEqual(false, storedConfiguration.Active);
+	}
 
-			var storedConfiguration = system.Configurations().Last();
-			Assert.AreEqual(false, storedConfiguration.Active);
-		}
-
-		[Test]
-		public void ShouldActivate()
+	[Test]
+	public void ShouldActivate()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Id = 1,
-				ConnectionString = "connectionString",
-				SchemaName = "awesomeSchema",
-				Active = false
-			});
+			Id = 1,
+			ConnectionString = "connectionString",
+			SchemaName = "awesomeSchema",
+			Active = false
+		});
 
-			system.ConfigurationApi().ActivateServer(1);
+		system.ConfigurationApi().ActivateServer(1);
 
-			var storedConfiguration = system.Configurations().Single();
-			Assert.AreEqual(true, storedConfiguration.Active);
-		}
+		var storedConfiguration = system.Configurations().Single();
+		Assert.AreEqual(true, storedConfiguration.Active);
 	}
 }
