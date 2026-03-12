@@ -8,13 +8,16 @@ internal class ConfigurationUpdater
 {
 	private readonly ConfigurationStorage _storage;
 	private readonly State _state;
+	private readonly INow _now;
 
 	internal ConfigurationUpdater(
 		ConfigurationStorage storage, 
-		State state)
+		State state,
+		INow now)
 	{
 		_storage = storage;
 		_state = state;
+		_now = now;
 	}
 
 	public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> stored)
@@ -34,7 +37,7 @@ internal class ConfigurationUpdater
 		{
 			_storage.LockConfiguration();
 			var @fixed = fixExistingConfigurations();
-			if (updateConfigurationsEnabled(options))
+			if (haveExternalConfigurations(options))
 				isUpdated = runConfigurationUpdates(received);
 			isUpdated = @fixed || isUpdated;
 		});
@@ -66,28 +69,41 @@ internal class ConfigurationUpdater
 
 	private bool fixExistingConfigurations()
 	{
-		var stored = _storage.ReadConfigurations();
+		var configurations = _storage.ReadConfigurations();
+		var @fixed = new List<StoredConfiguration>();
 
-		var ordered = stored.OrderBy(x => x.Id).ToArray();
-
-		var legacyConfiguration = ordered.FirstOrDefault(isLegacy);
+		var legacyConfiguration = configurations.FirstOrDefault(isLegacy);
 		if (legacyConfiguration != null)
 		{
 			legacyConfiguration.Name ??= DefaultConfigurationName.Name();
 			legacyConfiguration.Active ??= true;
-			_storage.WriteConfiguration(legacyConfiguration);
-			return true;
+			@fixed.Add(legacyConfiguration);
 		}
-
-		var markedConfiguration = ordered.FirstOrDefault(isMarked);
-		if (markedConfiguration != null)
+		else
 		{
-			markedConfiguration.Name = DefaultConfigurationName.Name();
-			_storage.WriteConfiguration(markedConfiguration);
-			return true;
+			var markedConfiguration = configurations.FirstOrDefault(isAutoUpdateMarked);
+			if (markedConfiguration != null)
+			{
+				markedConfiguration.Name = DefaultConfigurationName.Name();
+				@fixed.Add(markedConfiguration);
+			}
 		}
 
-		return false;
+		var shutdown = configurations
+			.Where(x => !x.IsActive() && x.ShutdownAt == null)
+			.ToArray();
+		foreach(var shutdownConfiguration in shutdown)
+		{
+			shutdownConfiguration.ShutdownAt = _now.UtcDateTime().AddDays(1);
+			@fixed.Add(shutdownConfiguration);
+		}
+
+		@fixed.Distinct().ForEach(x =>
+		{
+			_storage.WriteConfiguration(x);
+		});
+		
+		return @fixed.Any();
 	}
 
 	private bool runConfigurationUpdates(IEnumerable<UpdateStorageConfiguration> received)
@@ -116,7 +132,7 @@ internal class ConfigurationUpdater
 		return true;
 	}
 
-	private static bool updateConfigurationsEnabled(ConfigurationOptions options)
+	private static bool haveExternalConfigurations(ConfigurationOptions options)
 	{
 		if (options.UpdateConfigurations?.Any() ?? false)
 			return true;
@@ -126,7 +142,7 @@ internal class ConfigurationUpdater
 	private static bool isLegacy(StoredConfiguration configuration) =>
 		configuration.ConnectionString == null;
 
-	private static bool isMarked(StoredConfiguration configuration)
+	private static bool isAutoUpdateMarked(StoredConfiguration configuration)
 	{
 		var applicationName = configuration.ConnectionString.ApplicationName();
 		if (applicationName == null)

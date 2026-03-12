@@ -13,7 +13,7 @@ public class ConfigurationStorage
 	{
 		_store = store;
 	}
-		
+
 	public void Transaction(Action action)
 	{
 		_store.Transaction(action);
@@ -45,7 +45,7 @@ public class ConfigurationStorage
 			_store.Write($"Configuration:{configuration.Id}", JsonConvert.SerializeObject(configuration));
 		}
 	}
-		
+
 	public void DeleteConfiguration(StoredConfiguration configuration)
 	{
 		_store.Delete($"Configuration:{configuration.Id}");

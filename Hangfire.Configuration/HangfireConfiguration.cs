@@ -85,13 +85,22 @@ public class HangfireConfiguration
 		BuildOptions();
 		
 		
-	private StateMaintainer builderStateMaintainer(object appBuilder) =>
-		new(BuildHangfire(appBuilder), BuildConfigurationStorage(),
-			buildConfigurationUpdater(), _state);
+	private StateMaintainer builderStateMaintainer(object appBuilder) => new(
+		BuildHangfire(appBuilder), 
+		BuildConfigurationStorage(),
+		buildConfigurationUpdater(), 
+		_state,
+		BuildNow());
 
-	private ConfigurationUpdater buildConfigurationUpdater() => new(BuildConfigurationStorage(), _state);
+	private ConfigurationUpdater buildConfigurationUpdater() => new(
+		BuildConfigurationStorage(), 
+		_state,
+		BuildNow());
 
-	private Connector buildConnector() => new() {ConnectionString = _state.ReadOptions().ConnectionString};
+	private Connector buildConnector() => new()
+	{
+		ConnectionString = _state.ReadOptions().ConnectionString
+	};
 
 	private WorkerBalancer buildWorkerDeterminer() => new(BuildKeyValueStore());
 
@@ -107,8 +116,11 @@ public class HangfireConfiguration
 	protected Options BuildOptions() => new(_state);
 
 	protected WorkerServerStarter BuildWorkerServerStarter() =>
-		new(BuildHangfire(_builder), buildWorkerDeterminer(),
-			builderStateMaintainer(_builder), _state, buildServerCountSampleRecorder());
+		new(BuildHangfire(_builder), 
+			buildWorkerDeterminer(),
+			builderStateMaintainer(_builder), 
+			_state, 
+			buildServerCountSampleRecorder());
 
 	protected PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(null), _state);
 

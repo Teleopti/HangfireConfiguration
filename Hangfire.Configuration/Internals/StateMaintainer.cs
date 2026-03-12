@@ -9,17 +9,20 @@ internal class StateMaintainer
 	private readonly ConfigurationStorage _storage;
 	private readonly ConfigurationUpdater _configurationUpdater;
 	private readonly State _state;
+	private readonly INow _now;
 
 	internal StateMaintainer(
 		IHangfire hangfire,
 		ConfigurationStorage storage,
 		ConfigurationUpdater configurationUpdater,
-		State state)
+		State state,
+		INow now)
 	{
 		_hangfire = hangfire;
 		_storage = storage;
 		_configurationUpdater = configurationUpdater;
 		_state = state;
+		_now = now;
 	}
 
 	public void Refresh() =>
@@ -105,7 +108,8 @@ internal class StateMaintainer
 			configuration,
 			connectionString,
 			schemaName,
-			() => _hangfire.MakeJobStorage(connectionString, options)
+			() => _hangfire.MakeJobStorage(connectionString, options),
+			_now
 		);
 	}
 

@@ -305,8 +305,9 @@ public class StartWorkerServersTest
 
 		system.WorkerServerStarter.Start(new Worker());
 
-		Assert.IsEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == @"Data Source=.;Initial Catalog=inactive;")
-			.backgroundProcesses);
+		system.Hangfire.StartedServers
+			.Single(x => x.storage.ConnectionString == @"Data Source=.;Initial Catalog=inactive;").backgroundProcesses
+			.Should().Be.Empty();
 		system.Hangfire.StartedServers
 			.Single(x => x.storage.ConnectionString == @"Data Source=.;Initial Catalog=active;").backgroundProcesses
 			.Should().Not.Be.Empty();

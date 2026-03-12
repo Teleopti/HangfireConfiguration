@@ -15,12 +15,14 @@ internal class ConfigurationState
 		StoredConfiguration configuration,
 		string connectionString,
 		string schemaName,
-		Func<JobStorage> jobStorageCreator
+		Func<JobStorage> jobStorageCreator,
+		INow now
 	)
 	{
 		Configuration = configuration;
 		ConnectionString = connectionString;
 		SchemaName = schemaName;
+		_now = now;
 		_jobStorage = new Lazy<JobStorage>(jobStorageCreator, LazyThreadSafetyMode.ExecutionAndPublication);
 		_backgroundJobClient = new Lazy<IBackgroundJobClient>(() => new BackgroundJobClient(JobStorage), LazyThreadSafetyMode.ExecutionAndPublication);
 		_recurringJobManager = new Lazy<IRecurringJobManager>(() => new RecurringJobManager(JobStorage), LazyThreadSafetyMode.ExecutionAndPublication);
@@ -35,6 +37,7 @@ internal class ConfigurationState
 	internal StoredConfiguration Configuration;
 	internal readonly string ConnectionString;
 	internal readonly string SchemaName;
+	private readonly INow _now;
 	internal JobStorage JobStorage => _jobStorage.Value;
 	internal IBackgroundJobClient BackgroundJobClient => _backgroundJobClient.Value;
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
@@ -45,4 +48,14 @@ internal class ConfigurationState
 
 	internal bool WorkerBalancerIsEnabled() => 
 		Configuration.WorkerBalancerIsEnabled();
+
+	internal bool IsShutdown()
+	{
+		if (Configuration.Active.GetValueOrDefault())
+			return false;
+		var shutdownAt = Configuration.ShutdownAt;
+		if (shutdownAt == null)
+			return false;
+		return _now.UtcDateTime() >= shutdownAt.Value;
+	}
 }

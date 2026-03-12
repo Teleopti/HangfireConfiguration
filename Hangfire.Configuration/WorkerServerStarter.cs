@@ -41,8 +41,13 @@ public class WorkerServerStarter
 
 		_stateMaintainer.Refresh();
 		_state.Configurations
+			.Where(x => !x.IsShutdown())
 			.OrderBy(x => !x.IsPublisher())
-			.ForEach(x => { startWorkerServer(x, options, serverOptions, backgroundProcesses); });
+			.ForEach(x =>
+			{
+				//
+				startWorkerServer(x, options, serverOptions, backgroundProcesses);
+			});
 	}
 
 	private void startWorkerServer(

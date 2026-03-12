@@ -1,3 +1,4 @@
+using System;
 using Hangfire.Configuration.Providers;
 
 namespace Hangfire.Configuration;
@@ -9,6 +10,7 @@ public class StoredConfiguration
 	public string ConnectionString { get; set; }
 	public string SchemaName { get; set; }
 	public bool? Active { get; set; }
+	public DateTime? ShutdownAt { get; set; }
 	
 	public bool? WorkerBalancerEnabled { get; set; }
 	public int? GoalWorkerCount { get; set; }
