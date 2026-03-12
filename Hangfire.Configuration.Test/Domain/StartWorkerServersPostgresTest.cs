@@ -7,356 +7,355 @@ using Hangfire.Server;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class StartWorkerServersPostgresTest
 {
-    public class StartWorkerServersPostgresTest
-    {
-        [Test]
-        public void ShouldStartServer()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldStartServer()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            system.Hangfire.StartedServers
-	            .Should().Not.Be.Empty();
-        }
+		system.Hangfire.StartedServers
+			.Should().Not.Be.Empty();
+	}
 
-        [Test]
-        public void ShouldPassServerOptionsToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
-            var serverOptions = new BackgroundJobServerOptions
-            {
-                Queues = new[] {"queue1", "queue2"},
-                ServerTimeout = new TimeSpan(20),
-                HeartbeatInterval = new TimeSpan(30),
-                ShutdownTimeout = new TimeSpan(40),
-                ServerCheckInterval = new TimeSpan(50),
-                CancellationCheckInterval = new TimeSpan(60),
-                SchedulePollingInterval = new TimeSpan(70),
-                StopTimeout = new TimeSpan(80),
-                Activator = new JobActivator(),
-                FilterProvider = new JobFilterCollection(),
-                TaskScheduler = TaskScheduler.Current,
-                TimeZoneResolver = new DefaultTimeZoneResolver()
-            };
+	[Test]
+	public void ShouldPassServerOptionsToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+		var serverOptions = new BackgroundJobServerOptions
+		{
+			Queues = new[] {"queue1", "queue2"},
+			ServerTimeout = new TimeSpan(20),
+			HeartbeatInterval = new TimeSpan(30),
+			ShutdownTimeout = new TimeSpan(40),
+			ServerCheckInterval = new TimeSpan(50),
+			CancellationCheckInterval = new TimeSpan(60),
+			SchedulePollingInterval = new TimeSpan(70),
+			StopTimeout = new TimeSpan(80),
+			Activator = new JobActivator(),
+			FilterProvider = new JobFilterCollection(),
+			TaskScheduler = TaskScheduler.Current,
+			TimeZoneResolver = new DefaultTimeZoneResolver()
+		};
 
-            system.UseServerOptions(serverOptions);
-            system.WorkerServerStarter.Start();
+		system.UseServerOptions(serverOptions);
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
-            Assert.AreEqual(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
-            Assert.AreEqual(serverOptions.HeartbeatInterval,
-                system.Hangfire.StartedServers.Single().options.HeartbeatInterval);
-            Assert.AreEqual(serverOptions.ShutdownTimeout,
-                system.Hangfire.StartedServers.Single().options.ShutdownTimeout);
-            Assert.AreEqual(serverOptions.ServerCheckInterval,
-                system.Hangfire.StartedServers.Single().options.ServerCheckInterval);
-            Assert.AreEqual(serverOptions.CancellationCheckInterval,
-                system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
-            Assert.AreEqual(serverOptions.SchedulePollingInterval,
-                system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
-            Assert.AreEqual(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
-        }
+		Assert.AreEqual(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
+		Assert.AreEqual(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
+		Assert.AreEqual(serverOptions.HeartbeatInterval,
+			system.Hangfire.StartedServers.Single().options.HeartbeatInterval);
+		Assert.AreEqual(serverOptions.ShutdownTimeout,
+			system.Hangfire.StartedServers.Single().options.ShutdownTimeout);
+		Assert.AreEqual(serverOptions.ServerCheckInterval,
+			system.Hangfire.StartedServers.Single().options.ServerCheckInterval);
+		Assert.AreEqual(serverOptions.CancellationCheckInterval,
+			system.Hangfire.StartedServers.Single().options.CancellationCheckInterval);
+		Assert.AreEqual(serverOptions.SchedulePollingInterval,
+			system.Hangfire.StartedServers.Single().options.SchedulePollingInterval);
+		Assert.AreEqual(serverOptions.StopTimeout, system.Hangfire.StartedServers.Single().options.StopTimeout);
+	}
 
-        [Test]
-        public void ShouldPassNullServerNameToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldPassNullServerNameToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
-            system.WorkerServerStarter.Start();
+		system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
+		system.WorkerServerStarter.Start();
 
-            Assert.Null(system.Hangfire.StartedServers.Single().options.ServerName);
-        }
+		Assert.Null(system.Hangfire.StartedServers.Single().options.ServerName);
+	}
 
-        [Test]
-        public void ShouldPassAppBuilderToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldPassAppBuilderToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            system.Hangfire.StartedServers.Single().builder
-	            .Should().Be.SameInstanceAs(system.ApplicationBuilder);
-        }
+		system.Hangfire.StartedServers.Single().builder
+			.Should().Be.SameInstanceAs(system.ApplicationBuilder);
+	}
 
-        [Test]
-        public void ShouldPassBackgroundProcessesToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
-            var backgroundProcess = new Worker();
+	[Test]
+	public void ShouldPassBackgroundProcessesToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+		var backgroundProcess = new Worker();
 
-            system.WorkerServerStarter.Start(backgroundProcess);
+		system.WorkerServerStarter.Start(backgroundProcess);
 
-            Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
-        }
+		Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
+	}
 
-        [Test]
-        public void ShouldStartTwoServers()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldStartTwoServers()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(2, system.Hangfire.StartedServers.Count());
-        }
+		Assert.AreEqual(2, system.Hangfire.StartedServers.Count());
+	}
 
-        [Test]
-        public void ShouldPassBackgroundProcessesToFirstServer()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldPassBackgroundProcessesToFirstServer()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start(new Worker());
+		system.WorkerServerStarter.Start(new Worker());
 
-            system.Hangfire.StartedServers.First().backgroundProcesses
-	            .Should().Not.Be.Empty();
-            Assert.IsEmpty(system.Hangfire.StartedServers.Last().backgroundProcesses);
-        }
+		system.Hangfire.StartedServers.First().backgroundProcesses
+			.Should().Not.Be.Empty();
+		Assert.IsEmpty(system.Hangfire.StartedServers.Last().backgroundProcesses);
+	}
 
-        [Test]
-        public void ShouldConstructHangfireStorage()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration());
+	[Test]
+	public void ShouldConstructHangfireStorage()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration());
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.NotNull(system.Hangfire.StartedServers.Single().storage);
-        }
+		Assert.NotNull(system.Hangfire.StartedServers.Single().storage);
+	}
 
-        [Test]
-        public void ShouldConstructSqlHangfireStorage()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=fakedb;"});
+	[Test]
+	public void ShouldConstructSqlHangfireStorage()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=fakedb;"});
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(@"Host=localhost;Database=fakedb;", system.Hangfire.StartedServers.Single().storage.ConnectionString);
-        }
+		Assert.AreEqual(@"Host=localhost;Database=fakedb;", system.Hangfire.StartedServers.Single().storage.ConnectionString);
+	}
 
-        [Test]
-        public void ShouldConstructSqlHangfireStorageWithOptions()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
+	[Test]
+	public void ShouldConstructSqlHangfireStorageWithOptions()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration { ConnectionString = @"Host=localhost;Database=fakedb;" });
 
-            system.UseStorageOptions(new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
-            system.WorkerServerStarter.Start();
+		system.UseStorageOptions(new PostgreSqlStorageOptions { PrepareSchemaIfNecessary = false});
+		system.WorkerServerStarter.Start();
 
-            Assert.False(system.Hangfire.StartedServers.Single().storage.PostgresOptions.PrepareSchemaIfNecessary);
-        }
+		Assert.False(system.Hangfire.StartedServers.Single().storage.PostgresOptions.PrepareSchemaIfNecessary);
+	}
 
-        [Test]
-        public void ShouldUseSchemaNameFromConfiguration()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            SchemaName = "SchemaName", 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
+	[Test]
+	public void ShouldUseSchemaNameFromConfiguration()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "SchemaName", 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
 
-            system.UseStorageOptions(new PostgreSqlStorageOptions { SchemaName = "Ignored" });
-            system.WorkerServerStarter.Start();
+		system.UseStorageOptions(new PostgreSqlStorageOptions { SchemaName = "Ignored" });
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
-        }
+		Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
+	}
 
-        [Test]
-        public void ShouldUseSchemaNameFromConfiguration2()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            SchemaName = "SchemaName", 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
+	[Test]
+	public void ShouldUseSchemaNameFromConfiguration2()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "SchemaName", 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
-        }
+		Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
+	}
 
-        [Test]
-        public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            SchemaName = "SchemaName1", 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            SchemaName = "SchemaName2", 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
+	[Test]
+	public void ShouldUseSchemaNameFromConfigurationOfTwoServers()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "SchemaName1", 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "SchemaName2", 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual("SchemaName1", system.Hangfire.StartedServers.First().storage.PostgresOptions.SchemaName);
-            Assert.AreEqual("SchemaName2", system.Hangfire.StartedServers.Last().storage.PostgresOptions.SchemaName);
-        }
+		Assert.AreEqual("SchemaName1", system.Hangfire.StartedServers.First().storage.PostgresOptions.SchemaName);
+		Assert.AreEqual("SchemaName2", system.Hangfire.StartedServers.Last().storage.PostgresOptions.SchemaName);
+	}
 
-        [Test]
-        public void ShouldUseDefaultSchemaName()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {SchemaName = null, ConnectionString = @"Host=localhost;Database=fakedb;"});
+	[Test]
+	public void ShouldUseDefaultSchemaName()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {SchemaName = null, ConnectionString = @"Host=localhost;Database=fakedb;"});
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(DefaultSchemaName.Postgres(),
-                system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
-        }
+		Assert.AreEqual(DefaultSchemaName.Postgres(),
+			system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
+	}
 
-        [Test]
-        public void ShouldUseDefaultSchemaNameWhenEmpty()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {SchemaName = "", ConnectionString = @"Host=localhost;Database=fakedb;" });
+	[Test]
+	public void ShouldUseDefaultSchemaNameWhenEmpty()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {SchemaName = "", ConnectionString = @"Host=localhost;Database=fakedb;" });
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            Assert.AreEqual(DefaultSchemaName.Postgres(),
-                system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
-        }
+		Assert.AreEqual(DefaultSchemaName.Postgres(),
+			system.Hangfire.StartedServers.Single().storage.PostgresOptions.SchemaName);
+	}
 
-        [Test]
-        public void ShouldPassStorageOptionsToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            ConnectionString = @"Host=localhost"
-            });
-            var options = new PostgreSqlStorageOptions
-			{
-                QueuePollInterval = TimeSpan.FromSeconds(1.0),
-                DeleteExpiredBatchSize = 1,
-                JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
-                DistributedLockTimeout = TimeSpan.FromMinutes(5.0),
-                PrepareSchemaIfNecessary = !new PostgreSqlStorageOptions().PrepareSchemaIfNecessary,
-                EnableTransactionScopeEnlistment = true,
-                InvisibilityTimeout = TimeSpan.FromMinutes(7.0),
-                TransactionSynchronisationTimeout = TimeSpan.FromMinutes(4),
-				UseNativeDatabaseTransactions = true
-            };
-            system.UseStorageOptions(options);
+	[Test]
+	public void ShouldPassStorageOptionsToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = @"Host=localhost"
+		});
+		var options = new PostgreSqlStorageOptions
+		{
+			QueuePollInterval = TimeSpan.FromSeconds(1.0),
+			DeleteExpiredBatchSize = 1,
+			JobExpirationCheckInterval = TimeSpan.FromMinutes(4),
+			DistributedLockTimeout = TimeSpan.FromMinutes(5.0),
+			PrepareSchemaIfNecessary = !new PostgreSqlStorageOptions().PrepareSchemaIfNecessary,
+			EnableTransactionScopeEnlistment = true,
+			InvisibilityTimeout = TimeSpan.FromMinutes(7.0),
+			TransactionSynchronisationTimeout = TimeSpan.FromMinutes(4),
+			UseNativeDatabaseTransactions = true
+		};
+		system.UseStorageOptions(options);
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            var storage = system.Hangfire.StartedServers.Single().storage;
-            Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
-            Assert.AreEqual(options.DeleteExpiredBatchSize, storage.PostgresOptions.DeleteExpiredBatchSize);
-            Assert.AreEqual(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
-            Assert.AreEqual(options.DistributedLockTimeout, storage.PostgresOptions.DistributedLockTimeout);
-            Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
-            Assert.AreEqual(options.EnableTransactionScopeEnlistment, storage.PostgresOptions.EnableTransactionScopeEnlistment);
-            Assert.AreEqual(options.InvisibilityTimeout, storage.PostgresOptions.InvisibilityTimeout);
-            Assert.AreEqual(options.TransactionSynchronisationTimeout, storage.PostgresOptions.TransactionSynchronisationTimeout);
-            Assert.AreEqual(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
-		}
+		var storage = system.Hangfire.StartedServers.Single().storage;
+		Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
+		Assert.AreEqual(options.DeleteExpiredBatchSize, storage.PostgresOptions.DeleteExpiredBatchSize);
+		Assert.AreEqual(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
+		Assert.AreEqual(options.DistributedLockTimeout, storage.PostgresOptions.DistributedLockTimeout);
+		Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
+		Assert.AreEqual(options.EnableTransactionScopeEnlistment, storage.PostgresOptions.EnableTransactionScopeEnlistment);
+		Assert.AreEqual(options.InvisibilityTimeout, storage.PostgresOptions.InvisibilityTimeout);
+		Assert.AreEqual(options.TransactionSynchronisationTimeout, storage.PostgresOptions.TransactionSynchronisationTimeout);
+		Assert.AreEqual(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
+	}
 
-        [Test]
-        public void ShouldPassDefaultStorageOptionsToHangfire()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            ConnectionString = @"Host=localhost;Database=active;"
-            });
+	[Test]
+	public void ShouldPassDefaultStorageOptionsToHangfire()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = @"Host=localhost;Database=active;"
+		});
 
-            system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-            var options = new PostgreSqlStorageOptions();
-            var storage = system.Hangfire.StartedServers.Single().storage;
-			Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
-			Assert.AreEqual(options.DeleteExpiredBatchSize, storage.PostgresOptions.DeleteExpiredBatchSize);
-			Assert.AreEqual(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
-			Assert.AreEqual(options.DistributedLockTimeout, storage.PostgresOptions.DistributedLockTimeout);
-			Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
-			Assert.AreEqual(options.EnableTransactionScopeEnlistment, storage.PostgresOptions.EnableTransactionScopeEnlistment);
-			Assert.AreEqual(options.InvisibilityTimeout, storage.PostgresOptions.InvisibilityTimeout);
-			Assert.AreEqual(options.SchemaName, storage.PostgresOptions.SchemaName);
-			Assert.AreEqual(options.TransactionSynchronisationTimeout, storage.PostgresOptions.TransactionSynchronisationTimeout);
-			Assert.AreEqual(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
-		}
+		var options = new PostgreSqlStorageOptions();
+		var storage = system.Hangfire.StartedServers.Single().storage;
+		Assert.AreEqual(options.QueuePollInterval, storage.PostgresOptions.QueuePollInterval);
+		Assert.AreEqual(options.DeleteExpiredBatchSize, storage.PostgresOptions.DeleteExpiredBatchSize);
+		Assert.AreEqual(options.JobExpirationCheckInterval, storage.PostgresOptions.JobExpirationCheckInterval);
+		Assert.AreEqual(options.DistributedLockTimeout, storage.PostgresOptions.DistributedLockTimeout);
+		Assert.AreEqual(options.PrepareSchemaIfNecessary, storage.PostgresOptions.PrepareSchemaIfNecessary);
+		Assert.AreEqual(options.EnableTransactionScopeEnlistment, storage.PostgresOptions.EnableTransactionScopeEnlistment);
+		Assert.AreEqual(options.InvisibilityTimeout, storage.PostgresOptions.InvisibilityTimeout);
+		Assert.AreEqual(options.SchemaName, storage.PostgresOptions.SchemaName);
+		Assert.AreEqual(options.TransactionSynchronisationTimeout, storage.PostgresOptions.TransactionSynchronisationTimeout);
+		Assert.AreEqual(options.UseNativeDatabaseTransactions, storage.PostgresOptions.UseNativeDatabaseTransactions);
+	}
 
-        [Test]
-        public void ShouldPassBackgroundProcessesToActiveServer()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=inactive;" });
-            system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
+	[Test]
+	public void ShouldPassBackgroundProcessesToActiveServer()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=inactive;" });
+		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
 
-            system.WorkerServerStarter.Start(new Worker());
+		system.WorkerServerStarter.Start(new Worker());
 
-            Assert.IsEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == @"Host=localhost;Database=inactive;")
-                .backgroundProcesses);
-            system.Hangfire.StartedServers
-	            .Single(x => x.storage.ConnectionString == @"Host=localhost;Database=active;").backgroundProcesses
-	            .Should().Not.Be.Empty();
-        }
+		Assert.IsEmpty(system.Hangfire.StartedServers.Single(x => x.storage.ConnectionString == @"Host=localhost;Database=inactive;")
+			.backgroundProcesses);
+		system.Hangfire.StartedServers
+			.Single(x => x.storage.ConnectionString == @"Host=localhost;Database=active;").backgroundProcesses
+			.Should().Not.Be.Empty();
+	}
 
-        [Test]
-        public void ShouldGetGoalWorkerCountForTwoServers()
-        {
-            var system = new SystemUnderTest();
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            GoalWorkerCount = 20, 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
-            system.WithConfiguration(new StoredConfiguration
-            {
-	            GoalWorkerCount = 100, 
-	            ConnectionString = @"Host=localhost;Database=fakedb;"
-            });
+	[Test]
+	public void ShouldGetGoalWorkerCountForTwoServers()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			GoalWorkerCount = 20, 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			GoalWorkerCount = 100, 
+			ConnectionString = @"Host=localhost;Database=fakedb;"
+		});
 
-            system.UseOptions(new ConfigurationOptionsForTest());
-            system.WorkerServerStarter.Start();
+		system.UseOptions(new ConfigurationOptionsForTest());
+		system.WorkerServerStarter.Start();
 
-            var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
-            Assert.AreEqual(new[] {20, 100}, actual);
-        }
+		var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
+		Assert.AreEqual(new[] {20, 100}, actual);
+	}
 
-        [Test]
-        public void ShouldUseSchemaNameFromConfigurationOfTwoServersWithOptions()
-        {
-	        var system = new SystemUnderTest();
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        SchemaName = "schema1",
-		        ConnectionString = "Host=localhost"
-	        });
-	        system.WithConfiguration(new StoredConfiguration
-	        {
-		        SchemaName = "schema2",
-		        ConnectionString = "Host=localhost"
-	        });
+	[Test]
+	public void ShouldUseSchemaNameFromConfigurationOfTwoServersWithOptions()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "schema1",
+			ConnectionString = "Host=localhost"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "schema2",
+			ConnectionString = "Host=localhost"
+		});
 
-	        system.UseStorageOptions(new PostgreSqlStorageOptions{DistributedLockTimeout = TimeSpan.FromMinutes(1)});
-	        system.WorkerServerStarter.Start();
+		system.UseStorageOptions(new PostgreSqlStorageOptions{DistributedLockTimeout = TimeSpan.FromMinutes(1)});
+		system.WorkerServerStarter.Start();
 
-	        var options1 = system.Hangfire.StartedServers.First().storage.PostgresOptions;
-	        var options2 = system.Hangfire.StartedServers.Last().storage.PostgresOptions;
-	        options1.SchemaName.Should().Be.EqualTo("schema1");
-	        options1.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
-	        options2.SchemaName.Should().Be.EqualTo("schema2");
-	        options2.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
-        }
-    }
+		var options1 = system.Hangfire.StartedServers.First().storage.PostgresOptions;
+		var options2 = system.Hangfire.StartedServers.Last().storage.PostgresOptions;
+		options1.SchemaName.Should().Be.EqualTo("schema1");
+		options1.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
+		options2.SchemaName.Should().Be.EqualTo("schema2");
+		options2.DistributedLockTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(1));
+	}
 }

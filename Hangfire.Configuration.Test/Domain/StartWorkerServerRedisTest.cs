@@ -5,83 +5,82 @@ using Hangfire.Pro.Redis;
 using NUnit.Framework;
 using SharpTestsEx;
 
-namespace Hangfire.Configuration.Test.Domain
+namespace Hangfire.Configuration.Test.Domain;
+
+public class StartWorkerServerRedisTest
 {
-	public class StartWorkerServerRedisTest
+	[Test]
+	public void ShouldUseRedisOptions()
 	{
-		[Test]
-		public void ShouldUseRedisOptions()
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = "something"});
+
+		system.WorkerServerStarter.Start();
+
+		system.Hangfire.StartedServers.Single().storage.Options
+			.Should().Be.OfType<RedisStorageOptions>();
+	}
+
+	[Test]
+	public void ShouldUseProvidedRedisOptions()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = "redis"});
+		var options = new RedisStorageOptions
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration {ConnectionString = "something"});
+			MultiplexerPoolSize = 1,
+			Database = 42,
+			InvisibilityTimeout = TimeSpan.FromMinutes(11),
+			MaxSucceededListLength = 22,
+			MaxDeletedListLength = 33,
+			MaxStateHistoryLength = 44,
+			CheckCertificateRevocation = false
+		};
+		system.UseStorageOptions(options);
 
-			system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-			system.Hangfire.StartedServers.Single().storage.Options
-				.Should().Be.OfType<RedisStorageOptions>();
-		}
-
-		[Test]
-		public void ShouldUseProvidedRedisOptions()
-		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration {ConnectionString = "redis"});
-			var options = new RedisStorageOptions
-			{
-				MultiplexerPoolSize = 1,
-				Database = 42,
-				InvisibilityTimeout = TimeSpan.FromMinutes(11),
-				MaxSucceededListLength = 22,
-				MaxDeletedListLength = 33,
-				MaxStateHistoryLength = 44,
-				CheckCertificateRevocation = false
-			};
-			system.UseStorageOptions(options);
-
-			system.WorkerServerStarter.Start();
-
-			var actual = system.Hangfire.StartedServers.Single().storage.RedisOptions();
-			actual.Should().Not.Be.SameInstanceAs(options);
-			actual.MultiplexerPoolSize.Should().Be.EqualTo(1);
-			actual.Database.Should().Be.EqualTo(42);
-			actual.InvisibilityTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(11));
-			actual.MaxSucceededListLength.Should().Be.EqualTo(22);
-			actual.MaxDeletedListLength.Should().Be.EqualTo(33);
-			actual.MaxStateHistoryLength.Should().Be.EqualTo(44);
-			actual.CheckCertificateRevocation.Should().Be.EqualTo(false);
-		}
+		var actual = system.Hangfire.StartedServers.Single().storage.RedisOptions();
+		actual.Should().Not.Be.SameInstanceAs(options);
+		actual.MultiplexerPoolSize.Should().Be.EqualTo(1);
+		actual.Database.Should().Be.EqualTo(42);
+		actual.InvisibilityTimeout.Should().Be.EqualTo(TimeSpan.FromMinutes(11));
+		actual.MaxSucceededListLength.Should().Be.EqualTo(22);
+		actual.MaxDeletedListLength.Should().Be.EqualTo(33);
+		actual.MaxStateHistoryLength.Should().Be.EqualTo(44);
+		actual.CheckCertificateRevocation.Should().Be.EqualTo(false);
+	}
 		
-		[Test]
-		public void ShouldUseSchemaNameFromConfigurationAsPrefix()
+	[Test]
+	public void ShouldUseSchemaNameFromConfigurationAsPrefix()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Active = true, 
-				SchemaName = "myprefix:",
-				ConnectionString = "redis-gurka"
-			});
+			Active = true, 
+			SchemaName = "myprefix:",
+			ConnectionString = "redis-gurka"
+		});
 
-			system.PublisherStarter.Start();
+		system.PublisherStarter.Start();
 
-			Assert.AreEqual("myprefix:", system.Hangfire.CreatedStorages.Single().RedisOptions().Prefix);
-		}
+		Assert.AreEqual("myprefix:", system.Hangfire.CreatedStorages.Single().RedisOptions().Prefix);
+	}
 		
-		[Test]
-		public void ShouldUseDefaultPrefix()
+	[Test]
+	public void ShouldUseDefaultPrefix()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
 		{
-			var system = new SystemUnderTest();
-			system.WithConfiguration(new StoredConfiguration
-			{
-				Active = true,
-				SchemaName = null, 
-				ConnectionString =  "redis-gurka"
-			});
+			Active = true,
+			SchemaName = null, 
+			ConnectionString =  "redis-gurka"
+		});
 
-			system.WorkerServerStarter.Start();
+		system.WorkerServerStarter.Start();
 
-			system.Hangfire.StartedServers.Single().storage.RedisOptions().Prefix
-				.Should().Be.EqualTo(new RedisStorageOptions().Prefix);
-		}
+		system.Hangfire.StartedServers.Single().storage.RedisOptions().Prefix
+			.Should().Be.EqualTo(new RedisStorageOptions().Prefix);
 	}
 }
