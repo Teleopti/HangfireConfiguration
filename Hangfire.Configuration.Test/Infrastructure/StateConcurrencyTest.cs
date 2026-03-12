@@ -1,14 +1,17 @@
 using System.Linq;
+using DbAgnostic;
 using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class StateConcurrencyTest : DatabaseTest
+public class StateConcurrencyTest(string connectionString) : 
+	DatabaseTest(connectionString)
 {
 	[Test]
 	public void ShouldReturnCorrectNumberOfWorkServersConcurrently()
 	{
-		const int storageCount = 500;
+		// 500 takes 5 min on postgres for some reason
+		var storageCount = connectionString.PickDialect(500, 10);
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 		Enumerable.Range(1, storageCount)
@@ -47,9 +50,5 @@ public class StateConcurrencyTest : DatabaseTest
 			})
 			.Times(100)
 			.Wait();
-	}
-
-	public StateConcurrencyTest(string connectionString) : base(connectionString)
-	{
 	}
 }
