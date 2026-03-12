@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using Hangfire.Dashboard;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
@@ -31,7 +33,16 @@ namespace Hangfire.Configuration.Test
 					webHost.Configure(app =>
 					{
 						app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
+						
 						app.UseHangfireConfigurationUI(_urlPathMatch, null);
+						
+						var dashboardOptions = new DashboardOptions
+						{
+							Authorization = Enumerable.Empty<IDashboardAuthorizationFilter>(),
+							AsyncAuthorization = Enumerable.Empty<IDashboardAsyncAuthorizationFilter>(),
+							IgnoreAntiforgeryToken = true
+						};
+						app.UseDynamicHangfireDashboards("/HangfireDashboard", null, dashboardOptions);
 					});
 				})
 				.StartAsync()

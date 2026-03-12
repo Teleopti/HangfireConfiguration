@@ -6,19 +6,12 @@ using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class ServerCountCalculator
+internal class ServerCountCalculator(IKeyValueStore store)
 {
-	private readonly IKeyValueStore _store;
-        
 	private static readonly Policy _retry = Policy.Handle<SqlException>(DetectTransientSqlException.IsTransient)
 		.OrInner<SqlException>(DetectTransientSqlException.IsTransient)
 		.WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
 
-	public ServerCountCalculator(IKeyValueStore store)
-	{
-		_store = store;
-	}
-        
 	public int ServerCount(IMonitoringApi monitor, WorkerBalancerOptions options)
 	{
 		var serverCount = readServerCount(monitor, options);
@@ -52,7 +45,7 @@ internal class ServerCountCalculator
 
 	private int? serverCountFromSamples()
 	{
-		var samples = _store
+		var samples = store
 			.ServerCountSamples()
 			.Samples
 			.Where(s => s.Count != 0)

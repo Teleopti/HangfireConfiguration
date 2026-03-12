@@ -1,5 +1,6 @@
 ﻿#if NETSTANDARD2_0
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,15 +15,25 @@ public class DynamicHangfireDashboardsMiddleware
 	private readonly HangfireConfiguration _configuration;
 	private readonly DashboardOptions _dashboardOptions;
 
-	internal DynamicHangfireDashboardsMiddleware(
-		RequestDelegate next,
-		ConfigurationOptions options,
-		DashboardOptions dashboardOptions)
+	public DynamicHangfireDashboardsMiddleware(
+			RequestDelegate next,
+			IDictionary<string, object> properties)
 	{
 		_next = next;
-		_dashboardOptions = dashboardOptions;
-		_configuration = new HangfireConfiguration();
-		_configuration.UseOptions(options);
+
+		var injected = properties?.ContainsKey("HangfireConfiguration") ?? false;
+		if (injected)
+		{
+			_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
+		}
+		else
+		{
+			_configuration = new HangfireConfiguration();
+			var options = (ConfigurationOptions) properties["HangfireConfigurationOptions"];
+			_configuration.UseOptions(options);
+		}
+
+		_dashboardOptions = (DashboardOptions) properties["HangfireDashboardOptions"];
 	}
 
 	public async Task Invoke(HttpContext context)

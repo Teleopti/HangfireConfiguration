@@ -7,7 +7,10 @@ namespace Hangfire.Configuration;
 
 public static class ApplicationBuilderExtension
 {
-	public static void UseHangfireConfigurationUI(this IApplicationBuilder builder, string pathMatch, ConfigurationOptions options)
+	public static void UseHangfireConfigurationUI(
+		this IApplicationBuilder builder, 
+		string pathMatch, 
+		ConfigurationOptions options)
 	{
 		builder.Map(pathMatch, subApp =>
 		{
@@ -30,10 +33,9 @@ public static class ApplicationBuilderExtension
 	{
 		builder.Map(pathMatch, subApp =>
 		{
-			subApp.UseMiddleware<DynamicHangfireDashboardsMiddleware>(
-				options,
-				dashboardOptions
-			);
+			builder.Properties["HangfireConfigurationOptions"] = options;
+			builder.Properties["HangfireDashboardOptions"] = dashboardOptions;
+			subApp.UseMiddleware<DynamicHangfireDashboardsMiddleware>(builder.Properties);
 		});
 	}
 }
