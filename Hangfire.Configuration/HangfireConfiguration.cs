@@ -102,7 +102,7 @@ public class HangfireConfiguration
 		ConnectionString = _state.ReadOptions().ConnectionString
 	};
 
-	private WorkerBalancer buildWorkerDeterminer() => new(BuildKeyValueStore());
+	private WorkerBalancer buildWorkerBalancer() => new(BuildKeyValueStore());
 
 	protected ServerCountSampleRecorder buildServerCountSampleRecorder() =>
 		new(
@@ -117,7 +117,7 @@ public class HangfireConfiguration
 
 	protected WorkerServerStarter BuildWorkerServerStarter() =>
 		new(BuildHangfire(_builder), 
-			buildWorkerDeterminer(),
+			buildWorkerBalancer(),
 			builderStateMaintainer(_builder), 
 			_state, 
 			buildServerCountSampleRecorder());

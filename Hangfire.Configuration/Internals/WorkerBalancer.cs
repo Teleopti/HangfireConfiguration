@@ -12,7 +12,7 @@ internal class WorkerBalancer
 		_serverCountCalculator = new ServerCountCalculator(store);
 	}
 
-	internal int DetermineWorkerCount(
+	internal int CalculateWorkerCount(
 		IMonitoringApi monitor,
 		StoredConfiguration configuration,
 		WorkerBalancerOptions options)

@@ -76,7 +76,7 @@ public class WorkerServerStarter
 			return;
 
 		serverOptions.WorkerCount =
-			_workerBalancer.DetermineWorkerCount(
+			_workerBalancer.CalculateWorkerCount(
 				configurationState.MonitoringApi,
 				configurationState.Configuration,
 				options.WorkerBalancerOptions
