@@ -1,35 +1,34 @@
-﻿namespace Hangfire.Configuration.Test
+﻿namespace Hangfire.Configuration.Test;
+
+public class ConfigurationOptionsForTest : ConfigurationOptions
 {
-    public class ConfigurationOptionsForTest : ConfigurationOptions
+    public ConfigurationOptionsForTest()
     {
-	    public ConfigurationOptionsForTest()
-	    {
-		    ConnectionString = "unknown-storage";
-	    }
+        ConnectionString = "unknown-storage";
+    }
 
-        public int MinimumServerCount
-        {
-            set => WorkerBalancerOptions.MinimumServerCount = value;
-        }
+    public int MinimumServerCount
+    {
+        set => WorkerBalancerOptions.MinimumServerCount = value;
+    }
 
-        public bool UseServerCountSampling
-        {
-            set => WorkerBalancerOptions.UseServerCountSampling = value;
-        }
+    public bool UseServerCountSampling
+    {
+        set => WorkerBalancerOptions.UseServerCountSampling = value;
+    }
 
-        public int MaximumGoalWorkerCount
-        {
-            set => WorkerBalancerOptions.MaximumGoalWorkerCount = value;
-        }
+    public int MaximumGoalWorkerCount
+    {
+        set => WorkerBalancerOptions.MaximumGoalWorkerCount = value;
+    }
 
-        public int DefaultGoalWorkerCount
-        {
-            set => WorkerBalancerOptions.DefaultGoalWorkerCount = value;
-        }
+    public int DefaultGoalWorkerCount
+    {
+        set => WorkerBalancerOptions.DefaultGoalWorkerCount = value;
+    }
 
-        public int MinimumWorkerCount
-        {
-            set => WorkerBalancerOptions.MinimumWorkerCount = value;
-        }
+    public int MinimumWorkerCount
+    {
+        set => WorkerBalancerOptions.MinimumWorkerCount = value;
     }
 }
