@@ -218,7 +218,11 @@ public class StartWorkerServersTest
 	public void ShouldUseDefaultSchemaNameWhenEmpty()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {SchemaName = "", ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
+		system.WithConfiguration(new StoredConfiguration
+		{
+			SchemaName = "", 
+			ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;"
+		});
 
 		system.WorkerServerStarter.Start();
 
