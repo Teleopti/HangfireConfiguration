@@ -35,9 +35,9 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name(),
@@ -68,9 +68,9 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name(),

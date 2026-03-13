@@ -14,13 +14,13 @@ public class WorkerBalancerTest
 		system.WorkerServerStarter.Start(
 			new ConfigurationOptions
 			{
-				UpdateConfigurations = new[]
-				{
-					new UpdateStorageConfiguration
+				ExternalConfigurations =
+				[
+					new ExternalConfiguration
 					{
 						Name = DefaultConfigurationName.Name()
 					}
-				}
+				]
 			});
 
 		Assert.AreEqual(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -77,9 +77,9 @@ public class WorkerBalancerTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					Name = DefaultConfigurationName.Name()
 				}
@@ -171,9 +171,9 @@ public class WorkerBalancerTest
 			new ConfigurationOptionsForTest
 			{
 				MinimumServerCount = 2,
-				UpdateConfigurations = new[]
+				ExternalConfigurations = new[]
 				{
-					new UpdateStorageConfiguration
+					new ExternalConfiguration
 					{
 						Name = DefaultConfigurationName.Name()
 					}
@@ -233,9 +233,9 @@ public class WorkerBalancerTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					Name = DefaultConfigurationName.Name()
 				}

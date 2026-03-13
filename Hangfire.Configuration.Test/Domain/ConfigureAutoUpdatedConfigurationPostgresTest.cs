@@ -13,9 +13,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{Host = "host"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -45,9 +45,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -66,9 +66,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "host" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -89,9 +89,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -112,9 +112,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -135,9 +135,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -157,9 +157,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -180,9 +180,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -203,9 +203,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "dataSource", ApplicationName = "applicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -229,9 +229,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -250,9 +250,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -271,9 +271,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -296,9 +296,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -318,9 +318,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -339,9 +339,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
 					Name = DefaultConfigurationName.Name(),
@@ -361,9 +361,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
 					Name = DefaultConfigurationName.Name(),
@@ -381,9 +381,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "FirstUpdate" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -393,9 +393,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.UseOptions(new ConfigurationOptions
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "SecondUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -414,9 +414,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "FirstUpdate" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -427,9 +427,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "SecondUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -449,9 +449,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name()
@@ -470,9 +470,9 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			UpdateConfigurations = new []
+			ExternalConfigurations = new []
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
 					Name = DefaultConfigurationName.Name()

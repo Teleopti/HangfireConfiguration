@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration;
 
-public class UpdateStorageConfiguration
+public class ExternalConfiguration
 {
 	public string Name { get; set; }
 	public string ConnectionString { get; set; }

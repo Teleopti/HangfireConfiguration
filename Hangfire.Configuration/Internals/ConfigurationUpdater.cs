@@ -11,7 +11,7 @@ internal class ConfigurationUpdater
 	private readonly INow _now;
 
 	internal ConfigurationUpdater(
-		ConfigurationStorage storage, 
+		ConfigurationStorage storage,
 		State state,
 		INow now)
 	{
@@ -27,9 +27,11 @@ internal class ConfigurationUpdater
 
 		_state.ConfigurationUpdaterRan = true;
 
-		var received = buildUpdateConfigurations(options);
+		var external = options.ExternalConfigurations ?? Enumerable.Empty<ExternalConfiguration>()
+			.Where(x => x.ConnectionString != null)
+			.ToArray();
 
-		if (alreadyUpToDate(received, stored))
+		if (alreadyUpToDate(external, stored))
 			return false;
 
 		var isUpdated = false;
@@ -38,34 +40,29 @@ internal class ConfigurationUpdater
 			_storage.LockConfiguration();
 			var @fixed = fixExistingConfigurations();
 			if (haveExternalConfigurations(options))
-				isUpdated = runConfigurationUpdates(received);
+				isUpdated = runConfigurationUpdates(external);
 			isUpdated = @fixed || isUpdated;
 		});
 		return isUpdated;
 	}
 
-	private static bool alreadyUpToDate(IEnumerable<UpdateStorageConfiguration> received, IEnumerable<StoredConfiguration> stored)
+	private static bool alreadyUpToDate(
+		IEnumerable<ExternalConfiguration> external, 
+		IEnumerable<StoredConfiguration> stored)
 	{
-		if (!received.Any())
+		if (!external.Any())
 			return false; //always fix stored configurations if no configuration options received
 
-		return !(received.Any(r => notStored(stored, r)));
+		bool notStored(IEnumerable<StoredConfiguration> stored, ExternalConfiguration received) =>
+			!stored.Any(s => sameConfiguration(received, s));
+		
+		bool sameConfiguration(ExternalConfiguration received, StoredConfiguration stored) =>
+			stored.Name == received.Name &&
+			stored.SchemaName == received.SchemaName &&
+			received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
+		
+		return !(external.Any(r => notStored(stored, r)));
 	}
-
-	private static IEnumerable<UpdateStorageConfiguration> buildUpdateConfigurations(ConfigurationOptions options)
-	{
-		return options.UpdateConfigurations ?? Enumerable.Empty<UpdateStorageConfiguration>()
-			.Where(x => x.ConnectionString != null)
-			.ToArray();
-	}
-
-	private static bool notStored(IEnumerable<StoredConfiguration> stored, UpdateStorageConfiguration received) =>
-		!stored.Any(s => sameConfiguration(received, s));
-
-	private static bool sameConfiguration(UpdateStorageConfiguration received, StoredConfiguration stored) =>
-		stored.Name == received.Name &&
-		stored.SchemaName == received.SchemaName &&
-		received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
 
 	private bool fixExistingConfigurations()
 	{
@@ -92,21 +89,18 @@ internal class ConfigurationUpdater
 		var shutdown = configurations
 			.Where(x => !x.IsActive() && x.ShutdownAt == null)
 			.ToArray();
-		foreach(var shutdownConfiguration in shutdown)
+		foreach (var shutdownConfiguration in shutdown)
 		{
 			shutdownConfiguration.ShutdownAt = _now.UtcDateTime().AddDays(1);
 			@fixed.Add(shutdownConfiguration);
 		}
 
-		@fixed.Distinct().ForEach(x =>
-		{
-			_storage.WriteConfiguration(x);
-		});
-		
+		@fixed.Distinct().ForEach(x => { _storage.WriteConfiguration(x); });
+
 		return @fixed.Any();
 	}
 
-	private bool runConfigurationUpdates(IEnumerable<UpdateStorageConfiguration> received)
+	private bool runConfigurationUpdates(IEnumerable<ExternalConfiguration> received)
 	{
 		var stored = _storage.ReadConfigurations();
 
@@ -134,7 +128,7 @@ internal class ConfigurationUpdater
 
 	private static bool haveExternalConfigurations(ConfigurationOptions options)
 	{
-		if (options.UpdateConfigurations?.Any() ?? false)
+		if (options.ExternalConfigurations?.Any() ?? false)
 			return true;
 		return false;
 	}

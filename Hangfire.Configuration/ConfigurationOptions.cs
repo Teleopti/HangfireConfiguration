@@ -8,7 +8,7 @@ public class ConfigurationOptions
 
 	public bool PrepareSchemaIfNecessary { get; set; }
         
-	public IEnumerable<UpdateStorageConfiguration> UpdateConfigurations { get; set; }
+	public IEnumerable<ExternalConfiguration> ExternalConfigurations { get; set; }
 
 	public WorkerBalancerOptions WorkerBalancerOptions { get; } = new();
 

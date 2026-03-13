@@ -74,15 +74,15 @@ public class Startup
 		{
 			ConnectionString = configurationConnectionString,
 			PrepareSchemaIfNecessary = true,
-			UpdateConfigurations = new[]
-			{
-				new UpdateStorageConfiguration
+			ExternalConfigurations =
+			[
+				new ExternalConfiguration
 				{
 					ConnectionString = defaultHangfireConnectionString,
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = defaultHangfireSchema
 				}
-			}
+			]
 		};
 
 		Console.WriteLine();

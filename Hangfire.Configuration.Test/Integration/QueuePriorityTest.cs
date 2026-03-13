@@ -40,9 +40,9 @@ public class QueuePriorityTest(string connectionString) :
 		system.UseOptions(new ConfigurationOptions
 			{
 				ConnectionString = ConnectionString,
-				UpdateConfigurations = new[]
+				ExternalConfigurations = new[]
 				{
-					new UpdateStorageConfiguration
+					new ExternalConfiguration
 					{
 						ConnectionString = storageConnectionString,
 						Name = DefaultConfigurationName.Name()

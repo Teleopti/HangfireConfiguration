@@ -12,9 +12,9 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new[]
+	            ExternalConfigurations = new[]
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            Name = "name",
 			            ConnectionString = "connectionString",
@@ -37,9 +37,9 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new[]
+	            ExternalConfigurations = new[]
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            Name = "name",
 			            ConnectionString = "connectionString"
@@ -59,9 +59,9 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new[]
+	            ExternalConfigurations = new[]
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            Name = "name",
 			            ConnectionString = "newConnectionString"
@@ -81,15 +81,15 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new[]
+	            ExternalConfigurations = new[]
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            Name = "name1",
 			            ConnectionString = "connectionString1",
 			            SchemaName = "schema1"
 		            },
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            Name = "name2",
 			            ConnectionString = "connectionString2",

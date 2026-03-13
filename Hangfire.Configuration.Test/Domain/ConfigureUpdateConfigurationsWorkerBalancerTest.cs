@@ -15,9 +15,9 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "."}.ToString(),
 				}
@@ -36,9 +36,9 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "localhost"}.ToString(),
 				}
@@ -57,9 +57,9 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = "my-redis"
 				}
@@ -85,9 +85,9 @@ public class ConfigureUpdateConfigurationsWorkerBalancerTest
 		
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					Name = "hangfire",
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "changed"}.ToString()

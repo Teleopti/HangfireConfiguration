@@ -97,9 +97,9 @@ public class QueryPublishersTest
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "Hangfire"}.ToString(),
 					Name = DefaultConfigurationName.Name()

@@ -15,9 +15,9 @@ public class IntegrationTest(string connectionString) :
 		system.UseOptions(new ConfigurationOptions
 		{
 			ConnectionString = ConnectionString,
-			UpdateConfigurations = new[]
+			ExternalConfigurations = new[]
 			{
-				new UpdateStorageConfiguration
+				new ExternalConfiguration
 				{
 					ConnectionString = ConnectionString,
 					Name = DefaultConfigurationName.Name()

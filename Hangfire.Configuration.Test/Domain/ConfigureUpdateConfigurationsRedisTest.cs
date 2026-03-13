@@ -11,9 +11,9 @@ namespace Hangfire.Configuration.Test.Domain
 			var system = new SystemUnderTest();
 			system.WorkerServerStarter.Start(new ConfigurationOptions
 			{
-				UpdateConfigurations = new[]
+				ExternalConfigurations = new[]
 				{
-					new UpdateStorageConfiguration
+					new ExternalConfiguration
 					{
 						Name = "redis",
 						ConnectionString = "redis$$connstring",

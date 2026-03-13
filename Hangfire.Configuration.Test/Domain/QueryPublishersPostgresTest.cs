@@ -98,9 +98,9 @@ public class QueryPublishersPostgresTest
 
         system.UseOptions(new ConfigurationOptionsForTest
         {
-            UpdateConfigurations = new[]
+            ExternalConfigurations = new[]
             {
-                new UpdateStorageConfiguration
+                new ExternalConfiguration
                 {
                     ConnectionString = new NpgsqlConnectionStringBuilder {Host = "Hangfire"}.ToString(),
                     Name = DefaultConfigurationName.Name()

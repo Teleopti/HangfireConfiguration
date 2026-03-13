@@ -15,9 +15,9 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new[]
+	            ExternalConfigurations = new[]
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            ConnectionString = "Host=Hangfire",
 			            Name = DefaultConfigurationName.Name()

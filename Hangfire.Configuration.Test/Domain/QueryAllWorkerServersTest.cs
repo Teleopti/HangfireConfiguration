@@ -39,9 +39,9 @@ namespace Hangfire.Configuration.Test.Domain
 
             system.UseOptions(new ConfigurationOptionsForTest
             {
-	            UpdateConfigurations = new []
+	            ExternalConfigurations = new []
 	            {
-		            new UpdateStorageConfiguration
+		            new ExternalConfiguration
 		            {
 			            ConnectionString = @"Data Source=.;Initial Catalog=Hangfire;",
 			            Name = DefaultConfigurationName.Name()
