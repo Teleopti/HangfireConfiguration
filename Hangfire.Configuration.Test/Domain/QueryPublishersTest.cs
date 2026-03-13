@@ -79,8 +79,8 @@ public class QueryPublishersTest
 		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Data Source=.;Initial Catalog=one;" });
 		system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = "Data Source=.;Initial Catalog=two;" });
 		system.PublisherStarter.Start();
-		var activatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
-		var inactivatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => x.Active.Value).Id.Value;
+		var activatedId = system.Configurations().Single(x => !x.Active.Value).Id.Value;
+		var inactivatedId = system.Configurations().Single(x => x.Active.Value).Id.Value;
 		system.ConfigurationApi().ActivateServer(activatedId);
 		system.ConfigurationApi().InactivateServer(inactivatedId);
 

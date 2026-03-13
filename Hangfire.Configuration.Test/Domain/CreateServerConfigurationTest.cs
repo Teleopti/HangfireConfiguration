@@ -58,7 +58,7 @@ public class CreateServerConfigurationTest
 
 		system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
 
-		var config = system.ConfigurationStorage.ReadConfigurations();
+		var config = system.Configurations();
 		Assert.AreEqual(10, config.First().GoalWorkerCount);
 	}
 
@@ -89,7 +89,7 @@ public class CreateServerConfigurationTest
 			SchemaName = "newSchemaName"
 		});
 
-		var configurations = system.ConfigurationStorage.ReadConfigurations();
+		var configurations = system.Configurations();
 
 		Assert.AreEqual(2, configurations.Count());
 	}

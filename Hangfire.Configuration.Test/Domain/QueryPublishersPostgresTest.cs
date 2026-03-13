@@ -80,8 +80,8 @@ public class QueryPublishersPostgresTest
         system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=one;" });
         system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = "Host=loscalhost;Database=two;" });
         system.PublisherStarter.Start();
-        var activatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => !x.Active.Value).Id.Value;
-        var inactivatedId = system.ConfigurationStorage.ReadConfigurations().Single(x => x.Active.Value).Id.Value;
+        var activatedId = system.Configurations().Single(x => !x.Active.Value).Id.Value;
+        var inactivatedId = system.Configurations().Single(x => x.Active.Value).Id.Value;
         system.ConfigurationApi().ActivateServer(activatedId);
         system.ConfigurationApi().InactivateServer(inactivatedId);
 
