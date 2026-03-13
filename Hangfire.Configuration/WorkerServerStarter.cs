@@ -39,8 +39,7 @@ public class WorkerServerStarter
 		var backgroundProcesses = new List<IBackgroundProcess>();
 		if (additionalProcesses != null)
 			backgroundProcesses.AddRange(additionalProcesses);
-		if (_state.ReadOptions().WorkerBalancerOptions.UseServerCountSampling)
-			backgroundProcesses.Add(_recorder);
+		backgroundProcesses.Add(_recorder);
 		var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
 
 		_stateMaintainer.Refresh();

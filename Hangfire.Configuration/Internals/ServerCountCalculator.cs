@@ -20,13 +20,9 @@ internal class ServerCountCalculator(IKeyValueStore store)
 
 	private int readServerCount(IMonitoringApi api, WorkerBalancerOptions options)
 	{
-		if (options.UseServerCountSampling)
-		{
-			var serverCount = serverCountFromSamples();
-			if (serverCount.HasValue)
-				return serverCount.Value;
-		}
-
+		var serverCount = serverCountFromSamples();
+		if (serverCount.HasValue)
+			return serverCount.Value;
 		return serverCountFromHangfire(api);
 	}
 

@@ -12,11 +12,6 @@ public class ConfigurationOptionsForTest : ConfigurationOptions
         set => WorkerBalancerOptions.MinimumServerCount = value;
     }
 
-    public bool UseServerCountSampling
-    {
-        set => WorkerBalancerOptions.UseServerCountSampling = value;
-    }
-
     public int MaximumGoalWorkerCount
     {
         set => WorkerBalancerOptions.MaximumGoalWorkerCount = value;

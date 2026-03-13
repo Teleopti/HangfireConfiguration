@@ -59,22 +59,6 @@ public class WorkerBalancerServerCountSamplingTest
 	}
 
 	[Test]
-	public void ShouldDisableServerCountSampling()
-	{
-		var system = new SystemUnderTest();
-		system.HasGoalWorkerCount(10);
-		system.KeyValueStore.Has(new ServerCountSample {Count = 10});
-		system.Monitor.AnnounceServer("server");
-
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
-		{
-			UseServerCountSampling = false,
-		});
-
-		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
-	}
-
-	[Test]
 	public void ShouldCalculateWithoutServerCountFromServerRecycling()
 	{
 		var system = new SystemUnderTest();

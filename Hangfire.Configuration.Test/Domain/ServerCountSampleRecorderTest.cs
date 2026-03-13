@@ -19,21 +19,6 @@ public class ServerCountSampleRecorderTest
             .OfType<ServerCountSampleRecorder>()
             .Should().Have.Count.EqualTo(1);
     }
-
-    [Test]
-    public void ShouldNotStartRecorder()
-    {
-        var options = new ConfigurationOptionsForTest();
-        options.WorkerBalancerOptions.UseServerCountSampling = false;
-        var system = new SystemUnderTest();
-        system.UseOptions(options);
-        system.WithConfiguration(new StoredConfiguration());
-
-        system.WorkerServerStarter.Start();
-
-        Assert.IsEmpty(system.Hangfire.StartedServers.Single().backgroundProcesses
-            .OfType<ServerCountSampleRecorder>());
-    }
         
     [Test]
     public void ShouldRecord()
