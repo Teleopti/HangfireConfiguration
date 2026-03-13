@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class WorkerCountTest
+public class WorkerBalancerTest
 {
 	[Test]
 	public void ShouldGetDefaultForFirstServer()
