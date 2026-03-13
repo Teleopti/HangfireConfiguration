@@ -1,7 +1,6 @@
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public static class DefaultConfigurationName
 {
-    public static class DefaultConfigurationName
-    {
-        public static string Name() => "Hangfire";
-    }
+    public static string Name() => "Hangfire";
 }

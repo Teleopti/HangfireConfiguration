@@ -2,12 +2,11 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace Hangfire.Configuration
+namespace Hangfire.Configuration;
+
+public interface IHangfireConfigurationAuthorizationFilter
 {
-	public interface IHangfireConfigurationAuthorizationFilter
-	{
-		bool Authorize(HttpContext context);
-	}
+	bool Authorize(HttpContext context);
 }
 
 #endif
