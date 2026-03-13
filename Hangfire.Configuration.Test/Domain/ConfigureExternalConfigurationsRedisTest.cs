@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class ConfigureUpdateConfigurationsRedisTest
+public class ConfigureExternalConfigurationsRedisTest
 {
 	[Test]
 	public void ShouldUseRedisOptions()

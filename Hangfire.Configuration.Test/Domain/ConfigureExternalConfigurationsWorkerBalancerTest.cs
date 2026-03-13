@@ -6,7 +6,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class ConfigureUpdateConfigurationsWorkerBalancerTest
+public class ConfigureExternalConfigurationsWorkerBalancerTest
 {
 	[Test]
 	public void ShouldEnableForSqlServer()
