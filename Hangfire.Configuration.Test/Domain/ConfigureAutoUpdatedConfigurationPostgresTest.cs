@@ -1,6 +1,7 @@
 using System.Linq;
 using Npgsql;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
@@ -13,11 +14,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{Host = "host"}.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "host"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -39,129 +40,18 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 	}
 
 	[Test]
-	public void ShouldMarkAutoUpdatedConnectionString()
-	{
-		var system = new SystemUnderTest();
-
-		system.WorkerServerStarter.Start(new ConfigurationOptions
-		{
-			ExternalConfigurations = new []
-			{
-				new ExternalConfiguration
-				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ ApplicationName = "ApplicationName" }.ToString(),
-					Name = DefaultConfigurationName.Name()
-				}
-			}
-		});
-
-		var applicationName = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
-		Assert.AreEqual("ApplicationName.AutoUpdate", applicationName);
-	}
-
-	[Test]
-	public void ShouldMarkAutoUpdatedConnectionStringWhenNoApplicationName()
-	{
-		var system = new SystemUnderTest();
-
-		system.WorkerServerStarter.Start(new ConfigurationOptions
-		{
-			ExternalConfigurations = new []
-			{
-				new ExternalConfiguration
-				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "host" }.ToString(),
-					Name = DefaultConfigurationName.Name()
-				}
-			}
-		});
-
-		var applicationName = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).ApplicationName;
-		Assert.AreEqual("Hangfire.AutoUpdate", applicationName);
-	}
-
-	[Test]
-	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked()
-	{
-		var system = new SystemUnderTest();
-		var existing = new NpgsqlConnectionStringBuilder { Host = "existing" }.ToString();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
-
-		system.WorkerServerStarter.Start(new ConfigurationOptions
-		{
-			ExternalConfigurations = new []
-			{
-				new ExternalConfiguration
-				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
-					Name = DefaultConfigurationName.Name()
-				}
-			}
-		});
-
-		var actual = system.Configurations().OrderBy(x => x.Id).First();
-		Assert.AreEqual(existing, actual.ConnectionString);
-	}
-
-	[Test]
-	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked2()
-	{
-		var system = new SystemUnderTest();
-		var existing = new NpgsqlConnectionStringBuilder { Host = "AnotherDataSourceWith.AutoUpdate.InIt"}.ToString();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
-
-		system.WorkerServerStarter.Start(new ConfigurationOptions
-		{
-			ExternalConfigurations = new []
-			{
-				new ExternalConfiguration
-				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
-					Name = DefaultConfigurationName.Name()
-				}
-			}
-		});
-
-		var actual = system.Configurations().OrderBy(x => x.Id).First();
-		Assert.AreEqual(existing, actual.ConnectionString);
-	}
-
-	[Test]
-	public void ShouldNotUpdateExistingConfigurationThatIsNotMarked3()
-	{
-		var system = new SystemUnderTest();
-		var existing = new NpgsqlConnectionStringBuilder {ApplicationName = "ExistingApplicationWith.AutoUpdate.InIt"}.ToString();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
-
-		system.WorkerServerStarter.Start(new ConfigurationOptions
-		{
-			ExternalConfigurations = new []
-			{
-				new ExternalConfiguration
-				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
-					Name = DefaultConfigurationName.Name()
-				}
-			}
-		});
-
-		var actual = system.Configurations().OrderBy(x => x.Id).First();
-		Assert.AreEqual(existing, actual.ConnectionString);
-	}
-
-	[Test]
 	public void ShouldAddAutoUpdatedConfigurationIfNoMarkedExists()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "existing"}.ToString()});
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {Host = "existing"}.ToString()});
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "autoupdated" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "autoupdated"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -175,16 +65,16 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 	public void ShouldUpdate()
 	{
 		var system = new SystemUnderTest();
-		var existing = new NpgsqlConnectionStringBuilder { Host = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
+		var existing = new NpgsqlConnectionStringBuilder {Host = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -192,7 +82,7 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		var updatedConnectionString = new NpgsqlConnectionStringBuilder(system.Configurations().Single().ConnectionString);
 		Assert.AreEqual("newDataSource", updatedConnectionString.Host);
-		Assert.AreEqual("newApplicationName.AutoUpdate", updatedConnectionString.ApplicationName);
+		Assert.AreEqual("newApplicationName", updatedConnectionString.ApplicationName);
 	}
 
 	[Test]
@@ -203,17 +93,17 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "dataSource", ApplicationName = "applicationName"}.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "dataSource", ApplicationName = "applicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
-		var expected = new NpgsqlConnectionStringBuilder { Host = "dataSource", ApplicationName = "applicationName.AutoUpdate"}.ToString();
+		var expected = new NpgsqlConnectionStringBuilder {Host = "dataSource", ApplicationName = "applicationName"}.ToString();
 		Assert.AreEqual(55, system.Configurations().Single().GoalWorkerCount);
 		Assert.AreEqual(expected, system.Configurations().Single().ConnectionString);
 	}
@@ -222,25 +112,25 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 	public void ShouldUpdateOneOfTwo()
 	{
 		var system = new SystemUnderTest();
-		var one = new NpgsqlConnectionStringBuilder { Host = "One"}.ToString();
-		var two = new NpgsqlConnectionStringBuilder { Host = "Two", ApplicationName = "Two.AutoUpdate"}.ToString();
+		var one = new NpgsqlConnectionStringBuilder {Host = "One"}.ToString();
+		var two = new NpgsqlConnectionStringBuilder {Host = "Two", ApplicationName = "Two"}.ToString();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = one});
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = two});
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "UpdatedTwo", ApplicationName = "UpdatedTwo"}.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "Updated", ApplicationName = "Updated"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
-		var expected = new NpgsqlConnectionStringBuilder { Host = "UpdatedTwo", ApplicationName = "UpdatedTwo.AutoUpdate"}.ToString();
-		Assert.AreEqual(expected, system.Configurations().Last().ConnectionString);
+		system.Configurations().First().ConnectionString.Should().Be("Host=Updated;Application Name=Updated");
+		system.Configurations().Last().ConnectionString.Should().Be("Host=Two;Application Name=Two");
 	}
 
 	[Test]
@@ -250,11 +140,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -271,11 +161,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -296,11 +186,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -314,15 +204,15 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 	{
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder { Host = "DataSource"}.ToString(), Active = true});
+		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {Host = "DataSource"}.ToString(), Active = true});
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -339,11 +229,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = "schemaName"
 				}
@@ -361,11 +251,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "AutoUpdate" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = "schemaName"
 				}
@@ -381,11 +271,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "FirstUpdate" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "FirstUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -414,11 +304,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "FirstUpdate" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "FirstUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -449,11 +339,11 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder {Host = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}
@@ -466,15 +356,25 @@ public class ConfigureAutoUpdatedConfigurationPostgresTest
 	public void ShouldAutoUpdateWithDefaultConfigurationName2()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = new NpgsqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			ConnectionString = new NpgsqlConnectionStringBuilder
+			{
+				ApplicationName = "ApplicationName.AutoUpdate"
+			}.ToString(),
+			Active = false
+		});
 
 		system.WorkerServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new []
+			ExternalConfigurations = new[]
 			{
 				new ExternalConfiguration
 				{
-					ConnectionString = new NpgsqlConnectionStringBuilder{ Host = "DataSource" }.ToString(),
+					ConnectionString = new NpgsqlConnectionStringBuilder
+					{
+						Host = "DataSource"
+					}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
 			}

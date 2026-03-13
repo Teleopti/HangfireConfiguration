@@ -292,7 +292,7 @@ public class StartWorkerServersTest
 	public void ShouldPassBackgroundProcessesToActiveServer()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
+		system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
 		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Data Source=.;Initial Catalog=active;" });
 
 		system.WorkerServerStarter.Start(new Worker());

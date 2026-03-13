@@ -287,7 +287,7 @@ public class StartWorkerServersPostgresTest
 	public void ShouldPassBackgroundProcessesToActiveServer()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Host=localhost;Database=inactive;" });
+		system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = @"Host=localhost;Database=inactive;" });
 		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Host=localhost;Database=active;" });
 
 		system.WorkerServerStarter.Start(new Worker());

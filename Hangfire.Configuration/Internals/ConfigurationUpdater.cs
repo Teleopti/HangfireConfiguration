@@ -40,14 +40,14 @@ internal class ConfigurationUpdater
 			_storage.LockConfiguration();
 			var @fixed = fixExistingConfigurations();
 			if (haveExternalConfigurations(options))
-				isUpdated = runConfigurationUpdates(external);
+				isUpdated = updateExternalConfigurations(external);
 			isUpdated = @fixed || isUpdated;
 		});
 		return isUpdated;
 	}
 
 	private static bool alreadyUpToDate(
-		IEnumerable<ExternalConfiguration> external, 
+		IEnumerable<ExternalConfiguration> external,
 		IEnumerable<StoredConfiguration> stored)
 	{
 		if (!external.Any())
@@ -55,12 +55,12 @@ internal class ConfigurationUpdater
 
 		bool notStored(IEnumerable<StoredConfiguration> stored, ExternalConfiguration received) =>
 			!stored.Any(s => sameConfiguration(received, s));
-		
+
 		bool sameConfiguration(ExternalConfiguration received, StoredConfiguration stored) =>
 			stored.Name == received.Name &&
 			stored.SchemaName == received.SchemaName &&
-			received.ConnectionString?.Replace(".AutoUpdate", "") == stored.ConnectionString?.Replace(".AutoUpdate", "");
-		
+			stored.ConnectionString == received.ConnectionString;
+
 		return !(external.Any(r => notStored(stored, r)));
 	}
 
@@ -69,20 +69,21 @@ internal class ConfigurationUpdater
 		var configurations = _storage.ReadConfigurations();
 		var @fixed = new List<StoredConfiguration>();
 
-		var legacyConfiguration = configurations.FirstOrDefault(isLegacy);
-		if (legacyConfiguration != null)
+		// pop default values if missing on first
+		// tests and possibly very old installations
+		var first = configurations.FirstOrDefault();
+		if (first != null)
 		{
-			legacyConfiguration.Name ??= DefaultConfigurationName.Name();
-			legacyConfiguration.Active ??= true;
-			@fixed.Add(legacyConfiguration);
-		}
-		else
-		{
-			var markedConfiguration = configurations.FirstOrDefault(isAutoUpdateMarked);
-			if (markedConfiguration != null)
+			if (first.Name == null)
 			{
-				markedConfiguration.Name = DefaultConfigurationName.Name();
-				@fixed.Add(markedConfiguration);
+				first.Name = DefaultConfigurationName.Name();
+				@fixed.Add(first);
+			}
+
+			if (first.Active == null)
+			{
+				first.Active ??= true;
+				@fixed.Add(first);
 			}
 		}
 
@@ -95,12 +96,16 @@ internal class ConfigurationUpdater
 			@fixed.Add(shutdownConfiguration);
 		}
 
-		@fixed.Distinct().ForEach(x => { _storage.WriteConfiguration(x); });
+		@fixed.Distinct().ForEach(x =>
+		{
+			//
+			_storage.WriteConfiguration(x);
+		});
 
 		return @fixed.Any();
 	}
 
-	private bool runConfigurationUpdates(IEnumerable<ExternalConfiguration> received)
+	private bool updateExternalConfigurations(IEnumerable<ExternalConfiguration> received)
 	{
 		var stored = _storage.ReadConfigurations();
 
@@ -114,10 +119,7 @@ internal class ConfigurationUpdater
 				                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
 			                    };
 
-			if (update.Name == DefaultConfigurationName.Name())
-				configuration.ConnectionString = markConnectionString(update.ConnectionString);
-			else
-				configuration.ConnectionString = update.ConnectionString;
+			configuration.ConnectionString = update.ConnectionString;
 			configuration.SchemaName = update.SchemaName;
 
 			_storage.WriteConfiguration(configuration);
@@ -131,33 +133,5 @@ internal class ConfigurationUpdater
 		if (options.ExternalConfigurations?.Any() ?? false)
 			return true;
 		return false;
-	}
-
-	private static bool isLegacy(StoredConfiguration configuration) =>
-		configuration.ConnectionString == null;
-
-	private static bool isAutoUpdateMarked(StoredConfiguration configuration)
-	{
-		var applicationName = configuration.ConnectionString.ApplicationName();
-		if (applicationName == null)
-			return false;
-		return applicationName.EndsWith(".AutoUpdate");
-	}
-
-	private static string markConnectionString(string connectionString)
-	{
-		static bool applicationNameIsNotSet(string connectionString)
-		{
-			// because builder will return a app name even though the connection string does not have one
-			var applicationName = connectionString.ApplicationName();
-			return string.IsNullOrEmpty(applicationName) ||
-			       applicationName == ".Net SqlClient Data Provider" ||
-			       applicationName == "Core .Net SqlClient Data Provider";
-		}
-
-		var applicationName = connectionString.ApplicationName();
-		if (applicationNameIsNotSet(connectionString))
-			applicationName = "Hangfire";
-		return connectionString.ChangeApplicationName($"{applicationName}.AutoUpdate");
 	}
 }
