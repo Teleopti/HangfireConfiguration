@@ -16,7 +16,7 @@ public class WorkerBalancerServerCountSamplingTest
 
 		system.WorkerServerStarter.Start();
 
-		Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
 
 	[Test]
@@ -28,7 +28,7 @@ public class WorkerBalancerServerCountSamplingTest
 
 		system.WorkerServerStarter.Start();
 
-		Assert.AreEqual(10 / 5, system.Hangfire.StartedServers.Single().options.WorkerCount);
+		Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
 
 	[Test]
@@ -55,7 +55,7 @@ public class WorkerBalancerServerCountSamplingTest
 		});
 		system.WorkerServerStarter.Start();
 
-		Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
+		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
 
 	[Test]
