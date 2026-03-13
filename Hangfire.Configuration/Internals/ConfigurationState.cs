@@ -43,15 +43,24 @@ internal class ConfigurationState
 	internal IRecurringJobManager RecurringJobManager => _recurringJobManager.Value;
 	internal IMonitoringApi MonitoringApi => _monitoringApi.Value;
 
-	internal bool IsPublisher() =>
-		Configuration == null || Configuration.IsActive();
+	internal bool IsActive() =>
+		Configuration.Active.GetValueOrDefault();
 
-	internal bool WorkerBalancerIsEnabled() => 
+	internal bool IsPublisher()
+	{
+		// state can contain publishers without configuration
+		// for example when client get by connection string
+		if (Configuration == null) 
+			return true;
+		return IsActive();
+	}
+
+	internal bool WorkerBalancerIsEnabled() =>
 		Configuration.WorkerBalancerIsEnabled();
 
 	internal bool IsShutdown()
 	{
-		if (Configuration.Active.GetValueOrDefault())
+		if (IsActive())
 			return false;
 		var shutdownAt = Configuration.ShutdownAt;
 		if (shutdownAt == null)

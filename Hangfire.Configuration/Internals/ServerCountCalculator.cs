@@ -1,31 +1,24 @@
-﻿using System;
-using System.Data.SqlClient;
 using System.Linq;
 using Hangfire.Storage;
-using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
 internal class ServerCountCalculator(IKeyValueStore store)
 {
-	private static readonly Policy _retry = Policy.Handle<SqlException>(DetectTransientSqlException.IsTransient)
-		.OrInner<SqlException>(DetectTransientSqlException.IsTransient)
-		.WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
-
-	public int ServerCount(IMonitoringApi monitor, WorkerBalancerOptions options)
+	public int ServerCount(IMonitoringApi api, WorkerBalancerOptions options)
 	{
-		var serverCount = readServerCount(monitor, options);
+		var serverCount = readServerCount(api, options);
 
 		if (options.MinimumServerCount.HasValue)
 		{
 			if (serverCount < options.MinimumServerCount)
 				return options.MinimumServerCount.Value;
 		}
-            
+
 		return serverCount;
 	}
 
-	private int readServerCount(IMonitoringApi monitor, WorkerBalancerOptions options)
+	private int readServerCount(IMonitoringApi api, WorkerBalancerOptions options)
 	{
 		if (options.UseServerCountSampling)
 		{
@@ -33,14 +26,16 @@ internal class ServerCountCalculator(IKeyValueStore store)
 			if (serverCount.HasValue)
 				return serverCount.Value;
 		}
-		return serverCountFromHangfire(monitor);
+
+		return serverCountFromHangfire(api);
 	}
 
-	private static int serverCountFromHangfire(IMonitoringApi monitor)
+	private static int serverCountFromHangfire(IMonitoringApi api)
 	{
-		var runningServerCount = _retry.Execute(() => monitor.Servers().Count);
+		var servers = api.Servers();
+		var runningWorkerServers = servers.Count(s => s.WorkersCount > 0);
 		const int startingServer = 1;
-		return runningServerCount + startingServer;
+		return runningWorkerServers + startingServer;
 	}
 
 	private int? serverCountFromSamples()

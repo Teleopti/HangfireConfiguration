@@ -10,8 +10,12 @@ public class FakeMonitoringApi : IMonitoringApi
 {
 	private readonly IList<ServerDto> _servers = new List<ServerDto>();
 
-	public void AnnounceServer(string serverId) => _servers.Add(new ServerDto {Name = serverId});
-	
+	public void AnnounceServer(string serverId, int workersCount = 2) => _servers.Add(new ServerDto
+	{
+		Name = serverId,
+		WorkersCount = workersCount
+	});
+
 	public IList<QueueWithTopEnqueuedJobsDto> Queues() => new List<QueueWithTopEnqueuedJobsDto>();
 
 	public IList<ServerDto> Servers() => _servers;

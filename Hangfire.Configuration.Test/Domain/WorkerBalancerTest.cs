@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
@@ -13,7 +14,7 @@ public class WorkerBalancerTest
 		system.WorkerServerStarter.Start(
 			new ConfigurationOptions
 			{
-				UpdateConfigurations = new []
+				UpdateConfigurations = new[]
 				{
 					new UpdateStorageConfiguration
 					{
@@ -157,10 +158,10 @@ public class WorkerBalancerTest
 			{
 				MinimumServerCount = 0,
 			});
-            
+
 		Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
-        
+
 	[Test]
 	public void ShouldGetHalfOfDefaultForFirstServer()
 	{
@@ -170,7 +171,7 @@ public class WorkerBalancerTest
 			new ConfigurationOptionsForTest
 			{
 				MinimumServerCount = 2,
-				UpdateConfigurations = new []
+				UpdateConfigurations = new[]
 				{
 					new UpdateStorageConfiguration
 					{
@@ -178,7 +179,7 @@ public class WorkerBalancerTest
 					}
 				}
 			});
-            
+
 		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
 
@@ -210,7 +211,7 @@ public class WorkerBalancerTest
 
 		Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
-        
+
 	[Test]
 	public void ShouldGetHalfOfMaxOneHundred()
 	{
@@ -232,7 +233,7 @@ public class WorkerBalancerTest
 
 		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			UpdateConfigurations = new []
+			UpdateConfigurations = new[]
 			{
 				new UpdateStorageConfiguration
 				{
@@ -245,5 +246,18 @@ public class WorkerBalancerTest
 
 		Assert.AreEqual(6, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
-        
+
+	[Test]
+	public void ShouldOnlyCountServersWithWorkers()
+	{
+		var system = new SystemUnderTest();
+		system.HasGoalWorkerCount(10);
+		system.Monitor.AnnounceServer("server-with-workers", 5);
+		system.Monitor.AnnounceServer("server-without-workers2", 0);
+
+		system.WorkerServerStarter.Start();
+
+		system.Hangfire.StartedServers.Single().options.WorkerCount
+			.Should().Be(5);
+	}
 }

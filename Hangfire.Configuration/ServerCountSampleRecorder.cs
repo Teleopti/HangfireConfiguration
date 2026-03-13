@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Hangfire.Common;
 using Hangfire.Configuration.Internals;
@@ -8,59 +8,67 @@ namespace Hangfire.Configuration;
 
 public class ServerCountSampleRecorder : IBackgroundProcess
 {
-    private readonly IKeyValueStore _store;
-    private readonly State _state;
-    private readonly StateMaintainer _stateMaintainer;
-    private readonly INow _now;
-    private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
-    private const int _sampleLimit = 6;
+	private readonly IKeyValueStore _store;
+	private readonly State _state;
+	private readonly StateMaintainer _stateMaintainer;
+	private readonly INow _now;
+	private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
+	private const int _sampleLimit = 6;
 
-    internal ServerCountSampleRecorder(
-        IKeyValueStore store,
-        State state,
-        StateMaintainer stateMaintainer,
-        INow now)
-    {
-        _store = store;
-        _state = state;
-        _stateMaintainer = stateMaintainer;
-        _now = now;
-    }
+	internal ServerCountSampleRecorder(
+		IKeyValueStore store,
+		State state,
+		StateMaintainer stateMaintainer,
+		INow now)
+	{
+		_store = store;
+		_state = state;
+		_stateMaintainer = stateMaintainer;
+		_now = now;
+	}
 
-    public void Execute(BackgroundProcessContext context)
-    {
-        Record();
-        context.StoppingToken.Wait(TimeSpan.FromMinutes(10));
-    }
+	public void Execute(BackgroundProcessContext context)
+	{
+		Record();
+		context.StoppingToken.Wait(TimeSpan.FromMinutes(10));
+	}
 
-    public void Record()
-    {
-        _stateMaintainer.Refresh();
-        if (!_state.Configurations.Any())
-            return;
+	public void Record()
+	{
+		_stateMaintainer.Refresh();
+		if (!_state.Configurations.Any())
+			return;
 
-        var samples = _store.ServerCountSamples();
-        var noRecentSample = samples.Samples.Count(isRecent) == 0;
+		var samples = _store.ServerCountSamples();
+		var haveReceptSample = samples.Samples.Any(isRecent);
 
-        if (noRecentSample)
-        {
-            var serverCount = _state.Configurations.First().MonitoringApi.Servers().Count;
+		if (haveReceptSample)
+			return;
 
-            samples.Samples = samples
-                .Samples
-                .OrderByDescending(x => x.Timestamp)
-                .Take(_sampleLimit - 1)
-                .OrderBy(x => x.Timestamp)
-                .Append(new ServerCountSample {Timestamp = _now.UtcDateTime(), Count = serverCount})
-                .ToArray();
+		var api = _state.Configurations.First().MonitoringApi;
 
-            _store.ServerCountSamples(samples);
-        }
-    }
+		var serverCount = api
+			.Servers()
+			.Count(s => s.WorkersCount > 0);
 
-    private bool isRecent(ServerCountSample sample)
-    {
-        var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
-        return sample.Timestamp > recentFrom;
-    }
+		samples.Samples = samples
+			.Samples
+			.OrderByDescending(x => x.Timestamp)
+			.Take(_sampleLimit - 1)
+			.OrderBy(x => x.Timestamp)
+			.Append(new ServerCountSample
+			{
+				Timestamp = _now.UtcDateTime(),
+				Count = serverCount
+			})
+			.ToArray();
+
+		_store.ServerCountSamples(samples);
+	}
+
+	private bool isRecent(ServerCountSample sample)
+	{
+		var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
+		return sample.Timestamp > recentFrom;
+	}
 }

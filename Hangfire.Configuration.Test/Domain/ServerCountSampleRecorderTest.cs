@@ -282,4 +282,17 @@ public class ServerCountSampleRecorderTest
             "2020-12-01 13:10".Utc(),
         }, actual);
     }
+    
+    [Test]
+    public void ShouldOnlyRecordServersWithWorkers()
+    {
+        var system = new SystemUnderTest();
+        system.WithConfiguration(new StoredConfiguration());
+        system.Monitor.AnnounceServer("server-without-workers", 0);
+        system.Monitor.AnnounceServer("server-with-workers", 5);
+
+        system.ServerCountSampleRecorder.Record();
+
+        system.KeyValueStore.Samples().Single().Count.Should().Be(1);
+    }
 }

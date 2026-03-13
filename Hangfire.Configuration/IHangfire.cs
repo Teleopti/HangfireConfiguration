@@ -1,12 +1,17 @@
-﻿using Hangfire.Server;
+using Hangfire.Server;
 
 namespace Hangfire.Configuration;
 
 public interface IHangfire
 {
-	BackgroundJobServer UseHangfireServer(JobStorage storage,
+	IBackgroundProcessingServer StartBackgroundJobServer(
+		JobStorage storage,
 		BackgroundJobServerOptions options,
-		params IBackgroundProcess[] additionalProcesses);
+		IBackgroundProcess[] additionalProcesses);
+
+	IBackgroundProcessingServer StartBackgroundProcesses(
+		JobStorage storage, 
+		IBackgroundProcess[] processes);
 
 	JobStorage MakeJobStorage(string connectionString, object options);
 }

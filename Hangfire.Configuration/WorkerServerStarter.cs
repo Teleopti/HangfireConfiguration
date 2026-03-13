@@ -3,16 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Internals;
 using Hangfire.Server;
-#if NET472
-using System.Threading;
-using Owin;
-using Microsoft.Owin;
-
-#else
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-#endif
 
 namespace Hangfire.Configuration;
 
@@ -63,30 +53,11 @@ public class WorkerServerStarter
 			.ToArray();
 
 		var lifetime = new ServerLifetime(servers);
-		hookApplicationLifetime(lifetime);
+		ServerLifetime.HookApplicationLifetime(_appBuilder, lifetime);
 		return lifetime;
 	}
 
-	private void hookApplicationLifetime(ServerLifetime servers)
-	{
-		if (_appBuilder == null)
-			return;
-#if NET472
-		var context = new OwinContext(((IAppBuilder) _appBuilder).Properties);
-		var token = context.Get<CancellationToken>("host.OnAppDisposing");
-		if (token == default)
-			token = context.Get<CancellationToken>("server.OnDispose");
-		token.Register(servers.Dispose);
-#else
-		var lifetime = ((IApplicationBuilder) _appBuilder).ApplicationServices?.GetRequiredService<IApplicationLifetime>();
-		if (lifetime == null)
-			return;
-		lifetime.ApplicationStopping.Register(servers.SendStop);
-		lifetime.ApplicationStopped.Register(servers.Dispose);
-#endif
-	}
-
-	private BackgroundJobServer startWorkerServer(
+	private IBackgroundProcessingServer startWorkerServer(
 		ConfigurationState configurationState,
 		ConfigurationOptions options,
 		BackgroundJobServerOptions serverOptions,
@@ -96,7 +67,7 @@ public class WorkerServerStarter
 
 		applyWorkerBalancer(configurationState, options, serverOptions);
 
-		var server = _hangfire.UseHangfireServer(
+		var server = _hangfire.StartBackgroundJobServer(
 			configurationState.JobStorage,
 			serverOptions,
 			backgroundProcesses.ToArray()

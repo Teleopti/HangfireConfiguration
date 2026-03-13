@@ -10,14 +10,31 @@ public class FakeHangfire(FakeMonitoringApi monitoringApi) : IHangfire
     public FakeJobStorage LastCreatedStorage => CreatedStorages.LastOrDefault();
     public IEnumerable<FakeJobStorage> CreatedStorages = Enumerable.Empty<FakeJobStorage>();
 
-    public IEnumerable<(FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)> StartedServers { get; private set; } =
-        Array.Empty<(FakeJobStorage storage, BackgroundJobServerOptions options, IBackgroundProcess[] backgroundProcesses)>();
-
-    public BackgroundJobServer UseHangfireServer(JobStorage storage,
+    public List<(
+        FakeJobStorage storage,
         BackgroundJobServerOptions options,
-        params IBackgroundProcess[] additionalProcesses)
+        IBackgroundProcess[] backgroundProcesses
+        )> StartedServers = new();
+
+    public List<(
+        FakeJobStorage storage,
+        IBackgroundProcess[] backgroundProcesses
+        )> BackgroundProcessesStarted = new();
+
+    public IBackgroundProcessingServer StartBackgroundJobServer(
+        JobStorage storage,
+        BackgroundJobServerOptions options,
+        IBackgroundProcess[] additionalProcesses)
     {
-        StartedServers = StartedServers.Append((storage as FakeJobStorage, options, additionalProcesses)).ToArray();
+        StartedServers.Add((storage as FakeJobStorage, options, additionalProcesses));
+        return null;
+    }
+
+    public IBackgroundProcessingServer StartBackgroundProcesses(
+        JobStorage storage, 
+        IBackgroundProcess[] processes)
+    {
+        BackgroundProcessesStarted.Add((storage as FakeJobStorage, processes));
         return null;
     }
 

@@ -63,6 +63,9 @@ public class HangfireConfiguration
 	public IDisposable StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses) =>
 		BuildWorkerServerStarter().Start(additionalProcesses.ToArray());
 
+	public IDisposable StartBackgroundProcesses(IEnumerable<IBackgroundProcess> processes) =>
+		BuildBackgroundProcessStarter().Start(processes.ToArray());
+
 	public IEnumerable<ConfigurationInfo> QueryAllWorkerServers() =>
 		BuildWorkerServerQueries().QueryAllWorkerServers();
 
@@ -119,7 +122,14 @@ public class HangfireConfiguration
 			buildServerCountSampleRecorder(),
 			_builder);
 
-	protected PublisherStarter BuildPublisherStarter() => new(builderStateMaintainer(), _state);
+	protected BackgroundProcessStarter BuildBackgroundProcessStarter() => 
+		new(BuildHangfire(),
+			builderStateMaintainer(),
+			_state,
+			_builder);
+	
+	protected PublisherStarter BuildPublisherStarter() => 
+		new(builderStateMaintainer(), _state);
 
 	protected ConfigurationApi BuildConfigurationApi() =>
 		new(BuildConfigurationStorage(),
@@ -129,13 +139,17 @@ public class HangfireConfiguration
 			new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 		);
 
-	protected PublisherQueries BuildPublisherQueries() => new(_state, builderStateMaintainer());
+	protected PublisherQueries BuildPublisherQueries() => 
+		new(_state, builderStateMaintainer());
 
-	protected WorkerServerQueries BuildWorkerServerQueries() => new(builderStateMaintainer(), _state);
+	protected WorkerServerQueries BuildWorkerServerQueries() => 
+		new(builderStateMaintainer(), _state);
 
-	protected ViewModelBuilder BuildViewModelBuilder() => new(BuildConfigurationStorage());
+	protected ViewModelBuilder BuildViewModelBuilder() => 
+		new(BuildConfigurationStorage());
 
-	protected ConfigurationStorage BuildConfigurationStorage() => new(BuildKeyValueStore());
+	protected ConfigurationStorage BuildConfigurationStorage() => 
+		new(BuildKeyValueStore());
 
 	// boundary
 	protected virtual IHangfire BuildHangfire() =>
@@ -149,5 +163,6 @@ public class HangfireConfiguration
 
 	protected virtual INow BuildNow() => new Now();
 
-	protected virtual IRedisConnectionVerifier BuildRedisConnectionVerifier() => new RedisConnectionVerifier();
+	protected virtual IRedisConnectionVerifier BuildRedisConnectionVerifier() => 
+		new RedisConnectionVerifier();
 }
