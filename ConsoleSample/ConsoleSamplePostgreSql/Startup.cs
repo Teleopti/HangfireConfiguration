@@ -11,103 +11,102 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace ConsoleSample
+namespace ConsoleSample;
+
+public class CustomBackgroundProcess : IBackgroundProcess
 {
-	public class CustomBackgroundProcess : IBackgroundProcess
+	public void Execute(BackgroundProcessContext context)
 	{
-		public void Execute(BackgroundProcessContext context)
-		{
-			Console.WriteLine("20 second tick!");
-			context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
-		}
+		Console.WriteLine("20 second tick!");
+		context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
+	}
+}
+
+public class Startup
+{
+	public static HangfireConfiguration HangfireConfiguration;
+
+	public void ConfigureServices(IServiceCollection services)
+	{
+		services.AddHangfire(x => { });
 	}
 
-	public class Startup
+	public void Configure(IApplicationBuilder app)
+
 	{
-		public static HangfireConfiguration HangfireConfiguration;
+		GlobalConfiguration.Configuration
+			.UseColouredConsoleLogProvider()
+			.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+			.UseSimpleAssemblyNameTypeSerializer()
+			.UseRecommendedSerializerSettings();
 
-		public void ConfigureServices(IServiceCollection services)
+		app.UseDeveloperExceptionPage();
+
+		var configurationConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
+		var defaultHangfireConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
+		var defaultHangfireSchema = "hangfirecustomschemaname";
+
+		app.Use((context, next) =>
 		{
-			services.AddHangfire(x => { });
-		}
+			// simulate a hosting site with content security policy
+			context.Response.Headers.Append("Content-Security-Policy",
+				"script-src 'self'; frame-ancestors 'self';");
 
-		public void Configure(IApplicationBuilder app)
+			// simulate a hosting site with a static file handler
+			if (context.Request.Path.Value.Split('/').Last().Contains("."))
+			{
+				context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+				return Task.CompletedTask;
+			}
 
+			return next.Invoke();
+		});
+
+		var storageOptions = new PostgreSqlStorageOptions()
 		{
-			GlobalConfiguration.Configuration
-				.UseColouredConsoleLogProvider()
-				.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-				.UseSimpleAssemblyNameTypeSerializer()
-				.UseRecommendedSerializerSettings();
+			QueuePollInterval = TimeSpan.FromSeconds(2),
+			PrepareSchemaIfNecessary = true,
+			SchemaName = "NotUsedSchemaName"
+		};
 
-			app.UseDeveloperExceptionPage();
 
-			var configurationConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
-			var defaultHangfireConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
-			var defaultHangfireSchema = "hangfirecustomschemaname";
-
-			app.Use((context, next) =>
+		var options = new ConfigurationOptions
+		{
+			ConnectionString = configurationConnectionString,
+			PrepareSchemaIfNecessary = true,
+			UpdateConfigurations = new[]
 			{
-				// simulate a hosting site with content security policy
-				context.Response.Headers.Append("Content-Security-Policy",
-					"script-src 'self'; frame-ancestors 'self';");
-
-				// simulate a hosting site with a static file handler
-				if (context.Request.Path.Value.Split('/').Last().Contains("."))
+				new UpdateStorageConfiguration
 				{
-					context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-					return Task.CompletedTask;
+					ConnectionString = defaultHangfireConnectionString,
+					Name = DefaultConfigurationName.Name(),
+					SchemaName = defaultHangfireSchema
 				}
+			}
+		};
 
-				return next.Invoke();
-			});
+		Console.WriteLine();
+		Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
+		app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
-			var storageOptions = new PostgreSqlStorageOptions()
+		HangfireConfiguration = app
+				.UseHangfireConfiguration(options)
+				.UseStorageOptions(storageOptions)
+			;
+
+		HangfireConfiguration
+			.UseApplicationBuilder(app)
+			.UseServerOptions(new BackgroundJobServerOptions
 			{
-				QueuePollInterval = TimeSpan.FromSeconds(2),
-				PrepareSchemaIfNecessary = true,
-				SchemaName = "NotUsedSchemaName"
-			};
+				Queues = new[] {"critical", "default"},
+			})
+			.StartPublishers()
+			.StartWorkerServers([new CustomBackgroundProcess()]);
 
+		HangfireConfiguration
+			.QueryAllWorkerServers()
+			.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
 
-			var options = new ConfigurationOptions
-			{
-				ConnectionString = configurationConnectionString,
-				PrepareSchemaIfNecessary = true,
-				UpdateConfigurations = new[]
-				{
-					new UpdateStorageConfiguration
-					{
-						ConnectionString = defaultHangfireConnectionString,
-						Name = DefaultConfigurationName.Name(),
-						SchemaName = defaultHangfireSchema
-					}
-				}
-			};
-
-			Console.WriteLine();
-			Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
-			app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
-
-			HangfireConfiguration = app
-					.UseHangfireConfiguration(options)
-					.UseStorageOptions(storageOptions)
-				;
-
-			HangfireConfiguration
-				.UseApplicationBuilder(app)
-				.UseServerOptions(new BackgroundJobServerOptions
-				{
-					Queues = new[] {"critical", "default"},
-				})
-				.StartPublishers()
-				.StartWorkerServers([new CustomBackgroundProcess()]);
-
-			HangfireConfiguration
-				.QueryAllWorkerServers()
-				.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
-
-			app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
-		}
+		app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
 	}
 }

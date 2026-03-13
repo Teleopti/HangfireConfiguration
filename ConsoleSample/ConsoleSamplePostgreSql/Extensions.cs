@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace ConsoleSample
+namespace ConsoleSample;
+
+internal static class Extensions
 {
-    internal static class Extensions
+    internal static void ForEach<T>(this IEnumerable<T> source, Action<T> act)
     {
-        internal static void ForEach<T>(this IEnumerable<T> source, Action<T> act)
-        {
-            foreach (var item in source)
-                act(item);
-        }
+        foreach (var item in source)
+            act(item);
     }
 }

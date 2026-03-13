@@ -5,89 +5,88 @@ using Hangfire;
 using Hangfire.Configuration;
 using Microsoft.AspNetCore.Hosting;
 
-namespace ConsoleSample
+namespace ConsoleSample;
+
+public static class Program
 {
-	public static class Program
+	public static string NodeAddress = "http://localhost:12345";
+
+	public static void Main()
 	{
-		public static string NodeAddress = "http://localhost:12345";
+		Console.WriteLine("Starting site on " + NodeAddress);
 
-		public static void Main()
+		using (var host = new WebHostBuilder()
+			       .UseUrls(NodeAddress)
+			       .UseStartup<Startup>()
+			       .UseKestrel()
+			       .Build())
 		{
-			Console.WriteLine("Starting site on " + NodeAddress);
-
-			using (var host = new WebHostBuilder()
-				       .UseUrls(NodeAddress)
-				       .UseStartup<Startup>()
-				       .UseKestrel()
-				       .Build())
-			{
-				host.Start();
-				mainLoop(Startup.HangfireConfiguration);
-			}
-
-			Console.WriteLine("Press Enter to exit...");
-			Console.ReadLine();
+			host.Start();
+			mainLoop(Startup.HangfireConfiguration);
 		}
 
-		private static void mainLoop(HangfireConfiguration hangfireConfiguration)
+		Console.WriteLine("Press Enter to exit...");
+		Console.ReadLine();
+	}
+
+	private static void mainLoop(HangfireConfiguration hangfireConfiguration)
+	{
+		Console.WriteLine("Started.");
+		Console.WriteLine("'stop' to exit.");
+		Console.WriteLine("'add 1' to queue a job.");
+		while (true)
 		{
-			Console.WriteLine("Started.");
-			Console.WriteLine("'stop' to exit.");
-			Console.WriteLine("'add 1' to queue a job.");
-			while (true)
+			var command = Console.ReadLine();
+
+			if (command == null || command.Equals("stop", StringComparison.OrdinalIgnoreCase))
 			{
-				var command = Console.ReadLine();
+				break;
+			}
 
-				if (command == null || command.Equals("stop", StringComparison.OrdinalIgnoreCase))
+			if (command.StartsWith("add", StringComparison.OrdinalIgnoreCase))
+			{
+				try
 				{
-					break;
+					var publisher = hangfireConfiguration.QueryPublishers().First();
+					var workCount = int.Parse(command.Substring(4));
+					for (var i = 0; i < workCount; i++)
+					{
+						var number = i;
+						publisher.BackgroundJobClient.Enqueue<Services>(x => x.Random(number));
+					}
+
+					Console.WriteLine("Jobs enqueued on " + publisher.ConfigurationId);
 				}
-
-				if (command.StartsWith("add", StringComparison.OrdinalIgnoreCase))
+				catch (Exception ex)
 				{
-					try
-					{
-						var publisher = hangfireConfiguration.QueryPublishers().First();
-						var workCount = int.Parse(command.Substring(4));
-						for (var i = 0; i < workCount; i++)
-						{
-							var number = i;
-							publisher.BackgroundJobClient.Enqueue<Services>(x => x.Random(number));
-						}
-
-						Console.WriteLine("Jobs enqueued on " + publisher.ConfigurationId);
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine(ex.Message);
-					}
+					Console.WriteLine(ex.Message);
 				}
 			}
 		}
 	}
+}
 
-	public class Services
+public class Services
+{
+	private static readonly Random Rand = new Random();
+
+	[Queue("critical")]
+	public void Random(int number)
 	{
-		private static readonly Random Rand = new Random();
-
-		[Queue("critical")]
-		public void Random(int number)
+		Console.WriteLine("Starting	task: " + number);
+		int time;
+		lock (Rand)
 		{
-			Console.WriteLine("Starting	task: " + number);
-			int time;
-			lock (Rand)
-			{
-				time = Rand.Next(10);
-			}
-
-			if (time < 5)
-			{
-				Console.WriteLine("Failed task: " + number);
-				throw new Exception();
-			}
-
-			Thread.Sleep(TimeSpan.FromSeconds(5 + time));
-			Console.WriteLine("Finished task: " + number);
+			time = Rand.Next(10);
 		}
+
+		if (time < 5)
+		{
+			Console.WriteLine("Failed task: " + number);
+			throw new Exception();
+		}
+
+		Thread.Sleep(TimeSpan.FromSeconds(5 + time));
+		Console.WriteLine("Finished task: " + number);
 	}
 }
