@@ -75,7 +75,9 @@ INSERT INTO
 		install(3);
 
 		using var c2 = new SqlConnection(ConnectionStrings.SqlServer);
+#pragma warning disable DAP037
 		var result = c2.Query<dynamic>("SELECT * FROM hangfireconfiguration.configuration");
+#pragma warning restore DAP037
 		Assert.AreEqual(DefaultConfigurationName.Name(), result.First().Name);
 		Assert.AreEqual(3, version());
 	}
