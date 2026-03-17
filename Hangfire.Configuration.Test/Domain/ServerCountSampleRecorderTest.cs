@@ -13,7 +13,7 @@ public class ServerCountSampleRecorderTest
         var system = new SystemUnderTest();
         system.WithConfiguration(new StoredConfiguration());
 
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         system.Hangfire.StartedServers.Single().backgroundProcesses
             .OfType<ServerCountSampleRecorder>()

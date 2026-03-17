@@ -65,7 +65,7 @@ public class QueryPublishersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Active = false});
 		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Data Source=.;Initial Catalog=fakedb;" });
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
 

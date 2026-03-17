@@ -12,7 +12,7 @@ public class WorkerBalancerWithGracefulShutdownTest
         system.HasGoalWorkerCount(8);
         system.Monitor.AnnounceServer("runningServer");
 
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         Assert.AreEqual(4, system.Hangfire.StartedServers.Single().options.WorkerCount);
     }
@@ -25,7 +25,7 @@ public class WorkerBalancerWithGracefulShutdownTest
         system.Monitor.AnnounceServer("server1");
         system.Monitor.AnnounceServer("server2");
 
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
     }
@@ -39,7 +39,7 @@ public class WorkerBalancerWithGracefulShutdownTest
         system.Monitor.AnnounceServer("server2");
         system.Monitor.AnnounceServer("server3");
 
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         Assert.AreEqual(3, system.Hangfire.StartedServers.Single().options.WorkerCount);
     }
@@ -53,7 +53,7 @@ public class WorkerBalancerWithGracefulShutdownTest
         system.Monitor.AnnounceServer("server2");
         system.Monitor.AnnounceServer("server3");
 
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         Assert.AreEqual(25, system.Hangfire.StartedServers.Single().options.WorkerCount);
     }
@@ -66,7 +66,7 @@ public class WorkerBalancerWithGracefulShutdownTest
         system.Monitor.AnnounceServer("server1");
         system.Monitor.AnnounceServer("server2");
 
-        system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+        system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
         {
             MinimumServerCount = 4
         });

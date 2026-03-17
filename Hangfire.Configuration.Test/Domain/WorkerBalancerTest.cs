@@ -11,7 +11,7 @@ public class WorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(
+		system.BackgroundJobServerStarter.Start(
 			new ConfigurationOptions
 			{
 				ExternalConfigurations =
@@ -32,7 +32,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(8);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -43,7 +43,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(0);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -54,7 +54,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(-1);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(1, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -65,7 +65,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(101);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(100, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -75,7 +75,7 @@ public class WorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			ExternalConfigurations = new[]
 			{
@@ -96,7 +96,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(0);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumWorkerCount = 2,
 		});
@@ -110,7 +110,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(202);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MaximumGoalWorkerCount = 200,
 		});
@@ -124,7 +124,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(15);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumServerCount = 3,
 		});
@@ -138,7 +138,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(7);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumServerCount = 2,
 			MinimumWorkerCount = 6,
@@ -153,7 +153,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(8);
 
-		system.WorkerServerStarter.Start(
+		system.BackgroundJobServerStarter.Start(
 			new ConfigurationOptionsForTest
 			{
 				MinimumServerCount = 0,
@@ -167,7 +167,7 @@ public class WorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(
+		system.BackgroundJobServerStarter.Start(
 			new ConfigurationOptionsForTest
 			{
 				MinimumServerCount = 2,
@@ -189,7 +189,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(8);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumServerCount = 2,
 		});
@@ -204,7 +204,7 @@ public class WorkerBalancerTest
 		system.HasGoalWorkerCount(8);
 		system.Monitor.AnnounceServer("restartedServer");
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumServerCount = 2,
 		});
@@ -218,7 +218,7 @@ public class WorkerBalancerTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(101);
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			MinimumServerCount = 2,
 		});
@@ -231,7 +231,7 @@ public class WorkerBalancerTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			ExternalConfigurations = new[]
 			{
@@ -255,7 +255,7 @@ public class WorkerBalancerTest
 		system.Monitor.AnnounceServer("server-with-workers", 5);
 		system.Monitor.AnnounceServer("server-without-workers2", 0);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Hangfire.StartedServers.Single().options.WorkerCount
 			.Should().Be(5);

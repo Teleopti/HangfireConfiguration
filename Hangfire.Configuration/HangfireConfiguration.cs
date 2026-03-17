@@ -53,17 +53,17 @@ public class HangfireConfiguration
 		return this;
 	}
 
-	public IDisposable StartWorkerServers() =>
-		BuildWorkerServerStarter().Start();
+	public IDisposable StartBackgroundJobServers() =>
+		BuildBackgroundJobServerStarter().Start();
 
-	public IDisposable StartWorkerServers(IEnumerable<IBackgroundProcess> additionalProcesses) =>
-		BuildWorkerServerStarter().Start(additionalProcesses.ToArray());
+	public IDisposable StartBackgroundJobServers(IEnumerable<IBackgroundProcess> additionalProcesses) =>
+		BuildBackgroundJobServerStarter().Start(additionalProcesses.ToArray());
 
 	public IDisposable StartBackgroundProcesses(IEnumerable<IBackgroundProcess> processes) =>
 		BuildBackgroundProcessStarter().Start(processes.ToArray());
 
-	public IEnumerable<ConfigurationInfo> QueryAllWorkerServers() =>
-		BuildWorkerServerQueries().QueryAllWorkerServers();
+	public IEnumerable<ConfigurationInfo> QueryAllBackgroundJobServers() =>
+		BuildQueries().QueryAllBackgroundJobServers();
 
 	public IEnumerable<ConfigurationInfo> QueryPublishers() =>
 		BuildPublisherQueries().QueryPublishers();
@@ -110,7 +110,7 @@ public class HangfireConfiguration
 	// outer services
 	protected Options BuildOptions() => new(_state);
 
-	protected WorkerServerStarter BuildWorkerServerStarter() =>
+	protected BackgroundJobServerStarter BuildBackgroundJobServerStarter() =>
 		new(BuildHangfire(),
 			buildWorkerBalancer(),
 			builderStateMaintainer(),
@@ -118,13 +118,13 @@ public class HangfireConfiguration
 			buildServerCountSampleRecorder(),
 			_builder);
 
-	protected BackgroundProcessStarter BuildBackgroundProcessStarter() => 
+	protected BackgroundProcessStarter BuildBackgroundProcessStarter() =>
 		new(BuildHangfire(),
 			builderStateMaintainer(),
 			_state,
 			_builder);
-	
-	protected PublisherStarter BuildPublisherStarter() => 
+
+	protected PublisherStarter BuildPublisherStarter() =>
 		new(builderStateMaintainer(), _state);
 
 	protected ConfigurationApi BuildConfigurationApi() =>
@@ -132,19 +132,19 @@ public class HangfireConfiguration
 			_state,
 			new SqlDialectsServerConfigurationCreator(BuildConfigurationStorage(), BuildSchemaInstaller()),
 			new RedisServerConfigurationCreator(BuildConfigurationStorage(), BuildRedisConnectionVerifier()),
-			new WorkerServerUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
+			new StorageUpgrader(BuildSchemaInstaller(), BuildConfigurationStorage(), BuildOptions())
 		);
 
-	protected PublisherQueries BuildPublisherQueries() => 
+	protected PublisherQueries BuildPublisherQueries() =>
 		new(_state, builderStateMaintainer());
 
-	protected WorkerServerQueries BuildWorkerServerQueries() => 
+	protected Queries BuildQueries() =>
 		new(builderStateMaintainer(), _state);
 
-	protected ViewModelBuilder BuildViewModelBuilder() => 
+	protected ViewModelBuilder BuildViewModelBuilder() =>
 		new(BuildConfigurationStorage());
 
-	protected ConfigurationStorage BuildConfigurationStorage() => 
+	protected ConfigurationStorage BuildConfigurationStorage() =>
 		new(BuildKeyValueStore());
 
 	// boundary
@@ -159,6 +159,6 @@ public class HangfireConfiguration
 
 	protected virtual INow BuildNow() => new Now();
 
-	protected virtual IRedisConnectionVerifier BuildRedisConnectionVerifier() => 
+	protected virtual IRedisConnectionVerifier BuildRedisConnectionVerifier() =>
 		new RedisConnectionVerifier();
 }

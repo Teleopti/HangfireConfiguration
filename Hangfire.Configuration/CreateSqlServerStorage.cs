@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration;
 
-public class CreateSqlServerWorkerServer
+public class CreateSqlServer
 {
 	public string Name { get; set; }
 

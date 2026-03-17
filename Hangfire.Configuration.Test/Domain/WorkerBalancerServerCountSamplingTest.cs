@@ -14,7 +14,7 @@ public class WorkerBalancerServerCountSamplingTest
 		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -26,7 +26,7 @@ public class WorkerBalancerServerCountSamplingTest
 		system.HasGoalWorkerCount(10);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 5});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -37,7 +37,7 @@ public class WorkerBalancerServerCountSamplingTest
 		var system = new SystemUnderTest();
 		system.HasGoalWorkerCount(10);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(10, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -53,7 +53,7 @@ public class WorkerBalancerServerCountSamplingTest
 		{
 			MinimumServerCount = 2
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -67,7 +67,7 @@ public class WorkerBalancerServerCountSamplingTest
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -81,7 +81,7 @@ public class WorkerBalancerServerCountSamplingTest
 		system.KeyValueStore.Has(new ServerCountSample {Count = 2});
 		system.KeyValueStore.Has(new ServerCountSample {Count = 3});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(10 / 2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -102,7 +102,7 @@ public class WorkerBalancerServerCountSamplingTest
 			Timestamp = DateTime.Parse("2020-11-27 08:00")
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(8 / 4, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -114,7 +114,7 @@ public class WorkerBalancerServerCountSamplingTest
 		system.HasGoalWorkerCount(8);
 		system.KeyValueStore.Has(new ServerCountSample {Count = 0});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(8, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}

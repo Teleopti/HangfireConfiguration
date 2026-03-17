@@ -16,7 +16,7 @@ public class WorkerBalancerDisabledTest
 			Active = true
 		});
 		
-		system.StartWorkerServer();
+		system.StartBackgroundJobServers();
 		
 		var hangfireDefault = new BackgroundJobServerOptions().WorkerCount;
 		system.Hangfire.StartedServers.Single().options.WorkerCount

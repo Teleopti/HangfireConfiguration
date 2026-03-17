@@ -6,7 +6,7 @@ using Hangfire.Server;
 
 namespace Hangfire.Configuration;
 
-public class WorkerServerStarter
+public class BackgroundJobServerStarter
 {
 	private readonly IHangfire _hangfire;
 	private readonly WorkerBalancer _workerBalancer;
@@ -15,7 +15,7 @@ public class WorkerServerStarter
 	private readonly ServerCountSampleRecorder _recorder;
 	private readonly object _appBuilder;
 
-	internal WorkerServerStarter(
+	internal BackgroundJobServerStarter(
 		IHangfire hangfire,
 		WorkerBalancer workerBalancer,
 		StateMaintainer stateMaintainer,
@@ -47,7 +47,7 @@ public class WorkerServerStarter
 		var servers = _state.Configurations
 			.Where(x => !x.IsShutdown())
 			.OrderBy(x => !x.IsPublisher())
-			.Select(x => startWorkerServer(x, options, serverOptions, backgroundProcesses))
+			.Select(x => startBackgroundJobServer(x, options, serverOptions, backgroundProcesses))
 			.Where(x => x != null)
 			.ToArray();
 
@@ -56,7 +56,7 @@ public class WorkerServerStarter
 		return lifetime;
 	}
 
-	private IBackgroundProcessingServer startWorkerServer(
+	private IBackgroundProcessingServer startBackgroundJobServer(
 		ConfigurationState configurationState,
 		ConfigurationOptions options,
 		BackgroundJobServerOptions serverOptions,

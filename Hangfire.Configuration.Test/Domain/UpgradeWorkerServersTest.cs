@@ -5,7 +5,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class UpgradeWorkerServersTest
+public class UpgradeStorageTest
 {
 	[Test]
 	public void ShouldUpgradeConfigurationSchema()
@@ -13,7 +13,7 @@ public class UpgradeWorkerServersTest
 		var system = new SystemUnderTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "Host=local;Database=d"});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledHangfireConfigurationSchema
 			.Should().Contain("Host=local;Database=d");
@@ -28,7 +28,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas
 			.Single().ConnectionString.Should().Contain("Data Source=.;Initial Catalog=db");
@@ -44,7 +44,7 @@ public class UpgradeWorkerServersTest
 			SchemaName = "myschema"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas
 			.Single().SchemaName.Should().Be("myschema");
@@ -65,7 +65,7 @@ public class UpgradeWorkerServersTest
 			SchemaName = "schema2"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas.ElementAt(0).SchemaName.Should().Be("schema1");
 		system.SchemaInstaller.InstalledSchemas.ElementAt(1).SchemaName.Should().Be("schema2");
@@ -80,7 +80,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = c
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas.Should().Be.Empty();
 	}
@@ -94,7 +94,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Data Source=.;Initial Catalog=db",
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas
 			.Single().SchemaName.Should().Be("HangFire");
@@ -109,7 +109,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Host=local;Database=db",
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas
 			.Single().SchemaName.Should().Be("hangfire");
@@ -124,7 +124,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage
 		{
 			SchemaUpgraderUser = "upgrader",
 			SchemaUpgraderPassword = "pass",
@@ -144,7 +144,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Host=localhost;Database=datta"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage
 		{
 			SchemaUpgraderUser = "upgrader",
 			SchemaUpgraderPassword = "pass",
@@ -164,7 +164,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "redisserver"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		system.SchemaInstaller.InstalledSchemas.Should().Be.Empty();
 	}
@@ -175,7 +175,7 @@ public class UpgradeWorkerServersTest
 		var system = new SystemUnderTest();
 		system.SchemaInstaller.InstallHangfireConfigurationSchemaFailsWith = new Exception("boom!");
 
-		var exception = Assert.Catch(() => system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers()));
+		var exception = Assert.Catch(() => system.ConfigurationApi().UpgradeStorage(new UpgradeStorage()));
 
 		exception.Message.Should().Be("boom!");
 	}
@@ -190,7 +190,7 @@ public class UpgradeWorkerServersTest
 		});
 		system.SchemaInstaller.InstallHangfireConfigurationSchemaFailsWith = new Exception("boom!");
 
-		Assert.Catch(() => system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers()));
+		Assert.Catch(() => system.ConfigurationApi().UpgradeStorage(new UpgradeStorage()));
 
 		system.SchemaInstaller.InstalledSchemas.Single().ConnectionString
 			.Should().Contain("Host=host;Database=datta");
@@ -212,7 +212,7 @@ public class UpgradeWorkerServersTest
 		});
 		system.SchemaInstaller.InstallHangfireStorageSchemaFailsWith = (new Exception("boom!"), "schema1");
 
-		var exception = Assert.Catch(() => system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers()));
+		var exception = Assert.Catch(() => system.ConfigurationApi().UpgradeStorage(new UpgradeStorage()));
 
 		system.SchemaInstaller.InstalledSchemas.Single().SchemaName
 			.Should().Be("schema2");
@@ -228,7 +228,7 @@ public class UpgradeWorkerServersTest
 			ConnectionString = "Data Source=.;Initial Catalog=db"
 		});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers());
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage());
 
 		var upgraded = system.SchemaInstaller.InstalledSchemas.Single();
 		upgraded.ConnectionString.Should().Contain("Integrated Security=True");
@@ -240,7 +240,7 @@ public class UpgradeWorkerServersTest
 		var system = new SystemUnderTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = "Data Source=."});
 
-		system.ConfigurationApi().UpgradeWorkerServers(new UpgradeWorkerServers
+		system.ConfigurationApi().UpgradeStorage(new UpgradeStorage
 		{
 			SchemaUpgraderUser = "user",
 			SchemaUpgraderPassword = "pass"

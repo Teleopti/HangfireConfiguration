@@ -6,7 +6,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class QueryAllWorkerServersTest
+public class QueryAllBackgroundJobServersTest
 {
 	[Test]
 	public void ShouldQueryWorkerServers()
@@ -14,7 +14,7 @@ public class QueryAllWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var workerServers = system.WorkerServerQueries.QueryAllWorkerServers();
+		var workerServers = system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.NotNull(workerServers.Single());
 	}
@@ -25,7 +25,7 @@ public class QueryAllWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
+		var workerServer = system.Queries.QueryAllBackgroundJobServers().Single();
 
 		workerServer.JobStorage
 			.Should().Be.SameInstanceAs(system.Hangfire.CreatedStorages.Single());
@@ -48,7 +48,7 @@ public class QueryAllWorkerServersTest
 				}
 			}
 		});
-		system.WorkerServerQueries.QueryAllWorkerServers();
+		system.Queries.QueryAllBackgroundJobServers();
 
 		system.Configurations().Single().ConnectionString
 			.Should().Contain("Hangfire");
@@ -61,7 +61,7 @@ public class QueryAllWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
 		system.UseStorageOptions(new SqlServerStorageOptions {PrepareSchemaIfNecessary = false});
-		system.WorkerServerQueries.QueryAllWorkerServers();
+		system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.False(system.Hangfire.CreatedStorages.Single().SqlServerOptions.PrepareSchemaIfNecessary);
 	}
@@ -73,7 +73,7 @@ public class QueryAllWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration {ConnectionString =  @"Host=localhost;Database=fakedb;" });
 
 		system.UseStorageOptions(new PostgreSqlStorageOptions {PrepareSchemaIfNecessary = false});
-		system.WorkerServerQueries.QueryAllWorkerServers();
+		system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.False(system.Hangfire.CreatedStorages.Single().PostgresOptions.PrepareSchemaIfNecessary);
 	}
@@ -84,7 +84,7 @@ public class QueryAllWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Id = 3});
 
-		var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
+		var workerServer = system.Queries.QueryAllBackgroundJobServers().Single();
 
 		Assert.AreEqual(3, workerServer.ConfigurationId);
 	}
@@ -95,7 +95,7 @@ public class QueryAllWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Name = "name"});
 
-		var workerServer = system.WorkerServerQueries.QueryAllWorkerServers().Single();
+		var workerServer = system.Queries.QueryAllBackgroundJobServers().Single();
 
 		Assert.AreEqual("name", workerServer.Name);
 	}

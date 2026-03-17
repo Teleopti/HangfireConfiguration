@@ -9,7 +9,7 @@ public class ConfigureExternalConfigurationsRedisTest
 	public void ShouldUseRedisOptions()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{

@@ -23,7 +23,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(true);
@@ -44,7 +44,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);
@@ -65,7 +65,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);
@@ -94,7 +94,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 		
 		system.Configurations().Single().WorkerBalancerEnabled
 			.Should().Be(false);

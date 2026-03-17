@@ -44,7 +44,7 @@ public class DynamicHangfireDashboardsMiddleware
 		var resource = matches.Groups[2].Value;
 
 		var configuration = _configuration
-			.QueryAllWorkerServers()
+			.QueryAllBackgroundJobServers()
 			.Single(x => x.ConfigurationId == configurationId);
 
 		var originalPath = context.Request.Path;

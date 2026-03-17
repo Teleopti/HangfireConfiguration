@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration;
 
-public class CreatePostgresWorkerServer
+public class CreatePostgresServer
 {
 	public string Name { get; set; }
 

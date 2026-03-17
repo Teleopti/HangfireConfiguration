@@ -66,7 +66,7 @@ public class QueryPublishersPostgresTest
         var system = new SystemUnderTest();
         system.WithConfiguration(new StoredConfiguration {Active = false});
         system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = "Host=loscalhost;Database=fakedb;" });
-        system.WorkerServerStarter.Start();
+        system.BackgroundJobServerStarter.Start();
 
         var storage = system.QueryPublishers().Single().JobStorage as FakeJobStorage;
 

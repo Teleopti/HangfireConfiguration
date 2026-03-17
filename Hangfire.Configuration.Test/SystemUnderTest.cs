@@ -24,9 +24,9 @@ public class SystemUnderTest : HangfireConfiguration
 
 		UseOptions(new ConfigurationOptionsForTest());
 		ConfigurationStorage = BuildConfigurationStorage();
-		WorkerServerStarter = new WorkerServerStarterUnderTest(BuildWorkerServerStarter(), BuildOptions());
+		BackgroundJobServerStarter = new BackgroundJobServerStarterUnderTest(BuildBackgroundJobServerStarter(), BuildOptions());
 		PublisherStarter = BuildPublisherStarter();
-		WorkerServerQueries = BuildWorkerServerQueries();
+		Queries = BuildQueries();
 		ViewModelBuilder = BuildViewModelBuilder();
 		ServerCountSampleRecorder = buildServerCountSampleRecorder();
 	}
@@ -40,9 +40,9 @@ public class SystemUnderTest : HangfireConfiguration
 	public FakeRedisConnectionVerifier RedisConnectionVerifier { get; }
 
 	public ConfigurationStorage ConfigurationStorage { get; }
-	public WorkerServerStarterUnderTest WorkerServerStarter { get; }
+	public BackgroundJobServerStarterUnderTest BackgroundJobServerStarter { get; }
 	public PublisherStarter PublisherStarter { get; }
-	public WorkerServerQueries WorkerServerQueries { get; }
+	public Queries Queries { get; }
 	public ViewModelBuilder ViewModelBuilder { get; }
 	public ServerCountSampleRecorder ServerCountSampleRecorder { get; }
 
@@ -111,11 +111,6 @@ public class SystemUnderTest : HangfireConfiguration
 		configuration.MaxWorkersPerServer = maxWorkersPerServer;
 		ConfigurationStorage.WriteConfiguration(configuration);
 		return this;
-	}
-
-	public void StartWorkerServer()
-	{
-		WorkerServerStarter.Start();
 	}
 
 	private StoredConfiguration getConfiguration()

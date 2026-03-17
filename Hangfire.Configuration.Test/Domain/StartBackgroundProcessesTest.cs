@@ -72,7 +72,7 @@ public class StartBackgroundProcessesTest
 			PrepareSchemaIfNecessary = false
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Hangfire.StartedServers.Single().storage.Should().Not.Be(null);
 		system.Hangfire.StartedServers.Single().storage.ConnectionString.Should().Be("Data Source=.");

@@ -9,7 +9,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class StartWorkerServersTest
+public class StartBackgroundJobServersTest
 {
 	[Test]
 	public void ShouldStartServer()
@@ -17,7 +17,7 @@ public class StartWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		system.WorkerServerStarter.Start();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers
 			.Should().Not.Be.Empty();
@@ -45,7 +45,7 @@ public class StartWorkerServersTest
 		};
 
 		system.UseServerOptions(serverOptions);
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(serverOptions.Queues, system.Hangfire.StartedServers.Single().options.Queues);
 		Assert.AreEqual(serverOptions.ServerTimeout, system.Hangfire.StartedServers.Single().options.ServerTimeout);
@@ -69,7 +69,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration());
 
 		system.UseServerOptions(new BackgroundJobServerOptions {ServerName = "server!"});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.Null(system.Hangfire.StartedServers.Single().options.ServerName);
 	}
@@ -81,7 +81,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration());
 		var backgroundProcess = new Worker();
 
-		system.WorkerServerStarter.Start(new []{backgroundProcess});
+		system.BackgroundJobServerStarter.Start(new []{backgroundProcess});
 
 		Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
 	}
@@ -93,7 +93,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration());
 		system.WithConfiguration(new StoredConfiguration());
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(2, system.Hangfire.StartedServers.Count());
 	}
@@ -105,7 +105,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration());
 		system.WithConfiguration(new StoredConfiguration());
 
-		system.WorkerServerStarter.Start(new Worker());
+		system.BackgroundJobServerStarter.Start(new Worker());
 
 		system.Hangfire.StartedServers.First().backgroundProcesses
 			.Should().Not.Be.Empty();
@@ -118,7 +118,7 @@ public class StartWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.NotNull(system.Hangfire.StartedServers.Single().storage);
 	}
@@ -129,7 +129,7 @@ public class StartWorkerServersTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;" });
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual( @"Data Source=.;Initial Catalog=fakedb;", system.Hangfire.StartedServers.Single().storage.ConnectionString);
 	}
@@ -141,7 +141,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration { ConnectionString = "Data Source=."});
 
 		system.UseStorageOptions(new SqlServerStorageOptions { PrepareSchemaIfNecessary = false});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.False(system.Hangfire.StartedServers.Single().storage.SqlServerOptions.PrepareSchemaIfNecessary);
 	}
@@ -157,7 +157,7 @@ public class StartWorkerServersTest
 		});
 
 		system.UseStorageOptions(new SqlServerStorageOptions { SchemaName = "Ignored" });
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
 	}
@@ -172,7 +172,7 @@ public class StartWorkerServersTest
 			ConnectionString = "Data Source=."
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual("SchemaName", system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
 	}
@@ -192,7 +192,7 @@ public class StartWorkerServersTest
 			ConnectionString = "Data Source=."
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual("SchemaName1", system.Hangfire.StartedServers.First().storage.SqlServerOptions.SchemaName);
 		Assert.AreEqual("SchemaName2", system.Hangfire.StartedServers.Last().storage.SqlServerOptions.SchemaName);
@@ -208,7 +208,7 @@ public class StartWorkerServersTest
 			ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;"
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(DefaultSchemaName.SqlServer(),
 			system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
@@ -224,7 +224,7 @@ public class StartWorkerServersTest
 			ConnectionString =  @"Data Source=.;Initial Catalog=fakedb;"
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.AreEqual(DefaultSchemaName.SqlServer(),
 			system.Hangfire.StartedServers.Single().storage.SqlServerOptions.SchemaName);
@@ -251,7 +251,7 @@ public class StartWorkerServersTest
 		};
 		system.UseStorageOptions(options);
             
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var storage = system.Hangfire.StartedServers.Single().storage;
 		Assert.AreEqual(options.QueuePollInterval, storage.SqlServerOptions.QueuePollInterval);
@@ -274,7 +274,7 @@ public class StartWorkerServersTest
 			ConnectionString = @"Data Source=."
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var options = new SqlServerStorageOptions();
 		var storage = system.Hangfire.StartedServers.Single().storage;
@@ -295,7 +295,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration {Active = false, ConnectionString = @"Data Source=.;Initial Catalog=inactive;" });
 		system.WithConfiguration(new StoredConfiguration {Active = true, ConnectionString = @"Data Source=.;Initial Catalog=active;" });
 
-		system.WorkerServerStarter.Start(new Worker());
+		system.BackgroundJobServerStarter.Start(new Worker());
 
 		system.Hangfire.StartedServers
 			.Single(x => x.storage.ConnectionString == @"Data Source=.;Initial Catalog=inactive;").backgroundProcesses
@@ -312,7 +312,7 @@ public class StartWorkerServersTest
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 20});
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 100});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 
 		var actual = system.Hangfire.StartedServers.Select(x => x.options.WorkerCount).OrderBy(x => x).ToArray();
 		Assert.AreEqual(new[] {20, 100}, actual);
@@ -334,7 +334,7 @@ public class StartWorkerServersTest
 		});
 
 		system.UseStorageOptions(new SqlServerStorageOptions{CommandTimeout = TimeSpan.FromMinutes(1)});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var options1 = system.Hangfire.StartedServers.First().storage.SqlServerOptions;
 		var options2 = system.Hangfire.StartedServers.Last().storage.SqlServerOptions;

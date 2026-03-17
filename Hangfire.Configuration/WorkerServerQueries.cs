@@ -4,18 +4,18 @@ using Hangfire.Configuration.Internals;
 
 namespace Hangfire.Configuration;
 
-public class WorkerServerQueries
+public class Queries
 {
     private readonly StateMaintainer _stateMaintainer;
     private readonly State _state;
 
-    internal WorkerServerQueries(StateMaintainer stateMaintainer, State state)
+    internal Queries(StateMaintainer stateMaintainer, State state)
     {
         _stateMaintainer = stateMaintainer;
         _state = state;
     }
 
-    public IEnumerable<ConfigurationInfo> QueryAllWorkerServers()
+    public IEnumerable<ConfigurationInfo> QueryAllBackgroundJobServers()
     {
         _stateMaintainer.Refresh();
         return _state.Configurations

@@ -2,7 +2,7 @@ using Hangfire.Server;
 
 namespace Hangfire.Configuration.Test;
 
-public class WorkerServerStarterUnderTest(WorkerServerStarter instance, Options options)
+public class BackgroundJobServerStarterUnderTest(BackgroundJobServerStarter instance, Options options)
 {
 	public void Start() => 
 		instance.Start();

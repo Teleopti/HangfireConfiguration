@@ -10,7 +10,7 @@ public class ActivateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "AwesomeServer",
 			Database = "TestDatabase",

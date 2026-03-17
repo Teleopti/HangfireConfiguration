@@ -13,14 +13,14 @@ public class ConfigurationApi
 	private readonly State _state;
 	private readonly SqlDialectsServerConfigurationCreator _sqlDialectCreator;
 	private readonly RedisServerConfigurationCreator _redisCreator;
-	private readonly WorkerServerUpgrader _upgrader;
+	private readonly StorageUpgrader _upgrader;
 
 	internal ConfigurationApi(
 		ConfigurationStorage storage,
 		State state,
 		SqlDialectsServerConfigurationCreator sqlDialectCreator,
 		RedisServerConfigurationCreator redisCreator,
-		WorkerServerUpgrader upgrader)
+		StorageUpgrader upgrader)
 	{
 		_storage = storage;
 		_state = state;
@@ -68,7 +68,7 @@ public class ConfigurationApi
 		return configuration;
 	}
 
-	public void CreateServerConfiguration(CreateSqlServerWorkerServer command)
+	public void CreateServerConfiguration(CreateSqlServer command)
 	{
 		var storage = new SqlConnectionStringBuilder
 		{
@@ -93,7 +93,7 @@ public class ConfigurationApi
 		);
 	}
 
-	public void CreateServerConfiguration(CreatePostgresWorkerServer command)
+	public void CreateServerConfiguration(CreatePostgresServer command)
 	{
 		var storage = new NpgsqlConnectionStringBuilder
 		{
@@ -118,7 +118,7 @@ public class ConfigurationApi
 		);
 	}
 
-	public void CreateServerConfiguration(CreateRedisWorkerServer command) =>
+	public void CreateServerConfiguration(CreateRedisServer command) =>
 		_redisCreator.Create(command);
 
 	public void ActivateServer(int configurationId)
@@ -137,7 +137,7 @@ public class ConfigurationApi
 		_storage.WriteConfiguration(inactivate);
 	}
 
-	public void UpgradeWorkerServers(UpgradeWorkerServers command) =>
+	public void UpgradeStorage(UpgradeStorage command) =>
 		_upgrader.Upgrade(command);
 
 	public IEnumerable<StoredConfiguration> ReadConfigurations() =>

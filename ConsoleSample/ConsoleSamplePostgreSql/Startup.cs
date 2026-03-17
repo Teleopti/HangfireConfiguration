@@ -101,11 +101,15 @@ public class Startup
 				Queues = new[] {"critical", "default"},
 			})
 			.StartPublishers()
-			.StartWorkerServers([new CustomBackgroundProcess()]);
+			.StartBackgroundJobServers([new CustomBackgroundProcess()]);
 
 		HangfireConfiguration
-			.QueryAllWorkerServers()
-			.ForEach(x => { Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}"); });
+			.QueryAllBackgroundJobServers()
+			.ForEach(x =>
+			{
+				//
+				Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}");
+			});
 
 		app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
 	}

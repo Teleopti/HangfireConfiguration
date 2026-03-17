@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration;
 
-public class UpgradeWorkerServers
+public class UpgradeStorage
 {
 	public string SchemaUpgraderUser { get; set; }
 	public string SchemaUpgraderPassword { get; set; }

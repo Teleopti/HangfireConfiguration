@@ -7,7 +7,7 @@ internal class ServerCountCalculator(IKeyValueStore store)
 {
 	public int ServerCount(IMonitoringApi api, WorkerBalancerOptions options)
 	{
-		var serverCount = readServerCount(api, options);
+		var serverCount = readServerCount(api);
 
 		if (options.MinimumServerCount.HasValue)
 		{
@@ -18,7 +18,7 @@ internal class ServerCountCalculator(IKeyValueStore store)
 		return serverCount;
 	}
 
-	private int readServerCount(IMonitoringApi api, WorkerBalancerOptions options)
+	private int readServerCount(IMonitoringApi api)
 	{
 		var serverCount = serverCountFromSamples();
 		if (serverCount.HasValue)
@@ -29,9 +29,9 @@ internal class ServerCountCalculator(IKeyValueStore store)
 	private static int serverCountFromHangfire(IMonitoringApi api)
 	{
 		var servers = api.Servers();
-		var runningWorkerServers = servers.Count(s => s.WorkersCount > 0);
+		var runningServers = servers.Count(s => s.WorkersCount > 0);
 		const int startingServer = 1;
-		return runningWorkerServers + startingServer;
+		return runningServers + startingServer;
 	}
 
 	private int? serverCountFromSamples()

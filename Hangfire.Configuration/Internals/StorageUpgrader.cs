@@ -5,37 +5,26 @@ using System.Runtime.ExceptionServices;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class WorkerServerUpgrader
+internal class StorageUpgrader(
+	ISchemaInstaller installer,
+	ConfigurationStorage storage,
+	Options options)
 {
-	private readonly ISchemaInstaller _installer;
-	private readonly ConfigurationStorage _storage;
-	private readonly Options _options;
-
-	public WorkerServerUpgrader(
-		ISchemaInstaller installer,
-		ConfigurationStorage storage,
-		Options options)
-	{
-		_installer = installer;
-		_storage = storage;
-		_options = options;
-	}
-
-	public void Upgrade(UpgradeWorkerServers command)
+	public void Upgrade(UpgradeStorage command)
 	{
 		var exceptions = new List<Exception>();
 
 		try
 		{
-			var connectionString = setCredentials(command, _options.ConfigurationOptions().ConnectionString);
-			_installer.InstallHangfireConfigurationSchema(connectionString);
+			var connectionString = setCredentials(command, options.ConfigurationOptions().ConnectionString);
+			installer.InstallHangfireConfigurationSchema(connectionString);
 		}
 		catch (Exception e)
 		{
 			exceptions.Add(e);
 		}
 
-		var configurations = _storage.ReadConfigurations();
+		var configurations = storage.ReadConfigurations();
 
 		var exs = configurations
 			.Where(x => !string.IsNullOrEmpty(x.ConnectionString))
@@ -51,7 +40,7 @@ internal class WorkerServerUpgrader
 
 				try
 				{
-					_installer.InstallHangfireStorageSchema(schemaName, connectionString);
+					installer.InstallHangfireStorageSchema(schemaName, connectionString);
 				}
 				catch (Exception e)
 				{
@@ -71,7 +60,7 @@ internal class WorkerServerUpgrader
 			throw new AggregateException(exceptions);
 	}
 
-	private static string setCredentials(UpgradeWorkerServers command, string connectionString) =>
+	private static string setCredentials(UpgradeStorage command, string connectionString) =>
 		connectionString
 			.SetCredentials(
 				command.SchemaUpgraderUser == null,

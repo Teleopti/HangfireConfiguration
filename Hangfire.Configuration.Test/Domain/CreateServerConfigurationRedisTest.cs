@@ -12,7 +12,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Configuration = "AwesomeServer:425"
 		});
@@ -26,7 +26,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Name = "matte"
 		});
@@ -40,7 +40,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Configuration = "redis"
 		});
@@ -54,7 +54,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Prefix = "{my-prefix}:"
 		});
@@ -68,7 +68,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Prefix = null
 		});
@@ -82,7 +82,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 	
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Configuration = "AwesomeServer", 
 			Prefix = "{prefix}:"
@@ -97,7 +97,7 @@ public class CreateServerConfigurationRedisTest
 	{
 		var system = new SystemUnderTest();
 	
-		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 		{
 			Configuration = "AwesomeServer"
 		});
@@ -113,7 +113,7 @@ public class CreateServerConfigurationRedisTest
 		system.RedisConnectionVerifier.Throws();
 
 		Assert.Catch(() =>
-			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 			{
 				Configuration = "someconfig"
 			}));
@@ -133,7 +133,7 @@ public class CreateServerConfigurationRedisTest
 
 		Assert.Throws<ArgumentException>(() =>
 		{
-			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisWorkerServer
+			system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
 			{
 				Configuration = "localhost",
 				Prefix = prefix

@@ -7,7 +7,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class StartWorkerServerRedisTest
+public class StartBackgroundJobServersRedisTest
 {
 	[Test]
 	public void ShouldUseRedisOptions()
@@ -15,7 +15,7 @@ public class StartWorkerServerRedisTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = "something"});
 
-		system.WorkerServerStarter.Start();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers.Single().storage.Options
 			.Should().Be.OfType<RedisStorageOptions>();
@@ -38,7 +38,7 @@ public class StartWorkerServerRedisTest
 		};
 		system.UseStorageOptions(options);
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var actual = system.Hangfire.StartedServers.Single().storage.RedisOptions();
 		actual.Should().Not.Be.SameInstanceAs(options);
@@ -78,7 +78,7 @@ public class StartWorkerServerRedisTest
 			ConnectionString =  "redis-gurka"
 		});
 
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Hangfire.StartedServers.Single().storage.RedisOptions().Prefix
 			.Should().Be.EqualTo(new RedisStorageOptions().Prefix);

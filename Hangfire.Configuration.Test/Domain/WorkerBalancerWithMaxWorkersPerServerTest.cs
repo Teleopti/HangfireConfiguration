@@ -13,7 +13,7 @@ public class WorkerBalancerWithMaxWorkersPerServerTest
 			.WithGoalWorkerCount(10)
 			.WithMaxWorkersPerServer(2);
             
-		system.StartWorkerServer();
+		system.StartBackgroundJobServers();
 
 		Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}
@@ -33,7 +33,7 @@ public class WorkerBalancerWithMaxWorkersPerServerTest
 			.WithGoalWorkerCount(10)
 			.WithMaxWorkersPerServer(1);
             
-		system.StartWorkerServer();
+		system.StartBackgroundJobServers();
 
 		Assert.AreEqual(2, system.Hangfire.StartedServers.Single().options.WorkerCount);
 	}

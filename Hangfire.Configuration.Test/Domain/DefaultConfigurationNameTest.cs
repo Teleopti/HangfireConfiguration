@@ -11,7 +11,7 @@ public class DefaultConfigurationNameTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 3});
 
-		var result = system.WorkerServerQueries.QueryAllWorkerServers();
+		var result = system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.AreEqual(DefaultConfigurationName.Name(), result.Single().Name);
 	}
@@ -22,7 +22,7 @@ public class DefaultConfigurationNameTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Name = "name"});
 
-		var result = system.WorkerServerQueries.QueryAllWorkerServers();
+		var result = system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.AreEqual("name", result.Single().Name);
 	}
@@ -34,7 +34,7 @@ public class DefaultConfigurationNameTest
 		system.WithConfiguration(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
 		system.WithConfiguration(new StoredConfiguration {Id = 1, GoalWorkerCount = 1});
 
-		var result = system.WorkerServerQueries.QueryAllWorkerServers();
+		var result = system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.AreEqual(DefaultConfigurationName.Name(), result.Single(x => x.ConfigurationId == 1).Name);
 	}
@@ -45,7 +45,7 @@ public class DefaultConfigurationNameTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = "Application Name=AppName"});
 
-		var result = system.WorkerServerQueries.QueryAllWorkerServers();
+		var result = system.Queries.QueryAllBackgroundJobServers();
 
 		Assert.AreEqual(DefaultConfigurationName.Name(), result.Single().Name);
 		Assert.AreEqual("Application Name=AppName", result.Single().ConnectionString);

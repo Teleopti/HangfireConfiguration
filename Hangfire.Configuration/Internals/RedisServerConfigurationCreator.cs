@@ -10,7 +10,7 @@ internal class RedisServerConfigurationCreator(
 {
 #if Redis
 
-	public void Create(CreateRedisWorkerServer command)
+	public void Create(CreateRedisServer command)
 	{
 		var defaultSchemaName = $"{{{new RedisStorageProvider().DefaultSchemaName().TrimEnd(':')}}}:";
 		var prefix = command.Prefix ?? defaultSchemaName;
@@ -32,7 +32,7 @@ internal class RedisServerConfigurationCreator(
 	
 #else
 	
-	public void Create(CreateRedisWorkerServer command)
+	public void Create(CreateRedisServer command)
 	{
 		throw new NotImplementedException();
 	}

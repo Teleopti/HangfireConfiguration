@@ -4,7 +4,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class StartWorkerServersInactiveShutdownTest
+public class StartStartBackgroundJobServersInactiveShutdownTest
 {
 	[Test]
 	public void ShouldStartInactiveServer()
@@ -16,7 +16,7 @@ public class StartWorkerServersInactiveShutdownTest
 			ConnectionString = "inactive"
 		});
 
-		system.StartWorkerServers();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers
 			.Single().storage.ConnectionString.Should().Be("inactive");
@@ -34,7 +34,7 @@ public class StartWorkerServersInactiveShutdownTest
 			ShutdownAt = "2026-03-12 10:00".Utc()
 		});
 
-		system.StartWorkerServers();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers.Should().Be.Empty();
 	}
@@ -51,7 +51,7 @@ public class StartWorkerServersInactiveShutdownTest
 			ShutdownAt = "2026-01-01 00:00".Utc()
 		});
 
-		system.StartWorkerServers();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers
 			.Single().storage.ConnectionString.Should().Be("active");
@@ -68,7 +68,7 @@ public class StartWorkerServersInactiveShutdownTest
 			Active = false
 		});
 
-		system.StartWorkerServers();
+		system.StartBackgroundJobServers();
 
 		system.Hangfire.StartedServers
 			.Single().storage.ConnectionString.Should().Be("inactive");

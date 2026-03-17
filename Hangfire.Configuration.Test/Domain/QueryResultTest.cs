@@ -49,7 +49,7 @@ public class QueryResultTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var result = system.QueryAllWorkerServers().Single();
+		var result = system.QueryAllBackgroundJobServers().Single();
 
 		result.RecurringJobManager.Should().Be.OfType<RecurringJobManager>();
 	}
@@ -60,8 +60,8 @@ public class QueryResultTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var result1 = system.QueryAllWorkerServers().Single();
-		var result2 = system.QueryAllWorkerServers().Single();
+		var result1 = system.QueryAllBackgroundJobServers().Single();
+		var result2 = system.QueryAllBackgroundJobServers().Single();
 
 		result1.RecurringJobManager.Should()
 			.Be.SameInstanceAs(result2.RecurringJobManager);
@@ -73,7 +73,7 @@ public class QueryResultTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var result = system.QueryAllWorkerServers().Single();
+		var result = system.QueryAllBackgroundJobServers().Single();
 
 		result.MonitoringApi.Should().Be.OfType<FakeMonitoringApi>();
 		result.MonitoringApi.Should().Be(system.Monitor);
@@ -85,8 +85,8 @@ public class QueryResultTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration());
 
-		var result1 = system.QueryAllWorkerServers().Single();
-		var result2 = system.QueryAllWorkerServers().Single();
+		var result1 = system.QueryAllBackgroundJobServers().Single();
+		var result2 = system.QueryAllBackgroundJobServers().Single();
 
 		result1.MonitoringApi.Should()
 			.Be.SameInstanceAs(result2.MonitoringApi);
@@ -100,7 +100,7 @@ public class QueryResultTest
 		system.WithConfiguration(new StoredConfiguration {Id = 1});
 		system.WithConfiguration(new StoredConfiguration {Id = 3});
 
-		var result = system.QueryAllWorkerServers();
+		var result = system.QueryAllBackgroundJobServers();
 
 		result.Select(x => x.ConfigurationId)
 			.Should().Have.SameSequenceAs(1, 2, 3);
@@ -128,7 +128,7 @@ public class QueryResultTest
 		system.WithConfiguration(new StoredConfiguration {Id = 2, Active = null});
 		system.WithConfiguration(new StoredConfiguration {Id = 3, Active = true});
 
-		var result = system.QueryAllWorkerServers();
+		var result = system.QueryAllBackgroundJobServers();
 
 		result.ElementAt(0).Publisher.Should().Be.False();
 		result.ElementAt(1).Publisher.Should().Be.False();

@@ -28,7 +28,7 @@ public class AutoUpdateConcurrencyTest(string connectionString) :
 					}
 				}
 			});
-			using var s = system.StartWorkerServers();
+			using var s = system.StartBackgroundJobServers();
 		});
 
 		var system = new SystemUnderInfraTest();

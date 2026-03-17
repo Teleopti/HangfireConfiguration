@@ -1,6 +1,6 @@
 namespace Hangfire.Configuration;
 
-public class CreateRedisWorkerServer
+public class CreateRedisServer
 {
 	public string Name { get; set; }
 	public string Configuration { get; set; }

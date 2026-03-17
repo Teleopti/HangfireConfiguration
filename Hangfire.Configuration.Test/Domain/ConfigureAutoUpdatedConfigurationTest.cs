@@ -12,7 +12,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -34,7 +34,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 
 		system.UseOptions(new ConfigurationOptions());
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.IsEmpty(system.Configurations());
 	}
@@ -45,7 +45,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "existing"}.ToString()});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -68,7 +68,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var existing = new SqlConnectionStringBuilder {DataSource = "existingDataSource", ApplicationName = "existingApplicationName.AutoUpdate"}.ToString();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = existing});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -91,7 +91,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 55});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -117,7 +117,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = one});
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = two});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -138,7 +138,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -159,7 +159,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -184,7 +184,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 			Active = true
 		});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -206,7 +206,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(), Active = true});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -227,7 +227,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -249,7 +249,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -269,7 +269,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldOnlyAutoUpdateOnce()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -302,7 +302,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldAutoUpdateTwiceIfAllConfigurationsWhereRemoved()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptionsForTest
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
 			ExternalConfigurations = new[]
 			{
@@ -337,7 +337,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{
@@ -358,7 +358,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {ConnectionString = new SqlConnectionStringBuilder {ApplicationName = "ApplicationName.AutoUpdate"}.ToString(), Active = false});
 
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new[]
 			{

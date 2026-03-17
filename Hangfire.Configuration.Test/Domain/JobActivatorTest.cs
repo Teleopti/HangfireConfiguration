@@ -20,7 +20,7 @@ public class JobActivatorTest
 		});
 
 		system.WithConfiguration(new StoredConfiguration {Name = "Hangfire"});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		system.Hangfire.StartedServers.Single().options.Activator
 			.Should().Be.SameInstanceAs(activator);

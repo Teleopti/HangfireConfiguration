@@ -13,7 +13,7 @@ public class CreateServerConfigurationPostgresTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "AwesomeServer",
 			Database = "TestDatabase",
@@ -33,7 +33,7 @@ public class CreateServerConfigurationPostgresTest
 	public void ShouldSetGoalWorkerCountToDefaultConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new []
 			{
@@ -45,7 +45,7 @@ public class CreateServerConfigurationPostgresTest
 				}
 			}
 		});
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "newServer",
 			SchemaName = "newSchemaName",
@@ -66,7 +66,7 @@ public class CreateServerConfigurationPostgresTest
 	public void ShouldReadAllConfigurations()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new []
 			{
@@ -78,7 +78,7 @@ public class CreateServerConfigurationPostgresTest
 				}
 			}
 		});
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "newServer",
 			Database = "database",
@@ -101,7 +101,7 @@ public class CreateServerConfigurationPostgresTest
 		system.SchemaInstaller.TryConnectFailsWith = new Exception();
 
 		Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "Server",
 				Database = "TestDatabase",
@@ -116,7 +116,7 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -134,7 +134,7 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -152,7 +152,7 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -170,7 +170,7 @@ public class CreateServerConfigurationPostgresTest
 	public void ShouldThrowWhenSchemaAlreadyExists()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "server",
 			Database = "existingDatabase",
@@ -178,7 +178,7 @@ public class CreateServerConfigurationPostgresTest
 		});
 
 		var e = Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "server",
 				Database = "existingDatabase",
@@ -194,7 +194,7 @@ public class CreateServerConfigurationPostgresTest
 		system.SchemaInstaller.Has(DefaultSchemaName.Postgres(), "Host=_;Database=existingDatabase");
 
 		Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreatePostgresWorkerServer
+			new CreatePostgresServer
 			{
 				Server = "_",
 				Database = "existingDatabase",
@@ -208,7 +208,7 @@ public class CreateServerConfigurationPostgresTest
 		var system = new SystemUnderTest();
 		system.SchemaInstaller.Has("schemaName", "Host=_;Database=one");
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "_",
 			Database = "two",
@@ -226,7 +226,7 @@ public class CreateServerConfigurationPostgresTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Name = "namedConfiguration",
 			SchemaName = "schema"
@@ -241,7 +241,7 @@ public class CreateServerConfigurationPostgresTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
 		{
 			Server = "_",
 			Database = "db",

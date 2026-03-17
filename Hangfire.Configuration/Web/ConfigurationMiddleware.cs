@@ -149,7 +149,7 @@ public class ConfigurationMiddleware
 
 		if (databaseProvider == "SqlServer" || string.IsNullOrEmpty(databaseProvider))
 		{
-			_configurationApi.CreateServerConfiguration(new CreateSqlServerWorkerServer
+			_configurationApi.CreateServerConfiguration(new CreateSqlServer
 			{
 				Name = context.Request.Form["name"],
 				Server = context.Request.Form["server"],
@@ -164,7 +164,7 @@ public class ConfigurationMiddleware
 
 		if (databaseProvider == "PostgreSql")
 		{
-			_configurationApi.CreateServerConfiguration(new CreatePostgresWorkerServer
+			_configurationApi.CreateServerConfiguration(new CreatePostgresServer
 			{
 				Name = context.Request.Form["name"],
 				Server = context.Request.Form["server"],
@@ -179,7 +179,7 @@ public class ConfigurationMiddleware
 
 		if (databaseProvider == "Redis")
 		{
-			_configurationApi.CreateServerConfiguration(new CreateRedisWorkerServer
+			_configurationApi.CreateServerConfiguration(new CreateRedisServer
 			{
 				Name = context.Request.Form["name"],
 				Configuration = context.Request.Form["server"],

@@ -22,7 +22,7 @@ public class ConfigureExternalConfigurationsTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var configuration = system.Configurations().Single();
 		Assert.AreEqual("name", configuration.Name);
@@ -46,7 +46,7 @@ public class ConfigureExternalConfigurationsTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		Assert.True(system.Configurations().Single().Active);
 	}
@@ -68,7 +68,7 @@ public class ConfigureExternalConfigurationsTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var configuration = system.Configurations().Single();
 		Assert.AreEqual("newConnectionString", configuration.ConnectionString);
@@ -97,7 +97,7 @@ public class ConfigureExternalConfigurationsTest
 				}
 			}
 		});
-		system.WorkerServerStarter.Start();
+		system.BackgroundJobServerStarter.Start();
 
 		var configuration = system.Configurations().OrderBy(x => x.Id);
 		Assert.AreEqual("name1", configuration.ElementAt(0).Name);

@@ -13,7 +13,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "AwesomeServer",
 			Database = "TestDatabase",
@@ -33,7 +33,7 @@ public class CreateServerConfigurationTest
 	public void ShouldSetGoalWorkerCountToDefaultConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new []
 			{
@@ -45,7 +45,7 @@ public class CreateServerConfigurationTest
 				}
 			}
 		});
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "newServer",
 			SchemaName = "newSchemaName",
@@ -66,7 +66,7 @@ public class CreateServerConfigurationTest
 	public void ShouldReadAllConfigurations()
 	{
 		var system = new SystemUnderTest();
-		system.WorkerServerStarter.Start(new ConfigurationOptions
+		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
 			ExternalConfigurations = new []
 			{
@@ -78,7 +78,7 @@ public class CreateServerConfigurationTest
 				}
 			}
 		});
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "newServer",
 			Database = "database",
@@ -101,7 +101,7 @@ public class CreateServerConfigurationTest
 		system.SchemaInstaller.TryConnectFailsWith = new Exception();
 
 		Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "Server",
 				Database = "TestDatabase",
@@ -116,7 +116,7 @@ public class CreateServerConfigurationTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -134,7 +134,7 @@ public class CreateServerConfigurationTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -152,7 +152,7 @@ public class CreateServerConfigurationTest
 		var system = new SystemUnderTest();
 
 		system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "AwesomeServer",
 				Database = "TestDatabase",
@@ -170,7 +170,7 @@ public class CreateServerConfigurationTest
 	public void ShouldThrowWhenSchemaAlreadyExists()
 	{
 		var system = new SystemUnderTest();
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "server",
 			Database = "existingDatabase",
@@ -178,7 +178,7 @@ public class CreateServerConfigurationTest
 		});
 
 		var e = Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "server",
 				Database = "existingDatabase",
@@ -194,7 +194,7 @@ public class CreateServerConfigurationTest
 		system.SchemaInstaller.Has(DefaultSchemaName.SqlServer(), "Data Source=_;Initial Catalog=existingDatabase");
 
 		Assert.Throws<Exception>(() => system.ConfigurationApi().CreateServerConfiguration(
-			new CreateSqlServerWorkerServer
+			new CreateSqlServer
 			{
 				Server = "_",
 				Database = "existingDatabase",
@@ -208,7 +208,7 @@ public class CreateServerConfigurationTest
 		var system = new SystemUnderTest();
 		system.SchemaInstaller.Has("schemaName", "Data Source=_;Initial Catalog=one");
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Server = "_",
 			Database = "two",
@@ -226,7 +226,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			Name = "namedConfiguration",
 			SchemaName = "schema"
@@ -241,7 +241,7 @@ public class CreateServerConfigurationTest
 	{
 		var system = new SystemUnderTest();
 
-		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServerWorkerServer
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
 		{
 			SchemaName = null
 		});
