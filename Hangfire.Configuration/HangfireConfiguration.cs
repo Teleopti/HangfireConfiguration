@@ -23,11 +23,7 @@ public class HangfireConfiguration
 		_state = new State(BuildNow());
 	}
 
-#if NETSTANDARD2_0
-	public HangfireConfiguration UseApplicationBuilder(IApplicationBuilder builder)
-#else
-	public HangfireConfiguration UseApplicationBuilder(IAppBuilder builder)
-#endif
+	public HangfireConfiguration UseApplicationBuilder(object builder)
 	{
 		_builder = builder;
 		return this;
