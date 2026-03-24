@@ -18,7 +18,7 @@
 		<PackageTags>Hangfire</PackageTags>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Dapper" Version="2.0.123" />
+		<PackageReference Include="Dapper" Version="2.1.66" />
 		<!-- Newer versions of Hangfire.PostgreSql has Dapper.AOT as a reference -->
 		<!-- Dapper.AOT causes tons of analyzer warnings down the line -->
 		<!-- https://github.com/hangfire-postgres/Hangfire.PostgreSql/issues/416#issuecomment-3885438841 -->
