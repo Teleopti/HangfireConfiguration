@@ -7,7 +7,7 @@ public class ConfigurationOptions
 	public string ConnectionString { get; set; }
 
 	public bool PrepareSchemaIfNecessary { get; set; }
-        
+
 	public IEnumerable<ExternalConfiguration> ExternalConfigurations { get; set; }
 
 	public WorkerBalancerOptions WorkerBalancerOptions { get; } = new();
@@ -15,5 +15,4 @@ public class ConfigurationOptions
 #if NETSTANDARD2_0
 	public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
 #endif
-	    
 }
