@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Providers;
@@ -27,9 +28,7 @@ internal class ConfigurationUpdater
 
 		_state.ConfigurationUpdaterRan = true;
 
-		var external = options.ExternalConfigurations ?? Enumerable.Empty<ExternalConfiguration>()
-			.Where(x => x.ConnectionString != null)
-			.ToArray();
+		var external = options.ExternalConfigurations ?? Enumerable.Empty<ExternalConfiguration>();
 
 		if (alreadyUpToDate(external, stored))
 			return false;
@@ -50,8 +49,10 @@ internal class ConfigurationUpdater
 		IEnumerable<ExternalConfiguration> external,
 		IEnumerable<StoredConfiguration> stored)
 	{
+		// always fix stored configurations if no external configuration received
+		// why iv no idea right now
 		if (!external.Any())
-			return false; //always fix stored configurations if no configuration options received
+			return false; 
 
 		bool notStored(IEnumerable<StoredConfiguration> stored, ExternalConfiguration received) =>
 			!stored.Any(s => sameConfiguration(received, s));
