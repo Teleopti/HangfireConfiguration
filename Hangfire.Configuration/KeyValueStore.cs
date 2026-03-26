@@ -73,7 +73,7 @@ public class KeyValueStore : IKeyValueStore
 
 	public void Transaction(Action action)
 	{
-		_currentTransaction.Value = new ConnectorTransaction(_connector.ConnectionString);
+		_currentTransaction.Value = _connector.Transaction();
 		action.Invoke();
 		_currentTransaction.Value.Commit();
 		_currentTransaction.Value = null;

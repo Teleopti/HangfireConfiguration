@@ -129,7 +129,7 @@ public class CreateServerConfigurationRedisTest
 	[TestCase("{pre}fix}:")]
 	public void ShouldThrowIfPrefixIsNotCorrect(string prefix)
 	{
-		var system = new SystemUnderInfraTest();
+		var system = new SystemUnderTest();
 
 		Assert.Throws<ArgumentException>(() =>
 		{

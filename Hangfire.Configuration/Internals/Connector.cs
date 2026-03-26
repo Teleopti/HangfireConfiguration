@@ -3,21 +3,26 @@ using System.Data;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class Connector : ConnectorBase
+internal class Connector(string connectionString) : ConnectorBase(connectionString)
 {
 	protected override void operation(Action<IDbConnection, IDbTransaction> action)
 	{
 		this.PickAction(() =>
 			{
-				using var connection = ConnectionString.CreateConnection();
+				using var connection = ConnectionString().CreateConnection();
 				OpenWithRetry(connection);
 				action.Invoke(connection, null);
 			}, () =>
 			{
-				using var connection = ConnectionString.CreateConnection();
+				using var connection = ConnectionString().CreateConnection();
 				connection.Open();
 				action.Invoke(connection, null);
 			}
 		);
+	}
+
+	public ConnectorTransaction Transaction()
+	{
+		return new ConnectorTransaction(ConnectionString());
 	}
 }

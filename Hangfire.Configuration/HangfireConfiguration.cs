@@ -92,10 +92,8 @@ public class HangfireConfiguration
 		_state,
 		BuildNow());
 
-	private Connector buildConnector() => new()
-	{
-		ConnectionString = _state.ReadOptions().ConnectionString
-	};
+	private Connector buildConnector() =>
+		new(_state.ReadOptions().ConnectionString);
 
 	private WorkerBalancer buildWorkerBalancer() => new(BuildKeyValueStore());
 

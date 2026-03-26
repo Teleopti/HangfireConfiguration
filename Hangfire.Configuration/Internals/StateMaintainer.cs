@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Hangfire.Configuration.Providers;
 
@@ -42,7 +43,6 @@ internal class StateMaintainer
 						.Append(buildConfigurationState(null, connectionString, schemaName))
 						.ToArray();
 				}
-				
 			}
 		}
 
@@ -81,11 +81,10 @@ internal class StateMaintainer
 				.Where(x => !configurations.Select(x => x.Id).Contains(x.Configuration.Id))
 				.ToArray();
 			_state.Configurations = _state.Configurations.Except(toRemove).ToArray();
-			
+
 			_state.Configurations = _state.Configurations
 				.OrderBy(x => x.Configuration?.Id)
 				.ToArray();
-
 		}
 	}
 

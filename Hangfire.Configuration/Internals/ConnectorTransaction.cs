@@ -8,9 +8,8 @@ internal class ConnectorTransaction : ConnectorBase, IDisposable
 	private readonly IDbConnection _connection;
 	private readonly IDbTransaction _transaction;
 
-	public ConnectorTransaction(string connectionString)
+	public ConnectorTransaction(string connectionString) : base(connectionString)
 	{
-		ConnectionString = connectionString;
 		_connection = connectionString.CreateConnection();
 		OpenWithRetry(_connection);
 		_transaction = _connection.BeginTransaction();

@@ -7,16 +7,34 @@ using Polly;
 
 namespace Hangfire.Configuration.Internals;
 
-internal abstract class ConnectorBase : IDbSelector
+internal abstract class ConnectorBase(string connectionString) : IDbSelector
 {
+	private string _connectionString = connectionString;
+	private string _validConnectionString;
+	
 	protected abstract void operation(Action<IDbConnection, IDbTransaction> action);
 
+	protected string ConnectionString()
+	{
+		if (_validConnectionString != null)
+			return _validConnectionString;
+		
+		if (string.IsNullOrEmpty(_connectionString))
+			throw new Exception("Invalid connection string");
+		var valid = _connectionString.ToDbSelector()
+			.PickDialect(true, true);
+		if (!valid)
+			throw new Exception("Invalid connection string");
+
+		_validConnectionString = _connectionString;
+		_connectionString = null;
+		return _validConnectionString;
+	}
+	
 	private static readonly Policy _connectionRetry = Policy.Handle<TimeoutException>()
 		.Or<SqlException>(DetectTransientSqlException.IsTransient)
 		.OrInner<SqlException>(DetectTransientSqlException.IsTransient)
 		.WaitAndRetry(6, i => TimeSpan.FromSeconds(Math.Min(30, Math.Pow(i, 2))));
-
-	public string ConnectionString { get; set; }
 
 	public int Execute(string sql)
 	{
@@ -53,6 +71,6 @@ internal abstract class ConnectorBase : IDbSelector
 
 	public T PickFunc<T>(Func<T> sqlServer, Func<T> postgres, Func<T> redis = null)
 	{
-		return ConnectionString.ToDbSelector().PickFunc(sqlServer, postgres);
+		return ConnectionString().ToDbSelector().PickFunc(sqlServer, postgres);
 	}
 }
