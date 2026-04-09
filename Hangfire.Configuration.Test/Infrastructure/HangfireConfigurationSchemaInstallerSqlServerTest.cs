@@ -19,6 +19,7 @@ public class HangfireConfigurationSchemaInstallerSqlServerTest
 	[TestCase(5)]
 	[TestCase(6)]
 	[TestCase(7)]
+	[TestCase(8)]
 	public void ShouldInstallSchemaVersion(int schemaVersion)
 	{
 		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion);
@@ -33,6 +34,7 @@ public class HangfireConfigurationSchemaInstallerSqlServerTest
 	[TestCase(5)]
 	[TestCase(6)]
 	[TestCase(7)]
+	[TestCase(8)]
 	public void ShouldUpgradeFromSchemaVersion(int schemaVersion)
 	{
 		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion);
@@ -52,12 +54,12 @@ public class HangfireConfigurationSchemaInstallerSqlServerTest
 INSERT INTO 
     HangfireConfiguration.Configuration 
     (ConnectionString, SchemaName, GoalWorkerCount, Active) 
-    VALUES (@ConnectionString, @SchemaName, @GoalWorkerCount, @Active)
-", new StoredConfiguration {GoalWorkerCount = 99});
+    VALUES (@ConnectionString, @SchemaName, @GoalWorkerCount, @Active)", 
+				new { GoalWorkerCount = 99, ConnectionString = (string)null, SchemaName = (string)null, Active = (bool?)null });
 
 		install();
 
-		Assert.AreEqual(99, read().Single().GoalWorkerCount);
+		Assert.AreEqual(99, read().Single().Containers.Single().GoalWorkerCount);
 		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
 	}
 
@@ -68,8 +70,8 @@ INSERT INTO
 		Assert.AreEqual(2, version());
 		using (var c = ConnectionStrings.SqlServer.CreateConnection())
 		{
-			c.Execute(@"INSERT INTO HangfireConfiguration.Configuration (ConnectionString) VALUES (@ConnectionString)", new StoredConfiguration());
-			c.Execute(@"INSERT INTO HangfireConfiguration.Configuration (ConnectionString) VALUES (@ConnectionString)", new StoredConfiguration());
+			c.Execute(@"INSERT INTO HangfireConfiguration.Configuration (ConnectionString) VALUES (@ConnectionString)", new { ConnectionString = (string)null });
+			c.Execute(@"INSERT INTO HangfireConfiguration.Configuration (ConnectionString) VALUES (@ConnectionString)", new { ConnectionString = (string)null });
 		}
 
 		install(3);
@@ -89,7 +91,7 @@ INSERT INTO
 
 		install();
 
-		Assert.AreEqual(52, read().Single().GoalWorkerCount);
+		Assert.AreEqual(52, read().Single().Containers.Single().GoalWorkerCount);
 		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
 	}
 
@@ -118,9 +120,34 @@ VALUES
 		result.ConnectionString.Should().Be(ConnectionStrings.SqlServer);
 		result.SchemaName.Should().Be("hangfire");
 		result.Active.Should().Be(true);
-		result.WorkerBalancerEnabled.Should().Be(true);
-		result.GoalWorkerCount.Should().Be(10);
-		result.MaxWorkersPerServer.Should().Be(2);
+		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
+		result.Containers.Single().GoalWorkerCount.Should().Be(10);
+		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+	}
+
+	[Test]
+	public void ShouldUpgradeFrom7ToLatest()
+	{
+		DatabaseTestSetup.SetupSqlServer(ConnectionStrings.SqlServer, schemaVersion: 7);
+		using (var c = ConnectionStrings.SqlServer.CreateConnection())
+			c.Execute(@"INSERT INTO HangfireConfiguration.KeyValueStore ([Key], [Value]) VALUES (@Key, @Value)",
+				new
+				{
+					Key = "Configuration:1",
+					Value = @"{""Id"":1,""ConnectionString"":""Data Source=."",""GoalWorkerCount"":10,""MaxWorkersPerServer"":2,""WorkerBalancerEnabled"":true,""Active"":true}"
+				});
+
+		install();
+
+		var result = read().Single();
+		result.ConnectionString.Should().Be("Data Source=.");
+		result.Active.Should().Be(true);
+		result.Containers.Should().Not.Be.Null();
+		result.Containers.Single().Tag.Should().Be(DefaultContainerTag.Tag());
+		result.Containers.Single().GoalWorkerCount.Should().Be(10);
+		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
+		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
 		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
 	}
 	

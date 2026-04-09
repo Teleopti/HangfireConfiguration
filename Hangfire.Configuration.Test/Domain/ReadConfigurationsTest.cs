@@ -16,7 +16,7 @@ public class ReadConfigurationsTest
             ConnectionString = "connection",
             SchemaName = "schema",
             Active = true,
-            GoalWorkerCount = 11
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 11 } }
         });
 
         var result = system.ConfigurationApi().ReadConfigurations() as StoredConfiguration[];
@@ -25,7 +25,7 @@ public class ReadConfigurationsTest
         Assert.AreEqual("connection", result.Single().ConnectionString);
         Assert.AreEqual("schema", result.Single().SchemaName);
         Assert.AreEqual(true, result.Single().Active);
-        Assert.AreEqual(11, result.Single().GoalWorkerCount);
+        Assert.AreEqual(11, result.Single().Containers.Single().GoalWorkerCount);
     }
         
     [Test]
@@ -39,7 +39,7 @@ public class ReadConfigurationsTest
             ConnectionString = "connection",
             SchemaName = "SchemaName",
             Active = true,
-            GoalWorkerCount = 44
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 44 } }
         });
 
         var result = system.ConfigurationApi().ReadConfigurations().Single();
@@ -47,7 +47,7 @@ public class ReadConfigurationsTest
         Assert.AreEqual("connection", result.ConnectionString);
         Assert.AreEqual("SchemaName", result.SchemaName);
         Assert.True(result.Active);
-        Assert.AreEqual(44, result.GoalWorkerCount);
+        Assert.AreEqual(44, result.Containers.Single().GoalWorkerCount);
     }
         
     [Test]
@@ -61,7 +61,7 @@ public class ReadConfigurationsTest
             ConnectionString = "c",
             SchemaName = "s",
             Active = true,
-            GoalWorkerCount = 4
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 4 } }
         });
         var configuration = system.ConfigurationApi().ReadConfigurations().Single();
             

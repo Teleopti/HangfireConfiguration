@@ -56,7 +56,7 @@ internal class ConfigurationState
 	}
 
 	internal bool WorkerBalancerIsEnabled() =>
-		Configuration.WorkerBalancerIsEnabled();
+		Configuration.DefaultContainer().WorkerBalancerIsEnabled();
 
 	internal bool IsShutdown()
 	{

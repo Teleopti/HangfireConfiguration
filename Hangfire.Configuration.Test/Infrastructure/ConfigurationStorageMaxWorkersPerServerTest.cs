@@ -12,9 +12,9 @@ public class ConfigurationStorageMaxWorkersPerServerTest(string connectionString
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { MaxWorkersPerServer = 5 } }});
 
-		Assert.AreEqual(5, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
+		Assert.AreEqual(5, system.ConfigurationStorage.ReadConfigurations().Single().Containers.Single().MaxWorkersPerServer);
 	}
 
 	[Test]
@@ -22,12 +22,12 @@ public class ConfigurationStorageMaxWorkersPerServerTest(string connectionString
 	{
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
-		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {MaxWorkersPerServer = 5});
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { MaxWorkersPerServer = 5 } }});
 		var existing = system.ConfigurationStorage.ReadConfigurations().Single();
 
-		existing.MaxWorkersPerServer = 3;
+		existing.Containers ??= new[] { new ContainerConfiguration() }; existing.Containers[0].MaxWorkersPerServer = 3;
 		system.ConfigurationStorage.WriteConfiguration(existing);
 
-		Assert.AreEqual(3, system.ConfigurationStorage.ReadConfigurations().Single().MaxWorkersPerServer);
+		Assert.AreEqual(3, system.ConfigurationStorage.ReadConfigurations().Single().Containers.Single().MaxWorkersPerServer);
 	}
 }

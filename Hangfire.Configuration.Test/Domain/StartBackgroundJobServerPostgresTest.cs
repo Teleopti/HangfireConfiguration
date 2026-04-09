@@ -305,12 +305,12 @@ public class StartBackgroundJobServerPostgresTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			GoalWorkerCount = 20, 
+			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }, 
 			ConnectionString = @"Host=localhost;Database=fakedb;"
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			GoalWorkerCount = 100, 
+			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 100 } }, 
 			ConnectionString = @"Host=localhost;Database=fakedb;"
 		});
 

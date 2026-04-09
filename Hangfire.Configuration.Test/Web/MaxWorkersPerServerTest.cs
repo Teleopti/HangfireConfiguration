@@ -28,7 +28,7 @@ public class MaxWorkersPerServerTest
             })
         ).Wait();
 
-        Assert.AreEqual(5, system.Configurations().Single().MaxWorkersPerServer);
+        Assert.AreEqual(5, system.Configurations().Single().Containers.Single().MaxWorkersPerServer);
     }
 
     [Test]
@@ -38,7 +38,7 @@ public class MaxWorkersPerServerTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            MaxWorkersPerServer = 4
+            Containers = new[] { new ContainerConfiguration { MaxWorkersPerServer = 4 } }
         });
 
         using var s = new WebServerUnderTest(system);
@@ -51,6 +51,6 @@ public class MaxWorkersPerServerTest
             })
         ).Wait();
 
-        Assert.Null(system.Configurations().Single().MaxWorkersPerServer);
+        Assert.Null(system.Configurations().Single().Containers.Single().MaxWorkersPerServer);
     }
 }

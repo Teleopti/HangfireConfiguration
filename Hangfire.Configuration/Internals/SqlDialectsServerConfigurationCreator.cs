@@ -32,7 +32,11 @@ internal class SqlDialectsServerConfigurationCreator(
 			ConnectionString = storageConnectionString,
 			SchemaName = schemaName,
 			Active = false,
-			WorkerBalancerEnabled = provider.WorkerBalancerEnabledDefault()
+			Containers = new[] { new ContainerConfiguration
+			{
+				Tag = DefaultContainerTag.Tag(),
+				WorkerBalancerEnabled = provider.WorkerBalancerEnabledDefault()
+			}}
 		});
 	}
 }

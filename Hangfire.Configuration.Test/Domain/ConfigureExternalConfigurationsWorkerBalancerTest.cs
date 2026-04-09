@@ -25,7 +25,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 		});
 		system.BackgroundJobServerStarter.Start();
 
-		system.Configurations().Single().WorkerBalancerEnabled
+		system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(true);
 	}
 
@@ -46,7 +46,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 		});
 		system.BackgroundJobServerStarter.Start();
 
-		system.Configurations().Single().WorkerBalancerEnabled
+		system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 
@@ -67,7 +67,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 		});
 		system.BackgroundJobServerStarter.Start();
 
-		system.Configurations().Single().WorkerBalancerEnabled
+		system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 	
@@ -80,7 +80,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 			Id = 1, 
 			Name = "hangfire", 
 			ConnectionString = new SqlConnectionStringBuilder {DataSource = "original"}.ToString(),
-			WorkerBalancerEnabled = false
+			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = false } }
 		});
 		
 		system.UseOptions(new ConfigurationOptionsForTest
@@ -96,7 +96,7 @@ public class ConfigureExternalConfigurationsWorkerBalancerTest
 		});
 		system.BackgroundJobServerStarter.Start();
 		
-		system.Configurations().Single().WorkerBalancerEnabled
+		system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 }

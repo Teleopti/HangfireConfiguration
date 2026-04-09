@@ -89,7 +89,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldUpdateLegacyConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 55});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 55 } }});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
@@ -104,7 +104,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 		});
 
 		var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName"}.ToString();
-		Assert.AreEqual(55, system.Configurations().Single().GoalWorkerCount);
+		Assert.AreEqual(55, system.Configurations().Single().Containers.Single().GoalWorkerCount);
 		Assert.AreEqual(expected, system.Configurations().Single().ConnectionString);
 	}
 
@@ -157,7 +157,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 4 } }});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
@@ -247,7 +247,7 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldSaveSchemaNameOnLegacyConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 4});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 4 } }});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{

@@ -17,7 +17,8 @@ internal class WorkerBalancer
 		StoredConfiguration configuration,
 		WorkerBalancerOptions options)
 	{
-		var goal = configuration.GoalWorkerCount ?? options.DefaultGoalWorkerCount;
+		var container = configuration.DefaultContainer();
+		var goal = container.GoalWorkerCount ?? options.DefaultGoalWorkerCount;
 		if (goal > options.MaximumGoalWorkerCount)
 			goal = options.MaximumGoalWorkerCount;
 
@@ -25,10 +26,10 @@ internal class WorkerBalancer
 
 		var workerCount = Convert.ToInt32(Math.Ceiling(goal / (decimal) serverCount));
 
-		if (configuration.MaxWorkersPerServer.HasValue)
+		if (container.MaxWorkersPerServer.HasValue)
 		{
-			if (workerCount > configuration.MaxWorkersPerServer.Value)
-				workerCount = configuration.MaxWorkersPerServer.Value;
+			if (workerCount > container.MaxWorkersPerServer.Value)
+				workerCount = container.MaxWorkersPerServer.Value;
 		}
 
 		if (workerCount < options.MinimumWorkerCount)

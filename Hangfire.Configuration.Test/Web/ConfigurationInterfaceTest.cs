@@ -33,7 +33,7 @@ public class ConfigurationInterfaceTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            GoalWorkerCount = 3
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }
         });
 
         using var s = new WebServerUnderTest(system);
@@ -48,7 +48,7 @@ public class ConfigurationInterfaceTest
 
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         Assert.AreEqual(1, system.Configurations().Single().Id);
-        Assert.AreEqual(10, system.Configurations().Single().GoalWorkerCount);
+        Assert.AreEqual(10, system.Configurations().Single().Containers.Single().GoalWorkerCount);
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class ConfigurationInterfaceTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            GoalWorkerCount = 3
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }
         });
 
         using var s = new WebServerUnderTest(system);

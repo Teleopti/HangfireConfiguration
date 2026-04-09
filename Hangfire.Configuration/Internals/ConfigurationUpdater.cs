@@ -117,7 +117,11 @@ internal class ConfigurationUpdater
 			                    {
 				                    Name = update.Name,
 				                    Active = true,
-				                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
+				                    Containers = new[] { new ContainerConfiguration
+				                    {
+					                    Tag = DefaultContainerTag.Tag(),
+					                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
+				                    }}
 			                    };
 
 			configuration.ConnectionString = update.ConnectionString;

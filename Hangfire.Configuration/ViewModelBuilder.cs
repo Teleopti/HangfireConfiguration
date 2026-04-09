@@ -30,9 +30,9 @@ public class ViewModelBuilder
 					ConnectionString = connectionString,
 					SchemaName = schemaName,
 					Active = x.IsActive(),
-					WorkerBalancerEnabled = x.WorkerBalancerIsEnabled(),
-					Workers = x.GoalWorkerCount,
-					MaxWorkersPerServer = x.MaxWorkersPerServer
+					WorkerBalancerEnabled = x.DefaultContainer().WorkerBalancerIsEnabled(),
+					Workers = x.DefaultContainer().GoalWorkerCount,
+					MaxWorkersPerServer = x.DefaultContainer().MaxWorkersPerServer
 				};
 			}).ToArray();
 	}

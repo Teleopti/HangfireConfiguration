@@ -27,7 +27,7 @@ public class WorkerBalancerDisableTest
             })
         ).Wait();
 
-        system.Configurations().Single().WorkerBalancerEnabled
+        system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
             .Should().Be(false);
     }
 
@@ -49,7 +49,7 @@ public class WorkerBalancerDisableTest
             })
         ).Wait();
 
-        system.Configurations().Single().WorkerBalancerEnabled
+        system.Configurations().Single().Containers.Single().WorkerBalancerEnabled
             .Should().Be(true);
     }
 }

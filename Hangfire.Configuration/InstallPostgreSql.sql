@@ -117,6 +117,29 @@ BEGIN
 		var_CURRENT_SCHEMA_VERSION := 7;
 	END IF;
 
+	IF var_CURRENT_SCHEMA_VERSION < 8 AND var_TARGET_SCHEMA_VERSION >= 8 THEN
+
+		RAISE NOTICE 'Installing HangfireConfiguration schema version 8';
+
+		UPDATE $(HangfireConfigurationSchema).keyvaluestore
+		SET value = (
+			(value::jsonb - 'GoalWorkerCount' - 'MaxWorkersPerServer' - 'WorkerBalancerEnabled')
+			|| jsonb_build_object('Containers', jsonb_build_array(
+				jsonb_strip_nulls(jsonb_build_object(
+					'Tag', 'Hangfire',
+					'GoalWorkerCount', (value::jsonb->>'GoalWorkerCount')::int,
+					'MaxWorkersPerServer', (value::jsonb->>'MaxWorkersPerServer')::int,
+					'WorkerBalancerEnabled', (value::jsonb->>'WorkerBalancerEnabled')::boolean
+				))
+			))
+		)::text
+		WHERE key LIKE 'Configuration:%';
+
+		RAISE NOTICE 'Migrated worker properties to Containers array';
+
+		var_CURRENT_SCHEMA_VERSION := 8;
+	END IF;
+
 
 
 

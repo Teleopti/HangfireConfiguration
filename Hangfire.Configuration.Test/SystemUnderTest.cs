@@ -66,7 +66,10 @@ public class SystemUnderTest : HangfireConfiguration
 
 	public SystemUnderTest HasGoalWorkerCount(int goalWorkerCount)
 	{
-		ConfigurationStorage.WriteConfiguration(new StoredConfiguration {GoalWorkerCount = goalWorkerCount});
+		ConfigurationStorage.WriteConfiguration(new StoredConfiguration
+		{
+			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = goalWorkerCount } }
+		});
 		return this;
 	}
 
@@ -100,7 +103,8 @@ public class SystemUnderTest : HangfireConfiguration
 	public SystemUnderTest WithGoalWorkerCount(int goalWorkerCount)
 	{
 		var configuration = getConfiguration();
-		configuration.GoalWorkerCount = goalWorkerCount;
+		configuration.Containers ??= new[] { new ContainerConfiguration() };
+		configuration.Containers[0].GoalWorkerCount = goalWorkerCount;
 		ConfigurationStorage.WriteConfiguration(configuration);
 		return this;
 	}
@@ -108,7 +112,8 @@ public class SystemUnderTest : HangfireConfiguration
 	public SystemUnderTest WithMaxWorkersPerServer(int maxWorkersPerServer)
 	{
 		var configuration = getConfiguration();
-		configuration.MaxWorkersPerServer = maxWorkersPerServer;
+		configuration.Containers ??= new[] { new ContainerConfiguration() };
+		configuration.Containers[0].MaxWorkersPerServer = maxWorkersPerServer;
 		ConfigurationStorage.WriteConfiguration(configuration);
 		return this;
 	}

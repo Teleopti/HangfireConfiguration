@@ -9,7 +9,7 @@ public class DefaultConfigurationNameTest
 	public void ShouldUpdateLegacyWithDefaultName()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 3});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }});
 
 		var result = system.Queries.QueryAllBackgroundJobServers();
 
@@ -31,8 +31,8 @@ public class DefaultConfigurationNameTest
 	public void ShouldUpdateFirstLegacyWithDefaultName()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Id = 2, GoalWorkerCount = 3});
-		system.WithConfiguration(new StoredConfiguration {Id = 1, GoalWorkerCount = 1});
+		system.WithConfiguration(new StoredConfiguration {Id = 2, Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }});
+		system.WithConfiguration(new StoredConfiguration {Id = 1, Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 1 } }});
 
 		var result = system.Queries.QueryAllBackgroundJobServers();
 

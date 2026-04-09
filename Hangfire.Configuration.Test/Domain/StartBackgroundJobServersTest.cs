@@ -309,8 +309,8 @@ public class StartBackgroundJobServersTest
 	public void ShouldGetGoalWorkerCountForTwoServers()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 20});
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 100});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 100 } }});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 

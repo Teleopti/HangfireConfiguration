@@ -11,13 +11,17 @@ public class StoredConfiguration
 	public string SchemaName { get; set; }
 	public bool? Active { get; set; }
 	public DateTime? ShutdownAt { get; set; }
-	
-	public bool? WorkerBalancerEnabled { get; set; }
-	public int? GoalWorkerCount { get; set; }
-	public int? MaxWorkersPerServer { get; set; }
+
+	public ContainerConfiguration[] Containers { get; set; }
+
+	internal ContainerConfiguration DefaultContainer()
+	{
+		if (Containers == null || Containers.Length == 0)
+			Containers = new[] { new ContainerConfiguration { Tag = DefaultContainerTag.Tag() } };
+		return Containers[0];
+	}
 
 	internal bool IsActive() => Active.GetValueOrDefault();
-	internal bool WorkerBalancerIsEnabled() => WorkerBalancerEnabled ?? true;
 	internal string AppliedSchemaName()
 	{
 		if (SchemaName != null)

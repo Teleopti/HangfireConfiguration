@@ -36,7 +36,7 @@ public class ConfigurationApi
 
 		var configuration = matchingConfiguration(command.ConfigurationId);
 
-		configuration.GoalWorkerCount = command.Workers;
+		configuration.DefaultContainer().GoalWorkerCount = command.Workers;
 
 		_storage.WriteConfiguration(configuration);
 	}
@@ -45,7 +45,7 @@ public class ConfigurationApi
 	{
 		var configuration = matchingConfiguration(command.ConfigurationId);
 
-		configuration.MaxWorkersPerServer = command.MaxWorkers;
+		configuration.DefaultContainer().MaxWorkersPerServer = command.MaxWorkers;
 
 		_storage.WriteConfiguration(configuration);
 	}
@@ -147,10 +147,10 @@ public class ConfigurationApi
 		_storage.WriteConfiguration(configuration);
 
 	public void EnableWorkerBalancer(int configurationId) =>
-		mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = true; });
+		mutateConfiguration(configurationId, c => { c.DefaultContainer().WorkerBalancerEnabled = true; });
 
 	public void DisableWorkerBalancer(int configurationId) =>
-		mutateConfiguration(configurationId, c => { c.WorkerBalancerEnabled = false; });
+		mutateConfiguration(configurationId, c => { c.DefaultContainer().WorkerBalancerEnabled = false; });
 
 	private void mutateConfiguration(int configurationId, Action<StoredConfiguration> mutation)
 	{

@@ -26,7 +26,11 @@ internal class RedisServerConfigurationCreator(
 			ConnectionString = command.Configuration,
 			Name = command.Name,
 			Active = false,
-			WorkerBalancerEnabled = false
+			Containers = new[] { new ContainerConfiguration
+			{
+				Tag = DefaultContainerTag.Tag(),
+				WorkerBalancerEnabled = false
+			}}
 		});
 	}
 	

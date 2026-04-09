@@ -47,7 +47,7 @@ public class ConfigurationStorageTest(string connectionString) :
 		{
 			ConnectionString = "connectionString",
 			SchemaName = "schemaName",
-			GoalWorkerCount = 3,
+			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } },
 			Active = true
 		});
 
@@ -56,7 +56,7 @@ public class ConfigurationStorageTest(string connectionString) :
 		Assert.AreEqual(1, result.Id);
 		Assert.AreEqual("connectionString", result.ConnectionString);
 		Assert.AreEqual("schemaName", result.SchemaName);
-		Assert.AreEqual(3, result.GoalWorkerCount);
+		Assert.AreEqual(3, result.Containers.Single().GoalWorkerCount);
 		Assert.AreEqual(true, result.Active);
 	}
 
@@ -71,14 +71,14 @@ public class ConfigurationStorageTest(string connectionString) :
 		var existing = storage.ReadConfigurations().Single();
 		existing.ConnectionString = "connection";
 		existing.SchemaName = "schema";
-		existing.GoalWorkerCount = 23;
+		existing.Containers ??= new[] { new ContainerConfiguration() }; existing.Containers[0].GoalWorkerCount = 23;
 		existing.Active = true;
 		storage.WriteConfiguration(existing);
 
 		var configuration = storage.ReadConfigurations().Single();
 		Assert.AreEqual("connection", configuration.ConnectionString);
 		Assert.AreEqual("schema", configuration.SchemaName);
-		Assert.AreEqual(23, configuration.GoalWorkerCount);
+		Assert.AreEqual(23, configuration.Containers.Single().GoalWorkerCount);
 		Assert.AreEqual(true, configuration.Active);
 	}
 

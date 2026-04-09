@@ -14,9 +14,9 @@ public class ConfigurationStorageWorkerBalancerTest(string connectionString) :
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {WorkerBalancerEnabled = true});
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = true } }});
 
-		system.ConfigurationStorage.ReadConfigurations().Single().WorkerBalancerEnabled
+		system.ConfigurationStorage.ReadConfigurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(true);
 	}
 
@@ -26,9 +26,9 @@ public class ConfigurationStorageWorkerBalancerTest(string connectionString) :
 		var system = new SystemUnderInfraTest();
 		system.UseOptions(new ConfigurationOptions {ConnectionString = ConnectionString});
 
-		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {WorkerBalancerEnabled = false});
+		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = false } }});
 
-		system.ConfigurationStorage.ReadConfigurations().Single().WorkerBalancerEnabled
+		system.ConfigurationStorage.ReadConfigurations().Single().Containers.Single().WorkerBalancerEnabled
 			.Should().Be(false);
 	}
 
@@ -41,7 +41,7 @@ public class ConfigurationStorageWorkerBalancerTest(string connectionString) :
 
 		system.ConfigurationStorage.WriteConfiguration(new StoredConfiguration());
 
-		system.ConfigurationStorage.ReadConfigurations().Single().WorkerBalancerEnabled
-			.Should().Be(null);
+		var result = system.ConfigurationStorage.ReadConfigurations().Single();
+		(result.Containers?.SingleOrDefault()?.WorkerBalancerEnabled).Should().Be(null);
 	}
 }

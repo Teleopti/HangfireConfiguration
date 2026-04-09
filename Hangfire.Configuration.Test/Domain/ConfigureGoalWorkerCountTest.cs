@@ -15,7 +15,7 @@ public class ConfigureGoalWorkerCountTest
 
         system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = workers});
 
-        Assert.AreEqual(workers, system.Configurations().Single().GoalWorkerCount);
+        Assert.AreEqual(workers, system.Configurations().Single().Containers.Single().GoalWorkerCount);
     }
 
     [Test]
@@ -24,12 +24,12 @@ public class ConfigureGoalWorkerCountTest
         var system = new SystemUnderTest();
         system.WithConfiguration(new StoredConfiguration
         {
-            GoalWorkerCount = 1
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 1 } }
         });
 
         system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = null});
 
-        Assert.Null(system.Configurations().Single().GoalWorkerCount);
+        Assert.Null(system.Configurations().Single().Containers.Single().GoalWorkerCount);
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class ConfigureGoalWorkerCountTest
             Workers = 5
         });
 
-        Assert.AreEqual(5, system.Configurations().Single(x => x.Id == 2).GoalWorkerCount);
+        Assert.AreEqual(5, system.Configurations().Single(x => x.Id == 2).Containers.Single().GoalWorkerCount);
     }
 
     [Test]
@@ -64,7 +64,7 @@ public class ConfigureGoalWorkerCountTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            GoalWorkerCount = 10
+            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 10 } }
         });
 
         try
@@ -75,7 +75,7 @@ public class ConfigureGoalWorkerCountTest
         {
         }
 
-        Assert.AreEqual(10, system.Configurations().Single().GoalWorkerCount);
+        Assert.AreEqual(10, system.Configurations().Single().Containers.Single().GoalWorkerCount);
     }
 
     [Test]

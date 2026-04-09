@@ -56,7 +56,7 @@ public class ViewConfigurationsTest
 			ConnectionString = null,
 			SchemaName = null,
 			Active = null,
-			GoalWorkerCount = null
+			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = null } }
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -95,7 +95,7 @@ public class ViewConfigurationsTest
 	public void ShouldBuildWithWorkers()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {GoalWorkerCount = 10});
+		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 10 } }});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -294,7 +294,7 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			WorkerBalancerEnabled = true
+			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = true } }
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -308,7 +308,7 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			WorkerBalancerEnabled = null
+			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = null } }
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -322,7 +322,7 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			WorkerBalancerEnabled = false
+			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = false } }
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();

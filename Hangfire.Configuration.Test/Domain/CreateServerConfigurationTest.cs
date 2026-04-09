@@ -59,7 +59,7 @@ public class CreateServerConfigurationTest
 		system.ConfigurationApi().WriteGoalWorkerCount(new WriteGoalWorkerCount {Workers = 10});
 
 		var config = system.Configurations();
-		Assert.AreEqual(10, config.First().GoalWorkerCount);
+		Assert.AreEqual(10, config.First().Containers.Single().GoalWorkerCount);
 	}
 
 	[Test]

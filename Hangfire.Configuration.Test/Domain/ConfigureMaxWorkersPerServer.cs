@@ -14,7 +14,7 @@ public class ConfigureMaxWorkersPerServerTest
 
 		system.ConfigurationApi().WriteMaxWorkersPerServer(new WriteMaxWorkersPerServer {MaxWorkers = expected});
 
-		Assert.AreEqual(expected, system.Configurations().Single().MaxWorkersPerServer);
+		Assert.AreEqual(expected, system.Configurations().Single().Containers.Single().MaxWorkersPerServer);
 	}
         
 	[Test]
@@ -30,6 +30,6 @@ public class ConfigureMaxWorkersPerServerTest
 			MaxWorkers = 7
 		});
 
-		Assert.AreEqual(7, system.Configurations().Single(x => x.Id == 2).MaxWorkersPerServer);
+		Assert.AreEqual(7, system.Configurations().Single(x => x.Id == 2).Containers.Single().MaxWorkersPerServer);
 	}
 }
