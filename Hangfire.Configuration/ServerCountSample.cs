@@ -6,4 +6,5 @@ public class ServerCountSample
 {
     public DateTime Timestamp { get; set; }
     public int Count { get; set; }
+    public string[] Queues { get; set; }
 }

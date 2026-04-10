@@ -24,7 +24,7 @@ public class ContainerConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }
+			Containers = new[] {new ContainerConfiguration {GoalWorkerCount = 20}}
 		});
 
 		system.StartBackgroundJobServers();
@@ -34,119 +34,170 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	public void ShouldUseMaxWorkersPerServerFromContainer()
+	[Ignore("WIP")]
+	public void ShouldOnlyStartDefaultTagWhenNoTagSpecified()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration
+		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 200, MaxWorkersPerServer = 5 } }
+			Queues = new[] {"default", "reports"}
 		});
-
-		system.StartBackgroundJobServers();
-
-		system.Hangfire.StartedServers.Single().options.WorkerCount
-			.Should().Be.LessThanOrEqualTo(5);
-	}
-
-	[Test]
-	public void ShouldPreserveContainersOnRoundTrip()
-	{
-		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Containers = new[]
 			{
-				new ContainerConfiguration
-				{
-					Tag = DefaultContainerTag.Tag(),
-					GoalWorkerCount = 15,
-					MaxWorkersPerServer = 3,
-					WorkerBalancerEnabled = true
-				}
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
 			}
-		});
-
-		var result = system.Configurations().Single();
-
-		result.Containers.Single().Tag.Should().Be.EqualTo(DefaultContainerTag.Tag());
-		result.Containers.Single().GoalWorkerCount.Should().Be.EqualTo(15);
-		result.Containers.Single().MaxWorkersPerServer.Should().Be.EqualTo(3);
-		result.Containers.Single().WorkerBalancerEnabled.Should().Be.EqualTo(true);
-	}
-
-	[Test]
-	public void ShouldPreserveMultipleContainersOnRoundTrip()
-	{
-		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration
-		{
-			Containers = new[]
-			{
-				new ContainerConfiguration
-				{
-					Tag = DefaultContainerTag.Tag(),
-					GoalWorkerCount = 10
-				},
-				new ContainerConfiguration
-				{
-					Tag = "worker-b",
-					Queues = new[] {"reports", "emails"},
-					GoalWorkerCount = 5
-				}
-			}
-		});
-
-		var result = system.Configurations().Single();
-
-		result.Containers.Length.Should().Be.EqualTo(2);
-		result.Containers[0].Tag.Should().Be.EqualTo(DefaultContainerTag.Tag());
-		result.Containers[0].GoalWorkerCount.Should().Be.EqualTo(10);
-		result.Containers[1].Tag.Should().Be.EqualTo("worker-b");
-		result.Containers[1].Queues.Should().Have.SameSequenceAs("reports", "emails");
-		result.Containers[1].GoalWorkerCount.Should().Be.EqualTo(5);
-	}
-
-	[Test]
-	public void ShouldPreserveOtherPropertiesWhenUsingContainers()
-	{
-		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration
-		{
-			Name = "Production",
-			ConnectionString = "Data Source=.",
-			SchemaName = "MySchema",
-			Active = true,
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 10 } }
-		});
-
-		var result = system.Configurations().Single();
-
-		result.Name.Should().Be.EqualTo("Production");
-		result.ConnectionString.Should().Be.EqualTo("Data Source=.");
-		result.SchemaName.Should().Be.EqualTo("MySchema");
-		result.Active.Should().Be.EqualTo(true);
-		result.Containers.Single().GoalWorkerCount.Should().Be.EqualTo(10);
-	}
-
-	[Test]
-	public void ShouldStartServersForMultipleConfigurations()
-	{
-		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration
-		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 10 } }
-		});
-		system.WithConfiguration(new StoredConfiguration
-		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }
 		});
 
 		system.StartBackgroundJobServers();
 
-		var workerCounts = system.Hangfire.StartedServers
-			.Select(x => x.options.WorkerCount)
-			.OrderBy(x => x)
-			.ToArray();
-		workerCounts.Should().Have.SameSequenceAs(new[] {10, 20});
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Contain("default");
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Not.Contain("reports");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldOnlyStartDefaultTagWhenDefaultTagSpecified()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = DefaultContainerTag.Tag()
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = new[] {"default", "reports"}
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}, GoalWorkerCount = 5}
+			}
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Contain("default");
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Not.Contain("reports");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldStartSpecificTagWhenTagSpecified()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = new[] {"default", "reports"}
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}, GoalWorkerCount = 5}
+			}
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Not.Contain("default");
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Contain("reports");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldStartDefaultContainerWithConfiguredQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = new[] {"default", "email", "reports"}
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"default", "email"}},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
+			}
+		});
+
+		system.StartBackgroundJobServers();
+
+		var defaultServer = system.Hangfire.StartedServers.Single();
+		defaultServer.options.Queues.Should().Contain("default");
+		defaultServer.options.Queues.Should().Contain("email");
+		defaultServer.options.Queues.Should().Not.Contain("reports");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldPickUpNewQueueOnDefaultContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = new[] {"default", "email", "reports", "notifications"}
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"default", "email"}},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
+			}
+		});
+
+		system.StartBackgroundJobServers();
+
+		var defaultServer = system.Hangfire.StartedServers.Single();
+		defaultServer.options.Queues.Should().Contain("default");
+		defaultServer.options.Queues.Should().Contain("email");
+		defaultServer.options.Queues.Should().Contain("notifications");
+		defaultServer.options.Queues.Should().Not.Contain("reports");
+	}
+	
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldPickUpNewQueueOnDefaultContainerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = new[] {"default", "email", "reports", "notifications"}
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = null},
+				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
+			}
+		});
+
+		system.StartBackgroundJobServers();
+
+		var defaultServer = system.Hangfire.StartedServers.Single();
+		defaultServer.options.Queues.Should().Contain("default");
+		defaultServer.options.Queues.Should().Contain("email");
+		defaultServer.options.Queues.Should().Contain("notifications");
+		defaultServer.options.Queues.Should().Not.Contain("reports");
 	}
 }

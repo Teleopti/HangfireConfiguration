@@ -12,6 +12,8 @@ public class ConfigurationOptions
 
 	public WorkerBalancerOptions WorkerBalancerOptions { get; } = new();
 
+	public string ContainerTag { get; set; }
+
 #if NETSTANDARD2_0
 	public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
 #endif
