@@ -41,7 +41,7 @@ public class HangfireConfigurationSchemaInstallerSqlServerTest
 		
 		install();
 
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.SqlServer));
 	}
 
 	[Test]
@@ -60,7 +60,7 @@ INSERT INTO
 		install();
 
 		Assert.AreEqual(99, read().Single().Containers.Single().GoalWorkerCount);
-		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
+		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.SqlServer), version());
 	}
 
 	[Test]
@@ -92,7 +92,7 @@ INSERT INTO
 		install();
 
 		Assert.AreEqual(52, read().Single().Containers.Single().GoalWorkerCount);
-		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion, version());
+		Assert.AreEqual(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.SqlServer), version());
 	}
 
 	[Test]
@@ -123,7 +123,7 @@ VALUES
 		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
 		result.Containers.Single().GoalWorkerCount.Should().Be(10);
 		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.SqlServer));
 	}
 
 	[Test]
@@ -148,7 +148,7 @@ VALUES
 		result.Containers.Single().GoalWorkerCount.Should().Be(10);
 		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
 		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.SqlServer));
 	}
 	
 	private void install(int? schemaVersion = null)

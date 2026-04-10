@@ -32,7 +32,7 @@ public class HangfireConfigurationSchemaInstallerPostgresTest
 
 		install();
 
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.Postgres));
 	}
 
 	[Test]
@@ -74,7 +74,7 @@ VALUES
 		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
 		result.Containers.Single().GoalWorkerCount.Should().Be(10);
 		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.Postgres));
 	}
 
 	[Test]
@@ -99,7 +99,7 @@ VALUES
 		result.Containers.Single().GoalWorkerCount.Should().Be(10);
 		result.Containers.Single().MaxWorkersPerServer.Should().Be(2);
 		result.Containers.Single().WorkerBalancerEnabled.Should().Be(true);
-		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion);
+		version().Should().Be(HangfireConfigurationSchemaInstaller.SchemaVersion(ConnectionStrings.Postgres));
 	}
 
 	private void install(int? schemaVersion = null)
