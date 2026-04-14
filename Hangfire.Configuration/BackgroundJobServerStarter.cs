@@ -64,6 +64,7 @@ public class BackgroundJobServerStarter
 	{
 		serverOptions = copyOptions(serverOptions);
 
+		applyQueues(configurationState, options, serverOptions);
 		applyWorkerBalancer(configurationState, options, serverOptions);
 
 		var server = _hangfire.StartBackgroundJobServer(
@@ -74,6 +75,44 @@ public class BackgroundJobServerStarter
 
 		backgroundProcesses.Clear();
 		return server;
+	}
+
+	private static void applyQueues(
+		ConfigurationState configurationState,
+		ConfigurationOptions options,
+		BackgroundJobServerOptions serverOptions)
+	{
+		var containers = configurationState.Configuration.Containers;
+		if (containers == null)
+			return;
+
+		var tag = options.ContainerTag ?? DefaultContainerTag.Tag();
+
+		var container = containers.FirstOrDefault(c => c.Tag == tag);
+		if (container == null)
+			return;
+
+		var containerQueueus = container.Queues ?? [];
+		var isDefault = container.Tag == DefaultContainerTag.Tag();
+		if (isDefault)
+		{
+			var otherContainerQueues = containers
+				.Where(c => c.Tag != DefaultContainerTag.Tag())
+				.Where(c => c.Queues != null)
+				.SelectMany(c => c.Queues)
+				.ToArray();
+
+			var unclaimed = serverOptions.Queues
+				.Where(q => !otherContainerQueues.Contains(q))
+				.ToArray();
+
+			serverOptions.Queues = containerQueueus.Union(unclaimed).ToArray();
+		}
+		else
+		{
+			if (containerQueueus.Length > 0)
+				serverOptions.Queues = containerQueueus;
+		}
 	}
 
 	private void applyWorkerBalancer(ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)

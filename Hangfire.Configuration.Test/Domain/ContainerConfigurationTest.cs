@@ -24,7 +24,7 @@ public class ContainerConfigurationTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] {new ContainerConfiguration {GoalWorkerCount = 20}}
+			Containers = [new ContainerConfiguration {GoalWorkerCount = 20}]
 		});
 
 		system.StartBackgroundJobServers();
@@ -34,21 +34,27 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldOnlyStartDefaultTagWhenNoTagSpecified()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "reports"}
+			Queues = ["default", "reports"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
@@ -60,7 +66,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldOnlyStartDefaultTagWhenDefaultTagSpecified()
 	{
 		var system = new SystemUnderTest();
@@ -71,15 +76,22 @@ public class ContainerConfigurationTest
 		});
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "reports"}
+			Queues = ["default", "reports"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}, GoalWorkerCount = 5}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
@@ -91,7 +103,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldStartSpecificTagWhenTagSpecified()
 	{
 		var system = new SystemUnderTest();
@@ -102,15 +113,22 @@ public class ContainerConfigurationTest
 		});
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "reports"}
+			Queues = ["default", "reports"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag()},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}, GoalWorkerCount = 5}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
@@ -122,21 +140,28 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldStartDefaultContainerWithConfiguredQueues()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "email", "reports"}
+			Queues = ["default", "email", "reports"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"default", "email"}},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(), 
+					Queues = ["default", "email"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
@@ -148,21 +173,28 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldPickUpNewQueueOnDefaultContainer()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "email", "reports", "notifications"}
+			Queues = ["default", "email", "reports", "notifications"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"default", "email"}},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(), 
+					Queues = ["default", "email"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
@@ -173,23 +205,30 @@ public class ContainerConfigurationTest
 		defaultServer.options.Queues.Should().Contain("notifications");
 		defaultServer.options.Queues.Should().Not.Contain("reports");
 	}
-	
+
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldPickUpNewQueueOnDefaultContainerWithoutQueues()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
-			Queues = new[] {"default", "email", "reports", "notifications"}
+			Queues = ["default", "email", "reports", "notifications"]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = null},
-				new ContainerConfiguration {Tag = "reports", Queues = new[] {"reports"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(), 
+					Queues = null
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
 		});
 
 		system.StartBackgroundJobServers();
