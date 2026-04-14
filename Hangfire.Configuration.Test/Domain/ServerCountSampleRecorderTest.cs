@@ -24,8 +24,9 @@ public class ServerCountSampleRecorderTest
     public void ShouldRecord()
     {
         var system = new SystemUnderTest();
-        system.WithConfiguration(new StoredConfiguration());
-        system.Monitor.AnnounceServer("runningServer");
+        system
+            .WithConfiguration(new StoredConfiguration())
+            .WithAnnouncedServer("runningServer");
 
         system.ServerCountSampleRecorder.Record();
 
@@ -36,9 +37,10 @@ public class ServerCountSampleRecorderTest
     public void ShouldRecordBoth()
     {
         var system = new SystemUnderTest();
-        system.WithConfiguration(new StoredConfiguration());
-        system.Monitor.AnnounceServer("runningServer1");
-        system.Monitor.AnnounceServer("runningServer2");
+        system
+            .WithConfiguration(new StoredConfiguration())
+            .WithAnnouncedServer("runningServer1")
+            .WithAnnouncedServer("runningServer2");
 
         system.ServerCountSampleRecorder.Record();
 
@@ -272,9 +274,10 @@ public class ServerCountSampleRecorderTest
     public void ShouldOnlyRecordServersWithWorkers()
     {
         var system = new SystemUnderTest();
-        system.WithConfiguration(new StoredConfiguration());
-        system.Monitor.AnnounceServer("server-without-workers", 0);
-        system.Monitor.AnnounceServer("server-with-workers", 5);
+        system
+            .WithConfiguration(new StoredConfiguration())
+            .WithAnnouncedServer("server-without-workers", workersCount: 0)
+            .WithAnnouncedServer("server-with-workers", workersCount: 5);
 
         system.ServerCountSampleRecorder.Record();
 

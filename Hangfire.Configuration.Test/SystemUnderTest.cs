@@ -80,9 +80,9 @@ public class SystemUnderTest : HangfireConfiguration
 	}
 		
 
-	public SystemUnderTest WithAnnouncedServer(string serverId)
+	public SystemUnderTest WithAnnouncedServer(string serverId, int workersCount = 2, string[] queues = null)
 	{
-		Monitor.AnnounceServer(serverId);
+		Monitor.AnnounceServer(serverId, workersCount, queues);
 		return this;
 	}
 
