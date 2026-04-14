@@ -12,16 +12,17 @@ public class StoredConfiguration
 	public bool? Active { get; set; }
 	public DateTime? ShutdownAt { get; set; }
 
-	public ContainerConfiguration[] Containers { get; set; }
+	public ContainerConfiguration[] Containers { get; set; } = [new() {Tag = DefaultContainerTag.Tag()}];
 
 	internal ContainerConfiguration DefaultContainer()
 	{
 		if (Containers == null || Containers.Length == 0)
-			Containers = new[] { new ContainerConfiguration { Tag = DefaultContainerTag.Tag() } };
+			Containers = [new ContainerConfiguration {Tag = DefaultContainerTag.Tag()}];
 		return Containers[0];
 	}
 
 	internal bool IsActive() => Active.GetValueOrDefault();
+
 	internal string AppliedSchemaName()
 	{
 		if (SchemaName != null)

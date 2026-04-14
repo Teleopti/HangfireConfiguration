@@ -64,14 +64,10 @@ public class BackgroundJobServerStarter
 	{
 		serverOptions = copyOptions(serverOptions);
 
-		var containers = configurationState.Configuration.Containers;
-		if (containers != null)
-		{
-			var container = findContainer(containers, options);
-			if (container == null)
-				return null;
-			applyQueues(container, containers, serverOptions);
-		}
+		var container = findContainer(configurationState.Configuration.Containers, options);
+		if (container == null)
+			return null;
+		applyQueues(container, configurationState.Configuration.Containers, serverOptions);
 
 		applyWorkerBalancer(configurationState, options, serverOptions);
 
