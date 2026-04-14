@@ -13,6 +13,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 	private readonly StateMaintainer _stateMaintainer;
 	private readonly INow _now;
 	private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
+	private readonly TimeSpan _sampleMaxAge = TimeSpan.FromHours(24);
 	private const int _sampleLimit = 6;
 
 	internal ServerCountSampleRecorder(
@@ -46,21 +47,31 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 			return;
 
 		var api = _state.Configurations.First().MonitoringApi;
+		var servers = api.Servers().Where(s => s.WorkersCount > 0).ToArray();
+		var now = _now.UtcDateTime();
 
-		var serverCount = api
-			.Servers()
-			.Count(s => s.WorkersCount > 0);
+		var newSamples = servers.Length == 0
+			? [new ServerCountSample {Timestamp = now, Count = 0}]
+			: servers
+				.GroupBy(s => s.Queues != null ? string.Join(",", s.Queues) : "")
+				.Select(g => new ServerCountSample
+				{
+					Timestamp = now,
+					Count = g.Count(),
+					Queues = g.First().Queues?.ToArray()
+				})
+				.ToArray();
 
-		samples.Samples = samples
-			.Samples
-			.OrderByDescending(x => x.Timestamp)
-			.Take(_sampleLimit - 1)
+		var cutoff = now.Subtract(_sampleMaxAge);
+		samples.Samples = samples.Samples
+			.Where(s => s.Timestamp > cutoff)
+			.Concat(newSamples)
+			.GroupBy(s => s.Queues != null ? string.Join(",", s.Queues) : "")
+			.SelectMany(g => g
+				.OrderByDescending(x => x.Timestamp)
+				.Take(_sampleLimit)
+			)
 			.OrderBy(x => x.Timestamp)
-			.Append(new ServerCountSample
-			{
-				Timestamp = _now.UtcDateTime(),
-				Count = serverCount
-			})
 			.ToArray();
 
 		_store.ServerCountSamples(samples);

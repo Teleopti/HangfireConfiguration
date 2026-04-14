@@ -5,7 +5,6 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-[Ignore("WIP")]
 public class ServerCountSampleRecorderContainerQueuesTest
 {
 	[Test]
@@ -94,5 +93,49 @@ public class ServerCountSampleRecorderContainerQueuesTest
 		});
 
 		system.KeyValueStore.Samples().Count().Should().Be(12);
+	}
+
+	[Test]
+	public void ShouldRemoveSamplesOlderThan24Hours()
+	{
+		var system = new SystemUnderTest();
+		system
+			.WithConfiguration(new StoredConfiguration())
+			.WithServerCountSample(new ServerCountSample
+			{
+				Timestamp = "2020-12-01 12:00".Utc(),
+				Count = 1,
+				Queues = ["reports"]
+			})
+			.WithAnnouncedServer("defaultServer", queues: ["default"]);
+
+		system.Now("2020-12-02 12:10");
+		system.ServerCountSampleRecorder.Record();
+
+		system.KeyValueStore.Samples()
+			.Where(s => s.Queues != null && s.Queues.SequenceEqual(["reports"]))
+			.Should().Be.Empty();
+	}
+
+	[Test]
+	public void ShouldKeepSamplesWithin24Hours()
+	{
+		var system = new SystemUnderTest();
+		system
+			.WithConfiguration(new StoredConfiguration())
+			.WithServerCountSample(new ServerCountSample
+			{
+				Timestamp = "2020-12-01 12:00".Utc(),
+				Count = 1,
+				Queues = ["reports"]
+			})
+			.WithAnnouncedServer("defaultServer", queues: ["default"]);
+
+		system.Now("2020-12-02 11:50");
+		system.ServerCountSampleRecorder.Record();
+
+		system.KeyValueStore.Samples()
+			.Where(s => s.Queues != null && s.Queues.SequenceEqual(["reports"]))
+			.Should().Not.Be.Empty();
 	}
 }
