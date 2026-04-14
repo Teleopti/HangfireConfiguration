@@ -344,4 +344,35 @@ public class ContainerConfigurationTest
 		server.options.Queues.Should().Contain("default");
 		server.options.Queues.Should().Contain("reports");
 	}
+
+	[Test]
+	public void ShouldNotStartWhenContainerTagDoesNotExist()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "nonexistent"
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers
+			.Should().Be.Empty();
+	}
 }

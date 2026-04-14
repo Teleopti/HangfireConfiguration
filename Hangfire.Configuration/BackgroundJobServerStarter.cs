@@ -64,7 +64,15 @@ public class BackgroundJobServerStarter
 	{
 		serverOptions = copyOptions(serverOptions);
 
-		applyQueues(configurationState, options, serverOptions);
+		var containers = configurationState.Configuration.Containers;
+		if (containers != null)
+		{
+			var container = findContainer(containers, options);
+			if (container == null)
+				return null;
+			applyQueues(container, containers, serverOptions);
+		}
+
 		applyWorkerBalancer(configurationState, options, serverOptions);
 
 		var server = _hangfire.StartBackgroundJobServer(
@@ -77,29 +85,35 @@ public class BackgroundJobServerStarter
 		return server;
 	}
 
-	private static void applyQueues(
-		ConfigurationState configurationState,
-		ConfigurationOptions options,
-		BackgroundJobServerOptions serverOptions)
+	private static ContainerConfiguration findContainer(
+		ContainerConfiguration[] containers,
+		ConfigurationOptions options)
 	{
-		var containers = configurationState.Configuration.Containers;
-		if (containers == null)
-			return;
-
 		var tag = string.IsNullOrEmpty(options.ContainerTag)
 			? DefaultContainerTag.Tag()
 			: options.ContainerTag;
 
 		var container = containers.FirstOrDefault(c => c.Tag == tag);
-		if (container == null)
-			return;
+		if (container != null)
+			return container;
 
+		if (tag == DefaultContainerTag.Tag())
+			return containers.FirstOrDefault(c => c.Tag == null);
+
+		return null;
+	}
+
+	private static void applyQueues(
+		ContainerConfiguration container,
+		ContainerConfiguration[] containers,
+		BackgroundJobServerOptions serverOptions)
+	{
 		var containerQueueus = container.Queues ?? [];
-		var isDefault = container.Tag == DefaultContainerTag.Tag();
+		var isDefault = container.Tag == null || container.Tag == DefaultContainerTag.Tag();
 		if (isDefault)
 		{
 			var otherContainerQueues = containers
-				.Where(c => c.Tag != DefaultContainerTag.Tag())
+				.Where(c => c != container)
 				.Where(c => c.Queues != null)
 				.SelectMany(c => c.Queues)
 				.ToArray();
