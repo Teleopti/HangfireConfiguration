@@ -276,4 +276,72 @@ public class ContainerConfigurationTest
 		defaultServer.options.Queues.Should().Contain("notifications");
 		defaultServer.options.Queues.Should().Not.Contain("reports");
 	}
+
+	[Test]
+	public void ShouldNotClaimQueuesFromContainerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = null
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var defaultServer = system.Hangfire.StartedServers.Single();
+		defaultServer.options.Queues.Should().Contain("default");
+		defaultServer.options.Queues.Should().Contain("reports");
+	}
+
+	[Test]
+	public void ShouldKeepDefaultQueuesForSpecificContainerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = null
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.Queues.Should().Contain("default");
+		server.options.Queues.Should().Contain("reports");
+	}
 }
