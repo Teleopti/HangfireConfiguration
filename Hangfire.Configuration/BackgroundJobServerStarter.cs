@@ -86,7 +86,9 @@ public class BackgroundJobServerStarter
 		if (containers == null)
 			return;
 
-		var tag = options.ContainerTag ?? DefaultContainerTag.Tag();
+		var tag = string.IsNullOrEmpty(options.ContainerTag)
+			? DefaultContainerTag.Tag()
+			: options.ContainerTag;
 
 		var container = containers.FirstOrDefault(c => c.Tag == tag);
 		if (container == null)

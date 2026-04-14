@@ -103,6 +103,43 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
+	public void ShouldOnlyStartDefaultTagWhenEmptyTagSpecified()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = ""
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports", 
+					Queues = ["reports"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Contain("default");
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Not.Contain("reports");
+	}
+
+	[Test]
 	public void ShouldStartSpecificTagWhenTagSpecified()
 	{
 		var system = new SystemUnderTest();
