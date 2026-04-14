@@ -4,7 +4,6 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-[Ignore("WIP")]
 public class ContainerConfigurationBalancerTest
 {
 	[Test]
@@ -271,5 +270,57 @@ public class ContainerConfigurationBalancerTest
 		var server = system.Hangfire.StartedServers.Single();
 		server.options.WorkerCount.Should().Be(hangfireDefault);
 		server.options.Queues.Should().Have.SameSequenceAs(["reports"]);
+	}
+
+	[Test]
+	public void ShouldCountOldSampleWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.WithServerCountSample(new ServerCountSample
+		{
+			Count = 2,
+			Queues = null
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default"],
+					GoalWorkerCount = 10
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.WorkerCount.Should().Be(5);
+	}
+
+	[Test]
+	public void ShouldCountAnnouncedServerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.Monitor.AnnounceServer("oldServer");
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default"],
+					GoalWorkerCount = 10
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.WorkerCount.Should().Be(5);
 	}
 }

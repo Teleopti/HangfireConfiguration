@@ -69,7 +69,7 @@ public class BackgroundJobServerStarter
 			return null;
 		applyQueues(container, configurationState.Configuration.Containers, serverOptions);
 
-		applyWorkerBalancer(configurationState, options, serverOptions);
+		applyWorkerBalancer(container, configurationState, options, serverOptions);
 
 		var server = _hangfire.StartBackgroundJobServer(
 			configurationState.JobStorage,
@@ -127,16 +127,15 @@ public class BackgroundJobServerStarter
 		}
 	}
 
-	private void applyWorkerBalancer(ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)
+	private void applyWorkerBalancer(ContainerConfiguration container, ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)
 	{
-		var enabled = configurationState.WorkerBalancerIsEnabled();
-		if (!enabled)
+		if (!container.WorkerBalancerIsEnabled())
 			return;
 
 		serverOptions.WorkerCount =
 			_workerBalancer.CalculateWorkerCount(
 				configurationState.MonitoringApi,
-				configurationState.Configuration,
+				container,
 				options.WorkerBalancerOptions
 			);
 	}
