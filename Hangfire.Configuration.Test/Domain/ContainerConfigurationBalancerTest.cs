@@ -323,4 +323,81 @@ public class ContainerConfigurationBalancerTest
 		var server = system.Hangfire.StartedServers.Single();
 		server.options.WorkerCount.Should().Be(5);
 	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldBalanceWithAnnouncedServerWithSameQueuesInDifferentOrder()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.Monitor.AnnounceServer("reportsServer1", queues: ["batch", "reports"]);
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default"],
+					GoalWorkerCount = 10
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports", "batch"],
+					GoalWorkerCount = 20
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		// 1 matching announced server + 1 starting = 2
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.WorkerCount.Should().Be(10);
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldBalanceWithSampleHavingQueuesInDifferentOrder()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.WithServerCountSample(new ServerCountSample
+		{
+			Count = 2,
+			Queues = ["batch", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default"],
+					GoalWorkerCount = 10
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports", "batch"],
+					GoalWorkerCount = 20
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.WorkerCount.Should().Be(10);
+	}
 }

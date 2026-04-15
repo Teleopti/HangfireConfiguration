@@ -138,4 +138,20 @@ public class ServerCountSampleRecorderContainerQueuesTest
 			.Where(s => s.Queues != null && s.Queues.SequenceEqual(["reports"]))
 			.Should().Not.Be.Empty();
 	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldCountServersWithSameQueuesInDifferentOrder()
+	{
+		var system = new SystemUnderTest();
+		system
+			.WithConfiguration(new StoredConfiguration())
+			.WithAnnouncedServer("server1", queues: ["default", "email"])
+			.WithAnnouncedServer("server2", queues: ["email", "default"]);
+
+		system.ServerCountSampleRecorder.Record();
+
+		var sample = system.KeyValueStore.Samples().Single();
+		sample.Count.Should().Be(2);
+	}
 }
