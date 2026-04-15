@@ -377,7 +377,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldPreserveServerOptionsQueueOrderForSpecificContainer()
 	{
 		var system = new SystemUnderTest();
@@ -413,7 +412,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldPreserveServerOptionsQueueOrderForDefaultContainerWithUnclaimed()
 	{
 		var system = new SystemUnderTest();
@@ -445,7 +443,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldPreserveServerOptionsQueueOrderForDefaultContainerWithoutQueues()
 	{
 		var system = new SystemUnderTest();
@@ -477,7 +474,6 @@ public class ContainerConfigurationTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldUseServerOptionsQueueOrderNotContainerOrder()
 	{
 		var system = new SystemUnderTest();
@@ -510,5 +506,71 @@ public class ContainerConfigurationTest
 
 		system.Hangfire.StartedServers.Single().options.Queues
 			.Should().Have.SameSequenceAs("alpha", "beta", "gamma");
+	}
+
+	[Test]
+	public void ShouldExcludeContainerQueueNotInServerOptions()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports", "unknown"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("reports");
+	}
+
+	[Test]
+	public void ShouldExcludeDefaultContainerQueueNotInServerOptions()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["default", "unknown"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("default");
 	}
 }

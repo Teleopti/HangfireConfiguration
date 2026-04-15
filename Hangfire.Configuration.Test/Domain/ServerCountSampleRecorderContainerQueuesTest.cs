@@ -140,7 +140,6 @@ public class ServerCountSampleRecorderContainerQueuesTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldCountServersWithSameQueuesInDifferentOrder()
 	{
 		var system = new SystemUnderTest();

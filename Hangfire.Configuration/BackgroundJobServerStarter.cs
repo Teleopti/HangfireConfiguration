@@ -104,7 +104,7 @@ public class BackgroundJobServerStarter
 		ContainerConfiguration[] containers,
 		BackgroundJobServerOptions serverOptions)
 	{
-		var containerQueueus = container.Queues ?? [];
+		var containerQueues = container.Queues ?? [];
 		var isDefault = container.Tag == null || container.Tag == DefaultContainerTag.Tag();
 		if (isDefault)
 		{
@@ -118,12 +118,18 @@ public class BackgroundJobServerStarter
 				.Where(q => !otherContainerQueues.Contains(q))
 				.ToArray();
 
-			serverOptions.Queues = containerQueueus.Union(unclaimed).ToArray();
+			var included = containerQueues.Union(unclaimed);
+
+			serverOptions.Queues = serverOptions.Queues
+				.Intersect(included)
+				.ToArray();
 		}
 		else
 		{
-			if (containerQueueus.Length > 0)
-				serverOptions.Queues = containerQueueus;
+			if (containerQueues.Length > 0)
+				serverOptions.Queues = serverOptions.Queues
+					.Intersect(containerQueues)
+					.ToArray();
 		}
 	}
 

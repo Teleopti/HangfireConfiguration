@@ -39,6 +39,10 @@ public class ContainerConfigurationBalancerTest
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
 		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
 		system.WithServerCountSample(new ServerCountSample
 		{
 			Count = 2,
@@ -79,6 +83,10 @@ public class ContainerConfigurationBalancerTest
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
 		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
 		system.Monitor.AnnounceServer("reportsServer1", queues: ["reports"]);
 		system.Monitor.AnnounceServer("defaultServer", queues: ["default"]);
 		system.WithConfiguration(new StoredConfiguration
@@ -117,6 +125,10 @@ public class ContainerConfigurationBalancerTest
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
 		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
 		system.Monitor.AnnounceServer("defaultServer1", queues: ["default"]);
 		system.Monitor.AnnounceServer("defaultServer2", queues: ["default"]);
 		system.WithConfiguration(new StoredConfiguration
@@ -150,6 +162,10 @@ public class ContainerConfigurationBalancerTest
 	public void ShouldBalanceWorkersForDefaultContainer()
 	{
 		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "email", "reports"]
+		});
 		system.WithServerCountSample(new ServerCountSample
 		{
 			Count = 2,
@@ -195,6 +211,10 @@ public class ContainerConfigurationBalancerTest
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
 		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "email", "reports"]
+		});
 		system.WithServerCountSample(new ServerCountSample
 		{
 			Count = 1,
@@ -239,6 +259,10 @@ public class ContainerConfigurationBalancerTest
 		{
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
 		});
 		system.WithServerCountSample(new ServerCountSample
 		{
@@ -325,7 +349,6 @@ public class ContainerConfigurationBalancerTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldBalanceWithAnnouncedServerWithSameQueuesInDifferentOrder()
 	{
 		var system = new SystemUnderTest();
@@ -333,6 +356,10 @@ public class ContainerConfigurationBalancerTest
 		{
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports", "batch"]
 		});
 		system.Monitor.AnnounceServer("reportsServer1", queues: ["batch", "reports"]);
 		system.WithConfiguration(new StoredConfiguration
@@ -362,7 +389,6 @@ public class ContainerConfigurationBalancerTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldBalanceWithSampleHavingQueuesInDifferentOrder()
 	{
 		var system = new SystemUnderTest();
@@ -370,6 +396,10 @@ public class ContainerConfigurationBalancerTest
 		{
 			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
 			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports", "batch"]
 		});
 		system.WithServerCountSample(new ServerCountSample
 		{

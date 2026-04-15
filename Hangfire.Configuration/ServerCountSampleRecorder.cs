@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Common;
 using Hangfire.Configuration.Internals;
@@ -53,7 +54,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 		var newSamples = servers.Length == 0
 			? [new ServerCountSample {Timestamp = now, Count = 0}]
 			: servers
-				.GroupBy(s => s.Queues != null ? string.Join(",", s.Queues) : "")
+				.GroupBy(s => queueGroupKey(s.Queues))
 				.Select(g => new ServerCountSample
 				{
 					Timestamp = now,
@@ -66,7 +67,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 		samples.Samples = samples.Samples
 			.Where(s => s.Timestamp > cutoff)
 			.Concat(newSamples)
-			.GroupBy(s => s.Queues != null ? string.Join(",", s.Queues) : "")
+			.GroupBy(s => queueGroupKey(s.Queues))
 			.SelectMany(g => g
 				.OrderByDescending(x => x.Timestamp)
 				.Take(_sampleLimit)
@@ -82,4 +83,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 		var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
 		return sample.Timestamp > recentFrom;
 	}
+
+	private static string queueGroupKey(IEnumerable<string> queues) =>
+		queues != null ? string.Join(",", queues.OrderBy(q => q)) : "";
 }
