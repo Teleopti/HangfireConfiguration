@@ -77,7 +77,7 @@ public class Startup
 			.UseApplicationBuilder(app)
 			.UseServerOptions(new BackgroundJobServerOptions
 			{
-				Queues = new[] {"critical", "default"},
+				Queues = new[] {"critical", "invoices", "default"},
 			})
 			.StartPublishers()
 			.StartBackgroundJobServers([new SampleBackgroundProcess()]);

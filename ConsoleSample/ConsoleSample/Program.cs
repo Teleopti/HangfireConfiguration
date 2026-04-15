@@ -85,7 +85,7 @@ public static class Program
 	{
 		Console.WriteLine("Started.");
 		Console.WriteLine("'stop' to exit.");
-		Console.WriteLine("'add 1' to queue a job.");
+		Console.WriteLine("'add <count> [queue]' to enqueue jobs. Queue: critical, invoices, default (default: default)");
 		while (true)
 		{
 			var command = Console.ReadLine();
@@ -99,15 +99,17 @@ public static class Program
 			{
 				try
 				{
+					var parts = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+					var workCount = int.Parse(parts[1]);
+					var queue = parts.Length > 2 ? parts[2].ToLowerInvariant() : "default";
 					var publisher = hangfireConfiguration.QueryPublishers().First();
-					var workCount = int.Parse(command.Substring(4));
 					for (var i = 0; i < workCount; i++)
 					{
 						var number = i;
-						publisher.BackgroundJobClient.Enqueue<SampleService>(x => x.Random(number));
+						publisher.BackgroundJobClient.Enqueue<SampleService>(queue, x => x.DoWork(number));
 					}
 
-					Console.WriteLine("Jobs enqueued on " + publisher.ConfigurationId);
+					Console.WriteLine($"{workCount} job(s) enqueued on '{queue}'");
 				}
 				catch (Exception ex)
 				{

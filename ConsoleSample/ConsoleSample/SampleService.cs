@@ -8,23 +8,16 @@ public class SampleService
 {
 	private static readonly Random Rand = new();
 
-	[Queue("critical")]
-	public void Random(int number)
+	public void DoWork(int number)
 	{
-		Console.WriteLine("Starting	task: " + number);
 		int time;
 		lock (Rand)
 		{
-			time = Rand.Next(10);
+			time = Rand.Next(3);
 		}
 
-		if (time < 5)
-		{
-			Console.WriteLine("Failed task: " + number);
-			throw new Exception();
-		}
-
-		Thread.Sleep(TimeSpan.FromSeconds(5 + time));
-		Console.WriteLine("Finished task: " + number);
+		Console.WriteLine($"Starting task {number}, estimated {time}s");
+		Thread.Sleep(TimeSpan.FromSeconds(time));
+		Console.WriteLine($"Finished task {number}");
 	}
 }
