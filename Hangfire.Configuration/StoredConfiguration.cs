@@ -14,12 +14,7 @@ public class StoredConfiguration
 
 	public ContainerConfiguration[] Containers { get; set; } = [new() {Tag = DefaultContainerTag.Tag()}];
 
-	internal ContainerConfiguration DefaultContainer()
-	{
-		if (Containers == null || Containers.Length == 0)
-			Containers = [new ContainerConfiguration {Tag = DefaultContainerTag.Tag()}];
-		return Containers[0];
-	}
+	internal ContainerConfiguration DefaultContainer() => Containers[0];
 
 	internal bool IsActive() => Active.GetValueOrDefault();
 
