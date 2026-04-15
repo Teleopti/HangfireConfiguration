@@ -3,24 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire;
-using Hangfire.Common;
 using Hangfire.Configuration;
-using Hangfire.PostgreSql;
-using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 namespace ConsoleSample;
-
-public class CustomBackgroundProcess : IBackgroundProcess
-{
-	public void Execute(BackgroundProcessContext context)
-	{
-		Console.WriteLine("20 second tick!");
-		context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
-	}
-}
 
 public class Startup
 {
@@ -42,8 +30,7 @@ public class Startup
 
 		app.UseDeveloperExceptionPage();
 
-		var configurationConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
-		var defaultHangfireConnectionString = @"Username=postgres;Password=root;Host=localhost;Database=""hangfire.sample"";";
+		var db = Program.DatabaseSelection;
 		var defaultHangfireSchema = "hangfirecustomschemaname";
 
 		app.Use((context, next) =>
@@ -62,23 +49,15 @@ public class Startup
 			return next.Invoke();
 		});
 
-		var storageOptions = new PostgreSqlStorageOptions()
-		{
-			QueuePollInterval = TimeSpan.FromSeconds(2),
-			PrepareSchemaIfNecessary = true,
-			SchemaName = "NotUsedSchemaName"
-		};
-
-
 		var options = new ConfigurationOptions
 		{
-			ConnectionString = configurationConnectionString,
+			ConnectionString = db.ConfigurationConnectionString,
 			PrepareSchemaIfNecessary = true,
 			ExternalConfigurations =
 			[
 				new ExternalConfiguration
 				{
-					ConnectionString = defaultHangfireConnectionString,
+					ConnectionString = db.DefaultHangfireConnectionString,
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = defaultHangfireSchema
 				}
@@ -91,7 +70,7 @@ public class Startup
 
 		HangfireConfiguration = app
 				.UseHangfireConfiguration(options)
-				.UseStorageOptions(storageOptions)
+				.UseStorageOptions(db.StorageOptions)
 			;
 
 		HangfireConfiguration
@@ -101,7 +80,7 @@ public class Startup
 				Queues = new[] {"critical", "default"},
 			})
 			.StartPublishers()
-			.StartBackgroundJobServers([new CustomBackgroundProcess()]);
+			.StartBackgroundJobServers([new SampleBackgroundProcess()]);
 
 		HangfireConfiguration
 			.QueryAllBackgroundJobServers()
