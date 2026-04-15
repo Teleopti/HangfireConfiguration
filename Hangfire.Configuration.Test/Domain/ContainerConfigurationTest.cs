@@ -375,4 +375,140 @@ public class ContainerConfigurationTest
 		system.Hangfire.StartedServers
 			.Should().Be.Empty();
 	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldPreserveServerOptionsQueueOrderForSpecificContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "reports"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "alpha", "beta"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["beta", "alpha"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("alpha", "beta");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldPreserveServerOptionsQueueOrderForDefaultContainerWithUnclaimed()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["z-queue", "a-queue", "m-queue", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["m-queue", "a-queue"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("z-queue", "a-queue", "m-queue");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldPreserveServerOptionsQueueOrderForDefaultContainerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["z-queue", "a-queue", "m-queue", "reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = null
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("z-queue", "a-queue", "m-queue");
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldUseServerOptionsQueueOrderNotContainerOrder()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptions
+		{
+			ConnectionString = new ConfigurationOptionsForTest().ConnectionString,
+			ContainerTag = "worker"
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["alpha", "beta", "gamma"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag()
+				},
+				new ContainerConfiguration
+				{
+					Tag = "worker",
+					Queues = ["gamma", "alpha", "beta"]
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers.Single().options.Queues
+			.Should().Have.SameSequenceAs("alpha", "beta", "gamma");
+	}
 }
