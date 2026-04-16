@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using Hangfire;
 
 namespace ConsoleSample;
 
