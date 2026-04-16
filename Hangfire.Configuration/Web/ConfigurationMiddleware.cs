@@ -233,7 +233,7 @@ public class ConfigurationMiddleware
 			MaxWorkersPerServer = tryParseNullable(c.Request.Form["maxWorkersPerServer"])
 		});
 		display(c, p => p.Configuration(configurationId));
-		display(c, p => p.Message("Container saved successfully!"));
+		display(c, p => p.Message("Configuration saved successfully!"));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)

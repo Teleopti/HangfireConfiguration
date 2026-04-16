@@ -91,56 +91,38 @@ public class ConfigurationPage
 
         writeActivateConfiguration(configuration);
 
-        writeWorkerBalancer(configuration);
+        writeContainer(configuration);
 
         write(@"</fieldset></div>");
     }
 
-    private void writeWorkerBalancer(ViewModel configuration)
+    private void writeContainer(ViewModel configuration)
     {
-        var enabled = configuration.WorkerBalancerEnabled ? " - <span class='enabled'>⬤</span> Enabled" : " - <span class='disabled'>⬤</span> Disabled";
-        var action = configuration.WorkerBalancerEnabled ? "disableWorkerBalancer" : "enableWorkerBalancer";
-        var button = configuration.WorkerBalancerEnabled ? "Disable" : "Enable";
+        var checkedAttr = configuration.WorkerBalancerEnabled ? "checked" : "";
 
         write($@"
                     <fieldset>
-                        <legend>Worker balancer{enabled}</legend>
-						");
-
-        // Math.Min(Environment.ProcessorCount * 5, 20)
-        write($@"
-		        <div>
-					<form hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML'>
-						<label style='width: 126px'>Worker balancer: </label>
-						<input type='hidden' value='{configuration.Id}' name='configurationId'>
-						<button class='button' type='submit'>{button}</button>
-						(When disabled, hangfire default will be used) 
-					</form>
-				</div>");
-
-        write($@"
-                <div>
-                    <form hx-post='saveWorkerGoalCount' hx-target='closest .configuration' hx-swap='outerHTML'>
-                        <label for='workers' style='width: 126px'>Worker goal count: </label>
-                        <input type='hidden' value='{configuration.Id}' name='configurationId'>
-                        <input type='number' value='{configuration.Workers}' name='workers' style='margin-right: 6px; width:60px'>
-                        <button class='button' type='submit'>Save</button>
-                            (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
-							(Temporary configuration, may reset to default at times)
-                    </form>
-                </div>");
-
-        write($@"
-                <div>
-                    <form hx-post='saveMaxWorkersPerServer' hx-target='closest .configuration' hx-swap='outerHTML'>
-                        <label for='maxWorkers' style='width: 126px'>Max workers per server: </label>
-                        <input type='hidden' value='{configuration.Id}' name='configurationId'>
-                        <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' name='maxWorkers' style='margin-right: 6px; width:60px'>
-                        <button class='button' type='submit'>Save</button>
-                    </form>
-                </div>");
-
-        write($@"
+                        <legend>Container</legend>
+<form hx-post='saveContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
+    <input type='hidden' value='{configuration.Id}' name='configurationId'>
+    <div>
+        <label for='workerBalancerEnabled' style='width: 126px'>Worker balancer: </label>
+        <input type='checkbox' name='workerBalancerEnabled' id='workerBalancerEnabled' {checkedAttr}>
+        (When disabled, hangfire default will be used)
+    </div>
+    <div>
+        <label for='workers' style='width: 126px'>Worker goal count: </label>
+        <input type='number' value='{configuration.Workers}' name='workers' style='margin-right: 6px; width:60px'>
+        (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
+    </div>
+    <div>
+        <label for='maxWorkersPerServer' style='width: 126px'>Max workers per server: </label>
+        <input type='number' maxlength='3' value='{configuration.MaxWorkersPerServer}' name='maxWorkersPerServer' style='margin-right: 6px; width:60px'>
+    </div>
+    <div style='margin: 10px; margin-bottom: 5px'>
+        <button class='button' type='submit'>Save</button>
+    </div>
+</form>
                     </fieldset>
                         ");
     }

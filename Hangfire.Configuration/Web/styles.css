@@ -79,6 +79,12 @@ form input.small {
     width: 245px;
 }
 
+form input[type='checkbox'] {
+    width: auto;
+    height: auto;
+    vertical-align: middle;
+}
+
 button {
     height: 26px;
     padding: 1px 5px;
