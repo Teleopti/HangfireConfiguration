@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Newtonsoft.Json;
+﻿using System.Linq;
 using NUnit.Framework;
+using static Hangfire.Configuration.Test.Extensions;
 
 namespace Hangfire.Configuration.Test.Web;
 
@@ -21,10 +19,10 @@ public class MaxWorkersPerServerTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/saveMaxWorkersPerServer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "1"),
-                new KeyValuePair<string, string>("maxWorkers", "5")
+                configurationId = 1,
+                maxWorkers = 5
             })
         ).Wait();
 
@@ -38,16 +36,22 @@ public class MaxWorkersPerServerTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            Containers = new[] { new ContainerConfiguration { MaxWorkersPerServer = 4 } }
+            Containers = new[]
+            {
+                new ContainerConfiguration
+                {
+                    MaxWorkersPerServer = 4
+                }
+            }
         });
 
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/saveMaxWorkersPerServer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "1"),
-                new KeyValuePair<string, string>("maxWorkers", "")
+                configurationId = 1,
+                maxWorkers = ""
             })
         ).Wait();
 

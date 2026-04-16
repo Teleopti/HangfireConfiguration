@@ -146,6 +146,17 @@ public class ConfigurationApi
 	public void WriteConfiguration(StoredConfiguration configuration) =>
 		_storage.WriteConfiguration(configuration);
 
+	public void WriteContainer(WriteContainer command)
+	{
+		mutateConfiguration(command.ConfigurationId, c =>
+		{
+			var container = c.DefaultContainer();
+			container.WorkerBalancerEnabled = command.WorkerBalancerEnabled;
+			container.GoalWorkerCount = command.Workers;
+			container.MaxWorkersPerServer = command.MaxWorkersPerServer;
+		});
+	}
+
 	public void EnableWorkerBalancer(int configurationId) =>
 		mutateConfiguration(configurationId, c => { c.DefaultContainer().WorkerBalancerEnabled = true; });
 

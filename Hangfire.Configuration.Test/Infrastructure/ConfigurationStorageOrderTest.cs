@@ -4,7 +4,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Infrastructure;
 
-public class ConfigurationStorageOrderTest(string connectionString) : 
+public class ConfigurationStorageOrderTest(string connectionString) :
 	DatabaseTest(connectionString)
 {
 	[Test]
@@ -19,7 +19,7 @@ public class ConfigurationStorageOrderTest(string connectionString) :
 		storage.WriteConfiguration(new StoredConfiguration {ConnectionString = "3",});
 
 		system.ConfigurationApi().ActivateServer(2);
-			
+
 		var read = storage.ReadConfigurations();
 		read.ElementAt(0).Id.Should().Be(1);
 		read.ElementAt(1).Id.Should().Be(2);

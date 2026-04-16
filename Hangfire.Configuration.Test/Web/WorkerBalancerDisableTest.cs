@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using NUnit.Framework;
 using SharpTestsEx;
+using static Hangfire.Configuration.Test.Extensions;
 
 namespace Hangfire.Configuration.Test.Web;
 
@@ -21,9 +20,9 @@ public class WorkerBalancerDisableTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/disableWorkerBalancer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "2"),
+                configurationId = 2
             })
         ).Wait();
 
@@ -43,9 +42,9 @@ public class WorkerBalancerDisableTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/enableWorkerBalancer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "2"),
+                configurationId = 2
             })
         ).Wait();
 

@@ -57,6 +57,7 @@ public class ConfigurationMiddleware
 		yield return (c => c.Request.Path.Value.Equals("/inactivateServer"), inactivateServer);
 		yield return (c => c.Request.Path.Value.Equals("/enableWorkerBalancer"), enableWorkerBalancer);
 		yield return (c => c.Request.Path.Value.Equals("/disableWorkerBalancer"), disableWorkerBalancer);
+		yield return (c => c.Request.Path.Value.Equals("/saveContainer"), saveContainer);
 	}
 
 	public Task Invoke(HttpContext context)
@@ -219,6 +220,20 @@ public class ConfigurationMiddleware
 		var configurationId = parseConfigurationId(c);
 		_configurationApi.DisableWorkerBalancer(configurationId);
 		display(c, p => p.Configuration(configurationId));
+	}
+
+	private void saveContainer(HttpContext c)
+	{
+		var configurationId = parseConfigurationId(c);
+		_configurationApi.WriteContainer(new WriteContainer
+		{
+			ConfigurationId = configurationId,
+			WorkerBalancerEnabled = c.Request.Form["workerBalancerEnabled"] == "on",
+			Workers = tryParseNullable(c.Request.Form["workers"]),
+			MaxWorkersPerServer = tryParseNullable(c.Request.Form["maxWorkersPerServer"])
+		});
+		display(c, p => p.Configuration(configurationId));
+		display(c, p => p.Message("Container saved successfully!"));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)

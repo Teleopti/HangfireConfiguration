@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using NUnit.Framework;
 using SharpTestsEx;
+using static Hangfire.Configuration.Test.Extensions;
 
 namespace Hangfire.Configuration.Test.Web;
 
@@ -33,16 +34,22 @@ public class ConfigurationInterfaceTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }
+            Containers = new[]
+            {
+                new ContainerConfiguration
+                {
+                    GoalWorkerCount = 3
+                }
+            }
         });
 
         using var s = new WebServerUnderTest(system);
         var response = s.TestClient.PostAsync(
             "/config/saveWorkerGoalCount",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "1"),
-                new KeyValuePair<string, string>("workers", "10")
+                configurationId = 1,
+                workers = 10
             })
         ).Result;
 
@@ -59,13 +66,19 @@ public class ConfigurationInterfaceTest
         system.WithConfiguration(new StoredConfiguration
         {
             Id = 1,
-            Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 3 } }
+            Containers = new[]
+            {
+                new ContainerConfiguration
+                {
+                    GoalWorkerCount = 3
+                }
+            }
         });
 
         using var s = new WebServerUnderTest(system);
         var response = s.TestClient.PostAsync(
             "/config/saveWorkerGoalCount",
-            formContent(
+            FormContent(
                 new
                 {
                     configurationId = 1,
@@ -90,9 +103,9 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/activateServer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "2")
+                configurationId = 2
             })
         ).Wait();
 
@@ -107,7 +120,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            formContent(
+            FormContent(
                 new
                 {
                     server = ".",
@@ -134,7 +147,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            formContent(
+            FormContent(
                 new
                 {
                     server = ".",
@@ -185,9 +198,9 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/inactivateServer",
-            new FormUrlEncodedContent(new[]
+            FormContent(new
             {
-                new KeyValuePair<string, string>("configurationId", "3")
+                configurationId = 3
             })
         ).Wait();
 
@@ -202,7 +215,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            formContent(
+            FormContent(
                 new
                 {
                     server = "localhost",
@@ -230,7 +243,7 @@ public class ConfigurationInterfaceTest
         using var s = new WebServerUnderTest(system);
         s.TestClient.PostAsync(
             "/config/createNewServerConfiguration",
-            formContent(
+            FormContent(
                 new
                 {
                     server = "gurka",
@@ -243,14 +256,5 @@ public class ConfigurationInterfaceTest
         Assert.AreEqual(1, storedConfiguration.Id);
         storedConfiguration.ConnectionString.Should().Be("gurka");
         storedConfiguration.SchemaName.Should().Be("{gurka}:");
-    }
-
-    private FormUrlEncodedContent formContent(object data)
-    {
-        var properties = data.GetType().GetProperties();
-        var keyValues = properties
-            .Select(x => new KeyValuePair<string, string>(x.Name, x.GetValue(data).ToString()))
-            .ToArray();
-        return new FormUrlEncodedContent(keyValues);
     }
 }
