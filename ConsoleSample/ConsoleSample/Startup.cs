@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace ConsoleSample;
 public class Startup
 {
 	public static HangfireConfiguration HangfireConfiguration;
+	private static readonly List<IDisposable> ContainerServers = new();
 
 	public void ConfigureServices(IServiceCollection services)
 	{
@@ -36,7 +38,8 @@ public class Startup
 		app.Use((context, next) =>
 		{
 			// simulate a hosting site with content security policy
-			context.Response.Headers.Append("Content-Security-Policy",
+			context.Response.Headers.Append(
+				"Content-Security-Policy",
 				"script-src 'self'; frame-ancestors 'self';");
 
 			// simulate a hosting site with a static file handler
@@ -68,19 +71,45 @@ public class Startup
 		Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
 		app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
+		var serverOptions = new BackgroundJobServerOptions
+		{
+			Queues = ["critical", "invoices", "default"],
+		};
+
 		HangfireConfiguration = app
-				.UseHangfireConfiguration(options)
-				.UseStorageOptions(db.StorageOptions)
-			;
+			.UseHangfireConfiguration(options)
+			.UseStorageOptions(db.StorageOptions)
+			.UseServerOptions(serverOptions);
 
 		HangfireConfiguration
 			.UseApplicationBuilder(app)
-			.UseServerOptions(new BackgroundJobServerOptions
-			{
-				Queues = new[] {"critical", "invoices", "default"},
-			})
 			.StartPublishers()
 			.StartBackgroundJobServers([new SampleBackgroundProcess()]);
+
+		var containerTags = HangfireConfiguration.ConfigurationApi()
+			.ReadConfigurations()
+			.Where(c => c.Active.GetValueOrDefault())
+			.SelectMany(c => c.Containers)
+			.Select(c => c.Tag)
+			.Where(tag => tag != null && tag != DefaultContainerTag.Tag())
+			.Distinct();
+
+		foreach (var tag in containerTags)
+		{
+			var containerOptions = new ConfigurationOptions
+			{
+				ConnectionString = db.ConfigurationConnectionString,
+				PrepareSchemaIfNecessary = true,
+				ContainerTag = tag
+			};
+
+			var server = new HangfireConfiguration()
+				.UseOptions(containerOptions)
+				.UseStorageOptions(db.StorageOptions)
+				.UseServerOptions(serverOptions)
+				.StartBackgroundJobServers();
+			ContainerServers.Add(server);
+		}
 
 		HangfireConfiguration
 			.QueryAllBackgroundJobServers()
