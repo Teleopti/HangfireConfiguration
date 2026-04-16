@@ -150,10 +150,30 @@ public class ConfigurationApi
 	{
 		mutateConfiguration(command.ConfigurationId, c =>
 		{
-			var container = c.DefaultContainer();
+			var container = c.Containers[command.ContainerIndex];
+			if (command.Tag != null)
+				container.Tag = command.Tag;
+			if (command.Queues != null)
+				container.Queues = command.Queues;
 			container.WorkerBalancerEnabled = command.WorkerBalancerEnabled;
 			container.GoalWorkerCount = command.Workers;
 			container.MaxWorkersPerServer = command.MaxWorkersPerServer;
+		});
+	}
+
+	public void AddContainer(int configurationId)
+	{
+		mutateConfiguration(configurationId, c =>
+		{
+			c.Containers = c.Containers.Append(new ContainerConfiguration()).ToArray();
+		});
+	}
+
+	public void RemoveContainer(int configurationId, int containerIndex)
+	{
+		mutateConfiguration(configurationId, c =>
+		{
+			c.Containers = c.Containers.Where((_, i) => i != containerIndex).ToArray();
 		});
 	}
 

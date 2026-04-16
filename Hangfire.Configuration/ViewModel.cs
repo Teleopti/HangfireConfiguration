@@ -9,7 +9,7 @@ public class ViewModel
 
 	public bool Active { get; set; }
 
-	public bool WorkerBalancerEnabled { get; set; }
-	public int? Workers { get; set; }
-	public int? MaxWorkersPerServer { get; set; }
+	public ContainerViewModel[] Containers { get; set; } = [new()];
+
+	public string[] AvailableQueues { get; set; }
 }

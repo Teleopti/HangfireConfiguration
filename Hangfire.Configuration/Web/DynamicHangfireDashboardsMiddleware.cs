@@ -1,5 +1,6 @@
 ﻿#if NETSTANDARD2_0
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
@@ -21,18 +22,12 @@ public class DynamicHangfireDashboardsMiddleware
 	{
 		_next = next;
 
-		var injected = properties?.ContainsKey("HangfireConfiguration") ?? false;
-		if (injected)
-		{
-			_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
-		}
-		else
-		{
-			_configuration = new HangfireConfiguration();
-			var options = (ConfigurationOptions) properties["HangfireConfigurationOptions"];
-			_configuration.UseOptions(options);
-		}
-
+		if (properties == null || !properties.ContainsKey("HangfireConfiguration"))
+			throw new InvalidOperationException(
+				"UseDynamicHangfireDashboards must be called after UseHangfireConfiguration. " +
+				"Call app.UseHangfireConfiguration(options) before app.UseDynamicHangfireDashboards(path, dashboardOptions).");
+		
+		_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
 		_dashboardOptions = (DashboardOptions) properties["HangfireDashboardOptions"];
 	}
 

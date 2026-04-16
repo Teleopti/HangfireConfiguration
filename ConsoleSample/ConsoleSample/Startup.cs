@@ -56,6 +56,7 @@ public class Startup
 		{
 			ConnectionString = db.ConfigurationConnectionString,
 			PrepareSchemaIfNecessary = true,
+			EnableContainerManagement = false,
 			ExternalConfigurations =
 			[
 				new ExternalConfiguration
@@ -66,10 +67,6 @@ public class Startup
 				}
 			]
 		};
-
-		Console.WriteLine();
-		Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
-		app.UseHangfireConfigurationUI("/HangfireConfiguration", options);
 
 		var serverOptions = new BackgroundJobServerOptions
 		{
@@ -82,7 +79,6 @@ public class Startup
 			.UseServerOptions(serverOptions);
 
 		HangfireConfiguration
-			.UseApplicationBuilder(app)
 			.StartPublishers()
 			.StartBackgroundJobServers([new SampleBackgroundProcess()]);
 
@@ -111,6 +107,11 @@ public class Startup
 			ContainerServers.Add(server);
 		}
 
+		app.UseHangfireConfigurationUI("/HangfireConfiguration");
+
+		Console.WriteLine();
+		Console.WriteLine(Program.NodeAddress + "/HangfireConfiguration");
+
 		HangfireConfiguration
 			.QueryAllBackgroundJobServers()
 			.ForEach(x =>
@@ -119,6 +120,6 @@ public class Startup
 				Console.WriteLine(Program.NodeAddress + $"/HangfireDashboard/{x.ConfigurationId}");
 			});
 
-		app.UseDynamicHangfireDashboards("/HangfireDashboard", options, new DashboardOptions());
+		app.UseDynamicHangfireDashboards("/HangfireDashboard", new DashboardOptions());
 	}
 }

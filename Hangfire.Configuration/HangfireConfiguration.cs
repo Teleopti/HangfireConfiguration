@@ -140,7 +140,7 @@ public class HangfireConfiguration
 		new(builderStateMaintainer(), _state);
 
 	protected ViewModelBuilder BuildViewModelBuilder() =>
-		new(BuildConfigurationStorage());
+		new(BuildConfigurationStorage(), BuildOptions());
 
 	protected ConfigurationStorage BuildConfigurationStorage() =>
 		new(BuildKeyValueStore());

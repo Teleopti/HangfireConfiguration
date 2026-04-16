@@ -22,18 +22,12 @@ public class ConfigurationMiddleware
 		RequestDelegate next,
 		IDictionary<string, object> properties)
 	{
-		var injected = properties?.ContainsKey("HangfireConfiguration") ?? false;
-		if (injected)
-		{
-			_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
-		}
-		else
-		{
-			_configuration = new HangfireConfiguration();
-			if (properties?.ContainsKey("HangfireConfigurationOptions") ?? false)
-				_configuration.UseOptions((ConfigurationOptions) properties["HangfireConfigurationOptions"]);
-		}
-
+		if (properties == null || !properties.ContainsKey("HangfireConfiguration"))
+			throw new InvalidOperationException(
+				"UseHangfireConfigurationUI must be called after UseHangfireConfiguration. " +
+				"Call app.UseHangfireConfiguration(options) before app.UseHangfireConfigurationUI(path).");
+		
+		_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
 		_options = _configuration.Options().ConfigurationOptions();
 
 		_configurationApi = _configuration.ConfigurationApi();
@@ -54,6 +48,8 @@ public class ConfigurationMiddleware
 		yield return (c => c.Request.Path.Value.Equals("/activateServer"), activateServer);
 		yield return (c => c.Request.Path.Value.Equals("/inactivateServer"), inactivateServer);
 		yield return (c => c.Request.Path.Value.Equals("/saveContainer"), saveContainer);
+		yield return (c => c.Request.Path.Value.Equals("/addContainer"), addContainer);
+		yield return (c => c.Request.Path.Value.Equals("/removeContainer"), removeContainer);
 	}
 
 	public Task Invoke(HttpContext context)
@@ -183,15 +179,45 @@ public class ConfigurationMiddleware
 	private void saveContainer(HttpContext c)
 	{
 		var configurationId = parseConfigurationId(c);
-		_configurationApi.WriteContainer(new WriteContainer
+		var containerIndex = tryParseNullable(c.Request.Form["containerIndex"]);
+		var command = new WriteContainer
 		{
 			ConfigurationId = configurationId,
+			ContainerIndex = containerIndex.GetValueOrDefault(),
 			WorkerBalancerEnabled = c.Request.Form["workerBalancerEnabled"] == "on",
 			Workers = tryParseNullable(c.Request.Form["workers"]),
 			MaxWorkersPerServer = tryParseNullable(c.Request.Form["maxWorkersPerServer"])
-		});
+		};
+		if (_options.EnableContainerManagement)
+		{
+			var queues = c.Request.Form["queues"]
+				.SelectMany(q => q.Split(','))
+				.Select(q => q.Trim())
+				.Where(q => !string.IsNullOrEmpty(q))
+				.ToArray();
+			command.Tag = c.Request.Form["tag"].ToString();
+			command.Queues = queues;
+		}
+		
+		_configurationApi.WriteContainer(command);
+		
 		display(c, p => p.Configuration(configurationId));
 		display(c, p => p.Message("Configuration saved successfully!"));
+	}
+
+	private void addContainer(HttpContext c)
+	{
+		var configurationId = parseConfigurationId(c);
+		_configurationApi.AddContainer(configurationId);
+		display(c, p => p.Configuration(configurationId));
+	}
+
+	private void removeContainer(HttpContext c)
+	{
+		var configurationId = parseConfigurationId(c);
+		var containerIndex = int.Parse(c.Request.Form["containerIndex"]);
+		_configurationApi.RemoveContainer(configurationId, containerIndex);
+		display(c, p => p.Configuration(configurationId));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)

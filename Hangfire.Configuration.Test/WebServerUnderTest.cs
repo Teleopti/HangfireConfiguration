@@ -32,9 +32,9 @@ namespace Hangfire.Configuration.Test
 					webHost.UseTestServer();
 					webHost.Configure(app =>
 					{
-						app.Properties.Add("HangfireConfiguration", hangfireConfiguration);
+						app.UseHangfireConfiguration(hangfireConfiguration);
 						
-						app.UseHangfireConfigurationUI(_urlPathMatch, null);
+						app.UseHangfireConfigurationUI(_urlPathMatch);
 						
 						var dashboardOptions = new DashboardOptions
 						{
@@ -42,7 +42,7 @@ namespace Hangfire.Configuration.Test
 							AsyncAuthorization = Enumerable.Empty<IDashboardAsyncAuthorizationFilter>(),
 							IgnoreAntiforgeryToken = true
 						};
-						app.UseDynamicHangfireDashboards("/HangfireDashboard", null, dashboardOptions);
+						app.UseDynamicHangfireDashboards("/HangfireDashboard", dashboardOptions);
 					});
 				})
 				.StartAsync()

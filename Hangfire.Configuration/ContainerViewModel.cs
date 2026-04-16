@@ -1,9 +1,7 @@
 namespace Hangfire.Configuration;
 
-public class WriteContainer
+public class ContainerViewModel
 {
-	public int ConfigurationId { get; set; }
-	public int ContainerIndex { get; set; }
 	public string Tag { get; set; }
 	public string[] Queues { get; set; }
 	public bool WorkerBalancerEnabled { get; set; }

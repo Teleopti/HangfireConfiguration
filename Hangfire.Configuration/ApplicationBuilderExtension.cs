@@ -9,31 +9,36 @@ public static class ApplicationBuilderExtension
 {
 	public static void UseHangfireConfigurationUI(
 		this IApplicationBuilder builder, 
-		string pathMatch, 
-		ConfigurationOptions options)
+		string pathMatch)
 	{
 		builder.Map(pathMatch, subApp =>
 		{
-			if (options != null)
-				builder.Properties["HangfireConfigurationOptions"] = options;
 			subApp.UseMiddleware<ConfigurationMiddleware>(builder.Properties);
 		});
 	}
 
-	public static HangfireConfiguration UseHangfireConfiguration(this IApplicationBuilder builder, ConfigurationOptions options) =>
-		new HangfireConfiguration()
+	public static HangfireConfiguration UseHangfireConfiguration(this IApplicationBuilder builder, ConfigurationOptions options)
+	{
+		var configuration = new HangfireConfiguration()
 			.UseApplicationBuilder(builder)
 			.UseOptions(options);
+		builder.Properties["HangfireConfiguration"] = configuration;
+		return configuration;
+	}
+
+	public static void UseHangfireConfiguration(this IApplicationBuilder builder, HangfireConfiguration configuration)
+	{
+		configuration.UseApplicationBuilder(builder);
+		builder.Properties["HangfireConfiguration"] = configuration;
+	}
 
 	public static void UseDynamicHangfireDashboards(
 		this IApplicationBuilder builder,
 		string pathMatch,
-		ConfigurationOptions options,
 		DashboardOptions dashboardOptions)
 	{
 		builder.Map(pathMatch, subApp =>
 		{
-			builder.Properties["HangfireConfigurationOptions"] = options;
 			builder.Properties["HangfireDashboardOptions"] = dashboardOptions;
 			subApp.UseMiddleware<DynamicHangfireDashboardsMiddleware>(builder.Properties);
 		});

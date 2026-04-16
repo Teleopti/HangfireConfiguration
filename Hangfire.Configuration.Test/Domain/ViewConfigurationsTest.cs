@@ -64,7 +64,7 @@ public class ViewConfigurationsTest
 		Assert.AreEqual(1, result.Id);
 		Assert.Null(result.SchemaName);
 		Assert.IsFalse(result.Active);
-		Assert.Null(result.Workers);
+		Assert.Null(result.Containers[0].Workers);
 	}
 
 	[Test]
@@ -99,7 +99,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-		Assert.AreEqual(10, result.Single().Workers);
+		Assert.AreEqual(10, result.Single().Containers[0].Workers);
 	}
 
 	[Test]
@@ -169,7 +169,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
-		Assert.AreEqual(5, result.Single().MaxWorkersPerServer);
+		Assert.AreEqual(5, result.Single().Containers[0].MaxWorkersPerServer);
 	}
 
 	[Test]
@@ -299,7 +299,35 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.WorkerBalancerEnabled.Should().Be.True();
+		result.Containers[0].WorkerBalancerEnabled.Should().Be.True();
+	}
+
+	[Test]
+	public void ShouldBuildWithTag()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[] { new ContainerConfiguration { Tag = "my-tag" } }
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].Tag.Should().Be("my-tag");
+	}
+
+	[Test]
+	public void ShouldBuildWithQueues()
+	{
+		var system = new SystemUnderTest();
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[] { new ContainerConfiguration { Queues = new[] { "queue1", "queue2" } } }
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] { "queue1", "queue2" });
 	}
 
 	[Test]
@@ -313,7 +341,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.WorkerBalancerEnabled.Should().Be.True();
+		result.Containers[0].WorkerBalancerEnabled.Should().Be.True();
 	}
 
 	[Test]
@@ -327,6 +355,49 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.WorkerBalancerEnabled.Should().Be.False();
+		result.Containers[0].WorkerBalancerEnabled.Should().Be.False();
+	}
+
+	[Test]
+	public void ShouldBuildAvailableQueuesFromServerQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"queue1", "queue2"});
+	}
+
+	[Test]
+	public void ShouldBuildAvailableQueuesDefaultToDefault()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions());
+		system.WithConfiguration(new StoredConfiguration());
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"default"});
+	}
+
+	[Test]
+	public void ShouldBuildAvailableQueuesOnlyFromServerQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1"}});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Queues = new[] {"queue1", "queue2"}},
+				new ContainerConfiguration {Queues = new[] {"queue3"}}
+			}
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"queue1"});
 	}
 }

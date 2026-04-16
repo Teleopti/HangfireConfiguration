@@ -14,6 +14,8 @@ public class ConfigurationOptions
 
 	public string ContainerTag { get; set; }
 
+	public bool EnableContainerManagement { get; set; }
+
 #if NETSTANDARD2_0
 	public IHangfireConfigurationAuthorizationFilter Authorization { get; set; } = null;
 #endif

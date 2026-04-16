@@ -22,4 +22,7 @@ public class Options
 
 	public ConfigurationOptions ConfigurationOptions() =>
 		_state.ReadOptions();
+
+	internal BackgroundJobServerOptions ServerOptions() =>
+		_state.ServerOptions;
 }

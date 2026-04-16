@@ -9,14 +9,17 @@ namespace Hangfire.Configuration;
 public class ViewModelBuilder
 {
 	private readonly ConfigurationStorage _storage;
+	private readonly Options _options;
 
-	internal ViewModelBuilder(ConfigurationStorage storage)
+	internal ViewModelBuilder(ConfigurationStorage storage, Options options)
 	{
 		_storage = storage;
+		_options = options;
 	}
 
 	public IEnumerable<ViewModel> BuildServerConfigurations()
 	{
+		var availableQueues = _options.ServerOptions()?.Queues ?? new string[0];
 		return _storage.ReadConfigurations()
 			.Select(x =>
 			{
@@ -30,9 +33,15 @@ public class ViewModelBuilder
 					ConnectionString = connectionString,
 					SchemaName = schemaName,
 					Active = x.IsActive(),
-					WorkerBalancerEnabled = x.DefaultContainer().WorkerBalancerIsEnabled(),
-					Workers = x.DefaultContainer().GoalWorkerCount,
-					MaxWorkersPerServer = x.DefaultContainer().MaxWorkersPerServer
+					Containers = x.Containers.Select(c => new ContainerViewModel
+					{
+						Tag = c.Tag,
+						Queues = c.Queues,
+						WorkerBalancerEnabled = c.WorkerBalancerIsEnabled(),
+						Workers = c.GoalWorkerCount,
+						MaxWorkersPerServer = c.MaxWorkersPerServer
+					}).ToArray(),
+					AvailableQueues = availableQueues
 				};
 			}).ToArray();
 	}
