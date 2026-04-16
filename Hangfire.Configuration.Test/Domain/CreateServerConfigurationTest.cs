@@ -249,4 +249,18 @@ public class CreateServerConfigurationTest
 		var storedConfiguration = system.Configurations().Last();
 		Assert.AreEqual(DefaultSchemaName.SqlServer(), storedConfiguration.SchemaName);
 	}
+
+	[Test]
+	public void ShouldHaveWorkerBalancerEnabled()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi().CreateServerConfiguration(new CreateSqlServer
+		{
+			Server = "."
+		});
+
+		system.Configurations().Last().Containers.Single().WorkerBalancerEnabled
+			.Should().Be(true);
+	}
 }

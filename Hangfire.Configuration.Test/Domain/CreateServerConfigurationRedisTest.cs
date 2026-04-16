@@ -140,4 +140,18 @@ public class CreateServerConfigurationRedisTest
 			});
 		});
 	}
+
+	[Test]
+	public void ShouldHaveWorkerBalancerDisabled()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi().CreateServerConfiguration(new CreateRedisServer
+		{
+			Configuration = "my-redis"
+		});
+
+		system.Configurations().Last().Containers.Single().WorkerBalancerEnabled
+			.Should().Be(false);
+	}
 }

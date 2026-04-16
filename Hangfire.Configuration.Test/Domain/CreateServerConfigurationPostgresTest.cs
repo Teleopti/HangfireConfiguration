@@ -251,4 +251,18 @@ public class CreateServerConfigurationPostgresTest
 		var storedConfiguration = system.Configurations().Last();
 		Assert.AreEqual(DefaultSchemaName.Postgres(), storedConfiguration.SchemaName);
 	}
+
+	[Test]
+	public void ShouldHaveWorkerBalancerDisabled()
+	{
+		var system = new SystemUnderTest();
+
+		system.ConfigurationApi().CreateServerConfiguration(new CreatePostgresServer
+		{
+			Server = "localhost"
+		});
+
+		system.Configurations().Last().Containers.Single().WorkerBalancerEnabled
+			.Should().Be(false);
+	}
 }

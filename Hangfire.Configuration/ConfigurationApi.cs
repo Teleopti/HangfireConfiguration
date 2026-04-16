@@ -157,12 +157,6 @@ public class ConfigurationApi
 		});
 	}
 
-	public void EnableWorkerBalancer(int configurationId) =>
-		mutateConfiguration(configurationId, c => { c.DefaultContainer().WorkerBalancerEnabled = true; });
-
-	public void DisableWorkerBalancer(int configurationId) =>
-		mutateConfiguration(configurationId, c => { c.DefaultContainer().WorkerBalancerEnabled = false; });
-
 	private void mutateConfiguration(int configurationId, Action<StoredConfiguration> mutation)
 	{
 		var configurations = _storage.ReadConfigurations();
