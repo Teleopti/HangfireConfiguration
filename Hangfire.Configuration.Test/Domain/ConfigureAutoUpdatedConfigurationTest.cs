@@ -14,14 +14,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		var dataSource = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString).DataSource;
@@ -47,14 +47,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "autoupdated"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		var actual = system.Configurations().OrderBy(x => x.Id).Last();
@@ -70,14 +70,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "newDataSource", ApplicationName = "newApplicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		var updatedConnectionString = new SqlConnectionStringBuilder(system.Configurations().Single().ConnectionString);
@@ -89,18 +89,21 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldUpdateLegacyConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 55 } }});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = [new ContainerConfiguration { GoalWorkerCount = 55 }]
+		});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		var expected = new SqlConnectionStringBuilder {DataSource = "dataSource", ApplicationName = "applicationName"}.ToString();
@@ -119,14 +122,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "Updated", ApplicationName = "Updated"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		system.Configurations().First().ConnectionString.Should().Be("Data Source=Updated;Application Name=Updated");
@@ -140,14 +143,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.True(system.Configurations().Single().Active);
@@ -157,18 +160,18 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldActivateLegacyConfigurationWhenConfiguredAsDefault()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 4 } }});
+		system.WithConfiguration(new StoredConfiguration {Containers = [new ContainerConfiguration { GoalWorkerCount = 4 }]});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.True(system.Configurations().Single().Active);
@@ -186,14 +189,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.True(system.Configurations().Single().Active);
@@ -208,14 +211,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.False(system.Configurations().First().Active);
@@ -229,15 +232,15 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = "schemaName"
 				}
-			}
+			]
 		});
 
 		Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
@@ -247,19 +250,19 @@ public class ConfigureAutoUpdatedConfigurationTest
 	public void ShouldSaveSchemaNameOnLegacyConfiguration()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 4 } }});
+		system.WithConfiguration(new StoredConfiguration {Containers = [new ContainerConfiguration { GoalWorkerCount = 4 }]});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "AutoUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name(),
 					SchemaName = "schemaName"
 				}
-			}
+			]
 		});
 
 		Assert.AreEqual("schemaName", system.Configurations().Single().SchemaName);
@@ -271,26 +274,26 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		system.UseOptions(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 		system.QueryPublishers();
 
@@ -304,27 +307,27 @@ public class ConfigureAutoUpdatedConfigurationTest
 		var system = new SystemUnderTest();
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "FirstUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 		system.ClearConfigurations();
 
 		system.UseOptions(new ConfigurationOptionsForTest
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "SecondUpdate"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 		system.QueryPublishers();
 
@@ -339,14 +342,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
@@ -360,14 +363,14 @@ public class ConfigureAutoUpdatedConfigurationTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					ConnectionString = new SqlConnectionStringBuilder {DataSource = "DataSource"}.ToString(),
 					Name = DefaultConfigurationName.Name()
 				}
-			}
+			]
 		});
 
 		Assert.AreEqual("Hangfire", system.Configurations().Single().Name);
