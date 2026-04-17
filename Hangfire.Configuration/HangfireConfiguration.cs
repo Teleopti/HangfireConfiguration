@@ -90,7 +90,8 @@ public class HangfireConfiguration
 	private ConfigurationUpdater buildConfigurationUpdater() => new(
 		BuildConfigurationStorage(),
 		_state,
-		BuildNow());
+		BuildNow(),
+		buildQueueCalculator());
 
 	private Connector buildConnector() =>
 		new(_state.ReadOptions().ConnectionString);
@@ -143,7 +144,7 @@ public class HangfireConfiguration
 		new(builderStateMaintainer(), _state);
 
 	protected ViewModelBuilder BuildViewModelBuilder() =>
-		new(BuildConfigurationStorage(), BuildOptions(), buildQueueCalculator());
+		new(BuildConfigurationStorage(), BuildOptions(), buildQueueCalculator(), builderStateMaintainer());
 
 	protected ConfigurationStorage BuildConfigurationStorage() =>
 		new(BuildKeyValueStore());

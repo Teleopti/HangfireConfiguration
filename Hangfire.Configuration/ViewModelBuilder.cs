@@ -11,12 +11,18 @@ public class ViewModelBuilder
 	private readonly ConfigurationStorage _storage;
 	private readonly Options _options;
 	private readonly QueueCalculator _queueCalculator;
+	private readonly StateMaintainer _stateMaintainer;
 
-	internal ViewModelBuilder(ConfigurationStorage storage, Options options, QueueCalculator queueCalculator)
+	internal ViewModelBuilder(
+		ConfigurationStorage storage, 
+		Options options, 
+		QueueCalculator queueCalculator, 
+		StateMaintainer stateMaintainer)
 	{
 		_storage = storage;
 		_options = options;
 		_queueCalculator = queueCalculator;
+		_stateMaintainer = stateMaintainer;
 	}
 
 	public IEnumerable<ViewModel> BuildServerConfigurations()

@@ -56,7 +56,7 @@ public class ViewConfigurationsTest
 			ConnectionString = null,
 			SchemaName = null,
 			Active = null,
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = null } }
+			Containers = [new ContainerConfiguration {GoalWorkerCount = null}]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -95,7 +95,10 @@ public class ViewConfigurationsTest
 	public void ShouldBuildWithWorkers()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 10 } }});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = [new ContainerConfiguration {GoalWorkerCount = 10}]
+		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations();
 
@@ -294,7 +297,7 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = true } }
+			Containers = [new ContainerConfiguration {WorkerBalancerEnabled = true}]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -308,7 +311,7 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { Tag = "my-tag" } }
+			Containers = [new ContainerConfiguration {Tag = "my-tag"}]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -320,68 +323,109 @@ public class ViewConfigurationsTest
 	public void ShouldBuildWithQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { Queues = new[] { "queue1", "queue2" } } }
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Queues = ["queue1", "queue2"]
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] { "queue1", "queue2" });
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
 	public void ShouldBuildQueuesWithAppliedLogicForDefaultContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2", "queue3"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"queue1"}},
-				new ContainerConfiguration {Tag = "secondary", Queues = new[] {"queue2"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue2"]
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] {"queue1", "queue3"});
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 	}
 
 	[Test]
 	public void ShouldBuildQueuesWithAppliedLogicForNonDefaultContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2", "queue3"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"queue1"}},
-				new ContainerConfiguration {Tag = "secondary", Queues = new[] {"queue1", "queue4"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue1", "queue4"]
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[1].Queues.Should().Have.SameSequenceAs(new[] {"queue1"});
+		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue1"]);
 	}
 
 	[Test]
 	public void ShouldBuildQueuesForDefaultContainerWithoutQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = null} }
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = null
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] {"queue1", "queue2"});
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
@@ -390,7 +434,13 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = null } }
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					WorkerBalancerEnabled = null
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -404,7 +454,13 @@ public class ViewConfigurationsTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = false } }
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					WorkerBalancerEnabled = false
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
@@ -416,12 +472,15 @@ public class ViewConfigurationsTest
 	public void ShouldBuildAvailableQueuesFromServerQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
 		system.WithConfiguration(new StoredConfiguration());
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"queue1", "queue2"});
+		result.AvailableQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
@@ -433,25 +492,97 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"default"});
+		result.AvailableQueues.Should().Have.SameSequenceAs(["default"]);
 	}
 
 	[Test]
 	public void ShouldBuildAvailableQueuesOnlyFromServerQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1"}});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[]
-			{
-				new ContainerConfiguration {Queues = new[] {"queue1", "queue2"}},
-				new ContainerConfiguration {Queues = new[] {"queue3"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Queues = ["queue1", "queue2"]
+				},
+				new ContainerConfiguration
+				{
+					Queues = ["queue3"]
+				}
+			]
 		});
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.AvailableQueues.Should().Have.SameSequenceAs(new[] {"queue1"});
+		result.AvailableQueues.Should().Have.SameSequenceAs(["queue1"]);
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldUpdateContainerQueuesWithAppliedQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = null
+				}
+			]
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		var updated = system.Configurations().Single();
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+	}
+
+	[Test]
+	[Ignore("WIP")]
+	public void ShouldUpdateContainerQueuesWithAppliedQueues2()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue2"]
+				}
+			]
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		var updated = system.Configurations().Single();
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
 	}
 }

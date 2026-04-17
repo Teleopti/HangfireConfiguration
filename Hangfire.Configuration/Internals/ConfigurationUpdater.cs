@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hangfire.Configuration.Providers;
@@ -10,15 +9,18 @@ internal class ConfigurationUpdater
 	private readonly ConfigurationStorage _storage;
 	private readonly State _state;
 	private readonly INow _now;
+	private readonly QueueCalculator _queueCalculator;
 
 	internal ConfigurationUpdater(
 		ConfigurationStorage storage,
 		State state,
-		INow now)
+		INow now,
+		QueueCalculator queueCalculator)
 	{
 		_storage = storage;
 		_state = state;
 		_now = now;
+		_queueCalculator = queueCalculator;
 	}
 
 	public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> stored)
@@ -33,16 +35,39 @@ internal class ConfigurationUpdater
 		if (alreadyUpToDate(external, stored))
 			return false;
 
-		var isUpdated = false;
+		var updated = false;
 		_storage.Transaction(() =>
 		{
 			_storage.LockConfiguration();
-			var @fixed = fixExistingConfigurations();
+
+			var configurations = _storage.ReadConfigurations();
+			var changes = configurations
+				.Select(x => new ConfigurationChange
+				{
+					Configuration = x, 
+					Changed = false
+				})
+				.ToArray();
+
+			updateLegacyDefaultValues(changes);
+			updateShutdown(changes);
+			
+			var @fixed = false;
+			changes
+				.Where(x => x.Changed)
+				.ForEach(x =>
+				{
+					@fixed = true;
+					_storage.WriteConfiguration(x.Configuration);
+				});
+
+			var isUpdated = false;
 			if (haveExternalConfigurations(options))
 				isUpdated = updateExternalConfigurations(external);
-			isUpdated = @fixed || isUpdated;
+
+			updated = @fixed || isUpdated;
 		});
-		return isUpdated;
+		return updated;
 	}
 
 	private static bool alreadyUpToDate(
@@ -52,7 +77,7 @@ internal class ConfigurationUpdater
 		// always fix stored configurations if no external configuration received
 		// why iv no idea right now
 		if (!external.Any())
-			return false; 
+			return false;
 
 		bool notStored(IEnumerable<StoredConfiguration> stored, ExternalConfiguration received) =>
 			!stored.Any(s => sameConfiguration(received, s));
@@ -65,45 +90,44 @@ internal class ConfigurationUpdater
 		return !(external.Any(r => notStored(stored, r)));
 	}
 
-	private bool fixExistingConfigurations()
+	private class ConfigurationChange
 	{
-		var configurations = _storage.ReadConfigurations();
-		var @fixed = new List<StoredConfiguration>();
+		public StoredConfiguration Configuration;
+		public bool Changed;
+	}
 
-		// pop default values if missing on first
+	private void updateLegacyDefaultValues(IEnumerable<ConfigurationChange> configurations)
+	{
+		if (!configurations.Any())
+			return;
+
+		// set default values if missing on first
 		// tests and possibly very old installations
-		var first = configurations.FirstOrDefault();
-		if (first != null)
+		var first = configurations.First();
+		if (first.Configuration.Name == null)
 		{
-			if (first.Name == null)
-			{
-				first.Name = DefaultConfigurationName.Name();
-				@fixed.Add(first);
-			}
-
-			if (first.Active == null)
-			{
-				first.Active ??= true;
-				@fixed.Add(first);
-			}
+			first.Configuration.Name = DefaultConfigurationName.Name();
+			first.Changed = true;
 		}
 
-		var shutdown = configurations
-			.Where(x => !x.IsActive() && x.ShutdownAt == null)
+		if (first.Configuration.Active == null)
+		{
+			first.Configuration.Active ??= true;
+			first.Changed = true;
+		}
+
+	}
+
+	private void updateShutdown(IEnumerable<ConfigurationChange> configurations)
+	{
+		var toShutdown = configurations
+			.Where(x => !x.Configuration.IsActive() && x.Configuration.ShutdownAt == null)
 			.ToArray();
-		foreach (var shutdownConfiguration in shutdown)
+		foreach (var shutdown in toShutdown)
 		{
-			shutdownConfiguration.ShutdownAt = _now.UtcDateTime().AddDays(1);
-			@fixed.Add(shutdownConfiguration);
+			shutdown.Configuration.ShutdownAt = _now.UtcDateTime().AddDays(1);
+			shutdown.Changed = true;
 		}
-
-		@fixed.Distinct().ForEach(x =>
-		{
-			//
-			_storage.WriteConfiguration(x);
-		});
-
-		return @fixed.Any();
 	}
 
 	private bool updateExternalConfigurations(IEnumerable<ExternalConfiguration> received)
@@ -117,11 +141,14 @@ internal class ConfigurationUpdater
 			                    {
 				                    Name = update.Name,
 				                    Active = true,
-				                    Containers = new[] { new ContainerConfiguration
+				                    Containers = new[]
 				                    {
-					                    Tag = DefaultContainerTag.Tag(),
-					                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
-				                    }}
+					                    new ContainerConfiguration
+					                    {
+						                    Tag = DefaultContainerTag.Tag(),
+						                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
+					                    }
+				                    }
 			                    };
 
 			configuration.ConnectionString = update.ConnectionString;
