@@ -30,12 +30,12 @@ internal class ConfigurationUpdater
 
 		_state.ConfigurationUpdaterRan = true;
 
-		var external = options.ExternalConfigurations ?? Enumerable.Empty<ExternalConfiguration>();
-
-		if (alreadyUpToDate(external, stored))
-			return false;
+		// this could be optimized to check for changes
+		// before opening a transaction and locking everything
+		// but ofcourse then changes need to rerun inside the transaction
 
 		var updated = false;
+
 		_storage.Transaction(() =>
 		{
 			_storage.LockConfiguration();
@@ -44,50 +44,25 @@ internal class ConfigurationUpdater
 			var changes = configurations
 				.Select(x => new ConfigurationChange
 				{
-					Configuration = x, 
+					Configuration = x,
 					Changed = false
 				})
-				.ToArray();
+				.ToList();
 
 			updateLegacyDefaultValues(changes);
 			updateShutdown(changes);
-			
-			var @fixed = false;
+			updateExternalConfigurations(options, changes);
+
 			changes
 				.Where(x => x.Changed)
 				.ForEach(x =>
 				{
-					@fixed = true;
+					updated = true;
 					_storage.WriteConfiguration(x.Configuration);
 				});
-
-			var isUpdated = false;
-			if (haveExternalConfigurations(options))
-				isUpdated = updateExternalConfigurations(external);
-
-			updated = @fixed || isUpdated;
 		});
+
 		return updated;
-	}
-
-	private static bool alreadyUpToDate(
-		IEnumerable<ExternalConfiguration> external,
-		IEnumerable<StoredConfiguration> stored)
-	{
-		// always fix stored configurations if no external configuration received
-		// why iv no idea right now
-		if (!external.Any())
-			return false;
-
-		bool notStored(IEnumerable<StoredConfiguration> stored, ExternalConfiguration received) =>
-			!stored.Any(s => sameConfiguration(received, s));
-
-		bool sameConfiguration(ExternalConfiguration received, StoredConfiguration stored) =>
-			stored.Name == received.Name &&
-			stored.SchemaName == received.SchemaName &&
-			stored.ConnectionString == received.ConnectionString;
-
-		return !(external.Any(r => notStored(stored, r)));
 	}
 
 	private class ConfigurationChange
@@ -115,7 +90,6 @@ internal class ConfigurationUpdater
 			first.Configuration.Active ??= true;
 			first.Changed = true;
 		}
-
 	}
 
 	private void updateShutdown(IEnumerable<ConfigurationChange> configurations)
@@ -130,40 +104,48 @@ internal class ConfigurationUpdater
 		}
 	}
 
-	private bool updateExternalConfigurations(IEnumerable<ExternalConfiguration> received)
+	private void updateExternalConfigurations(ConfigurationOptions options, IList<ConfigurationChange> configurations)
 	{
-		var stored = _storage.ReadConfigurations();
+		var haveExternal = options.ExternalConfigurations?.Any() ?? false;
+		if (!haveExternal)
+			return;
 
-		received.ForEach(update =>
+		options.ExternalConfigurations.ForEach(x =>
 		{
-			var configuration = stored.FirstOrDefault(c => c.Name == update.Name) ??
-			                    new StoredConfiguration
-			                    {
-				                    Name = update.Name,
-				                    Active = true,
-				                    Containers = new[]
-				                    {
-					                    new ContainerConfiguration
-					                    {
-						                    Tag = DefaultContainerTag.Tag(),
-						                    WorkerBalancerEnabled = update.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
-					                    }
-				                    }
-			                    };
+			var configuration = configurations.FirstOrDefault(c => c.Configuration.Name == x.Name);
+			if (configuration == null)
+			{
+				configuration = new ConfigurationChange
+				{
+					Configuration = new StoredConfiguration
+					{
+						Name = x.Name,
+						Active = true,
+						Containers =
+						[
+							new ContainerConfiguration
+							{
+								Tag = DefaultContainerTag.Tag(),
+								WorkerBalancerEnabled = x.ConnectionString.GetProvider().WorkerBalancerEnabledDefault()
+							}
+						]
+					},
+					Changed = true
+				};
+				configurations.Add(configuration);
+			}
 
-			configuration.ConnectionString = update.ConnectionString;
-			configuration.SchemaName = update.SchemaName;
+			if (configuration.Configuration.ConnectionString != x.ConnectionString)
+			{
+				configuration.Configuration.ConnectionString = x.ConnectionString;
+				configuration.Changed = true;
+			}
 
-			_storage.WriteConfiguration(configuration);
+			if (configuration.Configuration.SchemaName != x.SchemaName)
+			{
+				configuration.Configuration.SchemaName = x.SchemaName;
+				configuration.Changed = true;
+			}
 		});
-
-		return true;
-	}
-
-	private static bool haveExternalConfigurations(ConfigurationOptions options)
-	{
-		if (options.ExternalConfigurations?.Any() ?? false)
-			return true;
-		return false;
 	}
 }
