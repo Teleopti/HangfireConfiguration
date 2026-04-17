@@ -320,6 +320,7 @@ public class ViewConfigurationsTest
 	public void ShouldBuildWithQueues()
 	{
 		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Containers = new[] { new ContainerConfiguration { Queues = new[] { "queue1", "queue2" } } }
@@ -328,6 +329,59 @@ public class ViewConfigurationsTest
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
 		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] { "queue1", "queue2" });
+	}
+
+	[Test]
+	public void ShouldBuildQueuesWithAppliedLogicForDefaultContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2", "queue3"}});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"queue1"}},
+				new ContainerConfiguration {Tag = "secondary", Queues = new[] {"queue2"}}
+			}
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] {"queue1", "queue3"});
+	}
+
+	[Test]
+	public void ShouldBuildQueuesWithAppliedLogicForNonDefaultContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2", "queue3"}});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[]
+			{
+				new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = new[] {"queue1"}},
+				new ContainerConfiguration {Tag = "secondary", Queues = new[] {"queue1", "queue4"}}
+			}
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[1].Queues.Should().Have.SameSequenceAs(new[] {"queue1"});
+	}
+
+	[Test]
+	public void ShouldBuildQueuesForDefaultContainerWithoutQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = new[] { new ContainerConfiguration {Tag = DefaultContainerTag.Tag(), Queues = null} }
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(new[] {"queue1", "queue2"});
 	}
 
 	[Test]

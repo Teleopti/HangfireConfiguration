@@ -24,5 +24,5 @@ public class Options
 		_state.ReadOptions();
 
 	internal BackgroundJobServerOptions ServerOptions() =>
-		_state.ServerOptions;
+		_state.ReadServerOptions();
 }

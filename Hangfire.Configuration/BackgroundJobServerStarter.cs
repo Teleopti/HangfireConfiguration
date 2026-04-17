@@ -14,6 +14,7 @@ public class BackgroundJobServerStarter
 	private readonly State _state;
 	private readonly ServerCountSampleRecorder _recorder;
 	private readonly object _appBuilder;
+	private readonly QueueCalculator _queueCalculator;
 
 	internal BackgroundJobServerStarter(
 		IHangfire hangfire,
@@ -21,7 +22,8 @@ public class BackgroundJobServerStarter
 		StateMaintainer stateMaintainer,
 		State state,
 		ServerCountSampleRecorder recorder,
-		object appBuilder)
+		object appBuilder,
+		QueueCalculator queueCalculator)
 	{
 		_hangfire = hangfire;
 		_workerBalancer = workerBalancer;
@@ -29,6 +31,7 @@ public class BackgroundJobServerStarter
 		_state = state;
 		_recorder = recorder;
 		_appBuilder = appBuilder;
+		_queueCalculator = queueCalculator;
 	}
 
 	public IDisposable Start() => Start(null);
@@ -40,7 +43,7 @@ public class BackgroundJobServerStarter
 		if (additionalProcesses != null)
 			backgroundProcesses.AddRange(additionalProcesses);
 		backgroundProcesses.Add(_recorder);
-		var serverOptions = _state.ServerOptions ?? new BackgroundJobServerOptions();
+		var serverOptions = _state.ReadServerOptions();
 
 		_stateMaintainer.Refresh();
 
@@ -99,38 +102,14 @@ public class BackgroundJobServerStarter
 		return null;
 	}
 
-	private static void applyQueues(
+	private void applyQueues(
 		ContainerConfiguration container,
 		ContainerConfiguration[] containers,
 		BackgroundJobServerOptions serverOptions)
 	{
-		var containerQueues = container.Queues ?? [];
-		var isDefault = container.Tag == null || container.Tag == DefaultContainerTag.Tag();
-		if (isDefault)
-		{
-			var otherContainerQueues = containers
-				.Where(c => c != container)
-				.Where(c => c.Queues != null)
-				.SelectMany(c => c.Queues)
-				.ToArray();
-
-			var unclaimed = serverOptions.Queues
-				.Where(q => !otherContainerQueues.Contains(q))
-				.ToArray();
-
-			var included = containerQueues.Union(unclaimed);
-
-			serverOptions.Queues = serverOptions.Queues
-				.Intersect(included)
-				.ToArray();
-		}
-		else
-		{
-			if (containerQueues.Length > 0)
-				serverOptions.Queues = serverOptions.Queues
-					.Intersect(containerQueues)
-					.ToArray();
-		}
+		var appliedQueues = _queueCalculator.CalculateAppliedQueues(container, containers);
+		if (appliedQueues.Length > 0)
+			serverOptions.Queues = appliedQueues;
 	}
 
 	private void applyWorkerBalancer(ContainerConfiguration container, ConfigurationState configurationState, ConfigurationOptions options, BackgroundJobServerOptions serverOptions)

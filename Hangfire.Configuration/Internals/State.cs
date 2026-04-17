@@ -16,13 +16,16 @@ internal class State
 	public ConfigurationOptions Options { private get; set; }
 
 	public List<object> StorageOptions { get; } = new();
-	public BackgroundJobServerOptions ServerOptions { get; set; }
+	public BackgroundJobServerOptions ServerOptions { private get; set; }
 
 	public IEnumerable<ConfigurationState> Configurations = Enumerable.Empty<ConfigurationState>();
 	public bool ConfigurationUpdaterRan { get; set; }
 
 	public ConfigurationOptions ReadOptions() =>
 		Options ?? new ConfigurationOptions();
+
+	public BackgroundJobServerOptions ReadServerOptions() =>
+		ServerOptions ?? new BackgroundJobServerOptions();
 
 	public TimedCache<IEnumerable<ConfigurationInfo>> QueryPublishersCache { get; }
 }

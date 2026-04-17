@@ -97,6 +97,8 @@ public class HangfireConfiguration
 
 	private WorkerBalancer buildWorkerBalancer() => new(BuildKeyValueStore());
 
+	private QueueCalculator buildQueueCalculator() => new(BuildOptions());
+
 	protected ServerCountSampleRecorder buildServerCountSampleRecorder() =>
 		new(
 			BuildKeyValueStore(),
@@ -114,7 +116,8 @@ public class HangfireConfiguration
 			builderStateMaintainer(),
 			_state,
 			buildServerCountSampleRecorder(),
-			_builder);
+			_builder,
+			buildQueueCalculator());
 
 	protected BackgroundProcessStarter BuildBackgroundProcessStarter() =>
 		new(BuildHangfire(),
@@ -140,7 +143,7 @@ public class HangfireConfiguration
 		new(builderStateMaintainer(), _state);
 
 	protected ViewModelBuilder BuildViewModelBuilder() =>
-		new(BuildConfigurationStorage(), BuildOptions());
+		new(BuildConfigurationStorage(), BuildOptions(), buildQueueCalculator());
 
 	protected ConfigurationStorage BuildConfigurationStorage() =>
 		new(BuildKeyValueStore());

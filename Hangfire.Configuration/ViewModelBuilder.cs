@@ -10,11 +10,13 @@ public class ViewModelBuilder
 {
 	private readonly ConfigurationStorage _storage;
 	private readonly Options _options;
+	private readonly QueueCalculator _queueCalculator;
 
-	internal ViewModelBuilder(ConfigurationStorage storage, Options options)
+	internal ViewModelBuilder(ConfigurationStorage storage, Options options, QueueCalculator queueCalculator)
 	{
 		_storage = storage;
 		_options = options;
+		_queueCalculator = queueCalculator;
 	}
 
 	public IEnumerable<ViewModel> BuildServerConfigurations()
@@ -36,7 +38,7 @@ public class ViewModelBuilder
 					Containers = x.Containers.Select(c => new ContainerViewModel
 					{
 						Tag = c.Tag,
-						Queues = c.Queues,
+						Queues = _queueCalculator.CalculateAppliedQueues(c, x.Containers),
 						WorkerBalancerEnabled = c.WorkerBalancerIsEnabled(),
 						Workers = c.GoalWorkerCount,
 						MaxWorkersPerServer = c.MaxWorkersPerServer
