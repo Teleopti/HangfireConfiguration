@@ -583,4 +583,86 @@ public class ViewConfigurationsTest
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
 		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
 	}
+
+	[Test]
+	public void ShouldNotUpdateContainerQueuesWhenAlreadyCorrect()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Name = DefaultConfigurationName.Name(),
+			Active = true,
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1", "queue3"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue2"]
+				}
+			]
+		});
+
+		system.KeyValueStore.WriteCount = 0;
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		var updated = system.Configurations().Single();
+		// Queues should remain as they were (already correctly calculated)
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		// Configuration should not have been written since queues didn't change
+		system.KeyValueStore.WriteCount.Should().Be(0);
+	}
+
+	[Test]
+	public void ShouldUpdateContainerQueuesWhenChanged()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Name = DefaultConfigurationName.Name(),
+			Active = true,
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1"]
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue2"]
+				}
+			]
+		});
+
+		system.KeyValueStore.WriteCount = 0;
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		var updated = system.Configurations().Single();
+		// Queues should be updated (default container should get queue3)
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		// Configuration should have been written since queues changed
+		system.KeyValueStore.WriteCount.Should().Be.GreaterThan(0);
+	}
 }

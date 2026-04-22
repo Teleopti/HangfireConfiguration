@@ -157,9 +157,13 @@ internal class ConfigurationUpdater
 			var containers = x.Configuration.Containers.ToArray();
 			x.Configuration.Containers.ForEach(container =>
 			{
-				container.Queues = _queueCalculator.CalculateAppliedQueues(container, containers);
+				var appliedQueues = _queueCalculator.CalculateAppliedQueues(container, containers);
+				var storedQueues = container.Queues ?? [];
+				if (storedQueues.SequenceEqual(appliedQueues)) 
+					return;
+				container.Queues = appliedQueues;
+				x.Changed = true;
 			});
-			x.Changed = true;
 		});
 	}
 }

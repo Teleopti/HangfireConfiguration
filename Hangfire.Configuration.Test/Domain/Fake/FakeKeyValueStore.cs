@@ -8,10 +8,15 @@ namespace Hangfire.Configuration.Test.Domain.Fake;
 public class FakeKeyValueStore : IKeyValueStore
 {
 	public int ReadConfigurationsQueryCount;
-		
+	public int WriteCount;
+
 	private readonly Hashtable _data = new();
 
-	public void Write(string key, string value) => _data[key] = value;
+	public void Write(string key, string value)
+	{
+		WriteCount++;
+		_data[key] = value;
+	}
 
 	public string Read(string key)
 	{
