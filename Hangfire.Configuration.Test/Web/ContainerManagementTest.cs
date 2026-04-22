@@ -13,8 +13,14 @@ public class ContainerManagementTest
 	public void ShouldAddContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest {EnableContainerManagement = true});
-		system.WithConfiguration(new StoredConfiguration {Id = 1});
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1
+		});
 
 		using var s = new WebServerUnderTest(system);
 		s.TestClient.PostAsync(
@@ -29,15 +35,18 @@ public class ContainerManagementTest
 	public void ShouldRemoveContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest {EnableContainerManagement = true});
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
+			Containers =
+			[
 				new ContainerConfiguration {Tag = "default"},
 				new ContainerConfiguration {Tag = "secondary"}
-			}
+			]
 		});
 
 		using var s = new WebServerUnderTest(system);
@@ -59,15 +68,28 @@ public class ContainerManagementTest
 	public void ShouldSaveContainerWithTagAndQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest {EnableContainerManagement = true});
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["alpha", "beta"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = "default"},
-				new ContainerConfiguration {Tag = "old-tag"}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "default"
+				},
+				new ContainerConfiguration
+				{
+					Tag = "old-tag"
+				}
+			]
 		});
 
 		using var s = new WebServerUnderTest(system);
@@ -88,7 +110,7 @@ public class ContainerManagementTest
 		Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		var container = system.Configurations().Single().Containers[1];
 		container.Tag.Should().Be("my-tag");
-		container.Queues.Should().Have.SameSequenceAs(new[] {"alpha", "beta"});
+		container.Queues.Should().Have.SameSequenceAs(["alpha", "beta"]);
 		container.WorkerBalancerEnabled.Should().Be(true);
 		container.GoalWorkerCount.Should().Be(5);
 		container.MaxWorkersPerServer.Should().Be(2);
@@ -98,16 +120,29 @@ public class ContainerManagementTest
 	public void ShouldShowContainerManagementUI()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest {EnableContainerManagement = true});
-		system.UseServerOptions(new BackgroundJobServerOptions {Queues = new[] {"queue1", "queue2"}});
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = "Hangfire"},
-				new ContainerConfiguration {Tag = "secondary", Queues = new[] {"queue1"}}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "Hangfire"
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue1"]
+				}
+			]
 		});
 
 		using var s = new WebServerUnderTest(system);
@@ -129,11 +164,17 @@ public class ContainerManagementTest
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
-				new ContainerConfiguration {Tag = "Hangfire"},
-				new ContainerConfiguration {Tag = "secondary"}
-			}
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "Hangfire"
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary"
+				}
+			]
 		});
 
 		using var s = new WebServerUnderTest(system);

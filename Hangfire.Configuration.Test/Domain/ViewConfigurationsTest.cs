@@ -63,7 +63,7 @@ public class ViewConfigurationsTest
 
 		Assert.AreEqual(1, result.Id);
 		Assert.Null(result.SchemaName);
-		Assert.IsFalse(result.Active);
+		Assert.IsTrue(result.Active);
 		Assert.Null(result.Containers[0].Workers);
 	}
 
@@ -524,7 +524,6 @@ public class ViewConfigurationsTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldUpdateContainerQueuesWithAppliedQueues()
 	{
 		var system = new SystemUnderTest();
@@ -552,7 +551,6 @@ public class ViewConfigurationsTest
 	}
 
 	[Test]
-	[Ignore("WIP")]
 	public void ShouldUpdateContainerQueuesWithAppliedQueues2()
 	{
 		var system = new SystemUnderTest();

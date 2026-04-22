@@ -27,6 +27,7 @@ public class ViewModelBuilder
 
 	public IEnumerable<ViewModel> BuildServerConfigurations()
 	{
+		_stateMaintainer.Refresh();
 		var availableQueues = _options.ServerOptions()?.Queues ?? new string[0];
 		return _storage.ReadConfigurations()
 			.Select(x =>

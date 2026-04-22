@@ -52,6 +52,7 @@ internal class ConfigurationUpdater
 			updateLegacyDefaultValues(changes);
 			updateShutdown(changes);
 			updateExternalConfigurations(options, changes);
+			updateQueues(changes);
 
 			changes
 				.Where(x => x.Changed)
@@ -146,6 +147,19 @@ internal class ConfigurationUpdater
 				configuration.Configuration.SchemaName = x.SchemaName;
 				configuration.Changed = true;
 			}
+		});
+	}
+	
+	private void updateQueues(List<ConfigurationChange> changes)
+	{
+		changes.ForEach(x =>
+		{
+			var containers = x.Configuration.Containers.ToArray();
+			x.Configuration.Containers.ForEach(container =>
+			{
+				container.Queues = _queueCalculator.CalculateAppliedQueues(container, containers);
+			});
+			x.Changed = true;
 		});
 	}
 }
