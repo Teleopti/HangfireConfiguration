@@ -30,29 +30,24 @@ internal class ConfigurationUpdater
 
 		_state.ConfigurationUpdaterRan = true;
 
-		// this could be optimized to check for changes
-		// before opening a transaction and locking everything
-		// but ofcourse then changes need to rerun inside the transaction
+		// First pass: check for changes without transaction/lock
+		var configurations = _storage.ReadConfigurations();
+		var changes = createChanges(configurations);
+		performUpdates(options, changes);
 
+		if (!changes.Any(x => x.Changed))
+			return false;
+
+		// Second pass: apply changes with transaction/lock
 		var updated = false;
 
 		_storage.Transaction(() =>
 		{
 			_storage.LockConfiguration();
 
-			var configurations = _storage.ReadConfigurations();
-			var changes = configurations
-				.Select(x => new ConfigurationChange
-				{
-					Configuration = x,
-					Changed = false
-				})
-				.ToList();
-
-			updateLegacyDefaultValues(changes);
-			updateShutdown(changes);
-			updateExternalConfigurations(options, changes);
-			updateQueues(changes);
+			configurations = _storage.ReadConfigurations();
+			changes = createChanges(configurations);
+			performUpdates(options, changes);
 
 			changes
 				.Where(x => x.Changed)
@@ -64,6 +59,23 @@ internal class ConfigurationUpdater
 		});
 
 		return updated;
+	}
+
+	private List<ConfigurationChange> createChanges(IEnumerable<StoredConfiguration> configurations) =>
+		configurations
+			.Select(x => new ConfigurationChange
+			{
+				Configuration = x,
+				Changed = false
+			})
+			.ToList();
+
+	private void performUpdates(ConfigurationOptions options, List<ConfigurationChange> changes)
+	{
+		updateLegacyDefaultValues(changes);
+		updateShutdown(changes);
+		updateExternalConfigurations(options, changes);
+		updateQueues(changes);
 	}
 
 	private class ConfigurationChange
