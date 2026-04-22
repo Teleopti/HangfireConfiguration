@@ -208,7 +208,10 @@ public class ConfigurationMiddleware
 	private void addContainer(HttpContext c)
 	{
 		var configurationId = parseConfigurationId(c);
-		_configurationApi.AddContainer(configurationId);
+		var tag = c.Request.Form["tag"].ToString();
+		if (string.IsNullOrEmpty(tag))
+			throw new ArgumentException("Tag is required when adding a container.");
+		_configurationApi.AddContainer(configurationId, tag);
 		display(c, p => p.Configuration(configurationId));
 	}
 

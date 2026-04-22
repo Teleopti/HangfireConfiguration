@@ -25,10 +25,36 @@ public class ContainerManagementTest
 		using var s = new WebServerUnderTest(system);
 		s.TestClient.PostAsync(
 			"/config/addContainer",
-			FormContent(new {configurationId = 1})
+			FormContent(new {configurationId = 1, tag = "my-tag"})
 		).Wait();
 
-		system.Configurations().Single().Containers.Length.Should().Be(2);
+		var containers = system.Configurations().Single().Containers;
+		containers.Length.Should().Be(2);
+		containers[1].Tag.Should().Be("my-tag");
+	}
+
+	[Test]
+	public void ShouldNotAddContainerWithoutTag()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1
+		});
+
+		using var s = new WebServerUnderTest(system);
+		var response = s.TestClient.PostAsync(
+			"/config/addContainer",
+			FormContent(new {configurationId = 1})
+		).Result;
+
+		Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+		var content = response.Content.ReadAsStringAsync().Result;
+		content.Should().Contain("Tag is required when adding a container");
 	}
 
 	[Test]

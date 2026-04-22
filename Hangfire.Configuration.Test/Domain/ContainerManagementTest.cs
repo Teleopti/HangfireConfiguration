@@ -12,9 +12,11 @@ public class ContainerManagementTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Id = 1});
 
-		system.ConfigurationApi().AddContainer(1);
+		system.ConfigurationApi().AddContainer(1, "my-tag");
 
-		system.Configurations().Single().Containers.Length.Should().Be(2);
+		var containers = system.Configurations().Single().Containers;
+		containers.Length.Should().Be(2);
+		containers[1].Tag.Should().Be("my-tag");
 	}
 
 	[Test]
@@ -150,10 +152,13 @@ public class ContainerManagementTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration {Id = 1});
 
-		system.ConfigurationApi().AddContainer(1);
-		system.ConfigurationApi().AddContainer(1);
+		system.ConfigurationApi().AddContainer(1, "tag1");
+		system.ConfigurationApi().AddContainer(1, "tag2");
 
-		system.Configurations().Single().Containers.Length.Should().Be(3);
+		var containers = system.Configurations().Single().Containers;
+		containers.Length.Should().Be(3);
+		containers[1].Tag.Should().Be("tag1");
+		containers[2].Tag.Should().Be("tag2");
 	}
 
 	[Test]
@@ -163,9 +168,11 @@ public class ContainerManagementTest
 		system.WithConfiguration(new StoredConfiguration {Id = 1});
 		system.WithConfiguration(new StoredConfiguration {Id = 2});
 
-		system.ConfigurationApi().AddContainer(2);
+		system.ConfigurationApi().AddContainer(2, "my-tag");
 
 		system.Configurations().Single(x => x.Id == 1).Containers.Length.Should().Be(1);
-		system.Configurations().Single(x => x.Id == 2).Containers.Length.Should().Be(2);
+		var config2 = system.Configurations().Single(x => x.Id == 2);
+		config2.Containers.Length.Should().Be(2);
+		config2.Containers[1].Tag.Should().Be("my-tag");
 	}
 }

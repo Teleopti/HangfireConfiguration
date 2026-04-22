@@ -143,8 +143,8 @@ public class ConfigurationPage
             var containerQueues = container.Queues ?? new string[0];
 
             write($@"
-                    <fieldset>
-                        <legend>{legend}</legend>
+<fieldset>
+<legend>{legend}</legend>
 <form hx-post='saveContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
     <input type='hidden' value='{configuration.Id}' name='configurationId'>
     <input type='hidden' value='{i}' name='containerIndex'>
@@ -194,16 +194,23 @@ public class ConfigurationPage
             write(@"
     </div>
 </form>
-                    </fieldset>");
+</fieldset>");
         }
 
         write($@"
+<fieldset>
+<legend>Add container</legend>
 <form hx-post='addContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
     <input type='hidden' value='{configuration.Id}' name='configurationId'>
-    <div style='margin: 10px; margin-bottom: 5px'>
+    <div>
+        <label for='newContainerTag' style='width: 126px'>Tag: </label>
+        <input type='text' id='newContainerTag' name='tag' style='width: 200px' required>
+    </div>
+    <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
         <button class='button' type='submit'>Add container</button>
     </div>
-</form>");
+</form>
+</fieldset>");
     }
 
     private void writeActivateConfiguration(ViewModel configuration)
@@ -225,7 +232,7 @@ public class ConfigurationPage
         write(@$"
 <div class='configuration'>
     <fieldset>
-        <legend>Create new</legend>
+        <legend>Add configuration</legend>
         <div style='display: flex; margin:10px'>
             <button class='button' type='button' hx-post='createNewServerSelection?databaseProvider=SqlServer' hx-target='closest .configuration' hx-swap='outerHTML' style='margin-right: 6px; width:120px'>
                 Sql Server

@@ -161,11 +161,11 @@ public class ConfigurationApi
 		});
 	}
 
-	public void AddContainer(int configurationId)
+	public void AddContainer(int configurationId, string tag)
 	{
 		mutateConfiguration(configurationId, c =>
 		{
-			c.Containers = c.Containers.Append(new ContainerConfiguration()).ToArray();
+			c.Containers = c.Containers.Append(new ContainerConfiguration { Tag = tag }).ToArray();
 		});
 	}
 
