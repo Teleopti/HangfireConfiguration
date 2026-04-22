@@ -109,7 +109,7 @@ public class ConfigurationMiddleware
 	private void createNewServerSelection(HttpContext context)
 	{
 		var provider = context.Request.Query["databaseProvider"];
-		display(context, p => p.CreateConfiguration(provider));
+		display(context, p => p.BuildCreateConfiguration(provider));
 	}
 
 	private void createNewServerConfiguration(HttpContext context)
@@ -158,22 +158,22 @@ public class ConfigurationMiddleware
 
 		var configurationId = _configurationApi.ReadConfigurations().Max(x => x.Id.Value);
 
-		display(context, p => p.Configuration(configurationId));
-		display(context, p => p.CreateConfiguration(null));
+		display(context, p => p.BuildConfiguration(configurationId));
+		display(context, p => p.BuildCreateConfiguration(null));
 	}
 
 	private void inactivateServer(HttpContext context)
 	{
 		var configurationId = parseConfigurationId(context);
 		_configurationApi.InactivateServer(configurationId);
-		display(context, p => p.Configuration(configurationId));
+		display(context, p => p.BuildConfiguration(configurationId));
 	}
 
 	private void activateServer(HttpContext context)
 	{
 		var configurationId = parseConfigurationId(context);
 		_configurationApi.ActivateServer(configurationId);
-		display(context, p => p.Configuration(configurationId));
+		display(context, p => p.BuildConfiguration(configurationId));
 	}
 
 	private void saveContainer(HttpContext c)
@@ -201,7 +201,7 @@ public class ConfigurationMiddleware
 		
 		_configurationApi.WriteContainer(command);
 		
-		display(c, p => p.Configuration(configurationId));
+		display(c, p => p.BuildContainer(configurationId, command.ContainerIndex));
 		display(c, p => p.Message("Configuration saved successfully!"));
 	}
 
@@ -212,7 +212,7 @@ public class ConfigurationMiddleware
 		if (string.IsNullOrEmpty(tag))
 			throw new ArgumentException("Tag is required when adding a container.");
 		_configurationApi.AddContainer(configurationId, tag);
-		display(c, p => p.Configuration(configurationId));
+		display(c, p => p.BuildConfiguration(configurationId));
 	}
 
 	private void removeContainer(HttpContext c)
@@ -220,7 +220,7 @@ public class ConfigurationMiddleware
 		var configurationId = parseConfigurationId(c);
 		var containerIndex = int.Parse(c.Request.Form["containerIndex"]);
 		_configurationApi.RemoveContainer(configurationId, containerIndex);
-		display(c, p => p.Configuration(configurationId));
+		display(c, p => p.BuildConfiguration(configurationId));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)

@@ -28,7 +28,7 @@ public class ConfigurationPage
         return _content.ToString();
     }
 
-    public string Configuration(int configurationId)
+    public string BuildConfiguration(int configurationId)
     {
         var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
         var configuration = configurations.Single(x => x.Id == configurationId);
@@ -36,7 +36,16 @@ public class ConfigurationPage
         return _content.ToString();
     }
 
-    public string CreateConfiguration(string databaseProvider)
+    public string BuildContainer(int configurationId, int containerIndex)
+    {
+        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+        var configuration = configurations.Single(x => x.Id == configurationId);
+        var container = configuration.Containers[containerIndex];
+        writeContainer(configuration, container, containerIndex);
+        return _content.ToString();
+    }
+    
+    public string BuildCreateConfiguration(string databaseProvider)
     {
         writeCreateNewServerConfiguration(databaseProvider);
         return _content.ToString();
@@ -94,12 +103,12 @@ public class ConfigurationPage
         if (_options.EnableContainerManagement)
             writeContainerManagement(configuration);
         else
-            writeContainer(configuration);
+            writeContainerLegacy(configuration);
 
         write(@"</fieldset></div>");
     }
 
-    private void writeContainer(ViewModel configuration)
+    private void writeContainerLegacy(ViewModel configuration)
     {
         var container = configuration.Containers[0];
         var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
@@ -134,67 +143,10 @@ public class ConfigurationPage
     private void writeContainerManagement(ViewModel configuration)
     {
         var containers = configuration.Containers;
-        var availableQueues = configuration.AvailableQueues;
 
         foreach (var (container, i) in containers.Select((c, i) => (c, i)))
         {
-            var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
-            var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
-            var containerQueues = container.Queues ?? new string[0];
-
-            write($@"
-<fieldset>
-<legend>{legend}</legend>
-<form hx-post='saveContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
-    <input type='hidden' value='{configuration.Id}' name='configurationId'>
-    <input type='hidden' value='{i}' name='containerIndex'>
-    <div>
-        <label for='tag_{i}' style='width: 126px'>Tag: </label>
-        <input type='text' value='{container.Tag}' name='tag' id='tag_{i}' style='width: 200px'>
-    </div>
-    <div>
-        <label style='width: 126px'>Queues: </label>");
-
-            foreach (var queue in availableQueues)
-            {
-                var queueChecked = containerQueues.Contains(queue) ? "checked" : "";
-                write($@"
-        <label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
-            }
-
-            write($@"
-    </div>
-    <div>
-        <label for='workerBalancerEnabled_{i}' style='width: 126px'>Worker balancer: </label>
-        <input type='checkbox' name='workerBalancerEnabled' id='workerBalancerEnabled_{i}' {checkedAttr}>
-        (When disabled, hangfire default will be used)
-    </div>
-    <div>
-        <label for='workers_{i}' style='width: 126px'>Worker goal count: </label>
-        <input type='number' value='{container.Workers}' name='workers' id='workers_{i}' style='margin-right: 6px; width:60px'>
-        (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
-    </div>
-    <div>
-        <label for='maxWorkersPerServer_{i}' style='width: 126px'>Max workers per server: </label>
-        <input type='number' maxlength='3' value='{container.MaxWorkersPerServer}' name='maxWorkersPerServer' id='maxWorkersPerServer_{i}' style='margin-right: 6px; width:60px'>
-    </div>
-    <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
-        <button class='button' type='submit'>Save</button>");
-
-            if (i > 0)
-            {
-                write($@"
-        <button class='button' type='button'
-            hx-post='removeContainer'
-            hx-target='closest .configuration'
-            hx-swap='outerHTML'
-            hx-vals='{{""configurationId"": ""{configuration.Id}"", ""containerIndex"": ""{i}""}}'>Remove</button>");
-            }
-
-            write(@"
-    </div>
-</form>
-</fieldset>");
+            writeContainer(configuration, container, i);
         }
 
         write($@"
@@ -208,6 +160,67 @@ public class ConfigurationPage
     </div>
     <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
         <button class='button' type='submit'>Add container</button>
+    </div>
+</form>
+</fieldset>");
+    }
+
+    private void writeContainer(ViewModel configuration, ContainerViewModel container, int containerIndex)
+    {
+        var availableQueues = configuration.AvailableQueues;
+        var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
+        var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
+        var containerQueues = container.Queues ?? new string[0];
+
+        write($@"
+<fieldset id='container-fieldset-{configuration.Id}-{containerIndex}'>
+<legend>{legend}</legend>
+<form hx-post='saveContainer' hx-target='#container-fieldset-{configuration.Id}-{containerIndex}' hx-swap='outerHTML'>
+    <input type='hidden' value='{configuration.Id}' name='configurationId'>
+    <input type='hidden' value='{containerIndex}' name='containerIndex'>
+    <div>
+        <label for='tag_{containerIndex}' style='width: 126px'>Tag: </label>
+        <input type='text' value='{container.Tag}' name='tag' id='tag_{containerIndex}' style='width: 200px'>
+    </div>
+    <div>
+        <label style='width: 126px'>Queues: </label>");
+
+        foreach (var queue in availableQueues)
+        {
+            var queueChecked = containerQueues.Contains(queue) ? "checked" : "";
+            write($"<label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
+        }
+
+        write($@"
+    </div>
+    <div>
+        <label for='workerBalancerEnabled_{containerIndex}' style='width: 126px'>Worker balancer: </label>
+        <input type='checkbox' name='workerBalancerEnabled' id='workerBalancerEnabled_{containerIndex}' {checkedAttr}>
+        (When disabled, hangfire default will be used)
+    </div>
+    <div>
+        <label for='workers_{containerIndex}' style='width: 126px'>Worker goal count: </label>
+        <input type='number' value='{container.Workers}' name='workers' id='workers_{containerIndex}' style='margin-right: 6px; width:60px'>
+        (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
+    </div>
+    <div>
+        <label for='maxWorkersPerServer_{containerIndex}' style='width: 126px'>Max workers per server: </label>
+        <input type='number' maxlength='3' value='{container.MaxWorkersPerServer}' name='maxWorkersPerServer' id='maxWorkersPerServer_{containerIndex}' style='margin-right: 6px; width:60px'>
+    </div>
+    <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
+        <button class='button' type='submit'>Save</button>");
+
+        if (containerIndex > 0)
+        {
+            write($@"
+        <button class='button' type='button'
+            hx-post='removeContainer'
+            hx-target='closest .configuration'
+            hx-swap='outerHTML'
+            hx-vals='{{""configurationId"": ""{configuration.Id}"", ""containerIndex"": ""{containerIndex}""}}'>Remove</button>");
+        }
+
+        write(@"
     </div>
 </form>
 </fieldset>");
@@ -276,7 +289,7 @@ public class ConfigurationPage
 	            <input type='text' id='schemaCreatorUser' name='schemaCreatorUser' class='small'><br>
 	            <label for='schemaCreatorPassword'>SQL Password: </label><br>
 	            <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword' class='small'>
-            </fieldset>";
+	        </fieldset>";
 
         if (databaseProvider == "Redis")
         {

@@ -211,4 +211,57 @@ public class ContainerManagementTest
 		content.Should().Not.Contain("name='tag'");
 		content.Should().Not.Contain("name='queues'");
 	}
+
+	[Test]
+	public void ShouldOnlyRefreshSavedContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "Hangfire"
+				},
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue1"]
+				}
+			]
+		});
+
+		using var s = new WebServerUnderTest(system);
+		var response = s.TestClient.PostAsync(
+			"/config/saveContainer",
+			FormContent(new
+			{
+				configurationId = 1,
+				containerIndex = 1,
+				tag = "secondary",
+				queues = "queue1",
+				workerBalancerEnabled = "on",
+				workers = 5,
+				maxWorkersPerServer = 2
+			})
+		).Result;
+
+		Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+		var content = response.Content.ReadAsStringAsync().Result;
+		
+		// The response should contain only the container fieldset, not the entire configuration
+		content.Should().Contain("fieldset id='container-fieldset-1-1'");
+		content.Should().Not.Contain("Create new");
+		content.Should().Not.Contain("Add container");
+	}
 }
