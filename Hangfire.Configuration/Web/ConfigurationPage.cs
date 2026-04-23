@@ -36,12 +36,21 @@ public class ConfigurationPage
         return _content.ToString();
     }
 
-    public string BuildContainer(int configurationId, int containerIndex)
+    public string BuildContainer(int configurationId, int? containerIndex = null)
     {
         var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
         var configuration = configurations.Single(x => x.Id == configurationId);
-        var container = configuration.Containers[containerIndex];
-        writeContainer(configuration, container, containerIndex);
+        containerIndex ??= configuration.Containers.Length - 1; // last / new if none given
+        var container = configuration.Containers[containerIndex.Value];
+        writeContainer(configuration, container, containerIndex.Value);
+        return _content.ToString();
+    }
+
+    public string BuildCreateContainer(int configurationId)
+    {
+        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+        var configuration = configurations.Single(x => x.Id == configurationId);
+        writeCreateContainerForm(configuration);
         return _content.ToString();
     }
     
@@ -143,26 +152,9 @@ public class ConfigurationPage
     private void writeContainerManagement(ViewModel configuration)
     {
         var containers = configuration.Containers;
-
         foreach (var (container, i) in containers.Select((c, i) => (c, i)))
-        {
             writeContainer(configuration, container, i);
-        }
-
-        write($@"
-<fieldset>
-<legend>Add container</legend>
-<form hx-post='addContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
-    <input type='hidden' value='{configuration.Id}' name='configurationId'>
-    <div>
-        <label for='tag_new' style='width: 126px'>Tag: </label>
-        <input type='text' id='tag_new' name='tag' style='width: 200px' required>
-    </div>
-    <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
-        <button class='button' type='submit'>Add container</button>
-    </div>
-</form>
-</fieldset>");
+        writeCreateContainerForm(configuration);
     }
 
     private void writeContainer(ViewModel configuration, ContainerViewModel container, int containerIndex)
@@ -170,12 +162,13 @@ public class ConfigurationPage
         var availableQueues = configuration.AvailableQueues;
         var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
         var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
-        var containerQueues = container.Queues ?? new string[0];
+        var containerQueues = container.Queues ?? [];
 
         write($@"
-<fieldset id='container-fieldset-{configuration.Id}-{containerIndex}'>
+<div class='container'>
+<fieldset>
 <legend>{legend}</legend>
-<form hx-post='saveContainer' hx-target='#container-fieldset-{configuration.Id}-{containerIndex}' hx-swap='outerHTML'>
+<form hx-post='saveContainer' hx-target='closest .container' hx-swap='outerHTML'>
     <input type='hidden' value='{configuration.Id}' name='configurationId'>
     <input type='hidden' value='{containerIndex}' name='containerIndex'>
     <div>
@@ -223,7 +216,28 @@ public class ConfigurationPage
         write(@"
     </div>
 </form>
-</fieldset>");
+</fieldset>
+</div>");
+    }
+
+    private void writeCreateContainerForm(ViewModel configuration)
+    {
+        write($@"
+<div class='container'>
+<fieldset>
+<legend>Add container</legend>
+<form hx-post='addContainer' hx-target='closest .container' hx-swap='outerHTML'>
+    <input type='hidden' value='{configuration.Id}' name='configurationId'>
+    <div>
+        <label for='tag_new' style='width: 126px'>Tag: </label>
+        <input type='text' id='tag_new' name='tag' style='width: 200px' required>
+    </div>
+    <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
+        <button class='button' type='submit'>Add container</button>
+    </div>
+</form>
+</fieldset>
+</div>");
     }
 
     private void writeActivateConfiguration(ViewModel configuration)

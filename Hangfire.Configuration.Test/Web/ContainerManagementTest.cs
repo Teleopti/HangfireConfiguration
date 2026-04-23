@@ -213,6 +213,44 @@ public class ContainerManagementTest
 	}
 
 	[Test]
+	public void ShouldOnlyRefreshAddedContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseOptions(new ConfigurationOptionsForTest
+		{
+			EnableContainerManagement = true
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "default"
+				}
+			]
+		});
+
+		using var s = new WebServerUnderTest(system);
+		var response = s.TestClient.PostAsync(
+			"/config/addContainer",
+			FormContent(new
+			{
+				configurationId = 1,
+				tag = "new-tag"
+			})
+		).Result;
+
+		Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+		var content = response.Content.ReadAsStringAsync().Result;
+		
+		content.Should().Contain("Container - new-tag");
+		content.Should().Not.Contain("Container - default");
+		content.Should().Contain("Add container");
+	}
+
+	[Test]
 	public void ShouldOnlyRefreshSavedContainer()
 	{
 		var system = new SystemUnderTest();
@@ -259,9 +297,8 @@ public class ContainerManagementTest
 		Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		var content = response.Content.ReadAsStringAsync().Result;
 		
-		// The response should contain only the container fieldset, not the entire configuration
-		content.Should().Contain("fieldset id='container-fieldset-1-1'");
-		content.Should().Not.Contain("Create new");
+		content.Should().Contain("Container - secondary");
+		content.Should().Not.Contain("Container - Hangfire");
 		content.Should().Not.Contain("Add container");
 	}
 }

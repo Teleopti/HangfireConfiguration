@@ -26,7 +26,7 @@ public class ConfigurationMiddleware
 			throw new InvalidOperationException(
 				"UseHangfireConfigurationUI must be called after UseHangfireConfiguration. " +
 				"Call app.UseHangfireConfiguration(options) before app.UseHangfireConfigurationUI(path).");
-		
+
 		_configuration = (HangfireConfiguration) properties["HangfireConfiguration"];
 		_options = _configuration.Options().ConfigurationOptions();
 
@@ -198,9 +198,9 @@ public class ConfigurationMiddleware
 			command.Tag = c.Request.Form["tag"].ToString();
 			command.Queues = queues;
 		}
-		
+
 		_configurationApi.WriteContainer(command);
-		
+
 		display(c, p => p.BuildContainer(configurationId, command.ContainerIndex));
 		display(c, p => p.Message("Container saved successfully!"));
 	}
@@ -212,8 +212,10 @@ public class ConfigurationMiddleware
 		if (string.IsNullOrEmpty(tag))
 			throw new ArgumentException("Tag is required when adding a container.");
 		_configurationApi.AddContainer(configurationId, tag);
-		display(c, p => p.BuildConfiguration(configurationId));
-		display(c, p => p.Message("Container saved successfully!"));
+
+		display(c, p => p.BuildContainer(configurationId));
+		display(c, p => p.BuildCreateContainer(configurationId));
+		display(c, p => p.Message("Container added successfully!"));
 	}
 
 	private void removeContainer(HttpContext c)
@@ -222,7 +224,7 @@ public class ConfigurationMiddleware
 		var containerIndex = int.Parse(c.Request.Form["containerIndex"]);
 		_configurationApi.RemoveContainer(configurationId, containerIndex);
 		display(c, p => p.BuildConfiguration(configurationId));
-		display(c, p => p.Message("Removed saved successfully!"));
+		display(c, p => p.Message("Container removed successfully!"));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)
