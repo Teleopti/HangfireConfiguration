@@ -81,7 +81,7 @@ public class StartBackgroundJobServersTest
 		system.WithConfiguration(new StoredConfiguration());
 		var backgroundProcess = new Worker();
 
-		system.BackgroundJobServerStarter.Start(new []{backgroundProcess});
+		system.BackgroundJobServerStarter.Start([backgroundProcess]);
 
 		Assert.Contains(backgroundProcess, system.Hangfire.StartedServers.Single().backgroundProcesses);
 	}
@@ -309,8 +309,14 @@ public class StartBackgroundJobServersTest
 	public void ShouldGetGoalWorkerCountForTwoServers()
 	{
 		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }});
-		system.WithConfiguration(new StoredConfiguration {Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 100 } }});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = [new ContainerConfiguration { GoalWorkerCount = 20 }]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers = [new ContainerConfiguration { GoalWorkerCount = 100 }]
+		});
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptions { ConnectionString = @"Data Source=.;Initial Catalog=fakedb;" });
 

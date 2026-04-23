@@ -9,7 +9,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class StartBackgroundJobServerPostgresTest
+public class StartBackgroundJobServersPostgresTest
 {
 	[Test]
 	public void ShouldStartServer()
@@ -30,7 +30,7 @@ public class StartBackgroundJobServerPostgresTest
 		system.WithConfiguration(new StoredConfiguration());
 		var serverOptions = new BackgroundJobServerOptions
 		{
-			Queues = new[] {"queue1", "queue2"},
+			Queues = ["queue1", "queue2"],
 			ServerTimeout = new TimeSpan(20),
 			HeartbeatInterval = new TimeSpan(30),
 			ShutdownTimeout = new TimeSpan(40),
@@ -305,12 +305,12 @@ public class StartBackgroundJobServerPostgresTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 20 } }, 
+			Containers = [new ContainerConfiguration { GoalWorkerCount = 20 }], 
 			ConnectionString = @"Host=localhost;Database=fakedb;"
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { GoalWorkerCount = 100 } }, 
+			Containers = [new ContainerConfiguration { GoalWorkerCount = 100 }], 
 			ConnectionString = @"Host=localhost;Database=fakedb;"
 		});
 

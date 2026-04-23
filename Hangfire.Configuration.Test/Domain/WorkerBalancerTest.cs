@@ -77,13 +77,13 @@ public class WorkerBalancerTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					Name = DefaultConfigurationName.Name()
 				}
-			},
+			],
 			DefaultGoalWorkerCount = 12
 		});
 
@@ -171,13 +171,13 @@ public class WorkerBalancerTest
 			new ConfigurationOptionsForTest
 			{
 				MinimumServerCount = 2,
-				ExternalConfigurations = new[]
-				{
+				ExternalConfigurations =
+				[
 					new ExternalConfiguration
 					{
 						Name = DefaultConfigurationName.Name()
 					}
-				}
+				]
 			});
 
 		Assert.AreEqual(5, system.Hangfire.StartedServers.Single().options.WorkerCount);
@@ -233,13 +233,13 @@ public class WorkerBalancerTest
 
 		system.BackgroundJobServerStarter.Start(new ConfigurationOptionsForTest
 		{
-			ExternalConfigurations = new[]
-			{
+			ExternalConfigurations =
+			[
 				new ExternalConfiguration
 				{
 					Name = DefaultConfigurationName.Name()
 				}
-			},
+			],
 			DefaultGoalWorkerCount = 12,
 			MinimumServerCount = 2
 		});

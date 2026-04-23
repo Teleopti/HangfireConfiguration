@@ -33,14 +33,14 @@ public class WriteContainerTest
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
+			Containers =
+			[
 				new ContainerConfiguration
 				{
 					GoalWorkerCount = 10,
 					MaxWorkersPerServer = 5
 				}
-			}
+			]
 		});
 
 		system.ConfigurationApi().WriteContainer(new WriteContainer
@@ -84,13 +84,13 @@ public class WriteContainerTest
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
+			Containers =
+			[
 				new ContainerConfiguration
 				{
 					WorkerBalancerEnabled = true
 				}
-			}
+			]
 		});
 
 		system.ConfigurationApi().WriteContainer(new WriteContainer
@@ -110,26 +110,26 @@ public class WriteContainerTest
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
-			Containers = new[]
-			{
+			Containers =
+			[
 				new ContainerConfiguration
 				{
 					GoalWorkerCount = 5,
 					WorkerBalancerEnabled = true
 				}
-			}
+			]
 		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 2,
-			Containers = new[]
-			{
+			Containers =
+			[
 				new ContainerConfiguration
 				{
 					GoalWorkerCount = 7,
 					WorkerBalancerEnabled = true
 				}
-			}
+			]
 		});
 
 		system.ConfigurationApi().WriteContainer(new WriteContainer

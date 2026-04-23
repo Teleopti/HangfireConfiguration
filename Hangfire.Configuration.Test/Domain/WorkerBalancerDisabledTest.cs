@@ -12,7 +12,7 @@ public class WorkerBalancerDisabledTest
 		var system = new SystemUnderTest();
 		system.WithConfiguration(new StoredConfiguration
 		{
-			Containers = new[] { new ContainerConfiguration { WorkerBalancerEnabled = false } },
+			Containers = [new ContainerConfiguration { WorkerBalancerEnabled = false }],
 			Active = true
 		});
 		
