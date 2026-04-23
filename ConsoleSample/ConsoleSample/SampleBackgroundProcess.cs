@@ -8,7 +8,7 @@ public class SampleBackgroundProcess : IBackgroundProcess
 {
 	public void Execute(BackgroundProcessContext context)
 	{
-		Console.WriteLine("20 second tick!");
+		Console.WriteLine("Background process tick!");
 		context.StoppingToken.Wait(TimeSpan.FromSeconds(20));
 	}
 }
