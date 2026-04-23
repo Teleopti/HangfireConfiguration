@@ -165,7 +165,12 @@ public class ConfigurationApi
 	{
 		mutateConfiguration(configurationId, c =>
 		{
-			c.Containers = c.Containers.Append(new ContainerConfiguration { Tag = tag }).ToArray();
+			c.Containers = c.Containers
+				.Append(new ContainerConfiguration
+				{
+					Tag = tag
+				})
+				.ToArray();
 		});
 	}
 
@@ -173,7 +178,9 @@ public class ConfigurationApi
 	{
 		mutateConfiguration(configurationId, c =>
 		{
-			c.Containers = c.Containers.Where((_, i) => i != containerIndex).ToArray();
+			c.Containers = c.Containers
+				.Where((_, i) => i != containerIndex)
+				.ToArray();
 		});
 	}
 
