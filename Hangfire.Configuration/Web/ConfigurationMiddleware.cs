@@ -202,7 +202,7 @@ public class ConfigurationMiddleware
 		_configurationApi.WriteContainer(command);
 		
 		display(c, p => p.BuildContainer(configurationId, command.ContainerIndex));
-		display(c, p => p.Message("Configuration saved successfully!"));
+		display(c, p => p.Message("Container saved successfully!"));
 	}
 
 	private void addContainer(HttpContext c)
@@ -213,6 +213,7 @@ public class ConfigurationMiddleware
 			throw new ArgumentException("Tag is required when adding a container.");
 		_configurationApi.AddContainer(configurationId, tag);
 		display(c, p => p.BuildConfiguration(configurationId));
+		display(c, p => p.Message("Container saved successfully!"));
 	}
 
 	private void removeContainer(HttpContext c)
@@ -221,6 +222,7 @@ public class ConfigurationMiddleware
 		var containerIndex = int.Parse(c.Request.Form["containerIndex"]);
 		_configurationApi.RemoveContainer(configurationId, containerIndex);
 		display(c, p => p.BuildConfiguration(configurationId));
+		display(c, p => p.Message("Removed saved successfully!"));
 	}
 
 	private void display(HttpContext context, Func<ConfigurationPage, string> html)
