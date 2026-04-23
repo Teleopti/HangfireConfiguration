@@ -214,8 +214,8 @@ public class ConfigurationMiddleware
 		_configurationApi.AddContainer(configurationId, tag);
 
 		display(c, p => p.BuildContainer(configurationId));
-		display(c, p => p.BuildCreateContainer(configurationId));
 		display(c, p => p.Message("Container added successfully!"));
+		display(c, p => p.BuildCreateContainer(configurationId));
 	}
 
 	private void removeContainer(HttpContext c)
@@ -223,7 +223,6 @@ public class ConfigurationMiddleware
 		var configurationId = parseConfigurationId(c);
 		var containerIndex = int.Parse(c.Request.Form["containerIndex"]);
 		_configurationApi.RemoveContainer(configurationId, containerIndex);
-		display(c, p => p.BuildConfiguration(configurationId));
 		display(c, p => p.Message("Container removed successfully!"));
 	}
 

@@ -208,7 +208,7 @@ public class ConfigurationPage
 			write($@"
         <button class='button' type='button'
             hx-post='removeContainer'
-            hx-target='closest .configuration'
+            hx-target='closest .container'
             hx-swap='outerHTML'
             hx-vals='{{""configurationId"": ""{configuration.Id}"", ""containerIndex"": ""{containerIndex}""}}'>Remove</button>");
 		}
