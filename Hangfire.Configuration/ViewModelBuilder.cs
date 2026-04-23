@@ -14,9 +14,9 @@ public class ViewModelBuilder
 	private readonly StateMaintainer _stateMaintainer;
 
 	internal ViewModelBuilder(
-		ConfigurationStorage storage, 
-		Options options, 
-		QueueCalculator queueCalculator, 
+		ConfigurationStorage storage,
+		Options options,
+		QueueCalculator queueCalculator,
 		StateMaintainer stateMaintainer)
 	{
 		_storage = storage;

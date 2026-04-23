@@ -6,123 +6,123 @@ namespace Hangfire.Configuration.Web;
 
 public class ConfigurationPage
 {
-    private readonly ViewModelBuilder _viewModelBuilder;
-    private readonly string _basePath;
-    private readonly ConfigurationOptions _options;
-    private readonly StringBuilder _content = new();
+	private readonly ViewModelBuilder _viewModelBuilder;
+	private readonly string _basePath;
+	private readonly ConfigurationOptions _options;
+	private readonly StringBuilder _content = new();
 
-    internal ConfigurationPage(
-        HangfireConfiguration configuration,
-        string basePath,
-        ConfigurationOptions options)
-    {
-        _viewModelBuilder = configuration.ViewModelBuilder();
-        _basePath = basePath;
-        _options = options;
-    }
+	internal ConfigurationPage(
+		HangfireConfiguration configuration,
+		string basePath,
+		ConfigurationOptions options)
+	{
+		_viewModelBuilder = configuration.ViewModelBuilder();
+		_basePath = basePath;
+		_options = options;
+	}
 
-    public string BuildPage()
-    {
-        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
-        writePage(configurations);
-        return _content.ToString();
-    }
+	public string BuildPage()
+	{
+		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+		writePage(configurations);
+		return _content.ToString();
+	}
 
-    public string BuildConfiguration(int configurationId)
-    {
-        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
-        var configuration = configurations.Single(x => x.Id == configurationId);
-        writeConfiguration(configuration);
-        return _content.ToString();
-    }
+	public string BuildConfiguration(int configurationId)
+	{
+		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		writeConfiguration(configuration);
+		return _content.ToString();
+	}
 
-    public string BuildContainer(int configurationId, int? containerIndex = null)
-    {
-        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
-        var configuration = configurations.Single(x => x.Id == configurationId);
-        containerIndex ??= configuration.Containers.Length - 1; // last / new if none given
-        var container = configuration.Containers[containerIndex.Value];
-        writeContainer(configuration, container, containerIndex.Value);
-        return _content.ToString();
-    }
+	public string BuildContainer(int configurationId, int? containerIndex = null)
+	{
+		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		containerIndex ??= configuration.Containers.Length - 1; // last / new if none given
+		var container = configuration.Containers[containerIndex.Value];
+		writeContainer(configuration, container, containerIndex.Value);
+		return _content.ToString();
+	}
 
-    public string BuildCreateContainer(int configurationId)
-    {
-        var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
-        var configuration = configurations.Single(x => x.Id == configurationId);
-        writeCreateContainerForm(configuration);
-        return _content.ToString();
-    }
-    
-    public string BuildCreateConfiguration(string databaseProvider)
-    {
-        writeCreateNewServerConfiguration(databaseProvider);
-        return _content.ToString();
-    }
+	public string BuildCreateContainer(int configurationId)
+	{
+		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		writeCreateContainerForm(configuration);
+		return _content.ToString();
+	}
 
-    private void writePage(IEnumerable<ViewModel> configurations)
-    {
-        write("<html>");
-        write($@"<base href=""{_basePath}/"">");
-        write("<head>");
-        write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles_css""/>");
-        write("</head>");
-        write("<body hx-ext='response-targets' hx-target-500='next .error'>");
-        write("<h2>Hangfire configuration</h2>");
+	public string BuildCreateConfiguration(string databaseProvider)
+	{
+		writeCreateNewServerConfiguration(databaseProvider);
+		return _content.ToString();
+	}
 
-        configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
+	private void writePage(IEnumerable<ViewModel> configurations)
+	{
+		write("<html>");
+		write($@"<base href=""{_basePath}/"">");
+		write("<head>");
+		write(@"<link rel=""stylesheet"" type=""text/css"" href=""styles_css""/>");
+		write("</head>");
+		write("<body hx-ext='response-targets' hx-target-500='next .error'>");
+		write("<h2>Hangfire configuration</h2>");
 
-        write("<div class='configurations'>");
-        foreach (var configuration in configurations)
-        {
-            writeConfiguration(configuration);
-            write("<div class='error'></div>");
-        }
+		configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
 
-        writeCreateNewServerConfiguration(null);
-        write("<div class='error'></div>");
-        
-        write("</div>");
-        write("<br/><br/><br/><br/><br/>");
+		write("<div class='configurations'>");
+		foreach (var configuration in configurations)
+		{
+			writeConfiguration(configuration);
+			write("<div class='error'></div>");
+		}
 
-        write($@"<script src=""{_basePath}/htmx_min_js""></script>");
-        write($@"<script src=""{_basePath}/response-targets_js""></script>");
-        write("</body>");
-        write("</html>");
-    }
+		writeCreateNewServerConfiguration(null);
+		write("<div class='error'></div>");
 
-    private void writeConfiguration(ViewModel configuration)
-    {
-        var title = "Configuration";
-        if (configuration.Name != null)
-            title = title + " - " + configuration.Name;
-        var state = configuration.Active ? " - <span class='active'>⬤</span> Active" : " - <span class='inactive'>⬤</span> Inactive";
+		write("</div>");
+		write("<br/><br/><br/><br/><br/>");
 
-        write($@"
+		write($@"<script src=""{_basePath}/htmx_min_js""></script>");
+		write($@"<script src=""{_basePath}/response-targets_js""></script>");
+		write("</body>");
+		write("</html>");
+	}
+
+	private void writeConfiguration(ViewModel configuration)
+	{
+		var title = "Configuration";
+		if (configuration.Name != null)
+			title = title + " - " + configuration.Name;
+		var state = configuration.Active ? " - <span class='active'>⬤</span> Active" : " - <span class='inactive'>⬤</span> Inactive";
+
+		write($@"
                 <div class='configuration'>
                     <fieldset>
                     <legend>{title}{state}</legend>");
 
-        write($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
-        if (!string.IsNullOrEmpty(configuration.SchemaName))
-            write($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
+		write($"<div><label>Connection string:</label><span>{configuration.ConnectionString}</span></div>");
+		if (!string.IsNullOrEmpty(configuration.SchemaName))
+			write($"<div><label>Schema name:</label><span>{configuration.SchemaName}</span></div>");
 
-        writeActivateConfiguration(configuration);
+		writeActivateConfiguration(configuration);
 
-        if (_options.EnableContainerManagement)
-            writeContainerManagement(configuration);
-        else
-            writeContainerLegacy(configuration);
+		if (_options.EnableContainerManagement)
+			writeContainerManagement(configuration);
+		else
+			writeContainerLegacy(configuration);
 
-        write(@"</fieldset></div>");
-    }
+		write(@"</fieldset></div>");
+	}
 
-    private void writeContainerLegacy(ViewModel configuration)
-    {
-        var container = configuration.Containers[0];
-        var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
+	private void writeContainerLegacy(ViewModel configuration)
+	{
+		var container = configuration.Containers[0];
+		var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
 
-        write($@"
+		write($@"
                     <fieldset>
                         <legend>Container</legend>
 <form hx-post='saveContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
@@ -147,24 +147,24 @@ public class ConfigurationPage
 </form>
                     </fieldset>
                         ");
-    }
+	}
 
-    private void writeContainerManagement(ViewModel configuration)
-    {
-        var containers = configuration.Containers;
-        foreach (var (container, i) in containers.Select((c, i) => (c, i)))
-            writeContainer(configuration, container, i);
-        writeCreateContainerForm(configuration);
-    }
+	private void writeContainerManagement(ViewModel configuration)
+	{
+		var containers = configuration.Containers;
+		foreach (var (container, i) in containers.Select((c, i) => (c, i)))
+			writeContainer(configuration, container, i);
+		writeCreateContainerForm(configuration);
+	}
 
-    private void writeContainer(ViewModel configuration, ContainerViewModel container, int containerIndex)
-    {
-        var availableQueues = configuration.AvailableQueues;
-        var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
-        var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
-        var containerQueues = container.Queues ?? [];
+	private void writeContainer(ViewModel configuration, ContainerViewModel container, int containerIndex)
+	{
+		var availableQueues = configuration.AvailableQueues;
+		var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
+		var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
+		var containerQueues = container.Queues ?? [];
 
-        write($@"
+		write($@"
 <div class='container'>
 <fieldset>
 <legend>{legend}</legend>
@@ -178,13 +178,13 @@ public class ConfigurationPage
     <div>
         <label style='width: 126px'>Queues: </label>");
 
-        foreach (var queue in availableQueues)
-        {
-            var queueChecked = containerQueues.Contains(queue) ? "checked" : "";
-            write($"<label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
-        }
+		foreach (var queue in availableQueues)
+		{
+			var queueChecked = containerQueues.Contains(queue) ? "checked" : "";
+			write($"<label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
+		}
 
-        write($@"
+		write($@"
     </div>
     <div>
         <label for='workerBalancerEnabled_{containerIndex}' style='width: 126px'>Worker balancer: </label>
@@ -203,26 +203,26 @@ public class ConfigurationPage
     <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
         <button class='button' type='submit'>Save</button>");
 
-        if (containerIndex > 0)
-        {
-            write($@"
+		if (containerIndex > 0)
+		{
+			write($@"
         <button class='button' type='button'
             hx-post='removeContainer'
             hx-target='closest .configuration'
             hx-swap='outerHTML'
             hx-vals='{{""configurationId"": ""{configuration.Id}"", ""containerIndex"": ""{containerIndex}""}}'>Remove</button>");
-        }
+		}
 
-        write(@"
+		write(@"
     </div>
 </form>
 </fieldset>
 </div>");
-    }
+	}
 
-    private void writeCreateContainerForm(ViewModel configuration)
-    {
-        write($@"
+	private void writeCreateContainerForm(ViewModel configuration)
+	{
+		write($@"
 <div class='container'>
 <fieldset>
 <legend>Add container</legend>
@@ -238,25 +238,25 @@ public class ConfigurationPage
 </form>
 </fieldset>
 </div>");
-    }
+	}
 
-    private void writeActivateConfiguration(ViewModel configuration)
-    {
-        var action = configuration.Active ? "inactivateServer" : "activateServer";
-        var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
+	private void writeActivateConfiguration(ViewModel configuration)
+	{
+		var action = configuration.Active ? "inactivateServer" : "activateServer";
+		var button = configuration.Active ? "Inactivate configuration" : "Activate configuration";
 
-        write($@"
+		write($@"
                 <div>
                     <form hx-post='{action}' hx-target='closest .configuration' hx-swap='outerHTML' style='margin: 10px'>
                         <input type='hidden' value='{configuration.Id}' name='configurationId'>
                         <button class='button' type='submit'>{button}</button>
                     </form>
                 </div>");
-    }
+	}
 
-    private void writeCreateNewServerConfiguration(string databaseProvider)
-    {
-        write(@$"
+	private void writeCreateNewServerConfiguration(string databaseProvider)
+	{
+		write(@$"
 <div class='configuration'>
     <fieldset>
         <legend>Add configuration</legend>
@@ -273,22 +273,22 @@ public class ConfigurationPage
         </div>
 ");
 
-        if (databaseProvider != null)
-            writeCreateNewServerConfigurationForm(databaseProvider);
+		if (databaseProvider != null)
+			writeCreateNewServerConfigurationForm(databaseProvider);
 
-        write(@$"</fieldset></div>");
-    }
+		write(@$"</fieldset></div>");
+	}
 
-    private void writeCreateNewServerConfigurationForm(string databaseProvider)
-    {
-        var storageName = "Sql Server";
-        if (databaseProvider != "SqlServer")
-            storageName = databaseProvider;
+	private void writeCreateNewServerConfigurationForm(string databaseProvider)
+	{
+		var storageName = "Sql Server";
+		if (databaseProvider != "SqlServer")
+			storageName = databaseProvider;
 
-        var database = $@"
+		var database = $@"
             <label for='database'>Database (existing): </label><br>
         	<input type='text' id='database' name='database'><br>";
-        var applicationUser = $@"
+		var applicationUser = $@"
 			<fieldset>
 				<legend>Application user</legend>
 				<label for='user'>SQL User Name:</label><br>
@@ -296,7 +296,7 @@ public class ConfigurationPage
 				<label for='password'>SQL Password: </label><br>
 				<input type='password' id='password' name='password' class='small'>
 			</fieldset>";
-        var creatorUser = $@"
+		var creatorUser = $@"
             <fieldset>
 	            <legend>User with create permissions</legend>
 	            <label for='schemaCreatorUser'>SQL User Name: </label><br>
@@ -305,14 +305,14 @@ public class ConfigurationPage
 	            <input type='password' id='schemaCreatorPassword' name='schemaCreatorPassword' class='small'>
 	        </fieldset>";
 
-        if (databaseProvider == "Redis")
-        {
-            database = null;
-            applicationUser = null;
-            creatorUser = null;
-        }
+		if (databaseProvider == "Redis")
+		{
+			database = null;
+			applicationUser = null;
+			creatorUser = null;
+		}
 
-        write($@"
+		write($@"
 <form hx-post='createNewServerConfiguration' hx-target='closest .configuration' hx-swap='outerHTML'>
     <div style='display: flex'>
         <fieldset>
@@ -331,15 +331,15 @@ public class ConfigurationPage
     <button class='button' type='submit'>Create</button>
 </form>
 ");
-    }
+	}
 
-    public string Message(string message) =>
-        $@"
+	public string Message(string message) =>
+		$@"
 <div class='message' hx-get='nothing' hx-trigger='load delay:3s' hx-swap='delete' hx-target='this'>
     <p>{message}</p>
 </div>
 ";
 
-    private void write(string textToAppend) =>
-        _content.Append(textToAppend);
+	private void write(string textToAppend) =>
+		_content.Append(textToAppend);
 }
