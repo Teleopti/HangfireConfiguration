@@ -17,7 +17,8 @@ internal class QueueCalculator
 	{
 		var serverQueues = _options.ServerOptions()?.Queues ?? [];
 		var containerQueues = container.Queues ?? [];
-		var isDefault = container.Tag == null || container.Tag == DefaultContainerTag.Tag();
+		var isDefault = container.Tag == DefaultContainerTag.Tag();
+
 		if (isDefault)
 		{
 			var otherContainerQueues = containers
@@ -36,14 +37,9 @@ internal class QueueCalculator
 				.Intersect(included)
 				.ToArray();
 		}
-		else
-		{
-			if (containerQueues.Length > 0)
-				return serverQueues
-					.Intersect(containerQueues)
-					.ToArray();
-		}
 
-		return [];
+		return serverQueues
+			.Intersect(containerQueues)
+			.ToArray();
 	}
 }

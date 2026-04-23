@@ -96,10 +96,7 @@ public class BackgroundJobServerStarter
 		if (container != null)
 			return container;
 
-		if (tag == DefaultContainerTag.Tag())
-			return containers.FirstOrDefault(c => c.Tag == null);
-
-		return null;
+		return containers.FirstOrDefault(c => c.Tag == null);
 	}
 
 	private void applyQueues(
