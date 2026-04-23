@@ -155,8 +155,8 @@ public class ConfigurationPage
 <form hx-post='addContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
     <input type='hidden' value='{configuration.Id}' name='configurationId'>
     <div>
-        <label for='newContainerTag' style='width: 126px'>Tag: </label>
-        <input type='text' id='newContainerTag' name='tag' style='width: 200px' required>
+        <label for='tag_new' style='width: 126px'>Tag: </label>
+        <input type='text' id='tag_new' name='tag' style='width: 200px' required>
     </div>
     <div style='display: flex; gap: 6px; margin: 10px; margin-bottom: 5px'>
         <button class='button' type='submit'>Add container</button>
