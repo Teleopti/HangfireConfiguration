@@ -16,7 +16,7 @@ public class ReadConfigurationsTest
 			ConnectionString = "connection",
 			SchemaName = "schema",
 			Active = true,
-			Containers = new[] {new ContainerConfiguration {GoalWorkerCount = 11}}
+			Containers = [new ContainerConfiguration {GoalWorkerCount = 11}]
 		});
 
 		var result = system.ConfigurationApi().ReadConfigurations() as StoredConfiguration[];
@@ -39,7 +39,7 @@ public class ReadConfigurationsTest
 			ConnectionString = "connection",
 			SchemaName = "SchemaName",
 			Active = true,
-			Containers = new[] {new ContainerConfiguration {GoalWorkerCount = 44}}
+			Containers = [new ContainerConfiguration {GoalWorkerCount = 44}]
 		});
 
 		var result = system.ConfigurationApi().ReadConfigurations().Single();
@@ -61,7 +61,7 @@ public class ReadConfigurationsTest
 			ConnectionString = "c",
 			SchemaName = "s",
 			Active = true,
-			Containers = new[] {new ContainerConfiguration {GoalWorkerCount = 4}}
+			Containers = [new ContainerConfiguration {GoalWorkerCount = 4}]
 		});
 		var configuration = system.ConfigurationApi().ReadConfigurations().Single();
 
