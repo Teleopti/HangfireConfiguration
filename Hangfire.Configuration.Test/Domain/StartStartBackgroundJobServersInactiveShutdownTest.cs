@@ -58,6 +58,34 @@ public class StartStartBackgroundJobServersInactiveShutdownTest
 	}
 	
 	[Test]
+	public void ShouldStartAfterActivateAndInactivateOfLongTimeShutdownServer()
+	{
+		var system = new SystemUnderTest();
+		system.Now("2026-01-01 00:00");
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 1,
+			ConnectionString = "server",
+			Active = false,
+			ShutdownAt = "2026-01-01 00:00".Utc()
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Id = 2,
+			ConnectionString = "other",
+			Active = true
+		});
+
+		system.Now("2026-03-12 11:00");
+		system.ConfigurationApi().ActivateServer(1);
+		system.ConfigurationApi().InactivateServer(1);
+		system.StartBackgroundJobServers();
+
+		system.Hangfire.StartedServers
+			.Select(x => x.storage.ConnectionString).Should().Have.SameValuesAs("server", "other");
+	}
+
+	[Test]
 	public void ShouldGiveInactiveConfigurationsAShutdownTime()
 	{
 		var system = new SystemUnderTest();

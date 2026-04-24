@@ -123,7 +123,11 @@ public class ConfigurationApi
 
 	public void ActivateServer(int configurationId)
 	{
-		mutateConfiguration(configurationId, c => { c.Active = true; });
+		mutateConfiguration(configurationId, c =>
+		{
+			c.Active = true;
+			c.ShutdownAt = null;
+		});
 		_state.QueryPublishersCache.Invalidate();
 	}
 
