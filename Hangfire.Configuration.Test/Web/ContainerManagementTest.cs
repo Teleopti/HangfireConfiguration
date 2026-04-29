@@ -13,10 +13,6 @@ public class ContainerManagementTest
 	public void ShouldAddContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1
@@ -37,10 +33,6 @@ public class ContainerManagementTest
 	public void ShouldNotAddContainerWithoutTag()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1
@@ -61,10 +53,6 @@ public class ContainerManagementTest
 	public void ShouldRemoveContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
@@ -94,10 +82,6 @@ public class ContainerManagementTest
 	public void ShouldSaveContainerWithTagAndQueues()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
 			Queues = ["alpha", "beta"]
@@ -146,10 +130,6 @@ public class ContainerManagementTest
 	public void ShouldShowContainerManagementUI()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
 			Queues = ["queue1", "queue2"]
@@ -184,42 +164,9 @@ public class ContainerManagementTest
 	}
 
 	[Test]
-	public void ShouldNotShowContainerManagementUI()
-	{
-		var system = new SystemUnderTest();
-		system.WithConfiguration(new StoredConfiguration
-		{
-			Id = 1,
-			Containers =
-			[
-				new ContainerConfiguration
-				{
-					Tag = "Hangfire"
-				},
-				new ContainerConfiguration
-				{
-					Tag = "secondary"
-				}
-			]
-		});
-
-		using var s = new WebServerUnderTest(system);
-		var response = s.TestClient.GetAsync("/config").Result;
-		var content = response.Content.ReadAsStringAsync().Result;
-
-		content.Should().Not.Contain("Add container");
-		content.Should().Not.Contain("name='tag'");
-		content.Should().Not.Contain("name='queues'");
-	}
-
-	[Test]
 	public void ShouldOnlyRefreshAddedContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Id = 1,
@@ -254,10 +201,6 @@ public class ContainerManagementTest
 	public void ShouldOnlyRefreshSavedContainer()
 	{
 		var system = new SystemUnderTest();
-		system.UseOptions(new ConfigurationOptionsForTest
-		{
-			EnableContainerManagement = true
-		});
 		system.UseServerOptions(new BackgroundJobServerOptions
 		{
 			Queues = ["queue1", "queue2"]

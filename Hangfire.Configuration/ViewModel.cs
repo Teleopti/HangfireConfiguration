@@ -11,5 +11,5 @@ public class ViewModel
 
 	public ContainerViewModel[] Containers { get; set; } = [new()];
 
-	public string[] AvailableQueues { get; set; }
+	public string[] AvailableQueues { get; set; } = [];
 }

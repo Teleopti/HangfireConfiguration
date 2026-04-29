@@ -180,24 +180,21 @@ public class ConfigurationMiddleware
 	{
 		var configurationId = parseConfigurationId(c);
 		var containerIndex = tryParseNullable(c.Request.Form["containerIndex"]);
+		var queues = c.Request.Form["queues"]
+			.SelectMany(q => q.Split(','))
+			.Select(q => q.Trim())
+			.Where(q => !string.IsNullOrEmpty(q))
+			.ToArray();
 		var command = new WriteContainer
 		{
 			ConfigurationId = configurationId,
 			ContainerIndex = containerIndex.GetValueOrDefault(),
 			WorkerBalancerEnabled = c.Request.Form["workerBalancerEnabled"] == "on",
 			Workers = tryParseNullable(c.Request.Form["workers"]),
-			MaxWorkersPerServer = tryParseNullable(c.Request.Form["maxWorkersPerServer"])
+			MaxWorkersPerServer = tryParseNullable(c.Request.Form["maxWorkersPerServer"]),
+			Tag = c.Request.Form["tag"].ToString(),
+			Queues = queues
 		};
-		if (_options.EnableContainerManagement)
-		{
-			var queues = c.Request.Form["queues"]
-				.SelectMany(q => q.Split(','))
-				.Select(q => q.Trim())
-				.Where(q => !string.IsNullOrEmpty(q))
-				.ToArray();
-			command.Tag = c.Request.Form["tag"].ToString();
-			command.Queues = queues;
-		}
 
 		_configurationApi.WriteContainer(command);
 

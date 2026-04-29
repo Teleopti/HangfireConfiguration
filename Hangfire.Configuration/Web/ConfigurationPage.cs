@@ -70,7 +70,7 @@ public class ConfigurationPage
 		write("<body hx-ext='response-targets' hx-target-500='next .error'>");
 		write("<h2>Hangfire configuration</h2>");
 
-		configurations = configurations.Any() ? configurations : new[] {new ViewModel()};
+		configurations = configurations.Any() ? configurations : [new ViewModel()];
 
 		write("<div class='configurations'>");
 		foreach (var configuration in configurations)
@@ -109,52 +109,12 @@ public class ConfigurationPage
 
 		writeActivateConfiguration(configuration);
 
-		if (_options.EnableContainerManagement)
-			writeContainerManagement(configuration);
-		else
-			writeContainerLegacy(configuration);
-
-		write(@"</fieldset></div>");
-	}
-
-	private void writeContainerLegacy(ViewModel configuration)
-	{
-		var container = configuration.Containers[0];
-		var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
-
-		write($@"
-                    <fieldset>
-                        <legend>Container</legend>
-<form hx-post='saveContainer' hx-target='closest .configuration' hx-swap='outerHTML'>
-    <input type='hidden' value='{configuration.Id}' name='configurationId'>
-    <div>
-        <label for='workerBalancerEnabled' style='width: 126px'>Worker balancer: </label>
-        <input type='checkbox' name='workerBalancerEnabled' id='workerBalancerEnabled' {checkedAttr}>
-        (When disabled, hangfire default will be used)
-    </div>
-    <div>
-        <label for='workers' style='width: 126px'>Worker goal count: </label>
-        <input type='number' value='{container.Workers}' name='workers' style='margin-right: 6px; width:60px'>
-        (Default: {_options.WorkerBalancerOptions.DefaultGoalWorkerCount}, Max: {_options.WorkerBalancerOptions.MaximumGoalWorkerCount})
-    </div>
-    <div>
-        <label for='maxWorkersPerServer' style='width: 126px'>Max workers per server: </label>
-        <input type='number' maxlength='3' value='{container.MaxWorkersPerServer}' name='maxWorkersPerServer' style='margin-right: 6px; width:60px'>
-    </div>
-    <div style='margin: 10px; margin-bottom: 5px'>
-        <button class='button' type='submit'>Save</button>
-    </div>
-</form>
-                    </fieldset>
-                        ");
-	}
-
-	private void writeContainerManagement(ViewModel configuration)
-	{
 		var containers = configuration.Containers;
 		foreach (var (container, i) in containers.Select((c, i) => (c, i)))
 			writeContainer(configuration, container, i);
 		writeCreateContainerForm(configuration);
+
+		write(@"</fieldset></div>");
 	}
 
 	private void writeContainer(ViewModel configuration, ContainerViewModel container, int containerIndex)

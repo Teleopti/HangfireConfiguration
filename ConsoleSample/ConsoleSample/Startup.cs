@@ -56,7 +56,6 @@ public class Startup
 		{
 			ConnectionString = db.ConfigurationConnectionString,
 			PrepareSchemaIfNecessary = true,
-			EnableContainerManagement = true,
 			ExternalConfigurations =
 			[
 				new ExternalConfiguration
