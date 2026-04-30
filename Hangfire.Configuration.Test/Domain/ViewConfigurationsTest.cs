@@ -340,7 +340,129 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+	}
+
+	[Test]
+	public void ShouldBuildSelectedQueuesFromStoredQueues()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Queues = ["queue1", "queue2"]
+				}
+			]
+		});
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].SelectedQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+	}
+
+	[Test]
+	public void ShouldBuildSelectedQueuesAsEmptyWhenStoredIsNull()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1"]
+		});
+		// pre-trigger updater so it won't rewrite stored queues on next refresh
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = []
+				}
+			]
+		});
+		system.ViewModelBuilder.BuildServerConfigurations();
+
+		// simulate persisted state with null queues (after updater has already run)
+		var stored = system.Configurations().Single();
+		stored.Containers[0].Queues = null;
+		system.ConfigurationStorage.WriteConfiguration(stored);
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].SelectedQueues.Should().Be.Empty();
+	}
+
+	[Test]
+	public void ShouldBuildSelectedQueuesDistinctFromAppliedQueuesForDefaultContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2", "queue3"]
+		});
+		// pre-trigger updater with matching config so it won't rewrite later
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = ["queue1", "queue2", "queue3"]
+				}
+			]
+		});
+		system.ViewModelBuilder.BuildServerConfigurations();
+
+		// simulate user saving partial selection after initial refresh
+		var stored = system.Configurations().Single();
+		stored.Containers[0].Queues = ["queue1"];
+		system.ConfigurationStorage.WriteConfiguration(stored);
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].SelectedQueues.Should().Have.SameSequenceAs(["queue1"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue2", "queue3"]);
+	}
+
+	[Test]
+	public void ShouldBuildSelectedQueuesDistinctFromAppliedQueuesForNonDefaultContainer()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["queue1", "queue2"]
+		});
+		// pre-trigger updater with matching config
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = "secondary",
+					Queues = ["queue1"]
+				}
+			]
+		});
+		system.ViewModelBuilder.BuildServerConfigurations();
+
+		// simulate user saving a queue that is not in available server queues
+		var stored = system.Configurations().Single();
+		stored.Containers[0].Queues = ["queue1", "queue4"];
+		system.ConfigurationStorage.WriteConfiguration(stored);
+
+		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
+
+		result.Containers[0].SelectedQueues.Should().Have.SameSequenceAs(["queue1", "queue4"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1"]);
 	}
 
 	[Test]
@@ -370,7 +492,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 	}
 
 	[Test]
@@ -400,7 +522,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue1"]);
+		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue1"]);
 	}
 
 	[Test]
@@ -425,7 +547,7 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
@@ -547,7 +669,7 @@ public class ViewConfigurationsTest
 
 		var updated = system.Configurations().Single();
 		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
@@ -579,9 +701,9 @@ public class ViewConfigurationsTest
 
 		var updated = system.Configurations().Single();
 		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
-		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue2"]);
 	}
 
 	[Test]
@@ -619,8 +741,8 @@ public class ViewConfigurationsTest
 		// Queues should remain as they were (already correctly calculated)
 		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
-		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue2"]);
 		// Configuration should not have been written since queues didn't change
 		system.KeyValueStore.WriteCount.Should().Be(0);
 	}
@@ -660,8 +782,8 @@ public class ViewConfigurationsTest
 		// Queues should be updated (default container should get queue3)
 		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
-		result.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
-		result.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue2"]);
 		// Configuration should have been written since queues changed
 		system.KeyValueStore.WriteCount.Should().Be.GreaterThan(0);
 	}

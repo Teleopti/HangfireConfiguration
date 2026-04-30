@@ -122,7 +122,8 @@ public class ConfigurationPage
 		var availableQueues = configuration.AvailableQueues;
 		var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
 		var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
-		var containerQueues = container.Queues ?? [];
+		var selectedQueues = container.SelectedQueues ?? [];
+		var appliedQueues = container.AppliedQueues ?? [];
 
 		write($@"
 <div class='container'>
@@ -140,11 +141,16 @@ public class ConfigurationPage
 
 		foreach (var queue in availableQueues)
 		{
-			var queueChecked = containerQueues.Contains(queue) ? "checked" : "";
+			var queueChecked = selectedQueues.Contains(queue) ? "checked" : "";
 			write($"<label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
 		}
 
+		var appliedText = appliedQueues.Any() ? string.Join(", ", appliedQueues) : "(none)";
 		write($@"
+    </div>
+    <div>
+        <label style='width: 126px'>Applied queues: </label>
+        <span>{appliedText}</span>
     </div>
     <div>
         <label for='workerBalancerEnabled_{containerIndex}' style='width: 126px'>Worker balancer: </label>

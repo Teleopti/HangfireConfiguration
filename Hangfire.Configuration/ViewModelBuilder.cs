@@ -45,7 +45,8 @@ public class ViewModelBuilder
 					Containers = x.Containers.Select(c => new ContainerViewModel
 					{
 						Tag = c.Tag,
-						Queues = _queueCalculator.CalculateAppliedQueues(c, x.Containers),
+						AppliedQueues = _queueCalculator.CalculateAppliedQueues(c, x.Containers),
+						SelectedQueues = c.Queues ?? [],
 						WorkerBalancerEnabled = c.WorkerBalancerIsEnabled(),
 						Workers = c.GoalWorkerCount,
 						MaxWorkersPerServer = c.MaxWorkersPerServer
