@@ -90,8 +90,7 @@ public class HangfireConfiguration
 	private ConfigurationUpdater buildConfigurationUpdater() => new(
 		BuildConfigurationStorage(),
 		_state,
-		BuildNow(),
-		buildQueueCalculator());
+		BuildNow());
 
 	private Connector buildConnector() =>
 		new(_state.ReadOptions().ConnectionString);

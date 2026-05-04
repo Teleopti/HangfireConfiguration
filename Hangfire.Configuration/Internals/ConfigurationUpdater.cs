@@ -9,18 +9,15 @@ internal class ConfigurationUpdater
 	private readonly ConfigurationStorage _storage;
 	private readonly State _state;
 	private readonly INow _now;
-	private readonly QueueCalculator _queueCalculator;
 
 	internal ConfigurationUpdater(
 		ConfigurationStorage storage,
 		State state,
-		INow now,
-		QueueCalculator queueCalculator)
+		INow now)
 	{
 		_storage = storage;
 		_state = state;
 		_now = now;
-		_queueCalculator = queueCalculator;
 	}
 
 	public bool Update(ConfigurationOptions options, IEnumerable<StoredConfiguration> stored)
@@ -75,7 +72,6 @@ internal class ConfigurationUpdater
 		updateLegacyDefaultValues(changes);
 		updateShutdown(changes);
 		updateExternalConfigurations(options, changes);
-		updateQueues(changes);
 	}
 
 	private class ConfigurationChange
@@ -159,23 +155,6 @@ internal class ConfigurationUpdater
 				configuration.Configuration.SchemaName = x.SchemaName;
 				configuration.Changed = true;
 			}
-		});
-	}
-	
-	private void updateQueues(List<ConfigurationChange> changes)
-	{
-		changes.ForEach(x =>
-		{
-			var containers = x.Configuration.Containers.ToArray();
-			x.Configuration.Containers.ForEach(container =>
-			{
-				var appliedQueues = _queueCalculator.CalculateAppliedQueues(container, containers);
-				var storedQueues = container.Queues ?? [];
-				if (storedQueues.SequenceEqual(appliedQueues)) 
-					return;
-				container.Queues = appliedQueues;
-				x.Changed = true;
-			});
 		});
 	}
 }

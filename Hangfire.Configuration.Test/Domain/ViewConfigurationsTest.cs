@@ -646,7 +646,7 @@ public class ViewConfigurationsTest
 	}
 
 	[Test]
-	public void ShouldUpdateContainerQueuesWithAppliedQueues()
+	public void ShouldComputeAppliedQueuesForDefaultContainerWithNullStoredQueues()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
@@ -667,13 +667,15 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
+		// Stored queues are NOT mutated by view-time refresh
 		var updated = system.Configurations().Single();
-		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
+		updated.Containers[0].Queues.Should().Be.Null();
+		// AppliedQueues are computed at view time
 		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue2"]);
 	}
 
 	[Test]
-	public void ShouldUpdateContainerQueuesWithAppliedQueues2()
+	public void ShouldComputeAppliedQueuesForDefaultContainerAbsorbingUnclaimedQueues()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
@@ -699,10 +701,12 @@ public class ViewConfigurationsTest
 
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
+		// Stored queues are NOT mutated by view-time refresh
 		var updated = system.Configurations().Single();
-		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
-		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1"]);
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		// AppliedQueues computed at view time: default absorbs unclaimed queue3
+		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue2"]);
 	}
 
@@ -748,7 +752,7 @@ public class ViewConfigurationsTest
 	}
 
 	[Test]
-	public void ShouldUpdateContainerQueuesWhenChanged()
+	public void ShouldNotMutateStoredQueuesWhenAppliedDiffersFromSelected()
 	{
 		var system = new SystemUnderTest();
 		system.UseServerOptions(new BackgroundJobServerOptions
@@ -779,12 +783,13 @@ public class ViewConfigurationsTest
 		var result = system.ViewModelBuilder.BuildServerConfigurations().Single();
 
 		var updated = system.Configurations().Single();
-		// Queues should be updated (default container should get queue3)
-		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
+		// Stored (selected) queues are preserved exactly as the user saved them.
+		updated.Containers[0].Queues.Should().Have.SameSequenceAs(["queue1"]);
 		updated.Containers[1].Queues.Should().Have.SameSequenceAs(["queue2"]);
+		// AppliedQueues are computed but never persisted.
 		result.Containers[0].AppliedQueues.Should().Have.SameSequenceAs(["queue1", "queue3"]);
 		result.Containers[1].AppliedQueues.Should().Have.SameSequenceAs(["queue2"]);
-		// Configuration should have been written since queues changed
-		system.KeyValueStore.WriteCount.Should().Be.GreaterThan(0);
+		// No write to storage from a refresh / view.
+		system.KeyValueStore.WriteCount.Should().Be(0);
 	}
 }
