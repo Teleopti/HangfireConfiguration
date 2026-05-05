@@ -42,9 +42,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 			return;
 
 		var samples = _store.ServerCountSamples();
-		var haveReceptSample = samples.Samples.Any(isRecent);
-
-		if (haveReceptSample)
+		if (samples.Samples.Any(isRecent))
 			return;
 
 		var api = _state.Configurations.First().MonitoringApi;
@@ -54,7 +52,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 		var newSamples = servers.Length == 0
 			? [new ServerCountSample {Timestamp = now, Count = 0}]
 			: servers
-				.GroupBy(s => queueGroupKey(s.Queues))
+				.GroupBy(s => queuesKey(s.Queues))
 				.Select(g => new ServerCountSample
 				{
 					Timestamp = now,
@@ -63,17 +61,19 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 				})
 				.ToArray();
 
+		var result = samples.Samples.Concat(newSamples);
+
 		var cutoff = now.Subtract(_sampleMaxAge);
-		samples.Samples = samples.Samples
-			.Where(s => s.Timestamp > cutoff)
-			.Concat(newSamples)
-			.GroupBy(s => queueGroupKey(s.Queues))
+		result = result.Where(s => s.Timestamp > cutoff);
+
+		result = result
+			.GroupBy(s => queuesKey(s.Queues))
 			.SelectMany(g => g
 				.OrderByDescending(x => x.Timestamp)
 				.Take(_sampleLimit)
-			)
-			.OrderBy(x => x.Timestamp)
-			.ToArray();
+			);
+
+		samples.Samples = result.OrderBy(x => x.Timestamp).ToArray();
 
 		_store.ServerCountSamples(samples);
 	}
@@ -84,6 +84,6 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 		return sample.Timestamp > recentFrom;
 	}
 
-	private static string queueGroupKey(IEnumerable<string> queues) =>
+	private static string queuesKey(IEnumerable<string> queues) =>
 		queues != null ? string.Join(",", queues.OrderBy(q => q)) : "";
 }
