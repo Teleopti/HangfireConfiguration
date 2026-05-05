@@ -7,9 +7,9 @@ internal class WorkerBalancer
 {
 	private readonly ServerCountCalculator _serverCountCalculator;
 
-	internal WorkerBalancer(IKeyValueStore store)
+	internal WorkerBalancer(ServerCountCalculator serverCountCalculator)
 	{
-		_serverCountCalculator = new ServerCountCalculator(store);
+		_serverCountCalculator = serverCountCalculator;
 	}
 
 	internal int CalculateWorkerCount(

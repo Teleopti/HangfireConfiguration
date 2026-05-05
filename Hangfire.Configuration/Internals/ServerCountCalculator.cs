@@ -4,7 +4,7 @@ using Hangfire.Storage;
 
 namespace Hangfire.Configuration.Internals;
 
-internal class ServerCountCalculator(IKeyValueStore store)
+internal class ServerCountCalculator(IKeyValueStore store, INow now)
 {
 	public int ServerCount(IMonitoringApi api, string[] containerQueues, WorkerBalancerOptions options)
 	{
@@ -40,22 +40,36 @@ internal class ServerCountCalculator(IKeyValueStore store)
 
 	private int? serverCountFromSamples(string[] containerQueues)
 	{
-		var samples = store
-			.ServerCountSamples()
-			.Samples
+		var samples = store.ServerCountSamples().Samples
 			.Where(s => s.Count != 0)
-			.Where(s => matchesQueues(s.Queues, containerQueues))
 			.ToArray();
-		if (samples.Any())
-		{
-			return samples
-				.OrderBy(s => s.Timestamp)
-				.GroupBy(s => new {count = s.Count})
-				.OrderByDescending(g => g.Count())
-				.First().Key.count;
-		}
 
-		return null;
+		var recentCutoff = now.UtcDateTime().Subtract(ServerCountSamplingPolicy.RecentWindow);
+
+		var tiers = new[]
+		{
+			samples.Where(s => isExactMatch(s.Queues, containerQueues) && s.Timestamp > recentCutoff),
+			samples.Where(s => isExactMatch(s.Queues, containerQueues)),
+			samples.Where(s => matchesQueues(s.Queues, containerQueues) && s.Timestamp > recentCutoff),
+			samples.Where(s => matchesQueues(s.Queues, containerQueues))
+		};
+
+		var tier = tiers.FirstOrDefault(t => t.Any());
+		if (tier == null)
+			return null;
+
+		return tier
+			.OrderBy(s => s.Timestamp)
+			.GroupBy(s => s.Count)
+			.OrderByDescending(g => g.Count())
+			.First().Key;
+	}
+
+	private static bool isExactMatch(IEnumerable<string> queues, string[] containerQueues)
+	{
+		if (containerQueues == null) return queues == null;
+		if (queues == null) return false;
+		return queues.OrderBy(q => q).SequenceEqual(containerQueues.OrderBy(q => q));
 	}
 
 	private static bool matchesQueues(IEnumerable<string> queues, string[] containerQueues)

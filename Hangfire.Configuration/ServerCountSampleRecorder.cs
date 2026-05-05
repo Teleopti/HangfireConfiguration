@@ -13,9 +13,6 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 	private readonly State _state;
 	private readonly StateMaintainer _stateMaintainer;
 	private readonly INow _now;
-	private readonly TimeSpan _samplingInterval = TimeSpan.FromMinutes(10);
-	private readonly TimeSpan _sampleMaxAge = TimeSpan.FromHours(24);
-	private const int _sampleLimit = 6;
 
 	internal ServerCountSampleRecorder(
 		IKeyValueStore store,
@@ -32,7 +29,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 	public void Execute(BackgroundProcessContext context)
 	{
 		Record();
-		context.StoppingToken.Wait(TimeSpan.FromMinutes(10));
+		context.StoppingToken.Wait(ServerCountSamplingPolicy.Interval);
 	}
 
 	public void Record()
@@ -63,14 +60,14 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 
 		var result = samples.Samples.Concat(newSamples);
 
-		var cutoff = now.Subtract(_sampleMaxAge);
+		var cutoff = now.Subtract(ServerCountSamplingPolicy.MaxAge);
 		result = result.Where(s => s.Timestamp > cutoff);
 
 		result = result
 			.GroupBy(s => queuesKey(s.Queues))
 			.SelectMany(g => g
 				.OrderByDescending(x => x.Timestamp)
-				.Take(_sampleLimit)
+				.Take(ServerCountSamplingPolicy.Limit)
 			);
 
 		samples.Samples = result.OrderBy(x => x.Timestamp).ToArray();
@@ -80,7 +77,7 @@ public class ServerCountSampleRecorder : IBackgroundProcess
 
 	private bool isRecent(ServerCountSample sample)
 	{
-		var recentFrom = _now.UtcDateTime().Subtract(_samplingInterval);
+		var recentFrom = _now.UtcDateTime().Subtract(ServerCountSamplingPolicy.Interval);
 		return sample.Timestamp > recentFrom;
 	}
 

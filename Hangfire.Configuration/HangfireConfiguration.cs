@@ -95,7 +95,9 @@ public class HangfireConfiguration
 	private Connector buildConnector() =>
 		new(_state.ReadOptions().ConnectionString);
 
-	private WorkerBalancer buildWorkerBalancer() => new(BuildKeyValueStore());
+	private WorkerBalancer buildWorkerBalancer() => new(buildServerCountCalculator());
+
+	private ServerCountCalculator buildServerCountCalculator() => new(BuildKeyValueStore(), BuildNow());
 
 	private QueueCalculator buildQueueCalculator() => new(BuildOptions());
 
