@@ -15,13 +15,14 @@ internal class WorkerBalancer
 	internal int CalculateWorkerCount(
 		IMonitoringApi monitor,
 		ContainerConfiguration container,
+		string[] appliedQueues,
 		WorkerBalancerOptions options)
 	{
 		var goal = container.GoalWorkerCount ?? options.DefaultGoalWorkerCount;
 		if (goal > options.MaximumGoalWorkerCount)
 			goal = options.MaximumGoalWorkerCount;
 
-		var serverCount = _serverCountCalculator.ServerCount(monitor, container.Queues, options);
+		var serverCount = _serverCountCalculator.ServerCount(monitor, appliedQueues, options);
 
 		var workerCount = Convert.ToInt32(Math.Ceiling(goal / (decimal) serverCount));
 

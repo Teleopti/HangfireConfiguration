@@ -118,6 +118,7 @@ public class BackgroundJobServerStarter
 			_workerBalancer.CalculateWorkerCount(
 				configurationState.MonitoringApi,
 				container,
+				serverOptions.Queues,
 				options.WorkerBalancerOptions
 			);
 	}

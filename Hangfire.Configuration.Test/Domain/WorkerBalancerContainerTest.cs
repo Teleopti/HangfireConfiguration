@@ -4,7 +4,7 @@ using SharpTestsEx;
 
 namespace Hangfire.Configuration.Test.Domain;
 
-public class ContainerConfigurationBalancerTest
+public class WorkerBalancerContainerTest
 {
 	[Test]
 	public void ShouldGetFullGoalOnFirstStartup()
@@ -429,5 +429,44 @@ public class ContainerConfigurationBalancerTest
 
 		var server = system.Hangfire.StartedServers.Single();
 		server.options.WorkerCount.Should().Be(10);
+	}
+
+	[Test]
+	public void ShouldUseAppliedQueuesNotStoredQueuesWhenMatchingSamples()
+	{
+		var system = new SystemUnderTest();
+		system.UseServerOptions(new BackgroundJobServerOptions
+		{
+			Queues = ["default", "reports"]
+		});
+		system.WithServerCountSample(new ServerCountSample
+		{
+			Count = 4,
+			Queues = ["reports"]
+		});
+		system.WithConfiguration(new StoredConfiguration
+		{
+			Containers =
+			[
+				new ContainerConfiguration
+				{
+					Tag = DefaultContainerTag.Tag(),
+					Queues = null,
+					GoalWorkerCount = 12
+				},
+				new ContainerConfiguration
+				{
+					Tag = "reports",
+					Queues = ["reports"],
+					GoalWorkerCount = 20
+				}
+			]
+		});
+
+		system.StartBackgroundJobServers();
+
+		var server = system.Hangfire.StartedServers.Single();
+		server.options.Queues.Should().Have.SameSequenceAs(["default"]);
+		server.options.WorkerCount.Should().Be(12);
 	}
 }
