@@ -46,6 +46,19 @@ public class ConfigurationPage
 		return _content.ToString();
 	}
 
+	public string BuildAppliedQueuesOobSwap(int configurationId, int excludeContainerIndex)
+	{
+		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
+		var configuration = configurations.Single(x => x.Id == configurationId);
+		for (var i = 0; i < configuration.Containers.Length; i++)
+		{
+			if (i == excludeContainerIndex)
+				continue;
+			writeAppliedQueues(configuration, configuration.Containers[i], i, oobSwap: true);
+		}
+		return _content.ToString();
+	}
+
 	public string BuildCreateContainer(int configurationId)
 	{
 		var configurations = _viewModelBuilder.BuildServerConfigurations().ToArray();
@@ -123,7 +136,6 @@ public class ConfigurationPage
 		var checkedAttr = container.WorkerBalancerEnabled ? "checked" : "";
 		var legend = string.IsNullOrEmpty(container.Tag) ? "Container" : $"Container - {container.Tag}";
 		var selectedQueues = container.SelectedQueues ?? [];
-		var appliedQueues = container.AppliedQueues ?? [];
 
 		write($@"
 <div class='container'>
@@ -145,12 +157,12 @@ public class ConfigurationPage
 			write($"<label><input type='checkbox' name='queues' value='{queue}' {queueChecked}> {queue}</label>");
 		}
 
-		var appliedText = appliedQueues.Any() ? string.Join(", ", appliedQueues) : "(none)";
 		write($@"
     </div>
     <div>
-        <label style='width: 126px'>Applied queues: </label>
-        <span>{appliedText}</span>
+        <label style='width: 126px'>Applied queues: </label>");
+		writeAppliedQueues(configuration, container, containerIndex, oobSwap: false);
+		write($@"
     </div>
     <div>
         <label for='workerBalancerEnabled_{containerIndex}' style='width: 126px'>Worker balancer: </label>
@@ -184,6 +196,15 @@ public class ConfigurationPage
 </form>
 </fieldset>
 </div>");
+	}
+
+	private void writeAppliedQueues(ViewModel configuration, ContainerViewModel container, int containerIndex, bool oobSwap)
+	{
+		var appliedQueues = container.AppliedQueues ?? [];
+		var appliedText = appliedQueues.Any() ? string.Join(", ", appliedQueues) : "(none)";
+		var id = $"applied-queues-{configuration.Id}-{containerIndex}";
+		var oobAttr = oobSwap ? " hx-swap-oob='true'" : "";
+		write($"<span id='{id}'{oobAttr}>{appliedText}</span>");
 	}
 
 	private void writeCreateContainerForm(ViewModel configuration)

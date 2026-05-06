@@ -199,6 +199,7 @@ public class ConfigurationMiddleware
 		_configurationApi.WriteContainer(command);
 
 		display(c, p => p.BuildContainer(configurationId, command.ContainerIndex));
+		display(c, p => p.BuildAppliedQueuesOobSwap(configurationId, command.ContainerIndex));
 		display(c, p => p.Message("Container saved successfully!"));
 	}
 
