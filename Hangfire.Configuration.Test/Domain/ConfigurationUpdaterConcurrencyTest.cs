@@ -148,7 +148,6 @@ internal class HookableFakeKeyValueStore : IKeyValueStore
 {
 	private readonly FakeKeyValueStore _inner = new();
 	private bool _inTransaction;
-	private bool _runningHook;
 	private Action _beforeNextReadPrefixInTransaction;
 	private Action _afterNextReadPrefix;
 
@@ -166,30 +165,26 @@ internal class HookableFakeKeyValueStore : IKeyValueStore
 	public void Transaction(Action action)
 	{
 		_inTransaction = true;
-		try { _inner.Transaction(action); }
-		finally { _inTransaction = false; }
+		_inner.Transaction(action);
+		_inTransaction = false;
 	}
 
 	public IEnumerable<string> ReadPrefix(string key)
 	{
-		if (_inTransaction && !_runningHook && _beforeNextReadPrefixInTransaction != null)
+		if (_inTransaction && _beforeNextReadPrefixInTransaction != null)
 		{
 			var hook = _beforeNextReadPrefixInTransaction;
 			_beforeNextReadPrefixInTransaction = null;
-			_runningHook = true;
-			try { hook(); }
-			finally { _runningHook = false; }
+			hook();
 		}
 
 		var result = _inner.ReadPrefix(key).ToArray();
 
-		if (!_runningHook && _afterNextReadPrefix != null)
+		if (_afterNextReadPrefix != null)
 		{
 			var hook = _afterNextReadPrefix;
 			_afterNextReadPrefix = null;
-			_runningHook = true;
-			try { hook(); }
-			finally { _runningHook = false; }
+			hook();
 		}
 
 		return result;
