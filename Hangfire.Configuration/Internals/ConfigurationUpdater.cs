@@ -27,35 +27,38 @@ internal class ConfigurationUpdater
 
 		_state.ConfigurationUpdaterRan = true;
 
-		// First pass: check for changes without transaction/lock
-		var configurations = _storage.ReadConfigurations();
-		var changes = createChanges(configurations);
+		// First pass: check for changes against the caller's snapshot, without
+		// transaction/lock and without re-reading storage. Re-reading here would open
+		// a race where a concurrent writer fixes storage between the caller's read and
+		// ours, leading us to report "no changes" against a snapshot the caller never
+		// sees. The transactional second pass below still re-reads under the lock for
+		// the actual write decision.
+		var changes = createChanges(stored);
 		performUpdates(options, changes);
 
 		if (!changes.Any(x => x.Changed))
 			return false;
 
 		// Second pass: apply changes with transaction/lock
-		var updated = false;
-
 		_storage.Transaction(() =>
 		{
 			_storage.LockConfiguration();
 
-			configurations = _storage.ReadConfigurations();
+			var configurations = _storage.ReadConfigurations();
 			changes = createChanges(configurations);
 			performUpdates(options, changes);
 
 			changes
 				.Where(x => x.Changed)
-				.ForEach(x =>
-				{
-					updated = true;
-					_storage.WriteConfiguration(x.Configuration);
-				});
+				.ForEach(x => _storage.WriteConfiguration(x.Configuration));
 		});
 
-		return updated;
+		// The first pass detected that the caller's snapshot is out of sync with
+		// storage. The transactional second pass may have found nothing left to write
+		// because another writer (e.g. another pod during a rolling deploy) committed
+		// an equivalent fix between the two passes — but the caller's snapshot is
+		// still stale either way and the caller must re-read.
+		return true;
 	}
 
 	private List<ConfigurationChange> createChanges(IEnumerable<StoredConfiguration> configurations) =>
