@@ -96,7 +96,7 @@ public class ConfigurationUpdaterConcurrencyTest
 
 		var system = new SystemUnderTestWithRaceHook();
 
-		// Pre-existing row with the connection string cleared by DBManager.
+		// Pre-existing row with the connection string cleared by something else.
 		system.WithConfiguration(new StoredConfiguration
 		{
 			Name = DefaultConfigurationName.Name(),
