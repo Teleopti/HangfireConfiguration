@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Linq;
+using Dapper;
 using Hangfire;
 using Hangfire.Configuration;
 using Hangfire.PostgreSql;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Hosting;
+using Npgsql;
 
 namespace ConsoleSample;
 
@@ -16,6 +19,8 @@ public static class Program
 	public static void Main()
 	{
 		DatabaseSelection = SelectDatabaseConfiguration();
+
+		EnsureDatabaseExists(DatabaseSelection);
 
 		Console.WriteLine("Starting site on " + NodeAddress);
 
@@ -117,5 +122,48 @@ public static class Program
 				}
 			}
 		}
+	}
+
+	private static void EnsureDatabaseExists(DatabaseSelection db)
+	{
+		if (db.StorageOptions is SqlServerStorageOptions)
+			EnsureSqlServerDatabase(db.ConfigurationConnectionString);
+		else if (db.StorageOptions is PostgreSqlStorageOptions)
+			EnsurePostgresDatabase(db.ConfigurationConnectionString);
+	}
+
+	private static void EnsureSqlServerDatabase(string connectionString)
+	{
+		var database = new SqlConnectionStringBuilder(connectionString).InitialCatalog;
+		var master = new SqlConnectionStringBuilder(connectionString) {InitialCatalog = "master"}.ToString();
+		using var c = new SqlConnection(master);
+		c.Open();
+		var exists = c.QuerySingleOrDefault<int?>($"SELECT db_id('{database}')") != null;
+		if (!exists)
+		{
+			Console.WriteLine($"Creating database [{database}]...");
+			c.Execute($"CREATE DATABASE [{database}]");
+		}
+
+		using var db = new SqlConnection(connectionString);
+		HangfireConfigurationSchemaInstaller.Install(db);
+	}
+
+	private static void EnsurePostgresDatabase(string connectionString)
+	{
+		var database = new NpgsqlConnectionStringBuilder(connectionString).Database;
+		var master = new NpgsqlConnectionStringBuilder(connectionString) {Database = "postgres"}.ToString();
+		using var c = new NpgsqlConnection(master);
+		c.Open();
+		var exists = c.QuerySingleOrDefault<int?>(
+			$"SELECT 1 FROM pg_database WHERE datname = '{database}'") != null;
+		if (!exists)
+		{
+			Console.WriteLine($"Creating database \"{database}\"...");
+			c.Execute($@"CREATE DATABASE ""{database}""");
+		}
+
+		using var db = new NpgsqlConnection(connectionString);
+		HangfireConfigurationSchemaInstaller.Install(db);
 	}
 }
