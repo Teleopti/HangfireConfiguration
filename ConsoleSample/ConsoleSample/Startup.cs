@@ -22,7 +22,6 @@ public class Startup
 	}
 
 	public void Configure(IApplicationBuilder app)
-
 	{
 		GlobalConfiguration.Configuration
 			.UseColouredConsoleLogProvider()
@@ -45,7 +44,7 @@ public class Startup
 			// simulate a hosting site with a static file handler
 			if (context.Request.Path.Value.Split('/').Last().Contains("."))
 			{
-				context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+				context.Response.StatusCode = (int)HttpStatusCode.NotFound;
 				return Task.CompletedTask;
 			}
 
