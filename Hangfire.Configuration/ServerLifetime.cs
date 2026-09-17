@@ -32,8 +32,8 @@ internal sealed class ServerLifetime : IDisposable
 		foreach (var server in _servers)
 			server.Dispose();
 	}
-	
-	internal static void HookApplicationLifetime(object appBuilder, ServerLifetime servers)
+
+	internal static void HookApplicationLifetime(object appBuilder, Action sendStop, Action dispose)
 	{
 		if (appBuilder == null)
 			return;
@@ -42,14 +42,13 @@ internal sealed class ServerLifetime : IDisposable
 		var token = context.Get<CancellationToken>("host.OnAppDisposing");
 		if (token == default)
 			token = context.Get<CancellationToken>("server.OnDispose");
-		token.Register(servers.Dispose);
+		token.Register(dispose);
 #else
 		var lifetime = ((IApplicationBuilder) appBuilder).ApplicationServices?.GetRequiredService<IApplicationLifetime>();
 		if (lifetime == null)
 			return;
-		lifetime.ApplicationStopping.Register(servers.SendStop);
-		lifetime.ApplicationStopped.Register(servers.Dispose);
+		lifetime.ApplicationStopping.Register(sendStop);
+		lifetime.ApplicationStopped.Register(dispose);
 #endif
 	}
-
 }

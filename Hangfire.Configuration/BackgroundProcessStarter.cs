@@ -34,7 +34,7 @@ public class BackgroundProcessStarter
 		var server = _hangfire.StartBackgroundProcesses(configuration.JobStorage, additionalProcesses);
 
 		var lifetime = new ServerLifetime([server]);
-		ServerLifetime.HookApplicationLifetime(_appBuilder, lifetime);
+		ServerLifetime.HookApplicationLifetime(_appBuilder, lifetime.SendStop, lifetime.Dispose);
 		return lifetime;
 	}
 }

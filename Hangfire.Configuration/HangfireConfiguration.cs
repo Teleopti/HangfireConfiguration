@@ -119,7 +119,8 @@ public class HangfireConfiguration
 			_state,
 			buildServerCountSampleRecorder(),
 			_builder,
-			buildQueueCalculator());
+			buildQueueCalculator(),
+			BuildNow());
 
 	protected BackgroundProcessStarter BuildBackgroundProcessStarter() =>
 		new(BuildHangfire(),

@@ -9,11 +9,11 @@ public class FakeHangfire(FakeMonitoringApi monitoringApi) : IHangfire
 {
     public FakeJobStorage LastCreatedStorage => CreatedStorages.LastOrDefault();
     public IEnumerable<FakeJobStorage> CreatedStorages = Enumerable.Empty<FakeJobStorage>();
-
     public List<(
         FakeJobStorage storage,
         BackgroundJobServerOptions options,
-        IBackgroundProcess[] backgroundProcesses
+        IBackgroundProcess[] backgroundProcesses,
+        FakeBackgroundProcessingServer server
         )> StartedServers = new();
 
     public List<(
@@ -26,8 +26,9 @@ public class FakeHangfire(FakeMonitoringApi monitoringApi) : IHangfire
         BackgroundJobServerOptions options,
         IBackgroundProcess[] additionalProcesses)
     {
-        StartedServers.Add((storage as FakeJobStorage, options, additionalProcesses));
-        return null;
+        var server = new FakeBackgroundProcessingServer();
+        StartedServers.Add((storage as FakeJobStorage, options, additionalProcesses, server));
+        return server;
     }
 
     public IBackgroundProcessingServer StartBackgroundProcesses(

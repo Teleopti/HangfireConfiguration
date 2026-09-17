@@ -12,6 +12,8 @@ public class ConfigurationOptions
 
 	public WorkerBalancerOptions WorkerBalancerOptions { get; } = new();
 
+	public bool RecycleBackgroundJobServers { get; set; }
+
 	public string ContainerTag { get; set; }
 
 #if NETSTANDARD2_0

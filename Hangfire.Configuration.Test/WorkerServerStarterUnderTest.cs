@@ -1,23 +1,24 @@
+using System;
 using Hangfire.Server;
 
 namespace Hangfire.Configuration.Test;
 
 public class BackgroundJobServerStarterUnderTest(BackgroundJobServerStarter instance, Options options)
 {
-	public void Start() => 
+	public IDisposable Start() => 
 		instance.Start();
 
-	public void Start(IBackgroundProcess additionalProcess) => 
+	public IDisposable Start(IBackgroundProcess additionalProcess) => 
 		instance.Start(additionalProcess.AsArray());
 
-	public void Start(IBackgroundProcess[] additionalProcesses) => 
+	public IDisposable Start(IBackgroundProcess[] additionalProcesses) => 
 		instance.Start(additionalProcesses);
 
-	public void Start(ConfigurationOptions options1)
+	public IDisposable Start(ConfigurationOptions options1)
 	{
 		if (string.IsNullOrEmpty(options1.ConnectionString))
 			options1.ConnectionString = new ConfigurationOptionsForTest().ConnectionString;
 		options.UseOptions(options1);
-		instance.Start();
+		return instance.Start();
 	}
 }

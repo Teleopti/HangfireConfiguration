@@ -15,6 +15,7 @@ public class BackgroundJobServerStarter
 	private readonly ServerCountSampleRecorder _recorder;
 	private readonly object _appBuilder;
 	private readonly QueueCalculator _queueCalculator;
+	private readonly INow _now;
 
 	internal BackgroundJobServerStarter(
 		IHangfire hangfire,
@@ -23,7 +24,8 @@ public class BackgroundJobServerStarter
 		State state,
 		ServerCountSampleRecorder recorder,
 		object appBuilder,
-		QueueCalculator queueCalculator)
+		QueueCalculator queueCalculator,
+		INow now)
 	{
 		_hangfire = hangfire;
 		_workerBalancer = workerBalancer;
@@ -32,11 +34,27 @@ public class BackgroundJobServerStarter
 		_recorder = recorder;
 		_appBuilder = appBuilder;
 		_queueCalculator = queueCalculator;
+		_now = now;
 	}
 
 	public IDisposable Start() => Start(null);
 
 	public IDisposable Start(IBackgroundProcess[] additionalProcesses)
+	{
+		if (!_state.ReadOptions().RecycleBackgroundJobServers)
+		{
+			var lifetime = startServers(additionalProcesses);
+			ServerLifetime.HookApplicationLifetime(_appBuilder, lifetime.SendStop, lifetime.Dispose);
+			return lifetime;
+		}
+
+		var recycler = new BackgroundJobServerRecycler(() => startServers(additionalProcesses), _now);
+		recycler.Start();
+		ServerLifetime.HookApplicationLifetime(_appBuilder, recycler.SendStop, recycler.Dispose);
+		return recycler;
+	}
+
+	private ServerLifetime startServers(IBackgroundProcess[] additionalProcesses)
 	{
 		var options = _state.ReadOptions();
 		var backgroundProcesses = new List<IBackgroundProcess>();
@@ -54,9 +72,7 @@ public class BackgroundJobServerStarter
 			.Where(x => x != null)
 			.ToArray();
 
-		var lifetime = new ServerLifetime(servers);
-		ServerLifetime.HookApplicationLifetime(_appBuilder, lifetime);
-		return lifetime;
+		return new ServerLifetime(servers);
 	}
 
 	private IBackgroundProcessingServer startBackgroundJobServer(
